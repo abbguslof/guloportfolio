@@ -1567,22 +1567,32 @@ ${escapeHtml(node.content)}
       },
 
       bg: (args) => {
-        const mode = (args[0] || '').toLowerCase().trim();
-        const validModes = ['topo', 'shimmer', 'ascii', 'dither', 'off'];
+        let mode = (args[0] || '').toLowerCase().trim();
+        if (mode === 'pixel') mode = 'blocky';
+        if (mode === 'noise') mode = 'shimmer';
+        const validModes = ['topo', 'dither', 'ascii', 'dots', 'blocky', 'shimmer', 'off'];
         const _l = getSiteLang();
         if (!mode) {
           const current = localStorage.getItem('site_bg_mode') || 'topo';
           return `
 <div class="space-y-1 font-mono text-xs">
   <div>${_l === 'sv' ? 'Aktiv bakgrundsstil:' : 'Active background style:'} <span class="text-[#10b981] font-bold">${escapeHtml(current)}</span></div>
-  <div class="text-[#8b949e]">${_l === 'sv' ? 'Välj stil:' : 'Select style:'} <code class="text-[#38bdf8]">bg topo</code>, <code class="text-[#38bdf8]">bg shimmer</code>, <code class="text-[#38bdf8]">bg ascii</code>, <code class="text-[#38bdf8]">bg dither</code>, <code class="text-[#38bdf8]">bg off</code></div>
+  <div class="text-[#8b949e]">${_l === 'sv' ? 'Tillgängliga stilar:' : 'Available styles:'} 
+    <code class="text-[#38bdf8]">bg topo</code>, 
+    <code class="text-[#38bdf8]">bg dither</code>, 
+    <code class="text-[#38bdf8]">bg ascii</code>, 
+    <code class="text-[#38bdf8]">bg dots</code>, 
+    <code class="text-[#38bdf8]">bg pixel</code>, 
+    <code class="text-[#38bdf8]">bg shimmer</code>, 
+    <code class="text-[#38bdf8]">bg off</code>
+  </div>
 </div>`;
         }
         if (validModes.includes(mode)) {
           window.dispatchEvent(new CustomEvent('set-bg-mode', { detail: mode }));
           return `<div class="text-[#10b981] font-mono">${_l === 'sv' ? 'Bakgrundsstil ändrad till:' : 'Background style set to:'} <span class="font-bold">${escapeHtml(mode)}</span></div>`;
         }
-        return `<div class="text-[#f85149] font-mono">${_l === 'sv' ? 'Ogiltig stil. Välj mellan: topo, shimmer, ascii, dither, off.' : 'Invalid style. Choose from: topo, shimmer, ascii, dither, off.'}</div>`;
+        return `<div class="text-[#f85149] font-mono">${_l === 'sv' ? 'Ogiltig stil. Välj mellan: topo, dither, ascii, dots, pixel, shimmer, off.' : 'Invalid style. Choose from: topo, dither, ascii, dots, pixel, shimmer, off.'}</div>`;
       },
 
       date: () => `<div class="text-[#8b949e]">${new Date().toLocaleString(getSiteLang() === 'sv' ? 'sv-SE' : 'en-GB')} (Europe/Stockholm)</div>`,
