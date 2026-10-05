@@ -6,6 +6,7 @@ category: "School"
 tech: ["Rust", "C", "RISC-V", "Operating Systems", "GDB"]
 repoUrl: "https://github.com"
 order: 2
+featured: true
 ---
 
 Utvecklad som en del av operativsystem- och datorteknikspåret på Datateknik vid Chalmers Tekniska Högskola.

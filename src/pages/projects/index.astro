@@ -2,6 +2,7 @@
 // src/pages/projects/index.astro - Fullständig Portfolio- & Projektöversikt
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
+import InteractiveTerminal from '../../components/InteractiveTerminal.astro';
 import Footer from '../../components/Footer.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
@@ -18,6 +19,9 @@ const categories = ['Alla', 'School', 'Homelab', 'Minecraft'];
   description="Portfolio över systemprogrammering, Chalmers Datateknik, Minecraft-infrastruktur och homelab."
 >
   <Header />
+
+  <!-- Global terminal on subpages (opens on header button click) -->
+  <InteractiveTerminal isSubpage={true} />
 
   <main class="w-full max-w-6xl mx-auto py-4 space-y-10">
     <!-- Breadcrumb & Top Header -->

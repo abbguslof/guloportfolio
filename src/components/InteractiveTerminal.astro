@@ -1,65 +1,77 @@
 ---
-// InteractiveTerminal.astro - High-res Chafa terminal portrait, realistic Bash, and perfected window ergonomics
+// InteractiveTerminal.astro - Ergonomic TUI Terminal with snug Chafa portrait, global subpage support, and fixed window states
+interface Props {
+  isSubpage?: boolean;
+}
+
+const { isSubpage = false } = Astro.props;
 ---
 
-<section id="terminal-section" class="w-full mb-10" aria-label="Interaktiv TUI Terminal">
-  <!-- Static Human-Readable "About Me" Card (Shown when terminal is closed via ✕) -->
-  <div 
-    id="terminal-closed-card" 
-    class="hidden mb-6 p-6 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#10b981]/60 transition-all shadow-xl"
-  >
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 mb-4 border-b border-[#30363d] gap-3">
-      <div class="flex items-center gap-3">
-        <span class="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse"></span>
-        <h2 class="text-sm font-mono font-bold tracking-wider uppercase text-[#e6edf3]">
-          Vem är gulo? // Om mig &amp; bakgrund
-        </h2>
+<section 
+  id="terminal-section" 
+  class={`w-full ${isSubpage ? 'hidden mb-8' : 'mb-10'}`} 
+  data-is-subpage={isSubpage ? 'true' : 'false'}
+  aria-label="Interaktiv TUI Terminal"
+>
+  <!-- Static Human-Readable "About Me" Card (Only on homepage when terminal is closed via ✕) -->
+  {!isSubpage && (
+    <div 
+      id="terminal-closed-card" 
+      class="hidden mb-6 p-6 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#10b981]/60 transition-all shadow-xl"
+    >
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 mb-4 border-b border-[#30363d] gap-3">
+        <div class="flex items-center gap-3">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse"></span>
+          <h2 class="text-sm font-mono font-bold tracking-wider uppercase text-[#e6edf3]">
+            Vem är gulo? // Om mig &amp; bakgrund
+          </h2>
+        </div>
+        <button 
+          type="button" 
+          id="btn-reopen-terminal" 
+          class="text-xs font-mono px-3 py-1.5 rounded bg-[#0d1117] border border-[#30363d] text-[#10b981] hover:border-[#10b981] hover:bg-[#10b981]/10 transition-all cursor-pointer flex items-center gap-2 self-start sm:self-auto"
+        >
+          <span>&gt;_</span>
+          <span>Öppna terminalen igen</span>
+        </button>
       </div>
-      <button 
-        type="button" 
-        id="btn-reopen-terminal" 
-        class="text-xs font-mono px-3 py-1.5 rounded bg-[#0d1117] border border-[#30363d] text-[#10b981] hover:border-[#10b981] hover:bg-[#10b981]/10 transition-all cursor-pointer flex items-center gap-2 self-start sm:self-auto"
-      >
-        <span>&gt;_</span>
-        <span>Öppna terminalen igen</span>
-      </button>
+
+      <!-- Structured Biography -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs sm:text-sm font-mono">
+        <div class="space-y-3">
+          <div>
+            <span class="text-[#38bdf8] font-semibold block mb-0.5">Chalmers Tekniska Högskola</span>
+            <p class="text-[#e6edf3] leading-relaxed">
+              Läser andra året på civilingenjörsprogrammet i <strong class="text-[#10b981]">Datateknik</strong>. Fokus på operativsystem, minneshantering, distribuerade system och lågnivå C/Rust.
+            </p>
+          </div>
+
+          <div>
+            <span class="text-[#38bdf8] font-semibold block mb-0.5">Kapplöpningssimning</span>
+            <p class="text-[#e6edf3] leading-relaxed">
+              Aktiv simmare med hemmabassäng i Valhallabadet (5-6 pass/vecka). Simningen ger den mentala disciplinen och fokuset som krävs för att lösa komplexa problem.
+            </p>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <span class="text-[#38bdf8] font-semibold block mb-0.5">Homelab &amp; Servrar</span>
+            <p class="text-[#e6edf3] leading-relaxed">
+              Driftar ett eget Minecraft-kluster (PaperMC 1.20 SMP) på Debian 12 med isolerade Docker-containers, automatiserade zstd-backuper och WireGuard VPN.
+            </p>
+          </div>
+
+          <div>
+            <span class="text-[#38bdf8] font-semibold block mb-0.5">Kreativt, Foto &amp; Gaming</span>
+            <p class="text-[#e6edf3] leading-relaxed">
+              Fotograferar analogt på 35mm film, bygger Neovim dotfiles i Lua, spelar co-op och meckar med Linux-miljöer (Arch + Hyprland).
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <!-- Structured Biography -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs sm:text-sm font-mono">
-      <div class="space-y-3">
-        <div>
-          <span class="text-[#38bdf8] font-semibold block mb-0.5">Chalmers Tekniska Högskola</span>
-          <p class="text-[#e6edf3] leading-relaxed">
-            Läser andra året på civilingenjörsprogrammet i <strong class="text-[#10b981]">Datateknik</strong>. Fokus på operativsystem, minneshantering, distribuerade system och lågnivå C/Rust.
-          </p>
-        </div>
-
-        <div>
-          <span class="text-[#38bdf8] font-semibold block mb-0.5">Kapplöpningssimning</span>
-          <p class="text-[#e6edf3] leading-relaxed">
-            Aktiv simmare med hemmabassäng i Valhallabadet (5-6 pass/vecka). Simningen ger den mentala disciplinen och fokuset som krävs för att lösa komplexa problem.
-          </p>
-        </div>
-      </div>
-
-      <div class="space-y-3">
-        <div>
-          <span class="text-[#38bdf8] font-semibold block mb-0.5">Homelab &amp; Servrar</span>
-          <p class="text-[#e6edf3] leading-relaxed">
-            Driftar ett eget Minecraft-kluster (PaperMC 1.20 SMP) på Debian 12 med isolerade Docker-containers, automatiserade zstd-backuper och WireGuard VPN.
-          </p>
-        </div>
-
-        <div>
-          <span class="text-[#38bdf8] font-semibold block mb-0.5">Kreativt, Foto &amp; Gaming</span>
-          <p class="text-[#e6edf3] leading-relaxed">
-            Fotograferar analogt på 35mm film, bygger Neovim dotfiles i Lua, spelar co-op och meckar med Linux-miljöer (Arch + Hyprland).
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
+  )}
 
   <!-- Terminal Window Container -->
   <div 
@@ -70,7 +82,7 @@
     <div 
       id="terminal-titlebar"
       class="flex items-center justify-between px-4 py-2.5 bg-[#0d1117] border-b border-[#30363d] select-none cursor-pointer"
-      title="Klicka för att fälla ut om minimerad, eller dubbelklicka för fullskärm"
+      title="Klicka var som helst på listen för att fälla ut om minimerad, eller dubbelklicka för fullskärm"
     >
       <!-- Real Interactive Window Action Buttons -->
       <div class="flex items-center space-x-2">
@@ -78,7 +90,7 @@
           type="button" 
           id="btn-win-close" 
           class="w-3.5 h-3.5 rounded-full bg-[#f85149] hover:brightness-125 transition-all flex items-center justify-center text-[9px] font-bold text-[#0d1117] group cursor-pointer" 
-          title="Stäng terminalen (visar läsbar Om mig-text)"
+          title="Stäng terminalen"
           aria-label="Stäng terminal"
         >
           <span class="opacity-0 group-hover:opacity-100 transition-opacity leading-none">✕</span>
@@ -87,7 +99,7 @@
           type="button" 
           id="btn-win-minimize" 
           class="w-3.5 h-3.5 rounded-full bg-[#f59e0b] hover:brightness-125 transition-all flex items-center justify-center text-[9px] font-bold text-[#0d1117] group cursor-pointer" 
-          title="Minimera fönstret (klicka listen för att öppna igen)"
+          title="Minimera fönstret"
           aria-label="Minimera terminal"
         >
           <span class="opacity-0 group-hover:opacity-100 transition-opacity leading-none">−</span>
@@ -121,85 +133,151 @@
     </div>
 
     <!-- Terminal Collapsible Body -->
-    <div id="terminal-body" class="p-4 sm:p-6 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto transition-all">
-      <!-- Fastfetch / Chafa Terminal Portrait & High Contrast Specs -->
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 pb-6 border-b border-[#30363d]/80 items-center">
-        <!-- High-Res Chafa Dithered CRT Terminal Portrait -->
-        <div class="md:col-span-4 flex flex-col items-center sm:items-start justify-center">
-          <div class="relative w-36 h-36 sm:w-44 sm:h-44 rounded-lg overflow-hidden border border-[#30363d] bg-[#0d1117] shadow-xl group">
-            <img 
-              src="/images/avatar.jpg" 
-              alt="gulo — dev & swimmer avatar" 
-              class="w-full h-full object-cover grayscale contrast-125 brightness-95 group-hover:grayscale-0 group-hover:brightness-105 transition-all duration-300"
-            />
-            <!-- CRT scanline & green phosphor tint effect -->
-            <div class="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-emerald-500/5 to-transparent opacity-60 mix-blend-overlay"></div>
-            <!-- Chafa graphics protocol badge -->
-            <div class="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-[#0d1117]/90 border border-[#30363d] text-[10px] text-[#10b981] font-mono shadow">
-              [chafa:six]
+    <div id="terminal-body" class="p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto transition-all">
+      <!-- High-Density TUI Fastfetch Cockpit (Eliminates all dead space and negative voids) -->
+      <div class="flex flex-col sm:flex-row items-stretch gap-4 pb-4 border-b border-[#30363d]/80">
+        <!-- Chafa Dithered CRT Terminal Identity Card (Fixed snug width, matched height) -->
+        <div class="shrink-0 flex flex-col justify-between w-full sm:w-44 md:w-48 bg-[#0d1117] p-2.5 rounded border border-[#30363d] shadow-sm">
+          <div>
+            <!-- Panel header -->
+            <div class="flex items-center justify-between pb-1.5 mb-2 border-b border-[#30363d] text-[10px] text-[#8b949e]">
+              <span class="text-[#10b981] font-bold">~/.face.six</span>
+              <span class="text-[9px] px-1 py-0.5 rounded bg-[#161b22] border border-[#30363d] text-[#38bdf8]">CHAFA</span>
+            </div>
+
+            <!-- CRT Scanline Portrait -->
+            <div class="relative w-full aspect-square rounded border border-[#30363d] overflow-hidden group shadow-inner bg-[#161b22]">
+              <img 
+                src="/images/avatar.jpg" 
+                alt="gulo — dev & swimmer avatar" 
+                class="w-full h-full object-cover grayscale contrast-125 brightness-95 group-hover:grayscale-0 group-hover:brightness-105 transition-all duration-300"
+              />
+              <!-- CRT phosphor scanline effect -->
+              <div class="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-emerald-500/5 to-transparent opacity-60 mix-blend-overlay"></div>
             </div>
           </div>
-          <div class="mt-2 text-[11px] text-[#8b949e] font-mono flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span>
-            <span>gulo@chalmers-box</span>
+
+          <!-- Identity metadata block directly below avatar (Zero empty space) -->
+          <div class="mt-2 pt-2 border-t border-[#30363d] space-y-1 text-[10px] text-[#8b949e]">
+            <div class="flex items-center justify-between">
+              <span>IDENT:</span>
+              <span class="text-[#e6edf3] font-semibold">gulo // 0x47</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span>HOST:</span>
+              <span class="text-[#38bdf8]">chalmers-d24</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span>SWIM:</span>
+              <span class="text-[#10b981]">valhalla 50m</span>
+            </div>
+            <!-- Terminal 6-color ANSI palette test bar -->
+            <div class="flex items-center justify-between pt-1 gap-1" title="Terminal 16-color test">
+              <span class="h-2 flex-1 rounded-xs bg-[#f85149]"></span>
+              <span class="h-2 flex-1 rounded-xs bg-[#10b981]"></span>
+              <span class="h-2 flex-1 rounded-xs bg-[#f59e0b]"></span>
+              <span class="h-2 flex-1 rounded-xs bg-[#38bdf8]"></span>
+              <span class="h-2 flex-1 rounded-xs bg-[#a78bfa]"></span>
+              <span class="h-2 flex-1 rounded-xs bg-[#e6edf3]"></span>
+            </div>
           </div>
         </div>
 
-        <!-- High-Contrast Personal Specs -->
-        <div class="md:col-span-8 space-y-2 text-xs sm:text-sm">
-          <div class="pb-1 border-b border-[#30363d]/60 flex items-center justify-between">
-            <div>
+        <!-- Balanced Two-Column Specification Pane (Fills horizontal space cleanly) -->
+        <div class="flex-1 min-w-0 flex flex-col justify-between space-y-2.5">
+          <!-- Top bar: User & Machine -->
+          <div class="pb-1.5 border-b border-[#30363d] flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
               <span class="text-[#10b981] font-bold text-sm">gulo</span>
               <span class="text-[#8b949e]">@</span>
-              <span class="text-[#38bdf8] font-bold text-sm">chalmers-workstation</span>
+              <span class="text-[#38bdf8] font-bold text-sm">chalmers-station</span>
+              <span class="text-[10px] px-1.5 py-0.2 rounded bg-[#0d1117] border border-[#30363d] text-[#8b949e]">Debian 12</span>
             </div>
-            <span class="text-[11px] text-[#8b949e]">Göteborg, Sverige</span>
+            <div class="flex items-center gap-2 text-[11px] text-[#8b949e]">
+              <span>Göteborg, Sverige</span>
+              <span>•</span>
+              <span class="text-[#10b981] font-medium flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse"></span>
+                ONLINE
+              </span>
+            </div>
           </div>
 
-          <div class="grid grid-cols-[120px_1fr] gap-x-2 pt-1">
-            <span class="text-[#38bdf8] font-medium">Utbildning:</span>
-            <span class="text-[#e6edf3]">Civilingenjör Datateknik @ Chalmers Tekniska Högskola (Åk 2)</span>
+          <!-- Two-Column High-Density Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-xs">
+            <!-- Column 1: Profil, Studier & Simning -->
+            <div class="space-y-1.5">
+              <div class="text-[10px] uppercase font-bold text-[#38bdf8] tracking-wider pb-0.5 border-b border-[#30363d]/40">
+                [PROFIL &amp; STUDIER]
+              </div>
+              <div class="grid grid-cols-[90px_1fr] gap-x-1.5 items-baseline">
+                <span class="text-[#8b949e] font-medium">Utbildning:</span>
+                <span class="text-[#e6edf3]">Civilingenjör Datateknik @ Chalmers (Åk 2)</span>
+              </div>
+              <div class="grid grid-cols-[90px_1fr] gap-x-1.5 items-baseline">
+                <span class="text-[#8b949e] font-medium">Fokus:</span>
+                <span class="text-[#e6edf3]">OS, distribuerade system, C/Rust</span>
+              </div>
+              <div class="grid grid-cols-[90px_1fr] gap-x-1.5 items-baseline">
+                <span class="text-[#8b949e] font-medium">Simning:</span>
+                <span class="text-[#e6edf3]">Valhallabadet • 5-6 pass/v (frisim/fjäril)</span>
+              </div>
+              <div class="grid grid-cols-[90px_1fr] gap-x-1.5 items-baseline">
+                <span class="text-[#8b949e] font-medium">Foto:</span>
+                <span class="text-[#e6edf3]">Analog 35mm film &amp; mörkrum</span>
+              </div>
+            </div>
+
+            <!-- Column 2: System, Homelab & Miljö -->
+            <div class="space-y-1.5">
+              <div class="text-[10px] uppercase font-bold text-[#a78bfa] tracking-wider pb-0.5 border-b border-[#30363d]/40">
+                [SYSTEM &amp; HOMELAB]
+              </div>
+              <div class="grid grid-cols-[90px_1fr] gap-x-1.5 items-baseline">
+                <span class="text-[#8b949e] font-medium">Homelab:</span>
+                <span class="text-[#e6edf3]">PaperMC SMP-kluster, Docker, Velocity</span>
+              </div>
+              <div class="grid grid-cols-[90px_1fr] gap-x-1.5 items-baseline">
+                <span class="text-[#8b949e] font-medium">OS/Kernel:</span>
+                <span class="text-[#e6edf3]">Debian 12 / Arch • Linux 6.12-zen</span>
+              </div>
+              <div class="grid grid-cols-[90px_1fr] gap-x-1.5 items-baseline">
+                <span class="text-[#8b949e] font-medium">Verktyg:</span>
+                <span class="text-[#e6edf3]">Neovim (Lua), Kitty, Git, Zsh</span>
+              </div>
+              <div class="grid grid-cols-[90px_1fr] gap-x-1.5 items-baseline">
+                <span class="text-[#8b949e] font-medium">Nätverk:</span>
+                <span class="text-[#e6edf3]">WireGuard VPN, Cloudflare Tunnel</span>
+              </div>
+            </div>
           </div>
 
-          <div class="grid grid-cols-[120px_1fr] gap-x-2">
-            <span class="text-[#38bdf8] font-medium">Simning:</span>
-            <span class="text-[#e6edf3]">Valhallabadet — 50m/100m frisim &amp; fjäril (5-6 pass/vecka)</span>
-          </div>
-
-          <div class="grid grid-cols-[120px_1fr] gap-x-2">
-            <span class="text-[#38bdf8] font-medium">Homelab:</span>
-            <span class="text-[#e6edf3]">Debian 12, PaperMC SMP-kluster, Docker, WireGuard</span>
-          </div>
-
-          <div class="grid grid-cols-[120px_1fr] gap-x-2">
-            <span class="text-[#38bdf8] font-medium">Fritid &amp; Foto:</span>
-            <span class="text-[#e6edf3]">Analog 35mm film, Neovim dotfiles, gaming &amp; emulatorer</span>
-          </div>
-
-          <div class="grid grid-cols-[120px_1fr] gap-x-2">
-            <span class="text-[#38bdf8] font-medium">System / Miljö:</span>
-            <span class="text-[#8b949e]">Linux 6.12 x86_64 • Neovim • Kitty terminal</span>
-          </div>
-
-          <div class="grid grid-cols-[120px_1fr] gap-x-2 pt-1.5 border-t border-[#30363d]/40">
-            <span class="text-[#10b981] font-medium">Status:</span>
-            <span class="text-[#10b981] font-medium flex items-center gap-1.5">
+          <!-- Bottom Telemetry & Status Bar (Spans full width) -->
+          <div class="pt-2 border-t border-[#30363d]/60 flex flex-wrap items-center justify-between gap-3 text-[11px]">
+            <div class="flex items-center gap-2 text-[#10b981]">
               <span class="w-2 h-2 rounded-full bg-[#10b981] animate-ping"></span>
-              [● ONLINE] Tentavecka @ Chalmers, bassängpass &amp; serverdrift
-            </span>
+              <span class="font-medium">Status: Tentavecka @ Chalmers, bassängpass &amp; serverdrift</span>
+            </div>
+            <div class="flex items-center gap-3 text-[#8b949e]">
+              <span>UPTIME: <strong class="text-[#e6edf3]">42d 8h</strong></span>
+              <span>•</span>
+              <span>MEM: <strong class="text-[#e6edf3]">3.8G / 16G</strong></span>
+              <span>•</span>
+              <span>LOAD: <strong class="text-[#e6edf3]">0.18</strong></span>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Terminal Output History -->
-      <div id="terminal-history" class="pt-4 space-y-3" aria-live="polite">
+      <div id="terminal-history" class="pt-3 space-y-2.5" aria-live="polite">
         <div class="text-[#8b949e] text-xs">
           Terminal redo. Skriv <code class="text-[#10b981] font-bold">help</code> för kommandolista (<code class="text-[#38bdf8]">school</code>, <code class="text-[#38bdf8]">swim</code>, <code class="text-[#38bdf8]">ls</code>, <code class="text-[#38bdf8]">cd</code>, <code class="text-[#38bdf8]">cat</code>, <code class="text-[#38bdf8]">open</code>). Tryck <code class="text-[#10b981]">Tab</code> för att auto-komplettera.
         </div>
       </div>
 
       <!-- Active Interactive Prompt Row -->
-      <form id="terminal-form" class="mt-4 flex items-center gap-2 pt-2 border-t border-[#30363d]/40">
+      <form id="terminal-form" class="mt-3 flex items-center gap-2 pt-2 border-t border-[#30363d]/40">
         <label id="terminal-prompt-label" for="terminal-input" class="text-xs sm:text-sm text-[#10b981] font-semibold whitespace-nowrap select-none flex items-center gap-1">
           <span>visitor@playground</span><span class="text-[#8b949e]">:</span><span id="prompt-cwd" class="text-[#38bdf8]">~</span><span class="text-[#e6edf3]">$</span>
         </label>
@@ -220,8 +298,8 @@
 </section>
 
 <script>
-  // Robust Terminal Engine with frictionless window ergonomics and Tab completion
   function initTerminalEngine() {
+    const termSection = document.getElementById('terminal-section');
     const termWindow = document.getElementById('terminal-window');
     const termBody = document.getElementById('terminal-body');
     const closedCard = document.getElementById('terminal-closed-card');
@@ -240,56 +318,89 @@
     const history = document.getElementById('terminal-history') as HTMLDivElement | null;
     const promptCwd = document.getElementById('prompt-cwd');
 
-    if (!termWindow || !termBody || !form || !input || !history) return;
+    if (!termSection || !termWindow || !termBody || !form || !input || !history) return;
+
+    const isSubpage = termSection.getAttribute('data-is-subpage') === 'true';
 
     let isMinimized = false;
     let isMaximized = false;
 
-    // Stäng (✕): Dölj terminalen och visa ren Om mig-text
+    // Stäng (✕)
     function closeWindow() {
-      termWindow.classList.add('hidden');
-      closedCard?.classList.remove('hidden');
-      if (isMinimized) toggleMinimize();
+      if (isMaximized) unmaximize();
+      if (isMinimized) unminimize();
+
+      if (isSubpage) {
+        termSection.classList.add('hidden');
+      } else {
+        termWindow.classList.add('hidden');
+        closedCard?.classList.remove('hidden');
+      }
     }
 
-    // Återställ terminalen
+    // Återställ fönstret
     function restoreWindow() {
+      termSection.classList.remove('hidden');
       termWindow.classList.remove('hidden');
       closedCard?.classList.add('hidden');
-      if (isMinimized) toggleMinimize();
+      if (isMinimized) unminimize();
       input.focus();
     }
 
-    // Minimera (−): Fäll ihop kroppen till namnlisten
-    function toggleMinimize() {
-      isMinimized = !isMinimized;
-      if (isMinimized) {
-        termBody.classList.add('hidden');
-        statusPill?.classList.remove('hidden');
-        if (titleText) titleText.textContent = 'bash — gulo@playground: ~ (klicka var som helst på listen för att öppna)';
-      } else {
-        termBody.classList.remove('hidden');
-        statusPill?.classList.add('hidden');
-        updateTitle();
-        input.focus();
-      }
+    // Unmaximize helper
+    function unmaximize() {
+      isMaximized = false;
+      document.body.classList.remove('overflow-hidden');
+      termWindow.classList.remove('fixed', 'inset-3', 'z-50', 'ring-2', 'ring-[#10b981]', 'h-[calc(100vh-1.5rem)]', 'flex', 'flex-col');
+      termBody.classList.remove('flex-1', 'overflow-y-auto');
+      fullscreenHint?.classList.add('hidden');
+      updateTitle();
     }
 
-    // Maximera (+): Full-width / full takeover mode
+    // Maximize helper
+    function applyMaximize() {
+      if (isMinimized) unminimize();
+      isMaximized = true;
+      document.body.classList.add('overflow-hidden');
+      termWindow.classList.add('fixed', 'inset-3', 'z-50', 'ring-2', 'ring-[#10b981]', 'h-[calc(100vh-1.5rem)]', 'flex', 'flex-col');
+      termBody.classList.add('flex-1', 'overflow-y-auto');
+      fullscreenHint?.classList.remove('hidden');
+      if (titleText) titleText.textContent = `bash — gulo@playground: ${getCwdLabel()} [MAXIMERAD FULLSKÄRM]`;
+      input.focus();
+    }
+
     function toggleMaximize() {
-      isMaximized = !isMaximized;
       if (isMaximized) {
-        termWindow.classList.add('fixed', 'inset-3', 'z-50', 'ring-2', 'ring-[#10b981]', 'h-[calc(100vh-1.5rem)]', 'flex', 'flex-col');
-        termBody.classList.add('flex-1', 'overflow-y-auto');
-        fullscreenHint?.classList.remove('hidden');
-        if (titleText) titleText.textContent = `bash — gulo@playground: ${getCwdLabel()} [MAXIMERAD FULLSKÄRM]`;
+        unmaximize();
       } else {
-        termWindow.classList.remove('fixed', 'inset-3', 'z-50', 'ring-2', 'ring-[#10b981]', 'h-[calc(100vh-1.5rem)]', 'flex', 'flex-col');
-        termBody.classList.remove('flex-1', 'overflow-y-auto');
-        fullscreenHint?.classList.add('hidden');
-        updateTitle();
+        applyMaximize();
       }
+    }
+
+    // Unminimize helper
+    function unminimize() {
+      isMinimized = false;
+      termBody.classList.remove('hidden');
+      statusPill?.classList.add('hidden');
+      updateTitle();
       input.focus();
+    }
+
+    // Minimize helper
+    function applyMinimize() {
+      if (isMaximized) unmaximize(); // Exit fullscreen before minimizing so page is visible!
+      isMinimized = true;
+      termBody.classList.add('hidden');
+      statusPill?.classList.remove('hidden');
+      if (titleText) titleText.textContent = 'bash — gulo@playground: ~ (klicka var som helst för att öppna)';
+    }
+
+    function toggleMinimize() {
+      if (isMinimized) {
+        unminimize();
+      } else {
+        applyMinimize();
+      }
     }
 
     btnClose?.addEventListener('click', (e) => {
@@ -307,26 +418,31 @@
       toggleMaximize();
     });
 
-    // Klicka var som helst på namnlisten när den är minimerad -> återställ!
+    // Klicka var som helst på namnlisten när minimerad -> återställ!
     titleBar?.addEventListener('click', (e) => {
       if (isMinimized) {
-        toggleMinimize();
+        unminimize();
       }
     });
 
     titleBar?.addEventListener('dblclick', toggleMaximize);
     reopenBtn?.addEventListener('click', restoreWindow);
-    window.addEventListener('restore-terminal', restoreWindow);
 
-    // Escape stänger fullskärmsläge
+    // Lyssna på header-knappen oavsett sida
+    window.addEventListener('restore-terminal', () => {
+      restoreWindow();
+      termSection.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Escape stänger fullskärm
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && isMaximized) {
         e.preventDefault();
-        toggleMaximize();
+        unmaximize();
       }
       if ((e.ctrlKey || e.metaKey) && e.key === '`') {
         e.preventDefault();
-        if (termWindow.classList.contains('hidden')) {
+        if (termSection.classList.contains('hidden') || termWindow.classList.contains('hidden')) {
           restoreWindow();
         } else {
           toggleMinimize();
@@ -480,7 +596,7 @@
       <div><span class="text-[#10b981] font-semibold">open &lt;mål&gt;</span> : Öppna projekt, artikel, fil eller sektion</div>
       <div><span class="text-[#10b981] font-semibold">projects</span> : Gå till /projects (Portfolio)</div>
       <div><span class="text-[#10b981] font-semibold">thoughts</span> : Gå till /thoughts (Blogg)</div>
-      <div><span class="text-[#10b981] font-semibold">files</span> : Scrolla till nedladdningsarkivet</div>
+      <div><span class="text-[#10b981] font-semibold">files</span> : Gå till /files (Filarkiv)</div>
     </div>
     <div>
       <div class="text-[#a78bfa] font-bold mb-1">Filsystem &amp; Bash:</div>
@@ -690,14 +806,8 @@ ${escapeHtml(node.content)}
 
         // 3. Files downloads / section
         if (target === 'files' || target === 'filer' || target === 'downloads') {
-          const filesEl = document.getElementById('files');
-          if (filesEl) {
-            filesEl.scrollIntoView({ behavior: 'smooth' });
-            // Expand details if closed
-            const details = filesEl.querySelector('details');
-            if (details) details.open = true;
-          }
-          return `<div class="text-[#10b981]">Scrollar till fildelningssektionen...</div>`;
+          window.location.href = '/files';
+          return `<div class="text-[#10b981]">Navigerar till /files...</div>`;
         }
         if (target.includes('fabric')) {
           window.location.href = '/downloads/fabric-1.20.4-optimized.zip';
@@ -722,13 +832,8 @@ ${escapeHtml(node.content)}
       },
 
       files: () => {
-        const filesEl = document.getElementById('files');
-        if (filesEl) {
-          filesEl.scrollIntoView({ behavior: 'smooth' });
-          const details = filesEl.querySelector('details');
-          if (details) details.open = true;
-        }
-        return `<div class="text-[#10b981]">Öppnar fildelningsarkivet nedanför...</div>`;
+        window.location.href = '/files';
+        return `<div class="text-[#10b981]">Öppnar /files...</div>`;
       },
 
       clear: () => {

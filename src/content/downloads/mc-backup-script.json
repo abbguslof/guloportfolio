@@ -7,5 +7,6 @@
   "description": "Automatiserat Bash-skript för rsync-snapshot, zstd-komprimering och retention-rotation (7 dagar dagligt, 4 veckor veckovis).",
   "updatedAt": "2026-03-01",
   "checksum": "sha256:3a1b89ef04",
-  "tags": ["Linux", "Bash", "Sysadmin"]
+  "tags": ["Linux", "Bash", "Sysadmin"],
+  "featured": true
 }

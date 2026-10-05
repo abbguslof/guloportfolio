@@ -6,6 +6,7 @@ category: "Minecraft"
 tech: ["Docker", "Linux / Debian", "Java 21", "Velocity", "Spark"]
 repoUrl: "https://github.com"
 order: 1
+featured: true
 ---
 
 Ett självhostat Minecraft-nätverk optimerat för maximal tick-stabilitet (20.0 TPS) och minimal minnesoverhead under hög belastning.

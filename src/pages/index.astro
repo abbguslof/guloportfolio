@@ -12,6 +12,9 @@ import { getCollection } from 'astro:content';
 // Hämta projekt
 const projects = await getCollection('projects');
 const sortedProjects = projects.sort((a, b) => a.data.order - b.data.order);
+// Utvalda projekt för startsidan (markerade som featured: true, eller de 2 högst prioriterade)
+const featuredProjects = sortedProjects.filter((p) => p.data.featured);
+const displayProjects = featuredProjects.length > 0 ? featuredProjects : sortedProjects.slice(0, 2);
 
 // Hämta tankar/inlägg
 const thoughts = await getCollection('thoughts');
@@ -19,17 +22,15 @@ const sortedThoughts = thoughts
   .filter((post) => !post.data.draft)
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 
-// Hämta nedladdningar för utfällbara listan
+// Hämta alla nedladdningar
 const rawDownloads = await getCollection('downloads');
-const downloads = rawDownloads.map((d) => ({
+const allDownloads = rawDownloads.map((d) => ({
   id: d.id,
   ...d.data,
 }));
-
-// Samla alla unika taggar för snabbfilter
-const allTags = Array.from(
-  new Set(sortedThoughts.flatMap((post) => post.data.tags))
-).sort();
+// Utvalda filer för startsidan (markerade som featured: true, eller de 4 första)
+const featuredDownloads = allDownloads.filter((d) => d.featured);
+const displayDownloads = featuredDownloads.length > 0 ? featuredDownloads : allDownloads.slice(0, 4);
 ---
 
 <Layout 
@@ -41,7 +42,7 @@ const allTags = Array.from(
 
   <main class="w-full space-y-16">
     <!-- 1. Hero: Interactive Terminal (Med Chafa-porträtt, fungerande fönsterknappar & Bash) -->
-    <InteractiveTerminal />
+    <InteractiveTerminal isSubpage={false} />
 
     <!-- 2. Utvalda Projekt & Homelab (Portfolio Showcase) -->
     <section id="projects" class="w-full" aria-labelledby="projects-heading">
@@ -58,14 +59,14 @@ const allTags = Array.from(
             href="/projects" 
             class="text-[#38bdf8] hover:text-[#e6edf3] hover:underline transition-colors flex items-center gap-1"
           >
-            <span>[Se hela portfolion</span>
+            <span>[Se hela portfolion ({sortedProjects.length})</span>
             <span class="text-[10px]">→]</span>
           </a>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {sortedProjects.map((project) => (
+        {displayProjects.map((project) => (
           <ProjectCard 
             title={project.data.title}
             description={project.data.description}
@@ -80,9 +81,9 @@ const allTags = Array.from(
       </div>
     </section>
 
-    <!-- 3. Senaste Tankar & Blogginlägg (Med interaktiva ämnesfilter) -->
+    <!-- 3. Senaste Tankar & Blogginlägg (Ren lista med länk till /thoughts) -->
     <section id="thoughts" class="w-full" aria-labelledby="thoughts-heading">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-5 border-b border-[#30363d] gap-3">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-5 border-b border-[#30363d] gap-2">
         <div class="flex items-center gap-2">
           <span class="text-[#f59e0b] font-bold">#</span>
           <h2 id="thoughts-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]">
@@ -90,40 +91,20 @@ const allTags = Array.from(
           </h2>
         </div>
 
-        <!-- Filter Buttons & Link to Full Blog -->
-        <div class="flex items-center flex-wrap gap-2 text-xs font-mono">
-          <div class="flex items-center gap-1" id="thoughts-filter-bar">
-            <span class="text-[#8b949e] text-[11px] mr-1 select-none">Filter:</span>
-            <button 
-              type="button" 
-              class="filter-btn active px-2 py-0.5 rounded bg-[#10b981] text-[#0d1117] font-semibold border border-[#10b981] transition-all cursor-pointer"
-              data-filter="all"
-            >
-              [Alla]
-            </button>
-            {allTags.map((tag) => (
-              <button 
-                type="button" 
-                class="filter-btn px-2 py-0.5 rounded bg-[#161b22] text-[#8b949e] border border-[#30363d] hover:text-[#e6edf3] hover:border-[#8b949e] transition-all cursor-pointer"
-                data-filter={tag.toLowerCase()}
-              >
-                [{tag}]
-              </button>
-            ))}
-          </div>
-
+        <div class="flex items-center gap-3 text-xs font-mono">
           <a 
             href="/thoughts" 
-            class="text-[#38bdf8] hover:text-[#e6edf3] hover:underline transition-colors ml-2"
+            class="text-[#38bdf8] hover:text-[#e6edf3] hover:underline transition-colors flex items-center gap-1"
           >
-            [Hela bloggarkivet →]
+            <span>[Hela bloggarkivet ({sortedThoughts.length})</span>
+            <span class="text-[10px]">→]</span>
           </a>
         </div>
       </div>
 
       <!-- Articles list container -->
       <div class="rounded-lg bg-[#161b22] border border-[#30363d] px-4 py-1 divide-y divide-[#30363d]/40">
-        {sortedThoughts.map((post) => (
+        {sortedThoughts.slice(0, 5).map((post) => (
           <ThoughtRow 
             title={post.data.title}
             slug={post.id}
@@ -131,61 +112,13 @@ const allTags = Array.from(
             tags={post.data.tags}
           />
         ))}
-
-        <div id="no-thoughts-msg" class="py-6 text-center text-xs text-[#8b949e] hidden">
-          Inga artiklar hittades för det valda filtret.
-        </div>
       </div>
     </section>
 
-    <!-- 4. Fildelning & Resurser (Utfällbar inline bullet-lista, ingen popup!) -->
-    <CollapsibleDownloads downloads={downloads} />
+    <!-- 4. Fildelning & Resurser (Utfällbar inline bullet-lista, stängd by default, med sortering) -->
+    <CollapsibleDownloads downloads={displayDownloads} totalCount={allDownloads.length} />
   </main>
 
   <!-- Footer -->
   <Footer />
 </Layout>
-
-<script>
-  // Real-time Category Filter for Thoughts
-  function initThoughtsFilter() {
-    const buttons = document.querySelectorAll('.filter-btn');
-    const items = document.querySelectorAll<HTMLElement>('.thought-item');
-    const noResults = document.getElementById('no-thoughts-msg');
-
-    buttons.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const filter = btn.getAttribute('data-filter') || 'all';
-
-        buttons.forEach((b) => {
-          b.classList.remove('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]');
-          b.classList.add('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]');
-        });
-
-        btn.classList.remove('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]');
-        btn.classList.add('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]');
-
-        let visibleCount = 0;
-        items.forEach((item) => {
-          const itemTags = (item.getAttribute('data-tags') || '').split(',');
-          if (filter === 'all' || itemTags.includes(filter)) {
-            item.style.display = '';
-            visibleCount++;
-          } else {
-            item.style.display = 'none';
-          }
-        });
-
-        if (noResults) {
-          noResults.classList.toggle('hidden', visibleCount > 0);
-        }
-      });
-    });
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initThoughtsFilter);
-  } else {
-    initThoughtsFilter();
-  }
-</script>
