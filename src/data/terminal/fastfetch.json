@@ -1,0 +1,59 @@
+{
+  "user": "gulo",
+  "host": "chalmers-station",
+  "badge": "CHALMERS // D-24",
+  "tagline": "swimmer • sysdev",
+  "specs": [
+    {
+      "key": "OS",
+      "value": "Debian GNU/Linux 12 (bookworm) x86_64",
+      "color": "sky"
+    },
+    {
+      "key": "Host",
+      "value": "chalmers-workstation",
+      "color": "sky"
+    },
+    {
+      "key": "Kernel",
+      "value": "Linux 6.12.8-zen1",
+      "color": "sky"
+    },
+    {
+      "key": "Uptime",
+      "value": "42 dagar, 8 timmar, 14 min",
+      "color": "sky"
+    },
+    {
+      "key": "Shell",
+      "value": "zsh 5.9 / bash 5.2 • kitty",
+      "color": "sky"
+    },
+    {
+      "key": "Editor",
+      "value": "Neovim v0.10.2 (Lua dotfiles)",
+      "color": "sky"
+    },
+    {
+      "key": "Utbildning",
+      "value": "Civilingenjör Datateknik @ Chalmers (Åk 2)",
+      "color": "emerald"
+    },
+    {
+      "key": "Simning",
+      "value": "Valhallabadet (5-6 pass/v, frisim/fjäril)",
+      "color": "emerald"
+    },
+    {
+      "key": "Homelab",
+      "value": "PaperMC SMP-kluster, Docker, Velocity",
+      "color": "emerald"
+    },
+    {
+      "key": "Status",
+      "value": "[● ONLINE] Tentavecka & serverdrift",
+      "color": "amber",
+      "online": true
+    }
+  ]
+}

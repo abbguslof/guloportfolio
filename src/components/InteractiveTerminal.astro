@@ -28,6 +28,32 @@ if (fs.existsSync(terminalDir)) {
   }
 }
 
+// Läs konfigurerad fastfetch-data från fastfetch.json
+let fastfetchData = {
+  user: 'gulo',
+  host: 'chalmers-station',
+  badge: 'CHALMERS // D-24',
+  tagline: 'swimmer • sysdev',
+  specs: [
+    { key: 'OS', value: 'Debian GNU/Linux 12 (bookworm) x86_64', color: 'sky' },
+    { key: 'Host', value: 'chalmers-workstation', color: 'sky' },
+    { key: 'Kernel', value: 'Linux 6.12.8-zen1', color: 'sky' },
+    { key: 'Uptime', value: '42 dagar, 8 timmar, 14 min', color: 'sky' },
+    { key: 'Shell', value: 'zsh 5.9 / bash 5.2 • kitty', color: 'sky' },
+    { key: 'Editor', value: 'Neovim v0.10.2 (Lua dotfiles)', color: 'sky' },
+    { key: 'Utbildning', value: 'Civilingenjör Datateknik @ Chalmers (Åk 2)', color: 'emerald' },
+    { key: 'Simning', value: 'Valhallabadet (5-6 pass/v, frisim/fjäril)', color: 'emerald' },
+    { key: 'Homelab', value: 'PaperMC SMP-kluster, Docker, Velocity', color: 'emerald' },
+    { key: 'Status', value: '[● ONLINE] Tentavecka & serverdrift', color: 'amber', online: true }
+  ]
+};
+
+if (staticFiles['fastfetch.json']) {
+  try {
+    fastfetchData = JSON.parse(staticFiles['fastfetch.json'].content);
+  } catch (e) {}
+}
+
 // 2. Läs dynamiska projekt (konfigurerbar sammanfattning så att cat visar relevant info utan att dumpa hela filen)
 const rawProjects = await getCollection('projects');
 const projectNodes: Record<string, any> = {};
@@ -175,12 +201,12 @@ const dynamicFileSystem = {
   <!-- Terminal Window Container -->
   <div 
     id="terminal-window" 
-    class="rounded-lg border border-[#30363d] bg-[#161b22] shadow-2xl transition-all duration-200 overflow-hidden"
+    class="rounded-lg border border-[#30363d] bg-[#161b22] shadow-2xl transition-all duration-200 overflow-hidden flex flex-col max-h-[min(880px,78vh)]"
   >
     <!-- Window Title Bar with FUNCTIONING Controls -->
     <div 
       id="terminal-titlebar"
-      class="flex items-center justify-between px-4 py-2.5 bg-[#0d1117] border-b border-[#30363d] select-none cursor-pointer"
+      class="flex items-center justify-between px-4 py-2.5 bg-[#0d1117] border-b border-[#30363d] select-none cursor-pointer shrink-0"
       title="Klicka var som helst på listen för att fälla ut om minimerad, eller dubbelklicka för fullskärm"
     >
       <!-- Real Interactive Window Action Buttons -->
@@ -232,7 +258,7 @@ const dynamicFileSystem = {
     </div>
 
     <!-- Terminal Collapsible Body -->
-    <div id="terminal-body" class="p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto transition-all">
+    <div id="terminal-body" class="p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto overflow-y-auto flex-1 transition-all">
       <!-- Authentic Neofetch / Fastfetch Layout -->
       <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-5 border-b border-[#30363d]/80">
         <!-- Authentic Fastfetch ASCII Emblem (Left column) -->
@@ -247,10 +273,10 @@ const dynamicFileSystem = {
 <span class="text-[#38bdf8]"> (__(__)___(__)__) </span>
           </pre>
           <div class="mt-2 text-[10px] font-bold text-[#10b981] tracking-wider uppercase">
-            CHALMERS // D-24
+            {fastfetchData.badge || 'CHALMERS // D-24'}
           </div>
           <div class="text-[9px] text-[#8b949e]">
-            swimmer • sysdev
+            {fastfetchData.tagline || 'swimmer • sysdev'}
           </div>
         </div>
 
@@ -258,7 +284,7 @@ const dynamicFileSystem = {
         <div class="flex-1 min-w-0 space-y-1 text-xs sm:text-sm">
           <!-- Fastfetch Header: user@host -->
           <div>
-            <span class="text-[#10b981] font-bold">gulo</span><span class="text-[#8b949e]">@</span><span class="text-[#38bdf8] font-bold">chalmers-station</span>
+            <span class="text-[#10b981] font-bold">{fastfetchData.user || 'gulo'}</span><span class="text-[#8b949e]">@</span><span class="text-[#38bdf8] font-bold">{fastfetchData.host || 'chalmers-station'}</span>
             <div class="text-[#30363d] select-none tracking-tighter leading-none mt-0.5">
               ---------------------------------------------------
             </div>
@@ -266,58 +292,22 @@ const dynamicFileSystem = {
 
           <!-- Specs list with authentic CLI colored key labels -->
           <div class="space-y-1 pt-1 text-xs">
-            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
-              <span class="text-[#38bdf8] font-semibold">OS:</span>
-              <span class="text-[#e6edf3]">Debian GNU/Linux 12 (bookworm) x86_64</span>
-            </div>
-
-            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
-              <span class="text-[#38bdf8] font-semibold">Host:</span>
-              <span class="text-[#e6edf3]">chalmers-workstation</span>
-            </div>
-
-            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
-              <span class="text-[#38bdf8] font-semibold">Kernel:</span>
-              <span class="text-[#e6edf3]">Linux 6.12.8-zen1</span>
-            </div>
-
-            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
-              <span class="text-[#38bdf8] font-semibold">Uptime:</span>
-              <span class="text-[#e6edf3]">42 dagar, 8 timmar, 14 min</span>
-            </div>
-
-            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
-              <span class="text-[#38bdf8] font-semibold">Shell:</span>
-              <span class="text-[#e6edf3]">zsh 5.9 / bash 5.2 • kitty</span>
-            </div>
-
-            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
-              <span class="text-[#38bdf8] font-semibold">Editor:</span>
-              <span class="text-[#e6edf3]">Neovim v0.10.2 (Lua dotfiles)</span>
-            </div>
-
-            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
-              <span class="text-[#10b981] font-semibold">Utbildning:</span>
-              <span class="text-[#e6edf3]">Civilingenjör Datateknik @ Chalmers (Åk 2)</span>
-            </div>
-
-            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
-              <span class="text-[#10b981] font-semibold">Simning:</span>
-              <span class="text-[#e6edf3]">Valhallabadet (5-6 pass/v, frisim/fjäril)</span>
-            </div>
-
-            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
-              <span class="text-[#10b981] font-semibold">Homelab:</span>
-              <span class="text-[#e6edf3]">PaperMC SMP-kluster, Docker, Velocity</span>
-            </div>
-
-            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
-              <span class="text-[#f59e0b] font-semibold">Status:</span>
-              <span class="text-[#10b981] font-medium flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-ping"></span>
-                [● ONLINE] Tentavecka @ Chalmers &amp; serverdrift
-              </span>
-            </div>
+            {fastfetchData.specs.map((item: any) => {
+              const colorClass = item.color === 'emerald' ? 'text-[#10b981]' : item.color === 'amber' ? 'text-[#f59e0b]' : 'text-[#38bdf8]';
+              return (
+                <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
+                  <span class={`${colorClass} font-semibold`}>{item.key}:</span>
+                  {item.online ? (
+                    <span class="text-[#10b981] font-medium flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-ping"></span>
+                      {item.value}
+                    </span>
+                  ) : (
+                    <span class="text-[#e6edf3]">{item.value}</span>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
           <!-- Authentic terminal 8-color palette test bar -->
@@ -488,8 +478,8 @@ const dynamicFileSystem = {
     function unmaximize() {
       isMaximized = false;
       document.body.classList.remove('overflow-hidden');
-      termWindow.classList.remove('fixed', 'inset-3', 'z-50', 'ring-2', 'ring-[#10b981]', 'h-[calc(100vh-1.5rem)]', 'flex', 'flex-col');
-      termBody.classList.remove('flex-1', 'overflow-y-auto');
+      termWindow.classList.remove('fixed', 'inset-3', 'z-50', 'ring-2', 'ring-[#10b981]', 'h-[calc(100vh-1.5rem)]');
+      termWindow.classList.add('max-h-[min(880px,78vh)]', 'flex', 'flex-col');
       fullscreenHint?.classList.add('hidden');
       updateTitle();
     }
@@ -499,8 +489,8 @@ const dynamicFileSystem = {
       if (isMinimized) unminimize();
       isMaximized = true;
       document.body.classList.add('overflow-hidden');
+      termWindow.classList.remove('max-h-[min(880px,78vh)]');
       termWindow.classList.add('fixed', 'inset-3', 'z-50', 'ring-2', 'ring-[#10b981]', 'h-[calc(100vh-1.5rem)]', 'flex', 'flex-col');
-      termBody.classList.add('flex-1', 'overflow-y-auto');
       fullscreenHint?.classList.remove('hidden');
       if (titleText) titleText.textContent = `bash — gulo@playground: ${getCwdLabel()} [MAXIMERAD FULLSKÄRM]`;
       input.focus({ preventScroll: true });
@@ -769,6 +759,31 @@ const dynamicFileSystem = {
       hideWindowInternal();
     }
 
+    function resolvePath(basePath: string[], pathStr: string): string[] {
+      if (!pathStr || pathStr === '.') return [...basePath];
+      let segments: string[];
+      if (pathStr.startsWith('/') || pathStr.startsWith('~')) {
+        segments = [];
+        pathStr = pathStr.replace(/^[~/]+/, '');
+      } else {
+        segments = [...basePath];
+      }
+
+      const parts = pathStr.split('/').filter(Boolean);
+      for (const p of parts) {
+        if (p === '.') {
+          continue;
+        } else if (p === '..') {
+          if (segments.length > 0) {
+            segments.pop();
+          }
+        } else {
+          segments.push(p);
+        }
+      }
+      return segments;
+    }
+
     function resolveNode(pathArr: string[]): DirNode | FileNode | null {
       let current: DirNode | FileNode = fileSystem;
       for (const seg of pathArr) {
@@ -780,7 +795,7 @@ const dynamicFileSystem = {
     }
 
     function getCurrentDir(): DirNode {
-      return resolveNode(currentPath) as DirNode;
+      return (resolveNode(currentPath) as DirNode) || fileSystem;
     }
 
     // Commands dictionary
@@ -795,6 +810,7 @@ const dynamicFileSystem = {
       <div><span class="text-[#10b981] font-semibold">swim</span> : Skriver ut simningspass &amp; tider</div>
       <div><span class="text-[#10b981] font-semibold">whoami</span> : Personlig bakgrund &amp; profil</div>
       <div><span class="text-[#10b981] font-semibold">contact</span> : GitHub, mail &amp; Discord</div>
+      <div><span class="text-[#10b981] font-semibold">fastfetch</span> : Systemöversikt &amp; status</div>
     </div>
     <div>
       <div class="text-[#f59e0b] font-bold mb-1">Navigering &amp; Webbsidor:</div>
@@ -806,7 +822,7 @@ const dynamicFileSystem = {
     <div>
       <div class="text-[#a78bfa] font-bold mb-1">Filsystem &amp; Bash:</div>
       <div><span class="text-[#10b981] font-semibold">ls [-la]</span> : Lista filer &amp; mappar</div>
-      <div><span class="text-[#10b981] font-semibold">cd &lt;katalog&gt;</span> : Byt mapp (cd .., cd ~, cd projects)</div>
+      <div><span class="text-[#10b981] font-semibold">cd &lt;katalog&gt;</span> : Byt mapp (cd .., cd ~, cd ../projects)</div>
       <div><span class="text-[#10b981] font-semibold">pwd</span> : Visa nuvarande arbetskatalog</div>
       <div><span class="text-[#10b981] font-semibold">cat &lt;fil&gt;</span> : Skriv ut filens innehåll</div>
       <div><span class="text-[#10b981] font-semibold">grep &lt;ord&gt; [fil]</span> : Sök text i filer</div>
@@ -819,11 +835,16 @@ const dynamicFileSystem = {
     </div>
   </div>
   <div class="text-[11px] text-[#8b949e] pt-1 border-t border-[#30363d]/40">
-    Tryck <kbd class="text-[#10b981]">Tab</kbd> för att komplettera kommandon och filnamn.
+    Tryck <kbd class="text-[#10b981]">Tab</kbd> för att komplettera kommandon och filnamn (även i <code class="text-[#38bdf8]">../</code>).
   </div>
 </div>`,
 
-      school: () => `
+      school: () => {
+        const fileNode = fileSystem.children['school.md'] || fileSystem.children['chalmers.md'] || fileSystem.children['chalmers.txt'];
+        if (fileNode && fileNode.type === 'file' && fileNode.content) {
+          return renderMarkdownCard(fileNode.content);
+        }
+        return `
 <div class="text-[#e6edf3] space-y-1 text-xs font-mono p-3 rounded bg-[#0d1117] border border-[#30363d]">
   <div class="text-[#38bdf8] font-bold border-b border-[#30363d] pb-1">
     CHALMERS TEKNISKA HÖGSKOLA — CIVILINGENJÖR DATATEKNIK (D-24)
@@ -833,9 +854,15 @@ const dynamicFileSystem = {
   <div><span class="text-[#8b949e]">Aktuella kurser:</span> Operativsystem, Datorarkitektur, Datakommunikation, Algoritmer</div>
   <div><span class="text-[#8b949e]">Laborationer:</span> Flertrådade schemaläggare i C, kontextbyten för RISC-V, minneshantering</div>
   <div class="text-[#10b981] pt-1">Skriv <code class="text-[#e6edf3]">open chalmers-sys-sched</code> för att läsa projektet, eller <code class="text-[#e6edf3]">projects</code> för portfolion.</div>
-</div>`,
+</div>`;
+      },
 
-      swim: () => `
+      swim: () => {
+        const fileNode = fileSystem.children['swim.md'] || fileSystem.children['swim.txt'];
+        if (fileNode && fileNode.type === 'file' && fileNode.content) {
+          return renderMarkdownCard(fileNode.content);
+        }
+        return `
 <div class="text-[#e6edf3] space-y-1 text-xs font-mono p-3 rounded bg-[#0d1117] border border-[#30363d]">
   <div class="text-[#38bdf8] font-bold border-b border-[#30363d] pb-1">
     🏊 KAPPLÖPNINGSSIMNING // VALHALLABADET
@@ -845,7 +872,8 @@ const dynamicFileSystem = {
   <div><span class="text-[#8b949e]">Huvudgrenar:</span> 50m och 100m frisim &amp; fjärilsim</div>
   <div><span class="text-[#8b949e]">Filosofi:</span> Den bästa motvikten till skärmtid och fastkörda algoritmer.</div>
   <div class="text-[#10b981] pt-1">Läs min artikel med kommandot: <code class="text-[#e6edf3]">open chalmers-simning-kod</code></div>
-</div>`,
+</div>`;
+      },
 
       whoami: () => {
         const fileNode = fileSystem.children['whoami.md'];
@@ -953,23 +981,20 @@ const dynamicFileSystem = {
       },
 
       cd: (args) => {
-        const dest = args[0] ? args[0].replace(/\/$/, '') : '~';
+        const dest = args[0] ? args[0].trim() : '~';
         if (dest === '~' || dest === '') {
           currentPath = [];
           updateTitle();
           return;
         }
-        if (dest === '..') {
-          if (currentPath.length > 0) currentPath.pop();
-          updateTitle();
-          return;
-        }
         if (dest === '.') return;
 
-        const current = getCurrentDir();
-        if (current.children[dest]) {
-          if (current.children[dest].type === 'dir') {
-            currentPath.push(dest);
+        const targetSegments = resolvePath(currentPath, dest);
+        const node = resolveNode(targetSegments);
+
+        if (node) {
+          if (node.type === 'dir') {
+            currentPath = targetSegments;
             updateTitle();
           } else {
             return `<div class="text-[#f85149]">cd: '${escapeHtml(dest)}': Inte en katalog</div>`;
@@ -983,10 +1008,10 @@ const dynamicFileSystem = {
 
       cat: (args) => {
         if (!args[0]) return `<div class="text-[#f85149]">Användning: cat &lt;filnamn&gt;</div>`;
-        const filename = args[0];
-        const current = getCurrentDir();
+        const filename = args[0].trim();
+        const targetSegments = resolvePath(currentPath, filename);
+        let node = resolveNode(targetSegments);
 
-        let node = current.children[filename];
         if (!node && currentPath.length > 0 && fileSystem.children[filename]) {
           node = fileSystem.children[filename];
         }
@@ -1018,9 +1043,10 @@ ${escapeHtml(node.content)}
         }
 
         if (targetFile) {
-          const node = current.children[targetFile];
+          const targetSegments = resolvePath(currentPath, targetFile);
+          const node = resolveNode(targetSegments);
           if (!node || node.type !== 'file') return `<div class="text-[#f85149]">grep: ${escapeHtml(targetFile)}: Ingen sådan fil</div>`;
-          scanFile(targetFile, node);
+          scanFile(targetFile, node as FileNode);
         } else {
           for (const [name, node] of Object.entries(current.children)) {
             if (node.type === 'file') scanFile(name, node);
@@ -1051,7 +1077,22 @@ ${escapeHtml(node.content)}
           return;
         }
 
-        // 2. Kontrollera om target matchar en fil med actionUrl i nuvarande katalog
+        // 2. Leta upp via resolvePath (hanterar ../, ./, underkataloger)
+        const targetSegments = resolvePath(currentPath, rawTarget);
+        const resolvedNode = resolveNode(targetSegments);
+
+        if (resolvedNode) {
+          if (resolvedNode.type === 'dir') {
+            const dirUrl = targetSegments.length === 0 ? '/' : `/${targetSegments.join('/')}`;
+            navigateWithCli(dirUrl, `<div class="text-[#10b981]">Öppnar ${escapeHtml(dirUrl)} på webben...</div>`);
+            return;
+          } else if (resolvedNode.type === 'file' && resolvedNode.actionUrl) {
+            navigateWithCli(resolvedNode.actionUrl, `<div class="text-[#10b981]">Öppnar ${escapeHtml(rawTarget)} (${escapeHtml(resolvedNode.actionUrl)})...</div>`);
+            return;
+          }
+        }
+
+        // Kontrollera om target matchar en fil med actionUrl i nuvarande katalog
         const current = getCurrentDir();
         if (current.children[rawTarget] && current.children[rawTarget].type === 'file') {
           const f = current.children[rawTarget] as FileNode;
@@ -1061,13 +1102,16 @@ ${escapeHtml(node.content)}
           }
         }
 
+        // Normalisera bort ledande ../, ./, /, ~/ för sektionsgenvägar
+        const cleanTarget = target.replace(/^(\.\.\/|\.\/|\/|~\/)+/, '');
+
         // 3. Sök i alla kända underkataloger i virtuella filsystemet
         for (const [dirName, dirNode] of Object.entries(fileSystem.children)) {
           if (dirNode.type === 'dir') {
             for (const [fname, node] of Object.entries(dirNode.children)) {
               if (node.type === 'file') {
                 const baseFname = fname.toLowerCase().replace(/\.md$/, '');
-                if (target === baseFname || target === fname.toLowerCase() || baseFname.includes(target) || target.includes(baseFname)) {
+                if (cleanTarget === baseFname || cleanTarget === fname.toLowerCase() || baseFname.includes(cleanTarget) || cleanTarget.includes(baseFname)) {
                   if (node.actionUrl) {
                     navigateWithCli(node.actionUrl, `<div class="text-[#38bdf8]">Öppnar ${escapeHtml(fname)} (${escapeHtml(node.actionUrl)})...</div>`);
                     return;
@@ -1079,38 +1123,38 @@ ${escapeHtml(node.content)}
         }
 
         // 4. Snabbgenvägar till sektioner
-        if (target === 'projects' || target === 'projekt') {
+        if (cleanTarget === 'projects' || cleanTarget === 'projekt') {
           navigateWithCli('/projects', `<div class="text-[#10b981]">Navigerar till /projects...</div>`);
           return;
         }
-        if (target === 'thoughts' || target === 'tankar' || target === 'blog' || target === 'blogg' || target === 'anteckningar') {
+        if (cleanTarget === 'thoughts' || cleanTarget === 'tankar' || cleanTarget === 'blog' || cleanTarget === 'blogg' || cleanTarget === 'anteckningar') {
           navigateWithCli('/thoughts', `<div class="text-[#10b981]">Navigerar till /thoughts...</div>`);
           return;
         }
-        if (target === 'files' || target === 'filer' || target === 'downloads') {
+        if (cleanTarget === 'files' || cleanTarget === 'filer' || cleanTarget === 'downloads') {
           navigateWithCli('/files', `<div class="text-[#10b981]">Navigerar till /files...</div>`);
           return;
         }
 
         // 5. Direktladdningar
-        if (target.includes('fabric')) {
+        if (cleanTarget.includes('fabric')) {
           window.location.href = '/downloads/fabric-1.20.4-optimized.zip';
           return `<div class="text-[#10b981]">Laddar ner fabric-1.20.4-optimized.zip...</div>`;
         }
-        if (target.includes('backup')) {
+        if (cleanTarget.includes('backup')) {
           window.location.href = '/downloads/backup-world.sh';
           return `<div class="text-[#10b981]">Laddar ner backup-world.sh...</div>`;
         }
-        if (target.includes('cv') || target.includes('resume')) {
+        if (cleanTarget.includes('cv') || cleanTarget.includes('resume')) {
           window.location.href = '/downloads/cv-gulo-datateknik.pdf';
           return `<div class="text-[#10b981]">Laddar ner cv-gulo-datateknik.pdf...</div>`;
         }
-        if (target.includes('dotfiles') || target.includes('nvim')) {
+        if (cleanTarget.includes('dotfiles') || cleanTarget.includes('nvim')) {
           window.location.href = '/downloads/nvim-dotfiles.tar.gz';
           return `<div class="text-[#10b981]">Laddar ner nvim-dotfiles.tar.gz...</div>`;
         }
 
-        return `<div class="text-[#f85149]">Känner inte igen '${escapeHtml(target)}'. Skriv 'help' eller 'ls'.</div>`;
+        return `<div class="text-[#f85149]">Känner inte igen '${escapeHtml(rawTarget)}'. Skriv 'help' eller 'ls'.</div>`;
       },
 
       projects: () => {
@@ -1128,11 +1172,38 @@ ${escapeHtml(node.content)}
         return;
       },
 
-      fastfetch: () => `
+      fastfetch: () => {
+        let cfg: any = null;
+        const node = fileSystem.children['fastfetch.json'];
+        if (node && node.type === 'file' && node.content) {
+          try { cfg = JSON.parse(node.content); } catch (e) {}
+        }
+        const user = cfg?.user || 'gulo';
+        const host = cfg?.host || 'chalmers-station';
+        const badge = cfg?.badge || 'CHALMERS // D-24';
+        const specs = cfg?.specs || [
+          { key: 'OS', value: 'Debian GNU/Linux 12 (bookworm) x86_64', color: 'sky' },
+          { key: 'Host', value: 'chalmers-workstation', color: 'sky' },
+          { key: 'Kernel', value: 'Linux 6.12.8-zen1', color: 'sky' },
+          { key: 'Uptime', value: '42 dagar, 8 timmar, 14 min', color: 'sky' },
+          { key: 'Shell', value: 'zsh 5.9 / bash 5.2 • kitty', color: 'sky' },
+          { key: 'Editor', value: 'Neovim v0.10.2 (Lua dotfiles)', color: 'sky' },
+          { key: 'Utbildning', value: 'Civilingenjör Datateknik @ Chalmers (Åk 2)', color: 'emerald' },
+          { key: 'Simning', value: 'Valhallabadet (5-6 pass/v, frisim/fjäril)', color: 'emerald' },
+          { key: 'Homelab', value: 'PaperMC SMP-kluster, Docker, Velocity', color: 'emerald' },
+          { key: 'Status', value: '[● ONLINE] Tentavecka & serverdrift', color: 'amber' }
+        ];
+
+        const specRows = specs.map((s: any) => {
+          const colClass = s.color === 'emerald' ? 'text-[#10b981]' : s.color === 'amber' ? 'text-[#f59e0b]' : 'text-[#38bdf8]';
+          return `<div><span class="${colClass} font-semibold">${escapeHtml(s.key)}:</span> ${escapeHtml(s.value)}</div>`;
+        }).join('');
+
+        return `
 <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 p-3 rounded bg-[#0d1117] border border-[#30363d] my-1 font-mono text-xs">
   <div class="shrink-0 select-none text-[11px] leading-[1.2] text-center">
     <pre class="leading-tight text-center text-[#10b981]">
-<span class="text-[#38bdf8]">     /\_____/\     </span>
+<span class="text-[#38bdf8]">     /\\_____/\\     </span>
 <span class="text-[#38bdf8]">    /</span>  <span class="text-[#e6edf3] font-bold">o</span>   <span class="text-[#e6edf3] font-bold">o</span>  <span class="text-[#38bdf8]">\    </span>
 <span class="text-[#10b981]">   (</span> <span class="text-[#38bdf8]">==</span>  <span class="text-[#10b981] font-bold">^</span>  <span class="text-[#38bdf8]">==</span> <span class="text-[#10b981]">)   </span>
 <span class="text-[#10b981]">    )</span>   <span class="text-[#e6edf3] font-bold">GULO</span>  <span class="text-[#10b981]">)    </span>
@@ -1140,23 +1211,15 @@ ${escapeHtml(node.content)}
 <span class="text-[#10b981]">  (</span> <span class="text-[#38bdf8]">(  )</span>   <span class="text-[#38bdf8]">(  )</span> <span class="text-[#10b981]">)  </span>
 <span class="text-[#38bdf8]"> (__(__)___(__)__) </span>
     </pre>
-    <div class="text-[10px] font-bold text-[#10b981] mt-1">CHALMERS // D-24</div>
+    <div class="text-[10px] font-bold text-[#10b981] mt-1">${escapeHtml(badge)}</div>
   </div>
   <div class="flex-1 space-y-1 text-xs">
-    <div><span class="text-[#10b981] font-bold">gulo</span><span class="text-[#8b949e]">@</span><span class="text-[#38bdf8] font-bold">chalmers-station</span></div>
+    <div><span class="text-[#10b981] font-bold">${escapeHtml(user)}</span><span class="text-[#8b949e]">@</span><span class="text-[#38bdf8] font-bold">${escapeHtml(host)}</span></div>
     <div class="text-[#30363d]">--------------------------------------</div>
-    <div><span class="text-[#38bdf8] font-semibold">OS:</span> Debian GNU/Linux 12 (bookworm) x86_64</div>
-    <div><span class="text-[#38bdf8] font-semibold">Host:</span> chalmers-workstation</div>
-    <div><span class="text-[#38bdf8] font-semibold">Kernel:</span> Linux 6.12.8-zen1</div>
-    <div><span class="text-[#38bdf8] font-semibold">Uptime:</span> 42 dagar, 8 timmar, 14 min</div>
-    <div><span class="text-[#38bdf8] font-semibold">Shell:</span> zsh 5.9 / bash 5.2 • kitty</div>
-    <div><span class="text-[#38bdf8] font-semibold">Editor:</span> Neovim v0.10.2 (Lua dotfiles)</div>
-    <div><span class="text-[#10b981] font-semibold">Utbildning:</span> Civilingenjör Datateknik @ Chalmers (Åk 2)</div>
-    <div><span class="text-[#10b981] font-semibold">Simning:</span> Valhallabadet (5-6 pass/v, frisim/fjäril)</div>
-    <div><span class="text-[#10b981] font-semibold">Homelab:</span> PaperMC SMP-kluster, Docker, Velocity</div>
-    <div><span class="text-[#f59e0b] font-semibold">Status:</span> [● ONLINE] Tentavecka &amp; serverdrift</div>
+    ${specRows}
   </div>
-</div>`,
+</div>`;
+      },
 
       tldr: () => `
 <div class="p-3 rounded bg-[#0d1117] border border-[#30363d] space-y-1.5 font-mono text-xs text-[#e6edf3]">
@@ -1252,6 +1315,9 @@ ${escapeHtml(node.content)}
 
       input.value = '';
       input.focus({ preventScroll: true });
+      if (termBody) {
+        termBody.scrollTop = termBody.scrollHeight;
+      }
     }
 
     form.addEventListener('submit', (e) => {
@@ -1344,56 +1410,81 @@ ${escapeHtml(node.content)}
 
         // If typing second token or later -> autocomplete filesystem nodes, flags or open targets
         const mainCmd = tokens[0].toLowerCase();
-        const currentDir = getCurrentDir();
         let availableItems: string[] = [];
 
         if (mainCmd === 'ls' && lastToken.startsWith('-')) {
           availableItems = ['-a', '-l', '-la', '-al'];
-        } else if (mainCmd === 'cd') {
-          availableItems = Object.entries(currentDir.children)
-            .filter(([_, node]) => node.type === 'dir')
-            .map(([name]) => `${name}/`);
-          if (currentPath.length > 0) availableItems.push('..');
-        } else {
-          // Standard file & dir listing
-          availableItems = Object.entries(currentDir.children)
-            .filter(([name]) => {
-              if (lastToken.startsWith('.')) return true; // visa dolda om användaren startat med '.'
-              return !name.startsWith('.');
-            })
-            .map(([name, node]) => node.type === 'dir' ? `${name}/` : name);
+          const matches = availableItems.filter(item => item.toLowerCase().startsWith(lastToken.toLowerCase()));
+          if (matches.length === 1) {
+            tokens[tokens.length - 1] = matches[0];
+            input.value = tokens.join(' ');
+          }
+          return;
+        }
 
-          if (lastToken.startsWith('.') && currentPath.length > 0) {
-            availableItems.push('..');
+        // Dela upp lastToken i katalogprefix (dirPrefix) och sökterm (basePrefix)
+        // Exempel: "../p" -> dirPrefix: "../", basePrefix: "p"
+        // Exempel: "../projects/" -> dirPrefix: "../projects/", basePrefix: ""
+        // Exempel: "c" -> dirPrefix: "", basePrefix: "c"
+        const lastSlashIdx = lastToken.lastIndexOf('/');
+        let dirPrefix = '';
+        let basePrefix = lastToken;
+
+        if (lastSlashIdx !== -1) {
+          dirPrefix = lastToken.slice(0, lastSlashIdx + 1);
+          basePrefix = lastToken.slice(lastSlashIdx + 1);
+        }
+
+        // Slå upp målkatalog baserat på dirPrefix
+        const targetDirSegments = dirPrefix ? resolvePath(currentPath, dirPrefix) : currentPath;
+        const targetDirNode = resolveNode(targetDirSegments);
+
+        if (targetDirNode && targetDirNode.type === 'dir') {
+          for (const [name, node] of Object.entries(targetDirNode.children)) {
+            // Dölj punkt-filer om inte användaren aktivt startade med '.'
+            if (name.startsWith('.') && !basePrefix.startsWith('.')) continue;
+
+            if (mainCmd === 'cd') {
+              if (node.type === 'dir') {
+                availableItems.push(`${name}/`);
+              }
+            } else {
+              availableItems.push(node.type === 'dir' ? `${name}/` : name);
+            }
           }
 
-          // If command is 'open', also offer standard section destinations and all dynamic slugs
-          if (mainCmd === 'open') {
-            const openTargets = ['projects', 'thoughts', 'files'];
-            openTargets.forEach(t => {
-              if (!availableItems.includes(t) && !availableItems.includes(`${t}/`)) {
-                availableItems.push(t);
-              }
-            });
+          // Om vi är i en underkatalog och användaren inte redan skrivit ../
+          if (targetDirSegments.length > 0 && !dirPrefix.endsWith('../')) {
+            availableItems.push('../');
+          }
+        }
 
-            // Inkludera alla dynamiska slugs från projekt, tankar och filer för Tab-komplettering
-            for (const [dirName, dirNode] of Object.entries(fileSystem.children)) {
-              if (dirNode.type === 'dir') {
-                for (const fname of Object.keys(dirNode.children)) {
-                  const baseFname = fname.replace(/\.md$/, '');
-                  if (!availableItems.includes(baseFname)) {
-                    availableItems.push(baseFname);
-                  }
+        // Om kommandot är 'open' och användaren inte angett specifik sökväg med slash:
+        // Erbjuda också standardsektioner och alla dynamiska slugs
+        if (mainCmd === 'open' && !dirPrefix) {
+          const openTargets = ['projects', 'thoughts', 'files'];
+          openTargets.forEach(t => {
+            if (!availableItems.includes(t) && !availableItems.includes(`${t}/`)) {
+              availableItems.push(t);
+            }
+          });
+
+          for (const [dirName, dirNode] of Object.entries(fileSystem.children)) {
+            if (dirNode.type === 'dir') {
+              for (const fname of Object.keys(dirNode.children)) {
+                const baseFname = fname.replace(/\.md$/, '');
+                if (!availableItems.includes(baseFname)) {
+                  availableItems.push(baseFname);
                 }
               }
             }
           }
         }
 
-        const matches = availableItems.filter(item => item.toLowerCase().startsWith(lastToken.toLowerCase()));
+        const matches = availableItems.filter(item => item.toLowerCase().startsWith(basePrefix.toLowerCase()));
 
         if (matches.length === 1) {
-          tokens[tokens.length - 1] = matches[0];
+          tokens[tokens.length - 1] = dirPrefix + matches[0];
           input.value = tokens.join(' ');
         } else if (matches.length > 1) {
           // Förhindra duplikation vid upprepade Tab-tryck!
@@ -1403,8 +1494,11 @@ ${escapeHtml(node.content)}
           }
           const hint = document.createElement('div');
           hint.className = 'tab-hint-row text-xs text-[#38bdf8] pl-3 my-1 font-mono';
-          hint.textContent = matches.join('   ');
+          hint.textContent = matches.map(m => dirPrefix + m).join('   ');
           history.appendChild(hint);
+          if (termBody) {
+            termBody.scrollTop = termBody.scrollHeight;
+          }
         }
       }
     });
@@ -1420,3 +1514,24 @@ ${escapeHtml(node.content)}
     initTerminalEngine();
   }
 </script>
+
+<style>
+  #terminal-body {
+    scrollbar-width: thin;
+    scrollbar-color: #30363d #0d1117;
+  }
+  #terminal-body::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  #terminal-body::-webkit-scrollbar-track {
+    background: #0d1117;
+  }
+  #terminal-body::-webkit-scrollbar-thumb {
+    background: #30363d;
+    border-radius: 3px;
+  }
+  #terminal-body::-webkit-scrollbar-thumb:hover {
+    background: #484f58;
+  }
+</style>
