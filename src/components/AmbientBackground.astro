@@ -1,317 +1,82 @@
 ---
-// src/components/AmbientBackground.astro - Living developer cockpit ambient atmosphere
-// Fully animated, high-performance GPU-accelerated, with full prefers-reduced-motion support
+// src/components/AmbientBackground.astro - Super minimal, calm ambient background
+// Pure CSS, ultra-low opacity, zero noise, respects prefers-reduced-motion
 ---
 
 <div id="ambient-bg-container" class="fixed inset-0 pointer-events-none overflow-hidden select-none z-0" aria-hidden="true">
-  <!-- 1. Ambient Slow-Drifting Aurora Blobs (Rich, living depth) -->
-  <div class="ambient-blob blob-1"></div>
-  <div class="ambient-blob blob-2"></div>
-  <div class="ambient-blob blob-3"></div>
+  <!-- Subtle, calm ambient glow: very soft and slow -->
+  <div class="ambient-glow glow-top"></div>
+  <div class="ambient-glow glow-bottom"></div>
 
-  <!-- 2. Technical Dot Matrix Coordinate Plane -->
+  <!-- Ultra-subtle, crisp tech dot grid -->
   <div class="ambient-grid"></div>
-
-  <!-- 3. Interactive Mouse Spotlight (Illuminates grid beneath cursor) -->
-  <div id="ambient-spotlight" class="ambient-spotlight"></div>
-
-  <!-- 4. Subtle Telemetry Radar Scanline (Sweeps smoothly down screen) -->
-  <div class="ambient-scanline"></div>
-
-  <!-- 5. Floating Cyber Data Sparks (12 subtle rising particles) -->
-  <div class="ambient-particles-layer">
-    <span class="ambient-particle p-1"></span>
-    <span class="ambient-particle p-2"></span>
-    <span class="ambient-particle p-3"></span>
-    <span class="ambient-particle p-4"></span>
-    <span class="ambient-particle p-5"></span>
-    <span class="ambient-particle p-6"></span>
-    <span class="ambient-particle p-7"></span>
-    <span class="ambient-particle p-8"></span>
-    <span class="ambient-particle p-9"></span>
-    <span class="ambient-particle p-10"></span>
-    <span class="ambient-particle p-11"></span>
-    <span class="ambient-particle p-12"></span>
-  </div>
 </div>
-
-<script>
-  // Mouse spotlight tracker with requestAnimationFrame (respects prefers-reduced-motion)
-  (function initAmbientSpotlight() {
-    const spotlight = document.getElementById('ambient-spotlight');
-    if (!spotlight) return;
-
-    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let targetX = window.innerWidth / 2;
-    let targetY = window.innerHeight / 2;
-    let currentX = targetX;
-    let currentY = targetY;
-    let rafId: number | null = null;
-    let isTracking = false;
-    let isListening = false;
-
-    function onMouseMove(e: MouseEvent) {
-      if (motionQuery.matches) return;
-      targetX = e.clientX;
-      targetY = e.clientY;
-
-      if (!isTracking) {
-        isTracking = true;
-        spotlight?.classList.add('is-active');
-        loop();
-      }
-    }
-
-    function loop() {
-      if (motionQuery.matches) return;
-      // Smooth lerp (linear interpolation) for organic flashlight lag
-      currentX += (targetX - currentX) * 0.14;
-      currentY += (targetY - currentY) * 0.14;
-
-      spotlight?.style.setProperty('--mouse-x', `${Math.round(currentX)}px`);
-      spotlight?.style.setProperty('--mouse-y', `${Math.round(currentY)}px`);
-
-      if (Math.abs(targetX - currentX) > 0.5 || Math.abs(targetY - currentY) > 0.5) {
-        rafId = requestAnimationFrame(loop);
-      } else {
-        isTracking = false;
-        rafId = null;
-      }
-    }
-
-    function setupListeners() {
-      if (motionQuery.matches) {
-        if (isListening) {
-          window.removeEventListener('pointermove', onMouseMove);
-          isListening = false;
-        }
-        if (rafId) {
-          cancelAnimationFrame(rafId);
-          rafId = null;
-        }
-        spotlight?.classList.remove('is-active');
-      } else {
-        if (!isListening) {
-          window.addEventListener('pointermove', onMouseMove, { passive: true });
-          isListening = true;
-        }
-      }
-    }
-
-    setupListeners();
-    motionQuery.addEventListener('change', setupListeners);
-
-    document.addEventListener('astro:before-swap', () => {
-      window.removeEventListener('pointermove', onMouseMove);
-      if (rafId) cancelAnimationFrame(rafId);
-    });
-  })();
-</script>
 
 <style>
   #ambient-bg-container {
     background-color: transparent;
   }
 
-  /* 1. Ambient Drifting Aurora Blobs */
-  .ambient-blob {
+  /* Super soft, slow, breathing ambient gradients */
+  .ambient-glow {
     position: absolute;
     border-radius: 9999px;
-    filter: blur(100px);
-    will-change: transform, opacity;
+    filter: blur(120px);
     pointer-events: none;
+    will-change: opacity, transform;
   }
 
-  /* Emerald blob (cockpit primary) */
-  .blob-1 {
-    width: 620px;
-    height: 620px;
-    background: radial-gradient(circle, rgba(16, 185, 129, 0.28) 0%, rgba(16, 185, 129, 0.08) 50%, transparent 75%);
-    top: -100px;
-    left: -120px;
-    animation: drift-1 22s ease-in-out infinite alternate;
+  /* Top subtle emerald / cyan aura */
+  .glow-top {
+    width: 600px;
+    height: 320px;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.09) 0%, rgba(56, 189, 248, 0.04) 50%, transparent 80%);
+    animation: pulse-slow 16s ease-in-out infinite alternate;
   }
 
-  /* Cyan blob (terminal secondary) */
-  .blob-2 {
-    width: 720px;
-    height: 720px;
-    background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, rgba(56, 189, 248, 0.06) 50%, transparent 75%);
-    bottom: -120px;
-    right: -140px;
-    animation: drift-2 26s ease-in-out infinite alternate;
+  /* Bottom subtle cyan / violet aura */
+  .glow-bottom {
+    width: 650px;
+    height: 350px;
+    bottom: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at center, rgba(56, 189, 248, 0.06) 0%, rgba(167, 139, 250, 0.03) 50%, transparent 80%);
+    animation: pulse-slow 20s ease-in-out infinite alternate 4s;
   }
 
-  /* Purple / Indigo accent blob */
-  .blob-3 {
-    width: 520px;
-    height: 520px;
-    background: radial-gradient(circle, rgba(167, 139, 250, 0.2) 0%, rgba(167, 139, 250, 0.05) 50%, transparent 75%);
-    top: 35%;
-    left: 45%;
-    animation: drift-3 24s ease-in-out infinite alternate;
+  @keyframes pulse-slow {
+    0% {
+      opacity: 0.45;
+      transform: translateX(-50%) scale(0.95);
+    }
+    100% {
+      opacity: 0.85;
+      transform: translateX(-50%) scale(1.05);
+    }
   }
 
-  @keyframes drift-1 {
-    0% { transform: translate3d(0, 0, 0) scale(1); }
-    50% { transform: translate3d(160px, 110px, 0) scale(1.18); }
-    100% { transform: translate3d(-70px, 180px, 0) scale(0.92); }
-  }
-
-  @keyframes drift-2 {
-    0% { transform: translate3d(0, 0, 0) scale(1); }
-    50% { transform: translate3d(-140px, -110px, 0) scale(1.22); }
-    100% { transform: translate3d(110px, -150px, 0) scale(0.88); }
-  }
-
-  @keyframes drift-3 {
-    0% { transform: translate3d(-50%, -50%, 0) scale(0.9); }
-    50% { transform: translate3d(-35%, -65%, 0) scale(1.25); }
-    100% { transform: translate3d(-65%, -35%, 0) scale(1); }
-  }
-
-  /* 2. Micro Dot Grid: clean, crisp, visible */
+  /* Ultra-subtle, crisp dot grid */
   .ambient-grid {
     position: absolute;
     inset: 0;
-    background-image: radial-gradient(rgba(230, 237, 243, 0.12) 1.2px, transparent 1.2px);
-    background-size: 26px 26px;
-    opacity: 0.75;
-    mask-image: radial-gradient(ellipse 95% 90% at 50% 50%, black 50%, transparent 100%);
-    -webkit-mask-image: radial-gradient(ellipse 95% 90% at 50% 50%, black 50%, transparent 100%);
+    background-image: radial-gradient(rgba(230, 237, 243, 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: 0.45;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 20%, transparent 90%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 20%, transparent 90%);
   }
 
-  /* 3. Interactive Mouse Spotlight */
-  .ambient-spotlight {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 0.8s ease;
-    background: radial-gradient(
-      520px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-      rgba(16, 185, 129, 0.12) 0%,
-      rgba(56, 189, 248, 0.05) 40%,
-      transparent 75%
-    );
-    will-change: background;
-  }
-
-  .ambient-spotlight.is-active {
-    opacity: 0.9;
-  }
-
-  /* 4. Telemetry Scanline Sweep */
-  .ambient-scanline {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, 
-      transparent 0%, 
-      rgba(56, 189, 248, 0.08) 15%, 
-      rgba(16, 185, 129, 0.45) 50%, 
-      rgba(56, 189, 248, 0.08) 85%, 
-      transparent 100%
-    );
-    box-shadow: 0 0 20px 2px rgba(16, 185, 129, 0.35);
-    opacity: 0.75;
-    animation: scan-down 14s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    will-change: transform;
-  }
-
-  @keyframes scan-down {
-    0% {
-      transform: translateY(-20px);
-      opacity: 0;
-    }
-    10% {
-      opacity: 0.75;
-    }
-    90% {
-      opacity: 0.75;
-    }
-    100% {
-      transform: translateY(105vh);
-      opacity: 0;
-    }
-  }
-
-  /* 5. Floating Cyber Data Sparks */
-  .ambient-particles-layer {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    pointer-events: none;
-  }
-
-  .ambient-particle {
-    position: absolute;
-    border-radius: 9999px;
-    will-change: transform, opacity;
-  }
-
-  .p-1 { width: 3px; height: 3px; background: #10b981; left: 12%; top: 90%; box-shadow: 0 0 6px #10b981; animation: float-p 18s linear infinite; }
-  .p-2 { width: 2px; height: 2px; background: #38bdf8; left: 24%; top: 95%; box-shadow: 0 0 5px #38bdf8; animation: float-p 22s linear infinite 3s; }
-  .p-3 { width: 3px; height: 3px; background: #a78bfa; left: 38%; top: 85%; box-shadow: 0 0 6px #a78bfa; animation: float-p 20s linear infinite 7s; }
-  .p-4 { width: 2px; height: 2px; background: #10b981; left: 48%; top: 92%; box-shadow: 0 0 5px #10b981; animation: float-p 16s linear infinite 2s; }
-  .p-5 { width: 3px; height: 3px; background: #38bdf8; left: 62%; top: 88%; box-shadow: 0 0 6px #38bdf8; animation: float-p 24s linear infinite 5s; }
-  .p-6 { width: 2px; height: 2px; background: #10b981; left: 74%; top: 94%; box-shadow: 0 0 5px #10b981; animation: float-p 19s linear infinite 8s; }
-  .p-7 { width: 3px; height: 3px; background: #a78bfa; left: 86%; top: 86%; box-shadow: 0 0 6px #a78bfa; animation: float-p 21s linear infinite 4s; }
-  .p-8 { width: 2px; height: 2px; background: #38bdf8; left: 18%; top: 80%; box-shadow: 0 0 5px #38bdf8; animation: float-p 25s linear infinite 10s; }
-  .p-9 { width: 3px; height: 3px; background: #10b981; left: 32%; top: 75%; box-shadow: 0 0 6px #10b981; animation: float-p 17s linear infinite 1s; }
-  .p-10 { width: 2px; height: 2px; background: #38bdf8; left: 55%; top: 78%; box-shadow: 0 0 5px #38bdf8; animation: float-p 23s linear infinite 9s; }
-  .p-11 { width: 3px; height: 3px; background: #10b981; left: 68%; top: 82%; box-shadow: 0 0 6px #10b981; animation: float-p 20s linear infinite 6s; }
-  .p-12 { width: 2px; height: 2px; background: #a78bfa; left: 92%; top: 80%; box-shadow: 0 0 5px #a78bfa; animation: float-p 26s linear infinite 11s; }
-
-  @keyframes float-p {
-    0% {
-      transform: translateY(0) translateX(0);
-      opacity: 0;
-    }
-    15% {
-      opacity: 0.65;
-    }
-    50% {
-      transform: translateY(-50vh) translateX(15px);
-      opacity: 0.8;
-    }
-    85% {
-      opacity: 0.5;
-    }
-    100% {
-      transform: translateY(-105vh) translateX(-15px);
-      opacity: 0;
-    }
-  }
-
-  /* =====================================================================
-     PREFERS-REDUCED-MOTION SUPPORT
-     Stops all animations and movement completely for users requesting
-     reduced motion, maintaining a static, calm, non-animated visual state.
-     ===================================================================== */
+  /* Complete prefers-reduced-motion compliance: completely stops breathing pulse */
   @media (prefers-reduced-motion: reduce) {
-    .ambient-blob,
-    .ambient-scanline,
-    .ambient-particle,
-    .ambient-spotlight,
-    .ambient-grid {
+    .glow-top,
+    .glow-bottom {
       animation: none !important;
-      transition: none !important;
-    }
-
-    /* Completely hide moving scanlines, floating particles, and dynamic spotlight */
-    .ambient-scanline,
-    .ambient-particle,
-    .ambient-particles-layer,
-    .ambient-spotlight {
-      display: none !important;
-    }
-
-    /* Render static, calm, resting ambient gradient orbs */
-    .ambient-blob {
-      transform: none !important;
-      opacity: 0.12 !important;
+      opacity: 0.6 !important;
+      transform: translateX(-50%) !important;
     }
   }
 </style>
