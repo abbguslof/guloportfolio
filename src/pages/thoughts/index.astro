@@ -1,0 +1,143 @@
+---
+// src/pages/thoughts/index.astro - Fullständig Blogg- & Tankesida
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import ThoughtRow from '../../components/ThoughtRow.astro';
+import { getCollection } from 'astro:content';
+
+const thoughts = await getCollection('thoughts');
+const sortedThoughts = thoughts
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+
+const allTags = Array.from(
+  new Set(sortedThoughts.flatMap((post) => post.data.tags))
+).sort();
+---
+
+<Layout 
+  title="Tankar & Blogg // gulo" 
+  description="Personliga anteckningar om Chalmers Datateknik, simning, Minecraft-servrar, Linux och programmering."
+>
+  <Header />
+
+  <main class="w-full max-w-4xl mx-auto py-4 space-y-10">
+    <!-- Breadcrumb & Top Header -->
+    <div class="border-b border-[#30363d] pb-6">
+      <div class="flex items-center gap-2 text-xs font-mono text-[#8b949e] mb-3">
+        <a href="/" class="hover:text-[#10b981] transition-colors">[~/hem]</a>
+        <span>/</span>
+        <span class="text-[#e6edf3]">tankar</span>
+      </div>
+
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold font-mono text-[#e6edf3] tracking-tight">
+            Tankar, Anteckningar &amp; Blogg
+          </h1>
+          <p class="text-xs sm:text-sm text-[#8b949e] mt-1 font-mono">
+            En text-first digital trädgård. Reflektioner från simbassängen, tentaveckor och serverkonfigurationer.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs font-mono text-[#8b949e]">
+          <span class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981]">
+            {sortedThoughts.length} inlägg
+          </span>
+        </div>
+      </div>
+
+      <!-- Tag Filters -->
+      <div class="flex flex-wrap items-center gap-2 mt-6 text-xs font-mono" id="blog-filter-bar">
+        <span class="text-[#8b949e] text-[11px] mr-1">Tagg:</span>
+        <button 
+          type="button" 
+          class="blog-filter-btn active px-3 py-1 rounded bg-[#10b981] text-[#0d1117] font-semibold border border-[#10b981] transition-all cursor-pointer"
+          data-tag="all"
+        >
+          [Alla]
+        </button>
+        {allTags.map((tag) => (
+          <button 
+            type="button" 
+            class="blog-filter-btn px-3 py-1 rounded bg-[#161b22] text-[#8b949e] border border-[#30363d] hover:text-[#e6edf3] transition-all cursor-pointer"
+            data-tag={tag.toLowerCase()}
+          >
+            [{tag}]
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <!-- Articles List -->
+    <div class="rounded-lg bg-[#161b22] border border-[#30363d] px-5 py-2 divide-y divide-[#30363d]/40">
+      {sortedThoughts.map((post) => (
+        <ThoughtRow 
+          title={post.data.title}
+          slug={post.id}
+          pubDate={post.data.pubDate}
+          tags={post.data.tags}
+        />
+      ))}
+
+      <div id="no-articles-msg" class="py-8 text-center text-xs font-mono text-[#8b949e] hidden">
+        Inga artiklar matchade det valda filtret.
+      </div>
+    </div>
+
+    <!-- Bottom Return Nav -->
+    <div class="pt-8 border-t border-[#30363d] flex items-center justify-between text-xs font-mono text-[#8b949e]">
+      <a href="/" class="hover:text-[#10b981] transition-colors flex items-center gap-1.5">
+        <span>←</span>
+        <span>[Tillbaka till cockpit]</span>
+      </a>
+      <span>gulo // thoughts archive</span>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  function initBlogFilters() {
+    const btns = document.querySelectorAll('.blog-filter-btn');
+    const items = document.querySelectorAll<HTMLElement>('.thought-item');
+    const noMsg = document.getElementById('no-articles-msg');
+
+    btns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tag = btn.getAttribute('data-tag') || 'all';
+
+        btns.forEach((b) => {
+          b.classList.remove('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]');
+          b.classList.add('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]');
+        });
+
+        btn.classList.remove('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]');
+        btn.classList.add('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]');
+
+        let count = 0;
+        items.forEach((item) => {
+          const tags = (item.getAttribute('data-tags') || '').split(',');
+          if (tag === 'all' || tags.includes(tag)) {
+            item.style.display = '';
+            count++;
+          } else {
+            item.style.display = 'none';
+          }
+        });
+
+        if (noMsg) {
+          noMsg.classList.toggle('hidden', count > 0);
+        }
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initBlogFilters);
+  } else {
+    initBlogFilters();
+  }
+</script>

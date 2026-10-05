@@ -9,7 +9,7 @@
       <div class="flex items-center justify-between pb-2 border-b border-[#30363d]/60 text-[11px]">
         <div class="flex items-center gap-2">
           <span class="w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
-          <span class="text-[#e6edf3] font-semibold">SYSTEM DIAGNOSTICS & TELEMETRY</span>
+          <span class="text-[#e6edf3] font-semibold">SYSTEM DIAGNOSTICS &amp; TELEMETRY</span>
         </div>
         <span class="text-[#10b981]">ALL_SYSTEMS_NOMINAL</span>
       </div>
@@ -38,6 +38,24 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2">
       <div class="flex flex-wrap items-center gap-4 text-xs">
         <a 
+          href="/projects" 
+          class="hover:text-[#e6edf3] hover:underline transition-colors"
+        >
+          [portfolio]
+        </a>
+        <a 
+          href="/thoughts" 
+          class="hover:text-[#e6edf3] hover:underline transition-colors"
+        >
+          [blogg]
+        </a>
+        <a 
+          href="/#files" 
+          class="hover:text-[#e6edf3] hover:underline transition-colors"
+        >
+          [filer]
+        </a>
+        <a 
           href="https://github.com" 
           target="_blank" 
           rel="noopener noreferrer" 
@@ -52,14 +70,6 @@
           <span>email</span><span class="text-[10px]">↗</span>
         </a>
         <a 
-          href="https://discord.com" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="hover:text-[#e6edf3] hover:underline transition-colors flex items-center gap-1"
-        >
-          <span>discord</span><span class="text-[10px]">↗</span>
-        </a>
-        <a 
           href="https://chalmers.se" 
           target="_blank" 
           rel="noopener noreferrer" 
@@ -67,24 +77,11 @@
         >
           <span>chalmers.se</span><span class="text-[10px]">↗</span>
         </a>
-        <button 
-          type="button" 
-          id="footer-files-trigger" 
-          class="text-[#38bdf8] hover:text-[#e6edf3] hover:underline transition-colors flex items-center gap-1 cursor-pointer"
-        >
-          <span>filer &amp; resurser</span><span class="text-[10px]">↓</span>
-        </button>
       </div>
 
       <div class="text-[11px] text-[#8b949e]">
-        <span>copyleft // built for curiosity & playground</span>
+        <span>copyleft // built for curiosity &amp; playground</span>
       </div>
     </div>
   </div>
 </footer>
-
-<script>
-  document.getElementById('footer-files-trigger')?.addEventListener('click', () => {
-    window.dispatchEvent(new CustomEvent('open-files-modal'));
-  });
-</script>

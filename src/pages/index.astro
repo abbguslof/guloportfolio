@@ -5,28 +5,28 @@ import Header from '../components/Header.astro';
 import InteractiveTerminal from '../components/InteractiveTerminal.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import ThoughtRow from '../components/ThoughtRow.astro';
-import FilesModal from '../components/FilesModal.astro';
+import CollapsibleDownloads from '../components/CollapsibleDownloads.astro';
 import Footer from '../components/Footer.astro';
 import { getCollection } from 'astro:content';
 
-// Hämta projekt och sortera
+// Hämta projekt
 const projects = await getCollection('projects');
 const sortedProjects = projects.sort((a, b) => a.data.order - b.data.order);
 
-// Hämta tankar/inlägg och sortera
+// Hämta tankar/inlägg
 const thoughts = await getCollection('thoughts');
 const sortedThoughts = thoughts
   .filter((post) => !post.data.draft)
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 
-// Hämta nedladdningar för modala popupen
+// Hämta nedladdningar för utfällbara listan
 const rawDownloads = await getCollection('downloads');
 const downloads = rawDownloads.map((d) => ({
   id: d.id,
   ...d.data,
 }));
 
-// Samla alla unika taggar för filter
+// Samla alla unika taggar för snabbfilter
 const allTags = Array.from(
   new Set(sortedThoughts.flatMap((post) => post.data.tags))
 ).sort();
@@ -36,26 +36,31 @@ const allTags = Array.from(
   title="gulo // digital garden & playground" 
   description="Personlig playground, portfolio och filarkiv. Chalmers Datateknik, simning, Minecraft homelab och systemprogrammering."
 >
-  <!-- Clean Header -->
+  <!-- Header -->
   <Header />
 
-  <main class="w-full space-y-14">
-    <!-- 1. Hero: Interactive Terminal (Fungerar med stäng->Om mig-kort, minimera & maximera) -->
+  <main class="w-full space-y-16">
+    <!-- 1. Hero: Interactive Terminal (Med Chafa-porträtt, fungerande fönsterknappar & Bash) -->
     <InteractiveTerminal />
 
-    <!-- 2. Projekt & Homelab (Klickbara till djupgående projektsidor) -->
+    <!-- 2. Utvalda Projekt & Homelab (Portfolio Showcase) -->
     <section id="projects" class="w-full" aria-labelledby="projects-heading">
-      <div class="flex items-center justify-between pb-3 mb-6 border-b border-[#30363d]">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-6 border-b border-[#30363d] gap-2">
         <div class="flex items-center gap-2">
           <span class="text-[#a78bfa] font-bold">#</span>
           <h2 id="projects-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]">
-            Projekt &amp; Homelab
+            Utvalda Projekt &amp; Homelab
           </h2>
         </div>
-        <div class="flex items-center gap-3 text-xs text-[#8b949e] font-mono">
-          <span>[{sortedProjects.length} projekt]</span>
-          <span class="hidden sm:inline">•</span>
-          <span class="hidden sm:inline text-[#10b981]">klicka för att läsa dokumentation</span>
+
+        <div class="flex items-center gap-3 text-xs font-mono">
+          <a 
+            href="/projects" 
+            class="text-[#38bdf8] hover:text-[#e6edf3] hover:underline transition-colors flex items-center gap-1"
+          >
+            <span>[Se hela portfolion</span>
+            <span class="text-[10px]">→]</span>
+          </a>
         </div>
       </div>
 
@@ -75,35 +80,44 @@ const allTags = Array.from(
       </div>
     </section>
 
-    <!-- 3. Tankar & Anteckningar (Med interaktiva ämnesfilter) -->
+    <!-- 3. Senaste Tankar & Blogginlägg (Med interaktiva ämnesfilter) -->
     <section id="thoughts" class="w-full" aria-labelledby="thoughts-heading">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-5 border-b border-[#30363d] gap-3">
         <div class="flex items-center gap-2">
           <span class="text-[#f59e0b] font-bold">#</span>
           <h2 id="thoughts-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]">
-            Tankar &amp; Anteckningar
+            Senaste Tankar &amp; Anteckningar
           </h2>
         </div>
 
-        <!-- Filter Buttons / Categories -->
-        <div class="flex items-center flex-wrap gap-1.5 text-xs font-mono" id="thoughts-filter-bar">
-          <span class="text-[#8b949e] text-[11px] mr-1 select-none">Filter:</span>
-          <button 
-            type="button" 
-            class="filter-btn active px-2 py-0.5 rounded bg-[#10b981] text-[#0d1117] font-semibold border border-[#10b981] transition-all cursor-pointer"
-            data-filter="all"
-          >
-            [Alla]
-          </button>
-          {allTags.map((tag) => (
+        <!-- Filter Buttons & Link to Full Blog -->
+        <div class="flex items-center flex-wrap gap-2 text-xs font-mono">
+          <div class="flex items-center gap-1" id="thoughts-filter-bar">
+            <span class="text-[#8b949e] text-[11px] mr-1 select-none">Filter:</span>
             <button 
               type="button" 
-              class="filter-btn px-2 py-0.5 rounded bg-[#161b22] text-[#8b949e] border border-[#30363d] hover:text-[#e6edf3] hover:border-[#8b949e] transition-all cursor-pointer"
-              data-filter={tag.toLowerCase()}
+              class="filter-btn active px-2 py-0.5 rounded bg-[#10b981] text-[#0d1117] font-semibold border border-[#10b981] transition-all cursor-pointer"
+              data-filter="all"
             >
-              [{tag}]
+              [Alla]
             </button>
-          ))}
+            {allTags.map((tag) => (
+              <button 
+                type="button" 
+                class="filter-btn px-2 py-0.5 rounded bg-[#161b22] text-[#8b949e] border border-[#30363d] hover:text-[#e6edf3] hover:border-[#8b949e] transition-all cursor-pointer"
+                data-filter={tag.toLowerCase()}
+              >
+                [{tag}]
+              </button>
+            ))}
+          </div>
+
+          <a 
+            href="/thoughts" 
+            class="text-[#38bdf8] hover:text-[#e6edf3] hover:underline transition-colors ml-2"
+          >
+            [Hela bloggarkivet →]
+          </a>
         </div>
       </div>
 
@@ -124,36 +138,9 @@ const allTags = Array.from(
       </div>
     </section>
 
-    <!-- 4. Resurs & Fildelnings-bar (Kompakt åtkomst till popup-arkivet) -->
-    <section class="w-full pt-2">
-      <div class="p-4 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#38bdf8]/60 transition-all flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded bg-[#0d1117] border border-[#30363d] flex items-center justify-center text-[#10b981] font-mono text-sm font-bold">
-            ↓
-          </div>
-          <div>
-            <div class="text-sm font-semibold text-[#e6edf3]">
-              Fildelningsarkiv &amp; Konfigurationer
-            </div>
-            <div class="text-xs text-[#8b949e]">
-              Nedladdningsbara Fabric modpacks, Aikar's JVM-flaggor och rsync backup-skript.
-            </div>
-          </div>
-        </div>
-
-        <button 
-          type="button" 
-          id="btn-open-files-drawer" 
-          class="px-4 py-2 rounded bg-[#0d1117] border border-[#30363d] text-xs font-mono font-medium text-[#38bdf8] hover:border-[#38bdf8] hover:text-[#e6edf3] transition-all cursor-pointer whitespace-nowrap self-start sm:self-auto"
-        >
-          [Öppna filarkivet ({downloads.length} filer) ⤢]
-        </button>
-      </div>
-    </section>
+    <!-- 4. Fildelning & Resurser (Utfällbar inline bullet-lista, ingen popup!) -->
+    <CollapsibleDownloads downloads={downloads} />
   </main>
-
-  <!-- Popup Modal för fildelning -->
-  <FilesModal downloads={downloads} />
 
   <!-- Footer -->
   <Footer />
@@ -165,17 +152,11 @@ const allTags = Array.from(
     const buttons = document.querySelectorAll('.filter-btn');
     const items = document.querySelectorAll<HTMLElement>('.thought-item');
     const noResults = document.getElementById('no-thoughts-msg');
-    const openFilesBtn = document.getElementById('btn-open-files-drawer');
-
-    openFilesBtn?.addEventListener('click', () => {
-      window.dispatchEvent(new CustomEvent('open-files-modal'));
-    });
 
     buttons.forEach((btn) => {
       btn.addEventListener('click', () => {
         const filter = btn.getAttribute('data-filter') || 'all';
 
-        // Update button styles
         buttons.forEach((b) => {
           b.classList.remove('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]');
           b.classList.add('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]');
@@ -184,7 +165,6 @@ const allTags = Array.from(
         btn.classList.remove('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]');
         btn.classList.add('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]');
 
-        // Filter items
         let visibleCount = 0;
         items.forEach((item) => {
           const itemTags = (item.getAttribute('data-tags') || '').split(',');
