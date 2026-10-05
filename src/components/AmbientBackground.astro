@@ -26,7 +26,8 @@
 <!-- Interactive Live Switcher in bottom-right corner with close '×' -->
 <aside 
   id="bg-style-switcher" 
-  class="fixed bottom-3 right-3 sm:bottom-4 sm:right-4 z-40 flex items-center gap-1 p-1 rounded-lg bg-[#161b22]/95 border border-[#30363d] backdrop-blur-md text-[11px] font-mono shadow-xl select-none transition-all duration-300"
+  style="display: none;"
+  class="fixed bottom-3 right-3 sm:bottom-4 sm:right-4 z-40 items-center gap-1 p-1 rounded-lg bg-[#161b22]/95 border border-[#30363d] backdrop-blur-md text-[11px] font-mono shadow-xl select-none transition-all duration-300"
   aria-label="Background style picker"
 >
   <span class="text-[#8b949e] pl-1.5 pr-1 hidden lg:inline text-[10px] font-bold uppercase tracking-wider">BG:</span>
@@ -341,15 +342,9 @@
 
     function toggleSwitcher(force?: boolean) {
       if (!switcher) return;
-      const isCurrentlyHidden = switcher.classList.contains('hidden');
-      const shouldShow = typeof force === 'boolean' ? force : isCurrentlyHidden;
-      if (shouldShow) {
-        switcher.classList.remove('hidden');
-        localStorage.setItem('site_bg_switcher_open', 'true');
-      } else {
-        switcher.classList.add('hidden');
-        localStorage.setItem('site_bg_switcher_open', 'false');
-      }
+      const isVisible = switcher.style.display !== 'none';
+      const shouldShow = typeof force === 'boolean' ? force : !isVisible;
+      switcher.style.display = shouldShow ? 'flex' : 'none';
     }
 
     // Button click listeners
@@ -365,11 +360,6 @@
       e.stopPropagation();
       toggleSwitcher(false);
     });
-
-    // Check if user previously closed the switcher
-    if (localStorage.getItem('site_bg_switcher_open') === 'false') {
-      switcher?.classList.add('hidden');
-    }
 
     // Terminal event listeners
     window.addEventListener('set-bg-mode', ((e: CustomEvent) => {

@@ -46,9 +46,47 @@ const {
       <slot />
     </div>
 
-    <!-- Client-side i18n runner -->
+    <!-- Client-side i18n & code block utilities -->
     <script>
       import '../scripts/i18n-client';
+
+      function setupCodeCopyButtons() {
+        document.querySelectorAll('pre').forEach((pre) => {
+          if (pre.closest('#terminal-window') || pre.closest('#ambient-bg-container')) return;
+          if (pre.querySelector('.code-copy-btn')) return;
+
+          const btn = document.createElement('button');
+          btn.className = 'code-copy-btn';
+          btn.type = 'button';
+          btn.setAttribute('aria-label', 'Copy code snippet');
+          btn.innerHTML = '<span>copy</span>';
+
+          btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const codeEl = pre.querySelector('code');
+            const textToCopy = (codeEl ? codeEl.innerText : pre.innerText).replace(/\n?copy$/, '').trim();
+            try {
+              await navigator.clipboard.writeText(textToCopy);
+              btn.innerHTML = '<span class="text-[#10b981] font-bold">✓ copied</span>';
+              setTimeout(() => {
+                btn.innerHTML = '<span>copy</span>';
+              }, 2000);
+            } catch (err) {
+              btn.innerHTML = '<span class="text-[#f85149]">err</span>';
+            }
+          });
+
+          pre.style.position = 'relative';
+          pre.appendChild(btn);
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupCodeCopyButtons);
+      } else {
+        setupCodeCopyButtons();
+      }
+      document.addEventListener('astro:page-load', setupCodeCopyButtons);
     </script>
   </body>
 </html>

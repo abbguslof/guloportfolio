@@ -276,6 +276,13 @@ const dynamicFileSystemSv = {
           </div>
         </div>
       </div>
+
+      <!-- Subtle read-more indicator below closed card -->
+      <div class="mt-5 pt-3 border-t border-[#30363d]/40 flex items-center justify-center gap-2 text-xs font-mono text-[#8b949e]">
+        <span class="inline-block animate-bounce text-[#10b981]">↓</span>
+        <span data-i18n="term_more_below">scrolla för projekt &amp; anteckningar</span>
+        <span class="inline-block animate-bounce text-[#10b981]">↓</span>
+      </div>
     </div>
     </>
   )}
@@ -292,7 +299,7 @@ const dynamicFileSystemSv = {
       title="Click titlebar to expand if minimized, or double click for fullscreen"
       data-i18n-title="term_titlebar_hint"
     >
-      <!-- Real Interactive Window Action Buttons -->
+      <!-- Real Interactive Window Action Buttons with subtle faint icons, clear on hover -->
       <div class="flex items-center space-x-2">
         <button 
           type="button" 
@@ -302,7 +309,7 @@ const dynamicFileSystemSv = {
           data-i18n-title="term_btn_close_title"
           aria-label="Close terminal"
         >
-          <span class="opacity-0 group-hover:opacity-100 transition-opacity leading-none">✕</span>
+          <span class="opacity-40 group-hover:opacity-100 transition-opacity leading-none text-[#0d1117]">✕</span>
         </button>
         <button 
           type="button" 
@@ -312,7 +319,7 @@ const dynamicFileSystemSv = {
           data-i18n-title="term_btn_min_title"
           aria-label="Minimize terminal"
         >
-          <span class="opacity-0 group-hover:opacity-100 transition-opacity leading-none">−</span>
+          <span class="opacity-40 group-hover:opacity-100 transition-opacity leading-none text-[#0d1117]">−</span>
         </button>
         <button 
           type="button" 
@@ -322,7 +329,7 @@ const dynamicFileSystemSv = {
           data-i18n-title="term_btn_max_title"
           aria-label="Maximize terminal"
         >
-          <span class="opacity-0 group-hover:opacity-100 transition-opacity leading-none">+</span>
+          <span class="opacity-40 group-hover:opacity-100 transition-opacity leading-none text-[#0d1117]">+</span>
         </button>
       </div>
 
@@ -439,6 +446,38 @@ const dynamicFileSystemSv = {
     </div>
   </div>
 
+  <!-- Minimized State Cat Notice: zero-height overlay wrapper ensures ZERO layout shift on sections below -->
+  {!isSubpage && (
+    <div class="relative w-full h-0 overflow-visible z-20 pointer-events-none">
+      <div 
+        id="terminal-minimized-cat-hint" 
+        class="hidden mt-1.5 select-none cursor-pointer group pointer-events-auto"
+        title="Klicka för att dölja notisen"
+        data-i18n-title="term_cat_hint_tooltip"
+      >
+        <div class="relative bg-[#161b22]/95 border border-[#30363d] group-hover:border-[#38bdf8] rounded-full py-1 pl-7 pr-3 text-[11px] font-mono text-[#e6edf3] shadow-lg transition-all flex items-center gap-1.5 whitespace-nowrap">
+          <!-- Pointer arrow pointing directly up at [✕] -->
+          <div class="absolute -top-1.5 left-[17px] w-2.5 h-2.5 bg-[#161b22] border-t border-l border-[#30363d] group-hover:border-[#38bdf8] rotate-45 transition-colors"></div>
+
+          <!-- Main hint message -->
+          <span class="text-[#8b949e] group-hover:text-[#e6edf3] transition-colors" data-i18n="term_cat_hint_text">
+            Klicka <span class="text-[#f85149] font-bold">[✕]</span> för bio i bakgrunden
+          </span>
+
+          <!-- Subtle grey dismiss hint requested by user -->
+          <span class="text-[#8b949e]/60 text-[10px] ml-1 font-mono tracking-tight select-none" data-i18n="term_cat_hint_dismiss">
+            (click to dismiss)
+          </span>
+
+          <!-- Cute cat mascot sitting half-overlapping on left edge, compact & vertically centered -->
+          <div class="absolute -left-2.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#161b22] border border-[#30363d] group-hover:border-[#f59e0b] shadow-md flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+            <span class="select-none leading-none">🐱</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+
   <!-- Blixtsnabb synk-script för att eliminera split-sekund flimmer vid sidnavigering -->
   <script is:inline>
     (function() {
@@ -458,6 +497,7 @@ const dynamicFileSystemSv = {
           sessionStorage.removeItem('terminal_body_scroll');
           sessionStorage.removeItem('terminal_nav_scroll_y');
           sessionStorage.removeItem('navigated_via_cli');
+          sessionStorage.removeItem('terminal_cat_hint_dismissed');
         }
 
         var isSub = sec.getAttribute('data-is-subpage') === 'true';
@@ -502,6 +542,10 @@ const dynamicFileSystemSv = {
 </section>
 
 <script>
+  import { getCommands } from '../scripts/terminal/commands';
+  import { getSiteLang } from '../scripts/terminal/i18n';
+  import type { CommandContext, DirNode, FileNode, LangCode } from '../scripts/terminal/types';
+
   function initTerminalEngine() {
     const termSection = document.getElementById('terminal-section');
     const termWindow = document.getElementById('terminal-window');
@@ -512,6 +556,8 @@ const dynamicFileSystemSv = {
     const titleText = document.getElementById('window-title-text');
     const statusPill = document.getElementById('window-status-pill');
     const fullscreenHint = document.getElementById('fullscreen-hint');
+
+    const minimizedCatHint = document.getElementById('terminal-minimized-cat-hint');
 
     const btnClose = document.getElementById('btn-win-close');
     const btnMinimize = document.getElementById('btn-win-minimize');
@@ -528,13 +574,14 @@ const dynamicFileSystemSv = {
 
     let isMinimized = false;
     let isMaximized = false;
-
-    function getSiteLang(): 'en' | 'sv' {
-      if (typeof window === 'undefined') return 'en';
-      const docLang = (document.documentElement.lang || document.documentElement.getAttribute('data-lang')) as 'en' | 'sv';
-      if (docLang === 'sv' || docLang === 'en') return docLang;
-      return (localStorage.getItem('site_lang') as 'en' | 'sv') || 'en';
+    let catHintTimer: number | null = null;
+    const navEntries = performance.getEntriesByType && performance.getEntriesByType('navigation');
+    const isReload = (navEntries && navEntries[0] && (navEntries[0] as PerformanceNavigationTiming).type === 'reload') || 
+                     (window.performance && window.performance.navigation && window.performance.navigation.type === 1);
+    if (isReload) {
+      sessionStorage.removeItem('terminal_cat_hint_dismissed');
     }
+    let catHintDismissed = sessionStorage.getItem('terminal_cat_hint_dismissed') === 'true';
 
     // ==========================================
     // 1. DYNAMIC VIRTUAL FILESYSTEM (EN / SV)
@@ -648,6 +695,17 @@ const dynamicFileSystemSv = {
     function userCloseWindow() {
       if (isClosing) return;
       isClosing = true;
+
+      // Klick på kryss räknas som att kattnotisen inte ska behöva komma tillbaka under sessionen
+      catHintDismissed = true;
+      sessionStorage.setItem('terminal_cat_hint_dismissed', 'true');
+      if (catHintTimer !== null) {
+        clearTimeout(catHintTimer);
+        catHintTimer = null;
+      }
+      minimizedCatHint?.classList.remove('cat-enter', 'cat-exit');
+      minimizedCatHint?.classList.add('hidden');
+
       if (isMaximized) unmaximize(true);
       if (isMinimized) unminimize(true);
       sessionStorage.setItem('terminal_closed_by_user', 'true');
@@ -660,17 +718,40 @@ const dynamicFileSystemSv = {
       termWindow.classList.remove('term-opening');
       termWindow.classList.add('term-closing');
 
-      setTimeout(() => {
-        termWindow.classList.remove('term-closing');
-        if (isSubpage) {
+      if (isSubpage) {
+        termSection.style.overflow = 'hidden';
+        termSection.style.maxHeight = termSection.scrollHeight + 'px';
+        termSection.style.transition = 'max-height 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.16s ease-out, margin-bottom 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
+        void termSection.offsetWidth;
+        termSection.style.maxHeight = '0px';
+        termSection.style.opacity = '0';
+        termSection.style.marginBottom = '0px';
+
+        setTimeout(() => {
+          termWindow.classList.remove('term-closing');
           termSection.classList.add('hidden');
-        } else {
+          termSection.style.maxHeight = '';
+          termSection.style.opacity = '';
+          termSection.style.marginBottom = '';
+          termSection.style.overflow = '';
+          termSection.style.transition = '';
+          isClosing = false;
+        }, 220);
+      } else {
+        setTimeout(() => {
+          termWindow.classList.remove('term-closing');
           termSection.classList.remove('hidden');
           termWindow.classList.add('hidden');
+          if (catHintTimer !== null) {
+            clearTimeout(catHintTimer);
+            catHintTimer = null;
+          }
+          minimizedCatHint?.classList.remove('cat-enter', 'cat-exit');
+          minimizedCatHint?.classList.add('hidden');
           closedCard?.classList.remove('hidden');
-        }
-        isClosing = false;
-      }, 160);
+          isClosing = false;
+        }, 160);
+      }
     }
 
     // Återställ och öppna fönstret med snärtig OS app-launch animation
@@ -679,10 +760,33 @@ const dynamicFileSystemSv = {
       termSection.classList.remove('hidden');
       termWindow.classList.remove('hidden', 'term-closing');
       closedCard?.classList.add('hidden');
+      if (catHintTimer !== null) {
+        clearTimeout(catHintTimer);
+        catHintTimer = null;
+      }
+      minimizedCatHint?.classList.remove('cat-enter', 'cat-exit');
+      minimizedCatHint?.classList.add('hidden');
       if (isMinimized) unminimize(true);
       updateTitle();
 
       if (!skipAnimation) {
+        if (isSubpage) {
+          termSection.style.overflow = 'hidden';
+          termSection.style.maxHeight = '0px';
+          termSection.style.opacity = '0';
+          termSection.style.transition = 'max-height 0.24s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease-in, margin-bottom 0.24s ease';
+          void termSection.offsetWidth;
+          const targetH = Math.min(880, window.innerHeight * 0.78);
+          termSection.style.maxHeight = targetH + 'px';
+          termSection.style.opacity = '1';
+          setTimeout(() => {
+            termSection.style.maxHeight = '';
+            termSection.style.opacity = '';
+            termSection.style.overflow = '';
+            termSection.style.transition = '';
+          }, 250);
+        }
+
         termWindow.classList.remove('term-opening');
         void termWindow.offsetWidth; // Force reflow för ren omstart av animation
         termWindow.classList.add('term-opening');
@@ -750,18 +854,36 @@ const dynamicFileSystemSv = {
     // Unminimize helper
     function unminimize(skipAnim = false) {
       isMinimized = false;
+      if (catHintTimer !== null) {
+        clearTimeout(catHintTimer);
+        catHintTimer = null;
+      }
+      minimizedCatHint?.classList.remove('cat-enter', 'cat-exit');
+      minimizedCatHint?.classList.add('hidden');
       termBody.classList.remove('is-minimized', 'hidden');
       statusPill?.classList.add('hidden');
+      closedCard?.classList.add('hidden');
       updateTitle();
       input.focus({ preventScroll: true });
     }
 
-    // Minimize helper
+    // Minimize helper: delayed appearance (3s) if not previously dismissed
     function applyMinimize() {
       if (isMaximized) unmaximize(true);
       isMinimized = true;
       termBody.classList.add('is-minimized');
       statusPill?.classList.remove('hidden');
+      if (!isSubpage && !catHintDismissed) {
+        closedCard?.classList.add('hidden');
+        if (catHintTimer !== null) clearTimeout(catHintTimer);
+        catHintTimer = window.setTimeout(() => {
+          catHintTimer = null;
+          if (isMinimized && !catHintDismissed) {
+            minimizedCatHint?.classList.remove('hidden', 'cat-exit');
+            minimizedCatHint?.classList.add('cat-enter');
+          }
+        }, 3000);
+      }
       updateTitle();
     }
 
@@ -772,6 +894,22 @@ const dynamicFileSystemSv = {
         applyMinimize();
       }
     }
+
+    minimizedCatHint?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      catHintDismissed = true;
+      sessionStorage.setItem('terminal_cat_hint_dismissed', 'true');
+      if (catHintTimer !== null) {
+        clearTimeout(catHintTimer);
+        catHintTimer = null;
+      }
+      minimizedCatHint.classList.remove('cat-enter');
+      minimizedCatHint.classList.add('cat-exit');
+      setTimeout(() => {
+        minimizedCatHint.classList.add('hidden');
+        minimizedCatHint.classList.remove('cat-exit');
+      }, 220);
+    });
 
     btnClose?.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -886,6 +1024,11 @@ const dynamicFileSystemSv = {
       }
       if (promptCwd) {
         promptCwd.textContent = getCwdLabel();
+      }
+      if (statusPill) {
+        statusPill.textContent = lang === 'sv'
+          ? 'MINIMERAD (klicka för att expandera)'
+          : 'MINIMIZED (click to expand)';
       }
     }
 
@@ -1042,8 +1185,10 @@ const dynamicFileSystemSv = {
       // Terminalfönstret är dolt men "Vem är gulo?" är ALLTID synligt!
       termSection.classList.remove('hidden');
       termWindow.classList.add('hidden');
+      minimizedCatHint?.classList.add('hidden');
       closedCard?.classList.remove('hidden');
     } else {
+      minimizedCatHint?.classList.add('hidden');
       hideWindowInternal();
     }
 
@@ -1086,654 +1231,7 @@ const dynamicFileSystemSv = {
       return (resolveNode(currentPath) as DirNode) || fileSystem;
     }
 
-    // Commands dictionary - fullständig flerspråkig terminalmotor
-    const commands: Record<string, (args: string[]) => string | void> = {
-      help: () => {
-        const lang = getSiteLang();
-        if (lang === 'sv') return `
-<div class="text-[#e6edf3] space-y-2 font-mono">
-  <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">BASH KOMMANDOTOLK // TILLGÄNGLIGA KOMMANDON</div>
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-xs">
-    <div>
-      <div class="text-[#38bdf8] font-bold mb-1">Information &amp; Studier:</div>
-      <div><span class="text-[#10b981] font-semibold">school / chalmers</span> : Skriver ut Chalmers-studier &amp; kurser</div>
-      <div><span class="text-[#10b981] font-semibold">swim</span> : Skriver ut simningspass &amp; tider</div>
-      <div><span class="text-[#10b981] font-semibold">whoami</span> : Personlig bakgrund &amp; profil</div>
-      <div><span class="text-[#10b981] font-semibold">contact</span> : GitHub, mail &amp; Discord</div>
-      <div><span class="text-[#10b981] font-semibold">fastfetch</span> : Systemöversikt &amp; status</div>
-    </div>
-    <div>
-      <div class="text-[#f59e0b] font-bold mb-1">Navigering &amp; Webbsidor:</div>
-      <div><span class="text-[#10b981] font-semibold">open &lt;mål&gt;</span> : Öppna projekt, artikel, fil eller sektion</div>
-      <div><span class="text-[#10b981] font-semibold">projects</span> : Gå till /projects (Portfolio)</div>
-      <div><span class="text-[#10b981] font-semibold">thoughts</span> : Gå till /thoughts (Blogg)</div>
-      <div><span class="text-[#10b981] font-semibold">files</span> : Gå till /files (Filarkiv)</div>
-    </div>
-    <div>
-      <div class="text-[#a78bfa] font-bold mb-1">Filsystem &amp; Bash:</div>
-      <div><span class="text-[#10b981] font-semibold">ls [-la]</span> : Lista filer &amp; mappar</div>
-      <div><span class="text-[#10b981] font-semibold">cd &lt;katalog&gt;</span> : Byt mapp (cd .., cd ~, cd ../projects)</div>
-      <div><span class="text-[#10b981] font-semibold">pwd</span> : Visa nuvarande arbetskatalog</div>
-      <div><span class="text-[#10b981] font-semibold">cat &lt;fil&gt;</span> : Skriv ut filens innehåll</div>
-      <div><span class="text-[#10b981] font-semibold">grep &lt;ord&gt; [fil]</span> : Sök text i filer</div>
-    </div>
-    <div>
-      <div class="text-[#8b949e] font-bold mb-1">Fönster &amp; Verktyg:</div>
-      <div><span class="text-[#10b981] font-semibold">clear (Ctrl+L)</span> : Rensa terminalen</div>
-      <div><span class="text-[#10b981] font-semibold">date / uptime</span> : Systemstatus &amp; drifttid</div>
-      <div><span class="text-[#10b981] font-semibold">exit / close</span> : Stäng terminalen</div>
-    </div>
-  </div>
-  <div class="text-[11px] text-[#8b949e] pt-1 border-t border-[#30363d]/40">
-    Tryck <kbd class="text-[#10b981]">Tab</kbd> för att komplettera kommandon och filnamn (även i <code class="text-[#38bdf8]">../</code>).
-  </div>
-</div>`;
-        return `
-<div class="text-[#e6edf3] space-y-2 font-mono">
-  <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">BASH SHELL // AVAILABLE COMMANDS</div>
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-xs">
-    <div>
-      <div class="text-[#38bdf8] font-bold mb-1">Info &amp; Studies:</div>
-      <div><span class="text-[#10b981] font-semibold">school / chalmers</span> : Chalmers studies &amp; courses</div>
-      <div><span class="text-[#10b981] font-semibold">swim</span> : Swimming sessions &amp; times</div>
-      <div><span class="text-[#10b981] font-semibold">whoami</span> : Personal background &amp; profile</div>
-      <div><span class="text-[#10b981] font-semibold">contact</span> : GitHub, email &amp; Discord</div>
-      <div><span class="text-[#10b981] font-semibold">fastfetch</span> : System overview &amp; status</div>
-    </div>
-    <div>
-      <div class="text-[#f59e0b] font-bold mb-1">Navigation &amp; Pages:</div>
-      <div><span class="text-[#10b981] font-semibold">open &lt;target&gt;</span> : Open project, article, file or section</div>
-      <div><span class="text-[#10b981] font-semibold">projects</span> : Go to /projects (Portfolio)</div>
-      <div><span class="text-[#10b981] font-semibold">thoughts</span> : Go to /thoughts (Blog)</div>
-      <div><span class="text-[#10b981] font-semibold">files</span> : Go to /files (File archive)</div>
-    </div>
-    <div>
-      <div class="text-[#a78bfa] font-bold mb-1">Filesystem &amp; Bash:</div>
-      <div><span class="text-[#10b981] font-semibold">ls [-la]</span> : List files &amp; directories</div>
-      <div><span class="text-[#10b981] font-semibold">cd &lt;dir&gt;</span> : Change directory (cd .., cd ~, cd ../projects)</div>
-      <div><span class="text-[#10b981] font-semibold">pwd</span> : Print working directory</div>
-      <div><span class="text-[#10b981] font-semibold">cat &lt;file&gt;</span> : Print file contents</div>
-      <div><span class="text-[#10b981] font-semibold">grep &lt;word&gt; [file]</span> : Search text in files</div>
-    </div>
-    <div>
-      <div class="text-[#8b949e] font-bold mb-1">Window &amp; Tools:</div>
-      <div><span class="text-[#10b981] font-semibold">clear (Ctrl+L)</span> : Clear terminal</div>
-      <div><span class="text-[#10b981] font-semibold">date / uptime</span> : System status &amp; uptime</div>
-      <div><span class="text-[#10b981] font-semibold">exit / close</span> : Close terminal</div>
-    </div>
-  </div>
-  <div class="text-[11px] text-[#8b949e] pt-1 border-t border-[#30363d]/40">
-    Press <kbd class="text-[#10b981]">Tab</kbd> to autocomplete commands and filenames (including <code class="text-[#38bdf8]">../</code> paths).
-  </div>
-</div>`;
-      },
-
-      school: () => {
-        const fileNode = fileSystem.children['school.md'] || fileSystem.children['chalmers.md'] || fileSystem.children['chalmers.txt'];
-        if (fileNode && fileNode.type === 'file' && fileNode.content) {
-          return renderMarkdownCard(fileNode.content);
-        }
-        return `<div class="text-[#8b949e] font-mono">Chalmers University of Technology — Computer Science & Engineering (D-24)</div>`;
-      },
-
-      swim: () => {
-        const fileNode = fileSystem.children['swim.md'] || fileSystem.children['swim.txt'];
-        if (fileNode && fileNode.type === 'file' && fileNode.content) {
-          return renderMarkdownCard(fileNode.content);
-        }
-        return `<div class="text-[#38bdf8] font-mono">Valhallabadet 50m — Competitive swimming (5-6 sessions/week)</div>`;
-      },
-
-      whoami: () => {
-        const fileNode = fileSystem.children['whoami.md'];
-        if (fileNode && fileNode.type === 'file' && fileNode.content) {
-          return renderMarkdownCard(fileNode.content);
-        }
-        return `<div class="text-[#10b981] font-mono">gulo // Chalmers student, swimmer & developer</div>`;
-      },
-
-      contact: () => {
-        const fileNode = fileSystem.children['contact.md'];
-        if (fileNode && fileNode.type === 'file' && fileNode.content) {
-          return renderMarkdownCard(fileNode.content);
-        }
-        return `<div class="text-[#10b981] font-mono">GitHub: github.com/gulo | Email: gulo@example.com</div>`;
-      },
-
-      ls: (args) => {
-        let targetDir = getCurrentDir();
-        const flags = args.filter(a => a.startsWith('-'));
-        const nonFlags = args.filter(a => !a.startsWith('-'));
-
-        const showAll = flags.some(f => f.includes('a'));
-        const isLong = flags.some(f => f.includes('l'));
-
-        if (nonFlags[0]) {
-          const target = nonFlags[0].replace(/\/$/, '');
-          const node = target === '~' ? fileSystem : targetDir.children[target];
-          if (!node) {
-            const _lsErr = getSiteLang() === 'sv' ? `kan inte komma åt '${escapeHtml(nonFlags[0])}': Ingen sådan fil eller katalog` : `cannot access '${escapeHtml(nonFlags[0])}': No such file or directory`;
-            return `<div class="text-[#f85149]">ls: ${_lsErr}</div>`;
-          }
-          if (node.type === 'file') {
-            return `<div class="text-[#e6edf3]">${escapeHtml(target)} (${node.size})</div>`;
-          }
-          targetDir = node as DirNode;
-        }
-
-        let entries = Object.entries(targetDir.children);
-        if (!showAll) {
-          entries = entries.filter(([name]) => !name.startsWith('.'));
-        }
-
-        if (entries.length === 0) return `<div class="text-[#8b949e]">${getSiteLang() === 'sv' ? 'Katalogen är tom.' : 'Directory is empty.'}</div>`;
-
-        if (isLong) {
-          let rows = '';
-          if (showAll) {
-            rows += `
-              <div class="grid grid-cols-[100px_70px_1fr] gap-2">
-                <span class="text-[#8b949e]">drwxr-xr-x</span>
-                <span class="text-[#8b949e] text-right">4.0 KB</span>
-                <span class="text-[#38bdf8] font-bold">.</span>
-              </div>
-              <div class="grid grid-cols-[100px_70px_1fr] gap-2">
-                <span class="text-[#8b949e]">drwxr-xr-x</span>
-                <span class="text-[#8b949e] text-right">4.0 KB</span>
-                <span class="text-[#38bdf8] font-bold">..</span>
-              </div>
-            `;
-          }
-          rows += entries.map(([name, node]) => {
-            const isDir = node.type === 'dir';
-            const perm = isDir ? 'drwxr-xr-x' : (name.startsWith('.') ? '-rw-------' : '-rw-r--r--');
-            const size = isDir ? '4.0 KB' : node.size;
-            const color = isDir ? 'text-[#38bdf8] font-bold' : (name.startsWith('.') ? 'text-[#a78bfa]' : 'text-[#e6edf3]');
-            return `<div class="grid grid-cols-[100px_70px_1fr] gap-2">
-              <span class="text-[#8b949e]">${perm}</span>
-              <span class="text-[#8b949e] text-right">${size}</span>
-              <span class="${color}">${escapeHtml(name)}${isDir ? '/' : ''}</span>
-            </div>`;
-          }).join('');
-          return `<div class="font-mono text-xs space-y-1">${rows}</div>`;
-        }
-
-        let prefix = '';
-        if (showAll) {
-          prefix = `<span class="text-[#38bdf8] font-bold">.</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-[#38bdf8] font-bold">..</span>&nbsp;&nbsp;&nbsp;&nbsp;`;
-        }
-
-        const pills = entries.map(([name, node]) => {
-          if (node.type === 'dir') {
-            return `<span class="text-[#38bdf8] font-bold">${escapeHtml(name)}/</span>`;
-          }
-          if (name.startsWith('.')) {
-            return `<span class="text-[#a78bfa]">${escapeHtml(name)}</span>`;
-          }
-          return `<span class="text-[#e6edf3]">${escapeHtml(name)}</span>`;
-        }).join('&nbsp;&nbsp;&nbsp;&nbsp;');
-
-        return `<div class="flex flex-wrap gap-x-6 gap-y-1 text-xs sm:text-sm font-mono">${prefix}${pills}</div>`;
-      },
-
-      cd: (args) => {
-        const dest = args[0] ? args[0].trim() : '~';
-        if (dest === '~' || dest === '') {
-          currentPath = [];
-          updateTitle();
-          return;
-        }
-        if (dest === '.') return;
-
-        const targetSegments = resolvePath(currentPath, dest);
-        const node = resolveNode(targetSegments);
-
-        if (node) {
-          if (node.type === 'dir') {
-            currentPath = targetSegments;
-            updateTitle();
-          } else {
-            return `<div class="text-[#f85149]">cd: '${escapeHtml(dest)}': ${getSiteLang() === 'sv' ? 'Inte en katalog' : 'Not a directory'}</div>`;
-          }
-        } else {
-          return `<div class="text-[#f85149]">cd: '${escapeHtml(dest)}': ${getSiteLang() === 'sv' ? 'Ingen sådan fil eller katalog' : 'No such file or directory'}</div>`;
-        }
-      },
-
-      pwd: () => `<div class="text-[#8b949e]">/home/gulo${currentPath.length > 0 ? '/' + currentPath.join('/') : ''}</div>`,
-
-      cat: (args) => {
-        if (!args[0]) return `<div class="text-[#f85149]">${getSiteLang() === 'sv' ? 'Användning' : 'Usage'}: cat &lt;${getSiteLang() === 'sv' ? 'filnamn' : 'filename'}&gt;</div>`;
-        const filename = args[0].trim();
-        const targetSegments = resolvePath(currentPath, filename);
-        let node = resolveNode(targetSegments);
-
-        if (!node && currentPath.length > 0 && fileSystem.children[filename]) {
-          node = fileSystem.children[filename];
-        }
-
-        if (!node) return `<div class="text-[#f85149]">cat: ${escapeHtml(filename)}: ${getSiteLang() === 'sv' ? 'Ingen sådan fil' : 'No such file'}</div>`;
-        if (node.type === 'dir') return `<div class="text-[#f85149]">cat: ${escapeHtml(filename)}: ${getSiteLang() === 'sv' ? 'Är en katalog' : 'Is a directory'}</div>`;
-
-        return `
-<div class="p-3 rounded bg-[#0d1117] border border-[#30363d] text-xs text-[#e6edf3] whitespace-pre-wrap leading-relaxed font-mono">
-${escapeHtml(node.content)}
-</div>`;
-      },
-
-      grep: (args) => {
-        if (!args[0]) return `<div class="text-[#f85149]">${getSiteLang() === 'sv' ? 'Användning' : 'Usage'}: grep &lt;${getSiteLang() === 'sv' ? 'sökord' : 'keyword'}&gt; [${getSiteLang() === 'sv' ? 'fil' : 'file'}]</div>`;
-        const query = args[0].toLowerCase();
-        const targetFile = args[1];
-        const current = getCurrentDir();
-
-        let matches: string[] = [];
-
-        function scanFile(name: string, f: FileNode) {
-          const lines = f.content.split('\n');
-          lines.forEach((line, idx) => {
-            if (line.toLowerCase().includes(query)) {
-              matches.push(`<span class="text-[#38bdf8]">${escapeHtml(name)}:${idx + 1}:</span> ${escapeHtml(line)}`);
-            }
-          });
-        }
-
-        if (targetFile) {
-          const targetSegments = resolvePath(currentPath, targetFile);
-          const node = resolveNode(targetSegments);
-          if (!node || node.type !== 'file') return `<div class="text-[#f85149]">grep: ${escapeHtml(targetFile)}: ${getSiteLang() === 'sv' ? 'Ingen sådan fil' : 'No such file'}</div>`;
-          scanFile(targetFile, node as FileNode);
-        } else {
-          for (const [name, node] of Object.entries(current.children)) {
-            if (node.type === 'file') scanFile(name, node);
-          }
-        }
-
-        if (matches.length === 0) return `<div class="text-[#8b949e]">${getSiteLang() === 'sv' ? 'Inga träffar för' : 'No matches for'} '${escapeHtml(query)}'.</div>`;
-        return `<div class="text-xs space-y-1 font-mono">${matches.join('<br/>')}</div>`;
-      },
-
-      open: (args) => {
-        const rawTarget = args[0] ? args[0].trim() : '.';
-        const target = rawTarget.toLowerCase().replace(/\/$/, '').replace(/\.md$/, '');
-        const _lang = getSiteLang();
-        const _opening = (p: string) => `<div class="text-[#10b981]">${_lang === 'sv' ? `Öppnar ${escapeHtml(p)} på webben...` : `Opening ${escapeHtml(p)} on web...`}</div>`;
-        const _navTo = (p: string) => `<div class="text-[#10b981]">${_lang === 'sv' ? `Navigerar till ${escapeHtml(p)}...` : `Navigating to ${escapeHtml(p)}...`}</div>`;
-
-        // 1. "open" eller "open ." -> öppnar katalogen användaren befinner sig i
-        if (target === '.' || target === '') {
-          if (currentPath.length === 0) {
-            navigateWithCli('/', _opening('/'));
-            return;
-          }
-          const folder = currentPath[0];
-          navigateWithCli(`/${folder}`, _opening(`/${folder}`));
-          return;
-        }
-
-        if (target === '..' || target === '~') {
-          navigateWithCli('/', _opening('/'));
-          return;
-        }
-
-        // 2. Leta upp via resolvePath (hanterar ../, ./, underkataloger)
-        const targetSegments = resolvePath(currentPath, rawTarget);
-        const resolvedNode = resolveNode(targetSegments);
-
-        if (resolvedNode) {
-          if (resolvedNode.type === 'dir') {
-            const dirUrl = targetSegments.length === 0 ? '/' : `/${targetSegments.join('/')}`;
-            navigateWithCli(dirUrl, _opening(dirUrl));
-            return;
-          } else if (resolvedNode.type === 'file' && resolvedNode.actionUrl) {
-            navigateWithCli(resolvedNode.actionUrl, _opening(`${rawTarget} (${resolvedNode.actionUrl})`));
-            return;
-          }
-        }
-
-        // Kontrollera om target matchar en fil med actionUrl i nuvarande katalog
-        const current = getCurrentDir();
-        if (current.children[rawTarget] && current.children[rawTarget].type === 'file') {
-          const f = current.children[rawTarget] as FileNode;
-          if (f.actionUrl) {
-            navigateWithCli(f.actionUrl, _opening(`${rawTarget} (${f.actionUrl})`));
-            return;
-          }
-        }
-
-        // Normalisera bort ledande ../, ./, /, ~/ för sektionsgenvägar
-        const cleanTarget = target.replace(/^(\.\.\/|\.\/|\/|~\/)+/, '');
-
-        // 3. Sök i alla kända underkataloger i virtuella filsystemet
-        for (const [dirName, dirNode] of Object.entries(fileSystem.children)) {
-          if (dirNode.type === 'dir') {
-            for (const [fname, node] of Object.entries(dirNode.children)) {
-              if (node.type === 'file') {
-                const baseFname = fname.toLowerCase().replace(/\.md$/, '');
-                if (cleanTarget === baseFname || cleanTarget === fname.toLowerCase() || baseFname.includes(cleanTarget) || cleanTarget.includes(baseFname)) {
-                  if (node.actionUrl) {
-                    navigateWithCli(node.actionUrl, `<div class="text-[#38bdf8]">${_lang === 'sv' ? 'Öppnar' : 'Opening'} ${escapeHtml(fname)} (${escapeHtml(node.actionUrl)})...</div>`);
-                    return;
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        // 4. Snabbgenvägar till sektioner
-        if (cleanTarget === 'projects' || cleanTarget === 'projekt') {
-          navigateWithCli('/projects', _navTo('/projects'));
-          return;
-        }
-        if (cleanTarget === 'thoughts' || cleanTarget === 'tankar' || cleanTarget === 'blog' || cleanTarget === 'blogg' || cleanTarget === 'anteckningar') {
-          navigateWithCli('/thoughts', _navTo('/thoughts'));
-          return;
-        }
-        if (cleanTarget === 'files' || cleanTarget === 'filer' || cleanTarget === 'downloads') {
-          navigateWithCli('/files', _navTo('/files'));
-          return;
-        }
-
-        // 5. Direktladdningar
-        const _dl = (f: string) => `<div class="text-[#10b981]">${_lang === 'sv' ? 'Laddar ner' : 'Downloading'} ${f}...</div>`;
-        if (cleanTarget.includes('fabric')) {
-          window.location.href = '/downloads/fabric-1.20.4-optimized.zip';
-          return _dl('fabric-1.20.4-optimized.zip');
-        }
-        if (cleanTarget.includes('backup')) {
-          window.location.href = '/downloads/backup-world.sh';
-          return _dl('backup-world.sh');
-        }
-        if (cleanTarget.includes('cv') || cleanTarget.includes('resume')) {
-          window.location.href = '/downloads/cv-gulo-datateknik.pdf';
-          return _dl('cv-gulo-datateknik.pdf');
-        }
-        if (cleanTarget.includes('dotfiles') || cleanTarget.includes('nvim')) {
-          window.location.href = '/downloads/nvim-dotfiles.tar.gz';
-          return _dl('nvim-dotfiles.tar.gz');
-        }
-
-        return `<div class="text-[#f85149]">${_lang === 'sv' ? `Känner inte igen '${escapeHtml(rawTarget)}'. Skriv 'help' eller 'ls'.` : `Unrecognized target '${escapeHtml(rawTarget)}'. Type 'help' or 'ls'.`}</div>`;
-      },
-
-      projects: () => {
-        const l = getSiteLang();
-        navigateWithCli('/projects', `<div class="text-[#a78bfa]">${l === 'sv' ? 'Öppnar /projects (Portfolio)...' : 'Opening /projects (Portfolio)...'}</div>`);
-        return;
-      },
-
-      thoughts: () => {
-        const l = getSiteLang();
-        navigateWithCli('/thoughts', `<div class="text-[#f59e0b]">${l === 'sv' ? 'Öppnar /thoughts (Blogg & Anteckningar)...' : 'Opening /thoughts (Blog & Notes)...'}</div>`);
-        return;
-      },
-
-      files: () => {
-        const l = getSiteLang();
-        navigateWithCli('/files', `<div class="text-[#10b981]">${l === 'sv' ? 'Öppnar /files...' : 'Opening /files...'}</div>`);
-        return;
-      },
-
-      fastfetch: () => {
-        let cfg: any = null;
-        const node = fileSystem.children['fastfetch.json'];
-        if (node && node.type === 'file' && node.content) {
-          try { cfg = JSON.parse(node.content); } catch (e) {}
-        }
-        const user = cfg?.user || 'gulo';
-        const host = cfg?.host || 'chalmers-station';
-        const badge = cfg?.badge || 'CHALMERS // D-24';
-        const specs = cfg?.specs || [];
-
-        const specRows = specs.map((s: any) => {
-          const colClass = s.color === 'emerald' ? 'text-[#10b981]' : s.color === 'amber' ? 'text-[#f59e0b]' : 'text-[#38bdf8]';
-          return `<div><span class="${colClass} font-semibold">${escapeHtml(s.key)}:</span> ${escapeHtml(s.value)}</div>`;
-        }).join('');
-
-        return `
-<div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 p-3 rounded bg-[#0d1117] border border-[#30363d] my-1 font-mono text-xs">
-  <div class="shrink-0 select-none text-[11px] leading-[1.2] text-center">
-    <pre class="leading-tight text-center text-[#10b981]">
-<span class="text-[#38bdf8]">     /\\_____/\\     </span>
-<span class="text-[#38bdf8]">    /</span>  <span class="text-[#e6edf3] font-bold">o</span>   <span class="text-[#e6edf3] font-bold">o</span>  <span class="text-[#38bdf8]">\    </span>
-<span class="text-[#10b981]">   (</span> <span class="text-[#38bdf8]">==</span>  <span class="text-[#10b981] font-bold">^</span>  <span class="text-[#38bdf8]">==</span> <span class="text-[#10b981]">)   </span>
-<span class="text-[#10b981]">    )</span>   <span class="text-[#e6edf3] font-bold">GULO</span>  <span class="text-[#10b981]">)    </span>
-<span class="text-[#10b981]">   (</span>  <span class="text-[#38bdf8]">[D-24]</span>   <span class="text-[#10b981]">)   </span>
-<span class="text-[#10b981]">  (</span> <span class="text-[#38bdf8]">(  )</span>   <span class="text-[#38bdf8]">(  )</span> <span class="text-[#10b981]">)  </span>
-<span class="text-[#38bdf8]"> (__(__)___(__)__) </span>
-    </pre>
-    <div class="text-[10px] font-bold text-[#10b981] mt-1">${escapeHtml(badge)}</div>
-  </div>
-  <div class="flex-1 space-y-1 text-xs">
-    <div><span class="text-[#10b981] font-bold">${escapeHtml(user)}</span><span class="text-[#8b949e]">@</span><span class="text-[#38bdf8] font-bold">${escapeHtml(host)}</span></div>
-    <div class="text-[#30363d]">--------------------------------------</div>
-    ${specRows}
-  </div>
-</div>`;
-      },
-
-      tldr: () => {
-        const l = getSiteLang();
-        if (l === 'sv') return `
-<div class="p-3 rounded bg-[#0d1117] border border-[#30363d] space-y-1.5 font-mono text-xs text-[#e6edf3]">
-  <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">⚡ TL;DR // GULO COCKPIT</div>
-  <div><span class="text-[#38bdf8] font-semibold">Vem:</span> Civilingenjörsstudent i Datateknik (Chalmers D-24) &amp; tävlingssimmare.</div>
-  <div><span class="text-[#38bdf8] font-semibold">Simning:</span> Valhallabadet 50m (frisim/fjäril). Bästa botemedlet mot skärmtrötthet.</div>
-  <div><span class="text-[#38bdf8] font-semibold">Homelab:</span> Eget 20.0 TPS PaperMC SMP-kluster med Velocity, Docker &amp; Debian 12.</div>
-  <div><span class="text-[#38bdf8] font-semibold">Filer:</span> CV, Neovim dotfiles, Fabric modpack och backup-skript tillgängliga på <code class="text-[#10b981]">/files</code>.</div>
-  <div><span class="text-[#38bdf8] font-semibold">Kommandon:</span> <code class="text-[#10b981]">projects</code>, <code class="text-[#10b981]">thoughts</code>, <code class="text-[#10b981]">files</code>, <code class="text-[#10b981]">school</code>, <code class="text-[#10b981]">swim</code>, <code class="text-[#10b981]">ls -la</code>.</div>
-</div>`;
-        return `
-<div class="p-3 rounded bg-[#0d1117] border border-[#30363d] space-y-1.5 font-mono text-xs text-[#e6edf3]">
-  <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">⚡ TL;DR // GULO COCKPIT</div>
-  <div><span class="text-[#38bdf8] font-semibold">Who:</span> M.Sc. Computer Science &amp; Eng student (Chalmers D-24) &amp; competitive swimmer.</div>
-  <div><span class="text-[#38bdf8] font-semibold">Swimming:</span> Valhallabadet 50m (freestyle/butterfly). Best antidote to screen fatigue.</div>
-  <div><span class="text-[#38bdf8] font-semibold">Homelab:</span> Custom 20.0 TPS PaperMC SMP cluster with Velocity, Docker &amp; Debian 12.</div>
-  <div><span class="text-[#38bdf8] font-semibold">Files:</span> CV, Neovim dotfiles, Fabric modpack and backup scripts available at <code class="text-[#10b981]">/files</code>.</div>
-  <div><span class="text-[#38bdf8] font-semibold">Commands:</span> <code class="text-[#10b981]">projects</code>, <code class="text-[#10b981]">thoughts</code>, <code class="text-[#10b981]">files</code>, <code class="text-[#10b981]">school</code>, <code class="text-[#10b981]">swim</code>, <code class="text-[#10b981]">ls -la</code>.</div>
-</div>`;
-      },
-
-      study: () => {
-        const l = getSiteLang();
-        return l === 'sv' 
-          ? `<div class="text-[#10b981] font-mono">Kompilerar operativsystem för RISC-V... Tentan godkänd med beröm! 💯</div>`
-          : `<div class="text-[#10b981] font-mono">Compiling operating systems for RISC-V... Exam passed with honors! 💯</div>`;
-      },
-      sleep: () => {
-        const l = getSiteLang();
-        return l === 'sv'
-          ? `<div class="text-[#f85149] font-mono">Error 404: Sleep Not Found under tentavecka på Chalmers. Fyller på kaffekoppen... ☕</div>`
-          : `<div class="text-[#f85149] font-mono">Error 404: Sleep Not Found during exam week at Chalmers. Refilling coffee... ☕</div>`;
-      },
-      mc: () => {
-        const l = getSiteLang();
-        return l === 'sv'
-          ? `<div class="text-[#10b981] font-mono">Docker SMP-kluster startat på port 25565. 20.0 TPS garanterat. 🟩</div>`
-          : `<div class="text-[#10b981] font-mono">Docker SMP cluster started on port 25565. 20.0 TPS guaranteed. 🟩</div>`;
-      },
-      alias: () => `
-<div class="text-xs space-y-1 font-mono text-[#8b949e]">
-  <div><span class="text-[#38bdf8]">alias swim</span>='echo "Dive in! Valhallabadet 06:00, 400m warmup ready."'</div>
-  <div><span class="text-[#38bdf8]">alias study</span>='echo "Compiling OS kernels... exam passed!"'</div>
-  <div><span class="text-[#38bdf8]">alias sleep</span>='echo "Error: 404 Sleep Not Found during exam week"'</div>
-  <div><span class="text-[#38bdf8]">alias mc</span>='docker compose -f ~/homelab/docker-compose.yml up -d'</div>
-</div>`,
-
-      clear: () => {
-        history.innerHTML = '';
-        sessionStorage.removeItem('terminal_history_html');
-        sessionStorage.removeItem('terminal_nav_scroll_y');
-        return;
-      },
-
-      bg: (args) => {
-        let mode = (args[0] || '').toLowerCase().trim();
-        const _l = getSiteLang();
-        const validModes = ['standard', 'topo', 'dither', 'ascii', 'dots', 'blocky', 'shimmer', 'off'];
-
-        // Help / list
-        if (mode === 'help' || mode === 'list' || mode === '--help' || mode === '-h') {
-          const listItems = _l === 'sv' ? [
-            { cmd: 'standard', desc: 'Ursprunglig mjuk topografi (Standard Canvas 2D)' },
-            { cmd: 'topo', desc: 'WebGL topografiska nivåkurvor' },
-            { cmd: 'dither', desc: 'Retro 4-färg Bayer dither plasma' },
-            { cmd: 'ascii', desc: 'CRT fosforgrön terminalmatris' },
-            { cmd: 'dots', desc: 'Interaktiv partikelvågsmatris' },
-            { cmd: 'pixel', desc: 'Cybernetisk blockgrid (alias: blocky)' },
-            { cmd: 'shimmer', desc: 'Eterisk smaragddimma & filmkorn (alias: noise)' },
-            { cmd: 'off', desc: 'Helt avstängd bakgrund', danger: true },
-            { cmd: 'next', desc: 'Växla cykliskt till nästa stil' },
-            { cmd: 'toggle', desc: 'Visa/dölj hörnpanelen (HUD)' },
-          ] : [
-            { cmd: 'standard', desc: 'Original smooth elevation contours (Standard Canvas 2D)' },
-            { cmd: 'topo', desc: 'WebGL topographic elevation contours' },
-            { cmd: 'dither', desc: 'Retro 4-color Bayer dither plasma' },
-            { cmd: 'ascii', desc: 'CRT phosphor green terminal matrix' },
-            { cmd: 'dots', desc: 'Interactive particle wave matrix' },
-            { cmd: 'pixel', desc: 'Cybernetic block grid (alias: blocky)' },
-            { cmd: 'shimmer', desc: 'Ethereal emerald mist & film grain (alias: noise)' },
-            { cmd: 'off', desc: 'Pure blackout (no effects)', danger: true },
-            { cmd: 'next', desc: 'Cycle to next background style' },
-            { cmd: 'toggle', desc: 'Toggle corner HUD picker on/off' },
-          ];
-
-          return `
-<div class="space-y-1.5 font-mono text-xs text-[#e6edf3]">
-  <div class="text-[#38bdf8] font-bold border-b border-[#30363d] pb-1">
-    ${_l === 'sv' ? 'BAKGRUNDSSTYRNING // TILLGÄNGLIGA STILAR' : 'BACKGROUND CONTROLLER // AVAILABLE STYLES'}
-  </div>
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-[11px] pt-1">
-    ${listItems.map(it => `<div><code class="${it.danger ? 'text-[#f85149]' : 'text-[#10b981]'} font-semibold">bg ${it.cmd}</code> : <span class="text-[#8b949e]">${escapeHtml(it.desc)}</span></div>`).join('')}
-  </div>
-</div>`;
-        }
-
-        // 1. Cycle to next background style
-        if (mode === 'next' || mode === 'cycle') {
-          window.dispatchEvent(new CustomEvent('cycle-bg-mode'));
-          const current = localStorage.getItem('site_bg_mode') || 'standard';
-          return `<div class="text-[#10b981] font-mono">${_l === 'sv' ? 'Växlade till nästa bakgrundsstil:' : 'Switched to next background style:'} <span class="font-bold">${escapeHtml(current)}</span></div>`;
-        }
-
-        // 2. Toggle corner HUD box
-        if (!mode || mode === 'toggle' || mode === 'hud' || mode === 'box') {
-          window.dispatchEvent(new CustomEvent('toggle-bg-switcher'));
-          const current = localStorage.getItem('site_bg_mode') || 'standard';
-          const isNowOpen = localStorage.getItem('site_bg_switcher_open') !== 'false';
-          return `
-<div class="space-y-1 font-mono text-xs">
-  <div>${_l === 'sv' ? 'Aktiv bakgrundsstil:' : 'Active background style:'} <span class="text-[#10b981] font-bold">${escapeHtml(current)}</span></div>
-  <div class="text-[#8b949e]">${_l === 'sv' ? 'Hörnpanel (HUD):' : 'Corner HUD:'} <span class="text-[#38bdf8] font-bold">${isNowOpen ? (_l === 'sv' ? 'SYNLIG' : 'VISIBLE') : (_l === 'sv' ? 'DOLD' : 'HIDDEN')}</span></div>
-  <div class="text-[#8b949e] text-[11px] pt-1">
-    ${_l === 'sv' ? 'Byt stil direkt med:' : 'Switch style directly with:'} 
-    <code class="text-[#38bdf8]">bg standard</code>, 
-    <code class="text-[#38bdf8]">bg topo</code>, 
-    <code class="text-[#38bdf8]">bg dither</code>, 
-    <code class="text-[#38bdf8]">bg ascii</code>, 
-    <code class="text-[#38bdf8]">bg dots</code>, 
-    <code class="text-[#38bdf8]">bg pixel</code>, 
-    <code class="text-[#38bdf8]">bg shimmer</code>, 
-    <code class="text-[#38bdf8]">bg off</code>,
-    <code class="text-[#38bdf8]">bg next</code>
-  </div>
-  <div class="text-[#8b949e] text-[10px] pt-0.5">
-    ${_l === 'sv' ? 'Tips: Skriv <code class="text-[#38bdf8]">bg help</code> för en översikt av alla stilar.' : 'Tip: Type <code class="text-[#38bdf8]">bg help</code> for an overview of all styles.'}
-  </div>
-</div>`;
-        }
-
-        // Normalize mode aliases
-        const rawInput = mode;
-        if (mode === 'default') mode = 'standard';
-        if (mode === 'pixel') mode = 'blocky';
-        if (mode === 'noise') mode = 'shimmer';
-
-        if (validModes.includes(mode)) {
-          window.dispatchEvent(new CustomEvent('set-bg-mode', { detail: mode }));
-          const label = rawInput === 'pixel' ? 'pixel' : (rawInput === 'noise' ? 'shimmer (noise)' : mode);
-          return `<div class="text-[#10b981] font-mono">${_l === 'sv' ? 'Bakgrundsstil ändrad till:' : 'Background style set to:'} <span class="font-bold">${escapeHtml(label)}</span></div>`;
-        }
-        return `<div class="text-[#f85149] font-mono">${_l === 'sv' ? `Ogiltig bakgrundsstil '${escapeHtml(rawInput)}'. Välj mellan: standard, topo, dither, ascii, dots, pixel, shimmer, off, next. (Skriv 'bg help' för detaljer).` : `Invalid background style '${escapeHtml(rawInput)}'. Choose from: standard, topo, dither, ascii, dots, pixel, shimmer, off, next. (Type 'bg help' for details).`}</div>`;
-      },
-
-      secret: () => {
-        const _l = getSiteLang();
-        const items = _l === 'sv' ? [
-          { cmd: 'bg standard', desc: 'Ursprunglig mjuk topo (Standard)' },
-          { cmd: 'bg topo', desc: 'WebGL topografiska kurvor' },
-          { cmd: 'bg dither', desc: 'Retro 4-färg Bayer dither' },
-          { cmd: 'bg ascii', desc: 'CRT fosforgrön terminalmatris' },
-          { cmd: 'bg dots', desc: 'Interaktiv partikelvåg' },
-          { cmd: 'bg pixel', desc: 'Cybernetisk blockgrid' },
-          { cmd: 'bg shimmer', desc: 'Eterisk smaragddimma & filmkorn' },
-          { cmd: 'bg off', desc: 'Helt avstängd bakgrund', danger: true },
-        ] : [
-          { cmd: 'bg standard', desc: 'Original smooth elevation topo (Standard)' },
-          { cmd: 'bg topo', desc: 'WebGL topographic contours' },
-          { cmd: 'bg dither', desc: 'Retro 4-color Bayer dither' },
-          { cmd: 'bg ascii', desc: 'CRT phosphor terminal matrix' },
-          { cmd: 'bg dots', desc: 'Interactive particle wave' },
-          { cmd: 'bg pixel', desc: 'Cybernetic blocky grid' },
-          { cmd: 'bg shimmer', desc: 'Ethereal emerald mist & film grain' },
-          { cmd: 'bg off', desc: 'Pure blackout (no effects)', danger: true },
-        ];
-
-        return `
-<div class="space-y-2 font-mono text-xs text-[#e6edf3]">
-  <div class="text-[#38bdf8] font-bold border-b border-[#30363d] pb-1">
-    ${_l === 'sv' ? 'KLASSIFICERAD DATA // COCKPIT DISPLAY DRIVER' : 'CLASSIFIED DATA // COCKPIT DISPLAY DRIVER'}
-  </div>
-  <div class="text-[#8b949e]">
-    ${_l === 'sv' 
-      ? 'Du har hittat grafikdrivrutinen! Använd kommandot <code class="text-[#10b981] font-bold">bg &lt;stil&gt;</code> eller <code class="text-[#10b981] font-bold">bg next</code> för att styra bakgrunden:'
-      : 'You found the display driver! Use <code class="text-[#10b981] font-bold">bg &lt;style&gt;</code> or <code class="text-[#10b981] font-bold">bg next</code> to control the background:'}
-  </div>
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 pl-2 text-[11px]">
-    ${items.map(it => `<div><span class="${it.danger ? 'text-[#f85149]' : 'text-[#10b981]'} font-semibold">${it.cmd}</span> : ${escapeHtml(it.desc)}</div>`).join('')}
-  </div>
-  <div class="text-[11px] text-[#8b949e] pt-1 border-t border-[#30363d]/40">
-    ${_l === 'sv' 
-      ? 'Tips: Skriv <code class="text-[#38bdf8]">bg</code> för att visa/dölja hörnpanelen, eller tryck <kbd class="text-[#10b981]">Tab</kbd> efter <code class="text-[#38bdf8]">bg </code>.'
-      : 'Protip: Type <code class="text-[#38bdf8]">bg</code> to toggle the corner HUD, or press <kbd class="text-[#10b981]">Tab</kbd> after <code class="text-[#38bdf8]">bg </code>.'}
-  </div>
-</div>`;
-      },
-
-      date: () => `<div class="text-[#8b949e]">${new Date().toLocaleString(getSiteLang() === 'sv' ? 'sv-SE' : 'en-GB')} (Europe/Stockholm)</div>`,
-      uptime: () => `<div class="text-[#10b981]">Uptime: ${getSiteLang() === 'sv' ? '42 dagar, 8 timmar' : '42 days, 8 hours'}, load: 0.18, 0.22, 0.35</div>`,
-      exit: () => { userCloseWindow(); return; },
-      close: () => { userCloseWindow(); return; }
-    };
-
-    commands['background'] = commands['bg'];
-    commands['secrets'] = commands['secret'];
-    commands['easteregg'] = commands['secret'];
-    commands['matrix'] = () => {
-      window.dispatchEvent(new CustomEvent('set-bg-mode', { detail: 'ascii' }));
-      return '<div class="text-[#10b981] font-mono">Wake up, Neo... [Background switched to ASCII]</div>';
-    };
-
-    commands['chalmers'] = commands['school'];
-    commands['dir'] = commands['ls'];
-    commands['neofetch'] = commands['fastfetch'];
-    commands['fetch'] = commands['fastfetch'];
-
-    commands['whoisgulo'] = commands['whoami'];
-    commands['whoamgulo'] = commands['whoami'];
-    commands['gulo'] = commands['whoami'];
-    commands['whois'] = commands['whoami'];
-    commands['who'] = commands['whoami'];
-
-    commands['discord'] = commands['contact'];
-    commands['phone'] = commands['contact'];
-    commands['number'] = commands['contact'];
-    commands['kontakt'] = commands['contact'];
-    commands['socials'] = commands['contact'];
-    commands['social'] = commands['contact'];
-    commands['email'] = commands['contact'];
-    commands['mail'] = commands['contact'];
+    const commandRegistry = getCommands();
 
     function execute(rawCmd: string) {
       const cleanCmd = rawCmd.trim();
@@ -1741,10 +1239,14 @@ ${escapeHtml(node.content)}
 
       cmdHistory.push(cleanCmd);
       historyIndex = cmdHistory.length;
+      try {
+        sessionStorage.setItem('terminal_cmd_history', JSON.stringify(cmdHistory));
+        (window as any).__terminal_cmd_history = cmdHistory;
+      } catch (e) {}
 
       // Render prompt execution line
       const cmdRow = document.createElement('div');
-      cmdRow.className = 'flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#8b949e] pt-1';
+      cmdRow.className = 'flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#8b949e] pt-1 font-mono';
       cmdRow.innerHTML = `
         <span class="text-[#10b981]">visitor@playground</span><span class="text-[#8b949e]">:</span><span class="text-[#38bdf8]">${escapeHtml(getCwdLabel())}</span><span class="text-[#e6edf3]">$</span>
         <span class="text-[#e6edf3]">${escapeHtml(cleanCmd)}</span>
@@ -1755,21 +1257,54 @@ ${escapeHtml(node.content)}
       const main = parts[0].toLowerCase();
       const args = parts.slice(1);
 
-      if (commands[main]) {
-        const res = commands[main](args);
+      const ctx: CommandContext = {
+        currentPath,
+        fileSystem,
+        lang: getSiteLang(),
+        navigateWithCli,
+        resolvePath,
+        resolveNode,
+        getCurrentDir,
+        getCwdLabel,
+        setCurrentPath: (newP: string[]) => {
+          currentPath = newP;
+          updateTitle();
+        },
+        renderMarkdownCard,
+        escapeHtml,
+        clearHistory: () => {
+          history.innerHTML = '';
+          sessionStorage.removeItem('terminal_history_html');
+          sessionStorage.removeItem('terminal_nav_scroll_y');
+        },
+        exitTerminal: () => {
+          userCloseWindow();
+        }
+      };
+
+      if (commandRegistry[main]) {
+        const res = commandRegistry[main](args, ctx);
         if (res) {
           const resBox = document.createElement('div');
-          resBox.className = 'text-xs pl-3 border-l border-[#30363d] my-1';
+          resBox.className = 'text-xs pl-3 border-l border-[#30363d] my-1 font-mono';
+          resBox.innerHTML = res;
+          history.appendChild(resBox);
+        }
+      } else if (cleanCmd === './helloworld.sh' || cleanCmd === 'helloworld.sh' || cleanCmd === './helloworld') {
+        const res = commandRegistry['./helloworld.sh'](args, ctx);
+        if (res) {
+          const resBox = document.createElement('div');
+          resBox.className = 'text-xs pl-3 border-l border-[#30363d] my-1 font-mono';
           resBox.innerHTML = res;
           history.appendChild(resBox);
         }
       } else {
         const errBox = document.createElement('div');
-        errBox.className = 'text-xs text-[#f85149] pl-3 border-l border-[#f85149]/40 my-1';
+        errBox.className = 'text-xs text-[#f85149] pl-3 border-l border-[#f85149]/40 my-1 font-mono';
         const _errLang = getSiteLang();
         errBox.innerHTML = _errLang === 'sv'
-          ? `Kommando hittades inte: '${escapeHtml(cleanCmd)}'. Skriv <span class="text-[#10b981] font-bold">help</span> för hjälplista.`
-          : `Command not found: '${escapeHtml(cleanCmd)}'. Type <span class="text-[#10b981] font-bold">help</span> for available commands.`;
+          ? `Kommando hittades inte: '${escapeHtml(cleanCmd)}'. Skriv <span class="text-[#10b981] font-bold">help</span> för hjälplista (eller <span class="text-[#10b981]">help -e</span>).`
+          : `Command not found: '${escapeHtml(cleanCmd)}'. Type <span class="text-[#10b981] font-bold">help</span> for available commands (or <span class="text-[#10b981]">help -e</span>).`;
         history.appendChild(errBox);
       }
 
@@ -1786,6 +1321,28 @@ ${escapeHtml(node.content)}
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       execute(input.value);
+    });
+
+    // Klick på Neovim :q [Exit] knapp stänger den virtuella editorn
+    history.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement | null;
+      const quitBtn = target?.closest('.nvim-quit-btn') as HTMLElement | null;
+      if (quitBtn) {
+        const sessionId = quitBtn.getAttribute('data-session');
+        const container = sessionId ? document.getElementById(sessionId) : quitBtn.closest('.nvim-container');
+        if (container) {
+          container.remove();
+          const exitMsg = document.createElement('div');
+          exitMsg.className = 'text-xs text-[#10b981] pl-3 border-l border-[#10b981]/40 my-1 font-mono';
+          const isSv = getSiteLang() === 'sv';
+          exitMsg.innerHTML = isSv 
+            ? `[nvim] Avslutade editorn. (Du lyckades ta dig ur vim! 🏆)`
+            : `[nvim] Exited editor. (You successfully escaped vim! 🏆)`;
+          history.appendChild(exitMsg);
+          if (termBody) termBody.scrollTop = termBody.scrollHeight;
+          if (input) input.focus();
+        }
+      }
     });
 
     // ==========================================
@@ -1853,10 +1410,15 @@ ${escapeHtml(node.content)}
         // Tab på första ordet -> komplettera kommando
         if (tokens.length <= 1) {
           const cmdList = [
-            'help', 'school', 'swim', 'whoami', 'contact', 'discord', 'phone', 'number', 'kontakt',
-            'ls', 'cd', 'cat', 'pwd', 'grep', 'open', 'projects', 'thoughts', 'files', 'clear', 
-            'date', 'uptime', 'fastfetch', 'neofetch', 'fetch', 'tldr', 'study', 'sleep', 'mc', 
-            'secret', 'alias', 'whoisgulo', 'gulo', 'exit'
+            'help', 'status', 'school', 'swim', 'whoami', 'contact', 'discord', 'kontakt',
+            'home', 'hem', 'main', 'cockpit', 'root',
+            'bio', 'about', 'tldr', 'info', 'profil', 'profile',
+            'cv', 'resume', 'recruit', 'stats', 'btop', 'htop',
+            'ls', 'cd', 'cat', 'nvim', 'vim', 'vi', 'pwd', 'grep', 'open', 
+            'projects', 'project', 'thoughts', 'thought', 'blog', 'note', 'notes', 'guide', 'guides', 'files', 'clear', 
+            'date', 'uptime', 'fastfetch', 'neofetch', 'fetch', 'uname', 'hostname', 'history',
+            'secret', 'git', 'calc', 'guess', './helloworld.sh', 'helloworld.sh', 'hello', 'tjena', 'hej', 'hejsan', 'halloj',
+            'bg', 'matrix', 'alias', 'whoisgulo', 'gulo', 'exit', 'wget', 'dl', 'download', 'linux', 'windows'
           ];
           const matches = cmdList.filter(c => c.startsWith(lastToken.toLowerCase()));
 
@@ -1875,9 +1437,86 @@ ${escapeHtml(node.content)}
           return;
         }
 
-        // Tab på argument -> komplettera sökvägar / filer / bakgrundsstilar
+        // Tab på argument -> komplettera sökvägar / filer / bakgrundsstilar / git / guess / wget / bio
         const mainCmd = tokens[0].toLowerCase();
         let availableItems: string[] = [];
+
+        if (mainCmd === 'bio' && tokens.length === 2) {
+          availableItems = ['cv', 'resume', 'stats', 'btop'];
+          const matches = availableItems.filter(item => item.toLowerCase().startsWith(lastToken.toLowerCase()));
+          if (matches.length === 1) {
+            tokens[tokens.length - 1] = matches[0];
+            input.value = tokens.join(' ');
+          }
+          return;
+        }
+
+        if ((mainCmd === 'wget' || mainCmd === 'dl' || mainCmd === 'download') && tokens.length === 2) {
+          const filesDir = fileSystem.children['files'];
+          if (filesDir && filesDir.type === 'dir') {
+            availableItems = Object.keys(filesDir.children);
+          }
+          const matches = availableItems.filter(item => item.toLowerCase().startsWith(lastToken.toLowerCase()));
+          if (matches.length === 1) {
+            tokens[tokens.length - 1] = matches[0];
+            input.value = tokens.join(' ');
+          } else if (matches.length > 1) {
+            const lastChild = history.lastElementChild;
+            if (lastChild && lastChild.classList.contains('tab-hint-row')) {
+              return;
+            }
+            const hint = document.createElement('div');
+            hint.className = 'tab-hint-row text-xs text-[#38bdf8] pl-3 my-1 font-mono';
+            hint.textContent = matches.join('   ');
+            history.appendChild(hint);
+            if (termBody) {
+              termBody.scrollTop = termBody.scrollHeight;
+            }
+          }
+          return;
+        }
+
+        if (mainCmd === 'git' && tokens.length === 2) {
+          availableItems = ['status', 'log', 'branch', 'diff', 'commit', 'push', 'pull', 'remote', 'clone', 'add', 'checkout'];
+          const matches = availableItems.filter(item => item.toLowerCase().startsWith(lastToken.toLowerCase()));
+          if (matches.length === 1) {
+            tokens[tokens.length - 1] = matches[0];
+            input.value = tokens.join(' ');
+          } else if (matches.length > 1) {
+            const lastChild = history.lastElementChild;
+            if (lastChild && lastChild.classList.contains('tab-hint-row')) {
+              return;
+            }
+            const hint = document.createElement('div');
+            hint.className = 'tab-hint-row text-xs text-[#38bdf8] pl-3 my-1 font-mono';
+            hint.textContent = matches.join('   ');
+            history.appendChild(hint);
+            if (termBody) {
+              termBody.scrollTop = termBody.scrollHeight;
+            }
+          }
+          return;
+        }
+
+        if (mainCmd === 'guess' && tokens.length === 2) {
+          availableItems = ['reset', 'quit', '50'];
+          const matches = availableItems.filter(item => item.toLowerCase().startsWith(lastToken.toLowerCase()));
+          if (matches.length === 1) {
+            tokens[tokens.length - 1] = matches[0];
+            input.value = tokens.join(' ');
+          }
+          return;
+        }
+
+        if (mainCmd === 'help' && tokens.length === 2) {
+          availableItems = ['--extended', '-e', '--all', '-a'];
+          const matches = availableItems.filter(item => item.toLowerCase().startsWith(lastToken.toLowerCase()));
+          if (matches.length === 1) {
+            tokens[tokens.length - 1] = matches[0];
+            input.value = tokens.join(' ');
+          }
+          return;
+        }
 
         if ((mainCmd === 'bg' || mainCmd === 'background') && tokens.length === 2) {
           availableItems = ['standard', 'topo', 'dither', 'ascii', 'dots', 'pixel', 'shimmer', 'off', 'next', 'help', 'toggle'];
@@ -2056,6 +1695,50 @@ ${escapeHtml(node.content)}
 
   .term-maximizing {
     animation: termWindowMaximize 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Cat Notice Display & Animations */
+  #terminal-minimized-cat-hint.hidden {
+    display: none !important;
+  }
+
+  #terminal-minimized-cat-hint:not(.hidden) {
+    display: inline-block;
+  }
+
+  @keyframes catNoticeEnter {
+    0% {
+      opacity: 0;
+      transform: translateY(8px) scale(0.94);
+    }
+    65% {
+      opacity: 0.95;
+      transform: translateY(-2px) scale(1.02);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes catNoticeExit {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(6px) scale(0.94);
+    }
+  }
+
+  .cat-enter {
+    animation: catNoticeEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .cat-exit {
+    animation: catNoticeExit 0.22s ease-in forwards;
+    pointer-events: none;
   }
 
   /* Smooth collapsible body for minimizing / unminimizing */

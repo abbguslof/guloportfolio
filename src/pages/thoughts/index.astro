@@ -50,34 +50,11 @@ const allTags = Array.from(
           </p>
         </div>
 
-        <!-- Sortering & Antal -->
+        <!-- Antal tillgängliga inlägg -->
         <div class="flex items-center gap-3 text-xs font-mono">
           <span class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981] font-mono text-xs">
-            <span id="thought-count-badge">{sortedThoughts.length}</span> <span data-i18n="thoughts_count_badge_suffix">posts visible</span>
+            <span id="thought-count-badge">{sortedThoughts.length}</span> <span data-i18n="thoughts_count_badge_suffix">posts available</span>
           </span>
-
-          <div class="inline-flex rounded-lg p-0.5 bg-[#0d1117] border border-[#30363d]" id="sort-controls">
-            <button 
-              type="button" 
-              id="btn-sort-newest" 
-              class="sort-btn active px-2.5 py-1 rounded text-[11px] font-semibold bg-[#161b22] text-[#e6edf3] border border-[#30363d] cursor-pointer transition-all"
-              data-order="desc"
-              data-i18n-title="thoughts_sort_newest_title"
-              title="Sort by newest publication date first"
-            >
-              <span data-i18n="thoughts_sort_newest">Newest ↓</span>
-            </button>
-            <button 
-              type="button" 
-              id="btn-sort-oldest" 
-              class="sort-btn px-2.5 py-1 rounded text-[11px] text-[#8b949e] hover:text-[#e6edf3] cursor-pointer transition-all"
-              data-order="asc"
-              data-i18n-title="thoughts_sort_oldest_title"
-              title="Sort by oldest publication date first"
-            >
-              <span data-i18n="thoughts_sort_oldest">Oldest ↑</span>
-            </button>
-          </div>
         </div>
       </div>
 
@@ -167,38 +144,71 @@ const allTags = Array.from(
 
         <!-- Live Search Input -->
         <div class="relative pt-2">
-          <div class="absolute inset-y-0 left-0 pl-3 pt-2 flex items-center pointer-events-none text-xs text-[#8b949e]">
-            <span>grep:</span>
+          <div class="absolute inset-y-0 left-0 pl-3.5 pt-2 flex items-center pointer-events-none gap-2 text-xs font-mono text-[#8b949e]">
+            <svg class="w-4 h-4 text-[#10b981] flex-shrink-0" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path d="M10.68 11.74a6 6 0 0 1-7.922-8.982 6 6 0 0 1 8.982 7.922l3.04 3.04a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215ZM11.5 7a4.5 4.5 0 1 0-9 0 4.5 4.5 0 0 0 9 0Z"></path>
+            </svg>
+            <span class="font-semibold text-[#8b949e]">grep:</span>
           </div>
           <input 
             type="text" 
             id="thought-search-input"
             data-i18n-placeholder="thoughts_search_placeholder"
             placeholder="Search thoughts, tags, or content (e.g. 'swimming', 'valgrind', 'tmux', 'jvm')..." 
-            class="w-full bg-[#161b22] text-[#e6edf3] text-xs pl-16 pr-4 py-2 rounded-lg border border-[#30363d] focus:outline-none focus:border-[#10b981] placeholder-[#8b949e]/60 font-mono transition-colors"
+            class="w-full bg-[#161b22] text-[#e6edf3] text-xs pl-20 pr-4 py-2 rounded-lg border border-[#30363d] focus:outline-none focus:border-[#10b981] placeholder-[#8b949e]/60 font-mono transition-colors"
           />
         </div>
 
-        <!-- Tag Filters -->
-        <div class="flex flex-wrap items-center gap-1.5 text-xs font-mono" id="blog-tag-bar">
-          <span class="text-[#8b949e] text-[11px] mr-1" data-i18n="thoughts_tag_filter_label">Tag filter:</span>
-          <button 
-            type="button" 
-            class="tag-filter-btn active px-2 py-0.5 rounded bg-[#10b981] text-[#0d1117] font-semibold text-[11px] border border-[#10b981] transition-all cursor-pointer"
-            data-tag="all"
-            data-i18n="thoughts_tag_all"
-          >
-            All
-          </button>
-          {allTags.map((tag) => (
+        <!-- Tag Filters & Sortering (likt i Files) -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs font-mono pt-1">
+          <!-- Tag Filters -->
+          <div class="flex flex-wrap items-center gap-1.5" id="blog-tag-bar">
+            <span class="text-[#8b949e] text-[11px] mr-1" data-i18n="thoughts_tag_filter_label">Tag filter:</span>
             <button 
               type="button" 
-              class="tag-filter-btn px-2 py-0.5 rounded bg-[#161b22] text-[#8b949e] text-[11px] border border-[#30363d] hover:text-[#e6edf3] transition-all cursor-pointer"
-              data-tag={tag.toLowerCase()}
+              class="tag-filter-btn active px-2 py-0.5 rounded bg-[#10b981] text-[#0d1117] font-semibold text-[11px] border border-[#10b981] transition-all cursor-pointer"
+              data-tag="all"
+              data-i18n="thoughts_tag_all"
             >
-              #{tag}
+              All
             </button>
-          ))}
+            {allTags.map((tag) => (
+              <button 
+                type="button" 
+                class="tag-filter-btn px-2 py-0.5 rounded bg-[#161b22] text-[#8b949e] text-[11px] border border-[#30363d] hover:text-[#e6edf3] transition-all cursor-pointer"
+                data-tag={tag.toLowerCase()}
+              >
+                #{tag}
+              </button>
+            ))}
+          </div>
+
+          <!-- Sortering flyttad hit till höger om taggarna -->
+          <div class="flex items-center gap-2 flex-shrink-0 self-end sm:self-auto">
+            <span class="text-[#8b949e] text-[11px]" data-i18n="thoughts_sort_label">Sort:</span>
+            <div class="inline-flex rounded-lg p-0.5 bg-[#0d1117] border border-[#30363d]" id="sort-controls">
+              <button 
+                type="button" 
+                id="btn-sort-newest" 
+                class="sort-btn active px-2.5 py-1 rounded text-[11px] font-semibold bg-[#161b22] text-[#e6edf3] border border-[#30363d] cursor-pointer transition-all"
+                data-order="desc"
+                data-i18n-title="thoughts_sort_newest_title"
+                title="Sort by newest publication date first"
+              >
+                <span data-i18n="thoughts_sort_newest">Newest ↓</span>
+              </button>
+              <button 
+                type="button" 
+                id="btn-sort-oldest" 
+                class="sort-btn px-2.5 py-1 rounded text-[11px] text-[#8b949e] hover:text-[#e6edf3] cursor-pointer transition-all"
+                data-order="asc"
+                data-i18n-title="thoughts_sort_oldest_title"
+                title="Sort by oldest publication date first"
+              >
+                <span data-i18n="thoughts_sort_oldest">Oldest ↑</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
