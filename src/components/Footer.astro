@@ -8,28 +8,28 @@
     <div class="p-4 rounded-lg bg-[#161b22] border border-[#30363d] space-y-3">
       <div class="flex items-center justify-between pb-2 border-b border-[#30363d]/60 text-[11px]">
         <div class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
-          <span class="text-[#e6edf3] font-semibold">SYSTEM DIAGNOSTICS &amp; TELEMETRY</span>
+          <span class="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse"></span>
+          <span class="text-[#e6edf3] font-semibold" data-i18n="footer_diagnostics">SYSTEM DIAGNOSTICS &amp; TELEMETRY</span>
         </div>
-        <span class="text-[#10b981]">ALL_SYSTEMS_NOMINAL</span>
+        <span class="text-[#10b981]" data-i18n="footer_nominal">ALL_SYSTEMS_NOMINAL</span>
       </div>
 
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px]">
         <div>
-          <span class="block text-[#8b949e]">LOCATION:</span>
-          <span class="text-[#e6edf3]">Göteborg, SE (Chalmers)</span>
+          <span class="block text-[#8b949e]" data-i18n="footer_location_label">LOCATION:</span>
+          <span class="text-[#e6edf3]" data-i18n="footer_location_val">Gothenburg, SE (Chalmers)</span>
         </div>
         <div>
-          <span class="block text-[#8b949e]">NETWORK PING:</span>
-          <span class="text-[#38bdf8]">~12ms (SUNET fiber)</span>
+          <span class="block text-[#8b949e]" data-i18n="footer_ping_label">NETWORK PING:</span>
+          <span class="text-[#38bdf8]" data-i18n="footer_ping_val">~12ms (SUNET fiber)</span>
         </div>
         <div>
-          <span class="block text-[#8b949e]">ENGINE:</span>
-          <span class="text-[#a78bfa]">Astro 7 (SSG) + TUI</span>
+          <span class="block text-[#8b949e]" data-i18n="footer_engine_label">ENGINE:</span>
+          <span class="text-[#a78bfa]" data-i18n="footer_engine_val">Astro 7 (SSG) + TUI</span>
         </div>
         <div>
-          <span class="block text-[#8b949e]">HOST UPTIME:</span>
-          <span class="text-[#10b981]">99.98% / 42d 8h</span>
+          <span class="block text-[#8b949e]" data-i18n="footer_uptime_label">HOST UPTIME:</span>
+          <span class="text-[#10b981]" data-i18n="footer_uptime_val">99.98% / 42 days, 8 hrs</span>
         </div>
       </div>
     </div>
@@ -40,20 +40,23 @@
         <a 
           href="/projects" 
           class="hover:text-[#e6edf3] hover:underline transition-colors"
+          data-i18n="footer_link_portfolio"
         >
           [portfolio]
         </a>
         <a 
           href="/thoughts" 
           class="hover:text-[#e6edf3] hover:underline transition-colors"
+          data-i18n="footer_link_blog"
         >
-          [blogg]
+          [blog]
         </a>
         <a 
           href="/files" 
           class="hover:text-[#e6edf3] hover:underline transition-colors"
+          data-i18n="footer_link_files"
         >
-          [filer]
+          [files]
         </a>
         <a 
           href="https://github.com" 
@@ -80,7 +83,7 @@
       </div>
 
       <div class="text-[11px] text-[#8b949e]">
-        <span>copyleft // built for curiosity &amp; playground</span>
+        <span data-i18n="footer_copyleft">copyleft // built for curiosity &amp; playground</span>
       </div>
     </div>
   </div>

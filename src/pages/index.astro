@@ -25,7 +25,7 @@ const latestThoughts = sortedThoughts.slice(0, 5);
 
 <Layout 
   title="gulo // digital garden & playground" 
-  description="Personlig playground, portfolio och filarkiv. Chalmers Datateknik, simning, Minecraft homelab och systemprogrammering."
+  description="Personal cockpit, portfolio and file archive. Chalmers Datateknik, swimming, Minecraft homelab and systems programming."
 >
   <!-- Header -->
   <Header />
@@ -39,8 +39,8 @@ const latestThoughts = sortedThoughts.slice(0, 5);
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-6 border-b border-[#30363d] gap-2">
         <div class="flex items-center gap-2">
           <span class="text-[#a78bfa] font-bold">#</span>
-          <h2 id="projects-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]">
-            Utvalda Projekt &amp; Homelab
+          <h2 id="projects-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]" data-i18n="home_hero_projects_title">
+            Featured Projects &amp; Homelab
           </h2>
         </div>
 
@@ -48,9 +48,10 @@ const latestThoughts = sortedThoughts.slice(0, 5);
           <a 
             href="/projects" 
             class="text-[#38bdf8] hover:text-[#e6edf3] hover:underline transition-colors flex items-center gap-1"
+            data-i18n="home_hero_projects_view_all"
+            data-i18n-count={sortedProjects.length}
           >
-            <span>[Se hela portfolion ({sortedProjects.length})</span>
-            <span class="text-[10px]">→]</span>
+            [View full portfolio ({sortedProjects.length}) →]
           </a>
         </div>
       </div>
@@ -76,8 +77,8 @@ const latestThoughts = sortedThoughts.slice(0, 5);
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-5 border-b border-[#30363d] gap-2">
         <div class="flex items-center gap-2">
           <span class="text-[#f59e0b] font-bold">#</span>
-          <h2 id="thoughts-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]">
-            Senaste Tankar, Guider &amp; Anteckningar
+          <h2 id="thoughts-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]" data-i18n="home_hero_thoughts_title">
+            Latest Thoughts, Guides &amp; Notes
           </h2>
         </div>
 
@@ -85,9 +86,10 @@ const latestThoughts = sortedThoughts.slice(0, 5);
           <a 
             href="/thoughts" 
             class="text-[#38bdf8] hover:text-[#e6edf3] hover:underline transition-colors flex items-center gap-1"
+            data-i18n="home_hero_thoughts_view_all"
+            data-i18n-count={sortedThoughts.length}
           >
-            <span>[Hela bloggarkivet ({sortedThoughts.length})</span>
-            <span class="text-[10px]">→]</span>
+            [Full blog archive ({sortedThoughts.length}) →]
           </a>
         </div>
       </div>
@@ -111,9 +113,10 @@ const latestThoughts = sortedThoughts.slice(0, 5);
         <a 
           href="/thoughts" 
           class="inline-flex items-center gap-2 text-xs font-mono text-[#8b949e] hover:text-[#10b981] px-4 py-2 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#10b981] transition-all"
+          data-i18n="home_hero_thoughts_bottom_btn"
+          data-i18n-count={sortedThoughts.length}
         >
-          <span>Visa alla tankar, guider och anteckningar i arkivet ({sortedThoughts.length} st)</span>
-          <span>→</span>
+          View all thoughts, guides and notes in the archive ({sortedThoughts.length} posts) →
         </a>
       </div>
     </section>

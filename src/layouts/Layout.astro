@@ -8,12 +8,12 @@ interface Props {
 
 const {
   title = "gulo // digital garden & playground",
-  description = "Personlig cockpit, portfolio och filarkiv. Chalmers Datateknik, simning, homelab och programmering.",
+  description = "Personal cockpit, portfolio and file archive. Chalmers Datateknik, swimming, homelab and systems programming.",
 } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="sv" class="bg-[#0d1117] text-[#e6edf3]">
+<html lang="en" class="bg-[#0d1117] text-[#e6edf3]">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -27,6 +27,15 @@ const {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+
+    <!-- Pre-hydration language detection (defaults to 'en') -->
+    <script is:inline>
+      (function() {
+        var lang = localStorage.getItem('site_lang') || 'en';
+        document.documentElement.lang = lang;
+        document.documentElement.setAttribute('data-lang', lang);
+      })();
+    </script>
   </head>
   <body class="min-h-screen bg-[#0d1117] text-[#e6edf3] font-mono selection:bg-[#2ea043] selection:text-[#0d1117] antialiased">
     <div class="relative min-h-screen flex flex-col justify-between max-w-6xl w-full mx-auto px-4 sm:px-6 py-6">
@@ -39,5 +48,10 @@ const {
 
       <slot />
     </div>
+
+    <!-- Client-side i18n runner -->
+    <script>
+      import '../scripts/i18n-client';
+    </script>
   </body>
 </html>

@@ -1,5 +1,5 @@
 ---
-// ThoughtRow.astro - Rich modern article row with category badge, description snippet & tags
+// ThoughtRow.astro - Rich modern article row with dynamic bilingual category badge & tags
 interface Props {
   title: string;
   slug: string;
@@ -16,13 +16,17 @@ const formattedDate = pubDate.toISOString().slice(0, 10);
 const tagsData = tags.map((t) => t.toLowerCase()).join(',');
 
 let catBadgeClass = 'text-[#f59e0b] border-[#f59e0b]/40 bg-[#f59e0b]/10';
-let catLabel = 'TANKE';
+let catBadgeKey = 'thoughts_cat_tanke_badge';
+let catDefaultText = '[THOUGHT]';
+
 if (category === 'guide') {
   catBadgeClass = 'text-[#38bdf8] border-[#38bdf8]/40 bg-[#38bdf8]/10';
-  catLabel = 'GUIDE';
+  catBadgeKey = 'thoughts_cat_guide_badge';
+  catDefaultText = '[GUIDE]';
 } else if (category === 'anteckning') {
   catBadgeClass = 'text-[#10b981] border-[#10b981]/40 bg-[#10b981]/10';
-  catLabel = 'ANTECKNING';
+  catBadgeKey = 'thoughts_cat_anteckning_badge';
+  catDefaultText = '[NOTE]';
 }
 ---
 
@@ -34,8 +38,11 @@ if (category === 'guide') {
 >
   <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
     <div class="flex items-center gap-2.5">
-      <span class={`text-[10px] font-bold px-2 py-0.5 rounded border ${catBadgeClass}`}>
-        [{catLabel}]
+      <span 
+        class={`text-[10px] font-bold px-2 py-0.5 rounded border ${catBadgeClass}`}
+        data-i18n={catBadgeKey}
+      >
+        {catDefaultText}
       </span>
       <time datetime={formattedDate} class="text-xs text-[#8b949e]">
         {formattedDate}
@@ -49,8 +56,11 @@ if (category === 'guide') {
           #{tag}
         </span>
       ))}
-      <span class="text-xs text-[#8b949e] group-hover:text-[#10b981] group-hover:translate-x-0.5 transition-transform ml-1 font-mono">
-        läs →
+      <span 
+        class="text-xs text-[#8b949e] group-hover:text-[#10b981] group-hover:translate-x-0.5 transition-transform ml-1 font-mono"
+        data-i18n="thoughts_read_more"
+      >
+        read →
       </span>
     </div>
   </div>

@@ -1,0 +1,10 @@
+# Things we ignore at Chalmers & in engineering life
+/node_modules/
+/target/
+/dist/
+/400m_individual_medley_lactic_acid.log
+/bad_code.c
+/exam_stress.tmp
+/coffee_overdose.pid
+/unfreed_malloc_leak.core
+/morning_practice_0530_rain.dump

@@ -22,13 +22,16 @@ const category = post.data.category || 'tanke';
 const hasDownloads = post.data.tags.some(t => t.toLowerCase() === 'minecraft' || t.toLowerCase() === 'sysadmin');
 
 let catBadgeClass = 'text-[#f59e0b] border-[#f59e0b]/40 bg-[#f59e0b]/10';
-let catLabel = 'TANKE';
+let catBadgeKey = 'thoughts_cat_tanke_badge';
+let catLabel = '[THOUGHT]';
 if (category === 'guide') {
   catBadgeClass = 'text-[#38bdf8] border-[#38bdf8]/40 bg-[#38bdf8]/10';
-  catLabel = 'GUIDE';
+  catBadgeKey = 'thoughts_cat_guide_badge';
+  catLabel = '[GUIDE]';
 } else if (category === 'anteckning') {
   catBadgeClass = 'text-[#10b981] border-[#10b981]/40 bg-[#10b981]/10';
-  catLabel = 'ANTECKNING';
+  catBadgeKey = 'thoughts_cat_anteckning_badge';
+  catLabel = '[NOTE]';
 }
 ---
 
@@ -48,8 +51,7 @@ if (category === 'guide') {
         href="/thoughts" 
         class="inline-flex items-center gap-1.5 text-xs font-mono text-[#8b949e] hover:text-[#10b981] transition-colors px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d]"
       >
-        <span>←</span>
-        <span>[~/tankar]</span>
+        <span data-i18n="thoughts_back_btn">← [~/thoughts]</span>
       </a>
 
       <div class="flex items-center gap-1.5">
@@ -67,8 +69,8 @@ if (category === 'guide') {
     <!-- Article Header -->
     <header class="pb-6 mb-8 border-b border-[#30363d]">
       <div class="flex items-center gap-3 text-xs font-mono text-[#8b949e] mb-3">
-        <span class={`text-[11px] font-bold px-2 py-0.5 rounded border ${catBadgeClass}`}>
-          [{catLabel}]
+        <span class={`text-[11px] font-bold px-2 py-0.5 rounded border ${catBadgeClass}`} data-i18n={catBadgeKey}>
+          {catLabel}
         </span>
         <time datetime={formattedDate}>{formattedDate}</time>
         <span>•</span>
@@ -106,7 +108,7 @@ if (category === 'guide') {
       <div class="mt-12 p-4 rounded-lg bg-[#161b22] border border-[#30363d] font-mono">
         <div class="text-xs font-bold text-[#10b981] mb-2 flex items-center gap-2">
           <span>↓</span>
-          <span>NEDLADDNINGSBARA RESURSER KOPPLADE TILL DETTA INLÄGG:</span>
+          <span data-i18n="thoughts_downloads_title">DOWNLOADABLE RESOURCES LINKED TO THIS POST:</span>
         </div>
         <div class="space-y-2 pt-2 border-t border-[#30363d]/60">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
@@ -118,8 +120,9 @@ if (category === 'guide') {
               href="/downloads/fabric-1.20.4-optimized.zip" 
               download="fabric-1.20.4-optimized.zip"
               class="px-3 py-1 rounded bg-[#0d1117] border border-[#30363d] text-[#10b981] hover:border-[#10b981] transition-all text-xs text-center"
+              data-i18n="thoughts_download_pack"
             >
-              [Ladda ner pack ↓]
+              [Download pack ↓]
             </a>
           </div>
 
@@ -132,8 +135,9 @@ if (category === 'guide') {
               href="/downloads/backup-world.sh" 
               download="backup-world.sh"
               class="px-3 py-1 rounded bg-[#0d1117] border border-[#30363d] text-[#10b981] hover:border-[#10b981] transition-all text-xs text-center"
+              data-i18n="thoughts_download_script"
             >
-              [Ladda ner skript ↓]
+              [Download script ↓]
             </a>
           </div>
         </div>
@@ -142,12 +146,20 @@ if (category === 'guide') {
 
     <!-- Bottom return navigation -->
     <div class="mt-12 pt-6 border-t border-[#30363d] flex items-center justify-between text-xs font-mono">
-      <a 
-        href="/thoughts" 
-        class="text-[#8b949e] hover:text-[#10b981] transition-colors"
-      >
-        [← Tillbaka till översikten]
-      </a>
+      <div class="flex items-center gap-4">
+        <a 
+          href="/thoughts" 
+          class="text-[#8b949e] hover:text-[#10b981] transition-colors"
+        >
+          <span data-i18n="thoughts_back_overview">[← Return to overview]</span>
+        </a>
+        <a 
+          href="/" 
+          class="text-[#8b949e] hover:text-[#10b981] transition-colors"
+        >
+          <span data-i18n="thoughts_back_home">[Back to the cockpit]</span>
+        </a>
+      </div>
       <span class="text-[#8b949e]">
         slug: {post.id}
       </span>

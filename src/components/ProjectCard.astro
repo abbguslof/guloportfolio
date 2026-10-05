@@ -1,5 +1,5 @@
 ---
-// ProjectCard.astro - Thumbnail-free TUI Project Card
+// ProjectCard.astro - Thumbnail-free TUI Project Card with dynamic bilingual tags & links
 interface Props {
   title: string;
   description: string;
@@ -24,13 +24,17 @@ const statusMap: Record<string, { label: string; textClass: string }> = {
 
 const currentStatus = statusMap[status] || statusMap.ACTIVE;
 const projectUrl = `/projects/${slug}`;
+const catKey = `projects_cat_${category.toLowerCase()}`;
 ---
 
 <div class="group relative flex flex-col justify-between p-5 rounded-lg bg-[#161b22] border border-[#30363d] hover:bg-[#1f242c] hover:border-[#38bdf8]/70 hover:shadow-lg transition-all">
   <div>
     <!-- Top Metadata: Category & Status -->
     <div class="flex items-center justify-between gap-2 mb-3">
-      <span class="text-[11px] font-mono font-medium text-[#8b949e] uppercase tracking-wider px-2 py-0.5 rounded bg-[#0d1117] border border-[#30363d]">
+      <span 
+        class="text-[11px] font-mono font-medium text-[#8b949e] uppercase tracking-wider px-2 py-0.5 rounded bg-[#0d1117] border border-[#30363d]"
+        data-i18n={catKey}
+      >
         {category}
       </span>
       <span class={`text-[11px] font-mono font-bold ${currentStatus.textClass}`}>
@@ -68,9 +72,9 @@ const projectUrl = `/projects/${slug}`;
       <a 
         href={projectUrl} 
         class="text-xs text-[#38bdf8] hover:underline z-20 flex items-center gap-1"
+        data-i18n="projects_read_more"
       >
-        <span>[Läs mer om projektet</span>
-        <span class="text-[10px]">→]</span>
+        [Read more about project →]
       </a>
 
       {repoUrl && (
@@ -79,10 +83,10 @@ const projectUrl = `/projects/${slug}`;
           target="_blank" 
           rel="noopener noreferrer" 
           class="text-[#8b949e] hover:text-[#e6edf3] flex items-center gap-1 transition-colors z-20"
-          title="Visa GitHub repository"
+          title="View GitHub repository"
+          data-i18n-title="projects_github_title"
         >
-          <span>[GitHub</span>
-          <span class="text-[10px]">↗]</span>
+          <span data-i18n="projects_github_link">[GitHub ↗]</span>
         </a>
       )}
     </div>

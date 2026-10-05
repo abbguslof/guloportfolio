@@ -21,7 +21,7 @@
     },
     {
       "key": "Uptime",
-      "value": "42 dagar, 8 timmar, 14 min",
+      "value": "42 days, 8 hours, 14 mins",
       "color": "sky"
     },
     {
@@ -35,23 +35,23 @@
       "color": "sky"
     },
     {
-      "key": "Utbildning",
-      "value": "Civilingenjör Datateknik @ Chalmers (Åk 2)",
+      "key": "Education",
+      "value": "M.Sc. Computer Science & Eng @ Chalmers (Year 2)",
       "color": "emerald"
     },
     {
-      "key": "Simning",
-      "value": "Valhallabadet (5-6 pass/v, frisim/fjäril)",
+      "key": "Swimming",
+      "value": "Valhallabadet (5-6 sessions/wk, freestyle/fly)",
       "color": "emerald"
     },
     {
       "key": "Homelab",
-      "value": "PaperMC SMP-kluster, Docker, Velocity",
+      "value": "PaperMC SMP cluster, Docker, Velocity",
       "color": "emerald"
     },
     {
       "key": "Status",
-      "value": "[● ONLINE] Tentavecka & serverdrift",
+      "value": "[● ONLINE] Exam week & server ops",
       "color": "amber",
       "online": true
     }

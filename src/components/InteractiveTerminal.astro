@@ -9,31 +9,66 @@ interface Props {
 
 const { isSubpage = false } = Astro.props;
 
-// 1. Läs statiska terminalfiler och easter eggs (.gitignore, .bashrc, .secret, about.txt, chalmers.txt, swim.txt)
+// 1. Läs statiska terminalfiler uppdelade i en/ och sv/ mappar
 const terminalDir = path.join(process.cwd(), 'src/data/terminal');
-const staticFiles: Record<string, { size: string; description: string; content: string }> = {};
+const terminalEnDir = path.join(terminalDir, 'en');
+const terminalSvDir = path.join(terminalDir, 'sv');
 
-if (fs.existsSync(terminalDir)) {
-  const fileEntries = fs.readdirSync(terminalDir);
-  for (const f of fileEntries) {
-    const fullPath = path.join(terminalDir, f);
-    const stat = fs.statSync(fullPath);
-    const content = fs.readFileSync(fullPath, 'utf-8');
-    const sizeStr = stat.size < 1024 ? `${stat.size} B` : `${(stat.size / 1024).toFixed(1)} KB`;
-    staticFiles[f] = {
-      size: sizeStr,
-      description: f,
-      content,
-    };
+function readStaticFiles(dir: string): Record<string, { size: string; description: string; content: string }> {
+  const files: Record<string, { size: string; description: string; content: string }> = {};
+  if (fs.existsSync(dir)) {
+    const entries = fs.readdirSync(dir);
+    for (const f of entries) {
+      const fullPath = path.join(dir, f);
+      const stat = fs.statSync(fullPath);
+      if (stat.isFile()) {
+        const content = fs.readFileSync(fullPath, 'utf-8');
+        const sizeStr = stat.size < 1024 ? `${stat.size} B` : `${(stat.size / 1024).toFixed(1)} KB`;
+        files[f] = {
+          size: sizeStr,
+          description: f,
+          content,
+        };
+      }
+    }
   }
+  return files;
 }
 
-// Läs konfigurerad fastfetch-data från fastfetch.json
-let fastfetchData = {
+const staticFilesEn = readStaticFiles(terminalEnDir);
+const staticFilesSv = readStaticFiles(terminalSvDir);
+
+// Läs konfigurerad fastfetch-data för EN och SV
+let fastfetchDataEn: any = {
   user: 'gulo',
   host: 'chalmers-station',
   badge: 'CHALMERS // D-24',
   tagline: 'swimmer • sysdev',
+  specs: [
+    { key: 'OS', value: 'Debian GNU/Linux 12 (bookworm) x86_64', color: 'sky' },
+    { key: 'Host', value: 'chalmers-workstation', color: 'sky' },
+    { key: 'Kernel', value: 'Linux 6.12.8-zen1', color: 'sky' },
+    { key: 'Uptime', value: '42 days, 8 hours, 14 mins', color: 'sky' },
+    { key: 'Shell', value: 'zsh 5.9 / bash 5.2 • kitty', color: 'sky' },
+    { key: 'Editor', value: 'Neovim v0.10.2 (Lua dotfiles)', color: 'sky' },
+    { key: 'Education', value: 'M.Sc. Computer Science & Eng @ Chalmers (Year 2)', color: 'emerald' },
+    { key: 'Swimming', value: 'Valhallabadet (5-6 sessions/wk, freestyle/fly)', color: 'emerald' },
+    { key: 'Homelab', value: 'PaperMC SMP cluster, Docker, Velocity', color: 'emerald' },
+    { key: 'Status', value: '[● ONLINE] Exam week & server ops', color: 'amber', online: true }
+  ]
+};
+
+if (staticFilesEn['fastfetch.json']) {
+  try {
+    fastfetchDataEn = JSON.parse(staticFilesEn['fastfetch.json'].content);
+  } catch (e) {}
+}
+
+let fastfetchDataSv: any = {
+  user: 'gulo',
+  host: 'chalmers-station',
+  badge: 'CHALMERS // D-24',
+  tagline: 'simmare • sysdev',
   specs: [
     { key: 'OS', value: 'Debian GNU/Linux 12 (bookworm) x86_64', color: 'sky' },
     { key: 'Host', value: 'chalmers-workstation', color: 'sky' },
@@ -48,17 +83,17 @@ let fastfetchData = {
   ]
 };
 
-if (staticFiles['fastfetch.json']) {
+if (staticFilesSv['fastfetch.json']) {
   try {
-    fastfetchData = JSON.parse(staticFiles['fastfetch.json'].content);
+    fastfetchDataSv = JSON.parse(staticFilesSv['fastfetch.json'].content);
   } catch (e) {}
 }
 
-// 2. Läs dynamiska projekt (konfigurerbar sammanfattning så att cat visar relevant info utan att dumpa hela filen)
+// 2. Läs dynamiska projekt (sammanfattning för terminal cat)
 const rawProjects = await getCollection('projects');
 const projectNodes: Record<string, any> = {};
 for (const p of rawProjects) {
-  const preview = `# ${p.data.title}\nStatus: [${p.data.status}] | Kategori: ${p.data.category}\nTech: ${(p.data.tech || []).join(', ')}\n\n${p.data.description}\n\nLäs hela projektet på webben: open ${p.id}`;
+  const preview = `# ${p.data.title}\nStatus: [${p.data.status}] | Category: ${p.data.category}\nTech: ${(p.data.tech || []).join(', ')}\n\n${p.data.description}\n\nView on web: open ${p.id}`;
   projectNodes[`${p.id}.md`] = {
     type: 'file',
     size: '1.4 KB',
@@ -74,7 +109,7 @@ const thoughtNodes: Record<string, any> = {};
 for (const t of rawThoughts) {
   const dateStr = t.data.pubDate ? new Date(t.data.pubDate).toISOString().split('T')[0] : '2026';
   const catLabel = (t.data.category || 'tanke').toUpperCase();
-  const preview = `[${catLabel}] ${t.data.title}\nDatum: ${dateStr} | Kategori: ${t.data.category || 'tanke'} | Taggar: ${(t.data.tags || []).join(', ')}\n\n"${t.data.description}"\n\nLäs hela artikeln: open ${t.id}`;
+  const preview = `[${catLabel}] ${t.data.title}\nDate: ${dateStr} | Category: ${t.data.category || 'tanke'} | Tags: ${(t.data.tags || []).join(', ')}\n\n"${t.data.description}"\n\nRead full post: open ${t.id}`;
   thoughtNodes[`${t.id}.md`] = {
     type: 'file',
     size: '1.8 KB',
@@ -88,7 +123,7 @@ for (const t of rawThoughts) {
 const rawDownloads = await getCollection('downloads');
 const downloadNodes: Record<string, any> = {};
 for (const d of rawDownloads) {
-  const preview = `${d.data.name} (${d.data.filename})\nStorlek: ${d.data.size} | Kategori: ${d.data.category}\n${d.data.description}\n\nSnabbkommando: ${d.data.usage || 'curl -O ' + d.data.fileUrl}\nLadda ner direkt: open ${d.data.filename}`;
+  const preview = `${d.data.name} (${d.data.filename})\nSize: ${d.data.size} | Category: ${d.data.category}\n${d.data.description}\n\nQuick command: ${d.data.usage || 'curl -O ' + d.data.fileUrl}\nDownload directly: open ${d.data.filename}`;
   downloadNodes[d.data.filename] = {
     type: 'file',
     size: d.data.size,
@@ -98,8 +133,8 @@ for (const d of rawDownloads) {
   };
 }
 
-// Slutlig virtuell filsystemstruktur
-const dynamicFileSystem = {
+// Slutliga virtuella filsystemstrukturer för EN och SV
+const dynamicFileSystemEn = {
   type: 'dir',
   children: {
     projects: {
@@ -115,7 +150,36 @@ const dynamicFileSystem = {
       children: downloadNodes,
     },
     ...Object.fromEntries(
-      Object.entries(staticFiles).map(([fname, data]) => [
+      Object.entries(staticFilesEn).map(([fname, data]) => [
+        fname,
+        {
+          type: 'file',
+          size: data.size,
+          description: data.description,
+          content: data.content,
+        }
+      ])
+    )
+  }
+};
+
+const dynamicFileSystemSv = {
+  type: 'dir',
+  children: {
+    projects: {
+      type: 'dir',
+      children: projectNodes,
+    },
+    thoughts: {
+      type: 'dir',
+      children: thoughtNodes,
+    },
+    files: {
+      type: 'dir',
+      children: downloadNodes,
+    },
+    ...Object.fromEntries(
+      Object.entries(staticFilesSv).map(([fname, data]) => [
         fname,
         {
           type: 'file',
@@ -133,22 +197,39 @@ const dynamicFileSystem = {
   id="terminal-section" 
   class={`w-full ${isSubpage ? 'hidden mb-8' : 'mb-10'}`} 
   data-is-subpage={isSubpage ? 'true' : 'false'}
-  aria-label="Interaktiv TUI Terminal"
+  aria-label="Interactive TUI Terminal"
 >
-  <!-- Embedded dynamic filesystem data for terminal client -->
-  <script id="terminal-fs-data" type="application/json" set:html={JSON.stringify(dynamicFileSystem)} />
+  <!-- Embedded dynamic filesystem data for EN and SV -->
+  <script id="terminal-fs-en" type="application/json" set:html={JSON.stringify(dynamicFileSystemEn)} />
+  <script id="terminal-fs-sv" type="application/json" set:html={JSON.stringify(dynamicFileSystemSv)} />
+  <script id="terminal-fastfetch-en" type="application/json" set:html={JSON.stringify(fastfetchDataEn)} />
+  <script id="terminal-fastfetch-sv" type="application/json" set:html={JSON.stringify(fastfetchDataSv)} />
 
-  <!-- Static Human-Readable "About Me" Card (Only on homepage when terminal is closed via ✕) -->
+  <!-- Static Human-Readable "About Me" Card (Only on homepage when terminal is closed via ✕, or by default on mobile phones) -->
   {!isSubpage && (
-    <div 
-      id="terminal-closed-card" 
-      class="hidden mb-6 p-6 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#10b981]/60 transition-all shadow-xl"
-    >
+    <>
+      <script is:inline>
+        (function() {
+          var isMobile = window.innerWidth < 1024;
+          var isClosed = sessionStorage.getItem('terminal_closed_by_user') === 'true';
+          var viaCli = sessionStorage.getItem('navigated_via_cli') === 'true';
+          if ((isMobile || isClosed) && !viaCli) {
+            var c = document.getElementById('terminal-closed-card');
+            var w = document.getElementById('terminal-window');
+            if (c) c.classList.remove('hidden');
+            if (w) w.classList.add('hidden');
+          }
+        })();
+      </script>
+      <div 
+        id="terminal-closed-card" 
+        class="hidden mb-6 p-6 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#10b981]/60 transition-all shadow-xl"
+      >
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 mb-4 border-b border-[#30363d] gap-3">
         <div class="flex items-center gap-3">
           <span class="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse"></span>
-          <h2 class="text-sm font-mono font-bold tracking-wider uppercase text-[#e6edf3]">
-            Vem är gulo? // Om mig &amp; bakgrund
+          <h2 class="text-sm font-mono font-bold tracking-wider uppercase text-[#e6edf3]" id="closed-card-title" data-i18n="term_closed_title">
+            Who is gulo? // About me &amp; background
           </h2>
         </div>
         <button 
@@ -157,45 +238,46 @@ const dynamicFileSystem = {
           class="text-xs font-mono px-3 py-1.5 rounded bg-[#0d1117] border border-[#30363d] text-[#10b981] hover:border-[#10b981] hover:bg-[#10b981]/10 transition-all cursor-pointer flex items-center gap-2 self-start sm:self-auto"
         >
           <span>&gt;_</span>
-          <span>Öppna terminalen igen</span>
+          <span id="closed-card-reopen-text" data-i18n="term_reopen_btn">Open terminal again</span>
         </button>
       </div>
 
-      <!-- Structured Biography -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs sm:text-sm font-mono">
+      <!-- Structured Biography with bilingual support -->
+      <div id="closed-card-content" class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs sm:text-sm font-mono">
         <div class="space-y-3">
           <div>
-            <span class="text-[#38bdf8] font-semibold block mb-0.5">Chalmers Tekniska Högskola</span>
-            <p class="text-[#e6edf3] leading-relaxed">
-              Läser andra året på civilingenjörsprogrammet i <strong class="text-[#10b981]">Datateknik</strong>. Fokus på operativsystem, minneshantering, distribuerade system och lågnivå C/Rust.
+            <span class="text-[#38bdf8] font-semibold block mb-0.5" data-i18n="term_card_chalmers_title">Chalmers University of Technology</span>
+            <p class="text-[#e6edf3] leading-relaxed" data-i18n="term_card_chalmers_desc">
+              Second-year student in the M.Sc. in Computer Science &amp; Engineering program. Focused on operating systems, memory safety, distributed systems, and low-level C/Rust.
             </p>
           </div>
 
           <div>
-            <span class="text-[#38bdf8] font-semibold block mb-0.5">Kapplöpningssimning</span>
-            <p class="text-[#e6edf3] leading-relaxed">
-              Aktiv simmare med hemmabassäng i Valhallabadet (5-6 pass/vecka). Simningen ger den mentala disciplinen och fokuset som krävs för att lösa komplexa problem.
+            <span class="text-[#38bdf8] font-semibold block mb-0.5" data-i18n="term_card_swim_title">Competitive Swimming</span>
+            <p class="text-[#e6edf3] leading-relaxed" data-i18n="term_card_swim_desc">
+              Active competitive swimmer training at Valhallabadet (5-6 sessions/week). Swimming provides the mental discipline and focus needed to solve difficult technical challenges.
             </p>
           </div>
         </div>
 
         <div class="space-y-3">
           <div>
-            <span class="text-[#38bdf8] font-semibold block mb-0.5">Homelab &amp; Servrar</span>
-            <p class="text-[#e6edf3] leading-relaxed">
-              Driftar ett eget Minecraft-kluster (PaperMC 1.20 SMP) på Debian 12 med isolerade Docker-containers, automatiserade zstd-backuper och WireGuard VPN.
+            <span class="text-[#38bdf8] font-semibold block mb-0.5" data-i18n="term_card_homelab_title">Homelab &amp; Infrastructure</span>
+            <p class="text-[#e6edf3] leading-relaxed" data-i18n="term_card_homelab_desc">
+              Running a dedicated Minecraft cluster (PaperMC 1.20 SMP) on Debian 12 with isolated Docker containers, automated zstd backups, and WireGuard VPN.
             </p>
           </div>
 
           <div>
-            <span class="text-[#38bdf8] font-semibold block mb-0.5">Kreativt, Foto &amp; Gaming</span>
-            <p class="text-[#e6edf3] leading-relaxed">
-              Fotograferar analogt på 35mm film, bygger Neovim dotfiles i Lua, spelar co-op och meckar med Linux-miljöer (Arch + Hyprland).
+            <span class="text-[#38bdf8] font-semibold block mb-0.5" data-i18n="term_card_creative_title">Creative, 35mm Film &amp; Dotfiles</span>
+            <p class="text-[#e6edf3] leading-relaxed" data-i18n="term_card_creative_desc">
+              Shooting analog 35mm photography, building Neovim dotfiles in Lua, playing co-op games, and tweaking Linux environments (Arch + Hyprland).
             </p>
           </div>
         </div>
       </div>
     </div>
+    </>
   )}
 
   <!-- Terminal Window Container -->
@@ -203,11 +285,12 @@ const dynamicFileSystem = {
     id="terminal-window" 
     class="rounded-lg border border-[#30363d] bg-[#161b22] shadow-2xl transition-all duration-200 overflow-hidden flex flex-col max-h-[min(880px,78vh)]"
   >
-    <!-- Window Title Bar with FUNCTIONING Controls -->
+    <!-- Window Title Bar with Interactive Controls -->
     <div 
       id="terminal-titlebar"
       class="flex items-center justify-between px-4 py-2.5 bg-[#0d1117] border-b border-[#30363d] select-none cursor-pointer shrink-0"
-      title="Klicka var som helst på listen för att fälla ut om minimerad, eller dubbelklicka för fullskärm"
+      title="Click titlebar to expand if minimized, or double click for fullscreen"
+      data-i18n-title="term_titlebar_hint"
     >
       <!-- Real Interactive Window Action Buttons -->
       <div class="flex items-center space-x-2">
@@ -215,8 +298,9 @@ const dynamicFileSystem = {
           type="button" 
           id="btn-win-close" 
           class="w-3.5 h-3.5 rounded-full bg-[#f85149] hover:brightness-125 transition-all flex items-center justify-center text-[9px] font-bold text-[#0d1117] group cursor-pointer" 
-          title="Stäng terminalen"
-          aria-label="Stäng terminal"
+          title="Close terminal"
+          data-i18n-title="term_btn_close_title"
+          aria-label="Close terminal"
         >
           <span class="opacity-0 group-hover:opacity-100 transition-opacity leading-none">✕</span>
         </button>
@@ -224,8 +308,9 @@ const dynamicFileSystem = {
           type="button" 
           id="btn-win-minimize" 
           class="w-3.5 h-3.5 rounded-full bg-[#f59e0b] hover:brightness-125 transition-all flex items-center justify-center text-[9px] font-bold text-[#0d1117] group cursor-pointer" 
-          title="Minimera fönstret"
-          aria-label="Minimera terminal"
+          title="Minimize window"
+          data-i18n-title="term_btn_min_title"
+          aria-label="Minimize terminal"
         >
           <span class="opacity-0 group-hover:opacity-100 transition-opacity leading-none">−</span>
         </button>
@@ -233,8 +318,9 @@ const dynamicFileSystem = {
           type="button" 
           id="btn-win-maximize" 
           class="w-3.5 h-3.5 rounded-full bg-[#2ea043] hover:brightness-125 transition-all flex items-center justify-center text-[9px] font-bold text-[#0d1117] group cursor-pointer" 
-          title="Maximera till fullskärm (stängs med Esc)"
-          aria-label="Maximera terminal"
+          title="Maximize to fullscreen (press Esc to close)"
+          data-i18n-title="term_btn_max_title"
+          aria-label="Maximize terminal"
         >
           <span class="opacity-0 group-hover:opacity-100 transition-opacity leading-none">+</span>
         </button>
@@ -243,14 +329,14 @@ const dynamicFileSystem = {
       <!-- Window Title & Path -->
       <div class="text-xs text-[#8b949e] font-mono tracking-wide flex items-center gap-2">
         <span id="window-title-text" class="text-[#e6edf3]">bash — gulo@playground: ~</span>
-        <span id="window-status-pill" class="text-[10px] text-[#f59e0b] bg-[#0d1117] px-2 py-0.5 rounded border border-[#30363d] hidden">
-          MINIMERAD (klicka för att öppna)
+        <span id="window-status-pill" class="text-[10px] text-[#f59e0b] bg-[#0d1117] px-2 py-0.5 rounded border border-[#30363d] hidden" data-i18n="term_minimized_pill">
+          MINIMIZED (click to open)
         </span>
       </div>
 
       <!-- Terminal details -->
       <div class="text-[11px] font-mono text-[#8b949e] hidden sm:flex items-center gap-2">
-        <span id="fullscreen-hint" class="text-[#10b981] hidden">[Esc för att avsluta fullskärm]</span>
+        <span id="fullscreen-hint" class="text-[#10b981] hidden" data-i18n="term_fullscreen_hint">[Esc to exit fullscreen]</span>
         <span class="text-[#38bdf8]">tty1</span>
         <span>•</span>
         <span>utf-8</span>
@@ -259,9 +345,9 @@ const dynamicFileSystem = {
 
     <!-- Terminal Collapsible Body -->
     <div id="terminal-body" class="p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto overflow-y-auto flex-1 transition-all">
-      <!-- Authentic Neofetch / Fastfetch Layout -->
+      <!-- Fastfetch Layout -->
       <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-5 border-b border-[#30363d]/80">
-        <!-- Authentic Fastfetch ASCII Emblem (Left column) -->
+        <!-- Fastfetch ASCII Emblem (Left column) -->
         <div class="shrink-0 select-none font-mono text-[11px] sm:text-xs leading-[1.2] p-3 rounded bg-[#0d1117] border border-[#30363d]/80 flex flex-col justify-center items-center text-center">
           <pre class="leading-tight text-center font-mono">
 <span class="text-[#38bdf8]">     /\_____/\     </span>
@@ -272,45 +358,45 @@ const dynamicFileSystem = {
 <span class="text-[#10b981]">  (</span> <span class="text-[#38bdf8]">(  )</span>   <span class="text-[#38bdf8]">(  )</span> <span class="text-[#10b981]">)  </span>
 <span class="text-[#38bdf8]"> (__(__)___(__)__) </span>
           </pre>
-          <div class="mt-2 text-[10px] font-bold text-[#10b981] tracking-wider uppercase">
-            {fastfetchData.badge || 'CHALMERS // D-24'}
+          <div id="fastfetch-badge" class="mt-2 text-[10px] font-bold text-[#10b981] tracking-wider uppercase">
+            {fastfetchDataEn.badge || 'CHALMERS // D-24'}
           </div>
-          <div class="text-[9px] text-[#8b949e]">
-            {fastfetchData.tagline || 'swimmer • sysdev'}
+          <div id="fastfetch-tagline" class="text-[9px] text-[#8b949e]">
+            {fastfetchDataEn.tagline || 'swimmer • sysdev'}
           </div>
         </div>
 
-        <!-- Clean Neofetch / Fastfetch Specs (Right column) -->
+        <!-- Fastfetch Specs (Right column) -->
         <div class="flex-1 min-w-0 space-y-1 text-xs sm:text-sm">
           <!-- Fastfetch Header: user@host -->
           <div>
-            <span class="text-[#10b981] font-bold">{fastfetchData.user || 'gulo'}</span><span class="text-[#8b949e]">@</span><span class="text-[#38bdf8] font-bold">{fastfetchData.host || 'chalmers-station'}</span>
+            <span id="fastfetch-user" class="text-[#10b981] font-bold">{fastfetchDataEn.user || 'gulo'}</span><span class="text-[#8b949e]">@</span><span id="fastfetch-host" class="text-[#38bdf8] font-bold">{fastfetchDataEn.host || 'chalmers-station'}</span>
             <div class="text-[#30363d] select-none tracking-tighter leading-none mt-0.5">
               ---------------------------------------------------
             </div>
           </div>
 
-          <!-- Specs list with authentic CLI colored key labels -->
-          <div class="space-y-1 pt-1 text-xs">
-            {fastfetchData.specs.map((item: any) => {
+          <!-- Specs list -->
+          <div class="space-y-1 pt-1 text-xs" id="fastfetch-specs-list">
+            {fastfetchDataEn.specs.map((item: any) => {
               const colorClass = item.color === 'emerald' ? 'text-[#10b981]' : item.color === 'amber' ? 'text-[#f59e0b]' : 'text-[#38bdf8]';
               return (
-                <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
-                  <span class={`${colorClass} font-semibold`}>{item.key}:</span>
+                <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2 fastfetch-spec-row">
+                  <span class={`${colorClass} font-semibold spec-key-label`}>{item.key}:</span>
                   {item.online ? (
-                    <span class="text-[#10b981] font-medium flex items-center gap-1.5">
+                    <span class="text-[#10b981] font-medium flex items-center gap-1.5 spec-val-label">
                       <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-ping"></span>
                       {item.value}
                     </span>
                   ) : (
-                    <span class="text-[#e6edf3]">{item.value}</span>
+                    <span class="text-[#e6edf3] spec-val-label">{item.value}</span>
                   )}
                 </div>
               );
             })}
           </div>
 
-          <!-- Authentic terminal 8-color palette test bar -->
+          <!-- Terminal 8-color test palette bar -->
           <div class="pt-2 flex items-center gap-1.5" title="Terminal 8-color test palette">
             <span class="w-4 h-2.5 rounded-xs bg-[#0d1117] border border-[#30363d]"></span>
             <span class="w-4 h-2.5 rounded-xs bg-[#f85149]"></span>
@@ -324,9 +410,9 @@ const dynamicFileSystem = {
         </div>
       </div>
 
-      <!-- Terminal Ready Banner (Bevaras alltid vid 'clear') -->
+      <!-- Terminal Ready Banner -->
       <div id="terminal-ready-banner" class="pt-3 text-[#8b949e] text-xs select-none">
-        Terminal redo. Skriv <code class="text-[#10b981] font-bold">help</code> för kommandolista (<code class="text-[#38bdf8]">school</code>, <code class="text-[#38bdf8]">swim</code>, <code class="text-[#38bdf8]">ls</code>, <code class="text-[#38bdf8]">cd</code>, <code class="text-[#38bdf8]">cat</code>, <code class="text-[#38bdf8]">open</code>). Tryck <code class="text-[#10b981]">Tab</code> för att auto-komplettera.
+        Terminal ready. Type <code class="text-[#10b981] font-bold">help</code> for command list (<code class="text-[#38bdf8]">school</code>, <code class="text-[#38bdf8]">swim</code>, <code class="text-[#38bdf8]">ls</code>, <code class="text-[#38bdf8]">cd</code>, <code class="text-[#38bdf8]">cat</code>, <code class="text-[#38bdf8]">open</code>). Press <code class="text-[#10b981]">Tab</code> to auto-complete.
       </div>
 
       <!-- Terminal Output History -->
@@ -345,9 +431,10 @@ const dynamicFileSystem = {
           autocapitalize="off" 
           spellcheck="false" 
           class="flex-1 bg-transparent border-none text-[#e6edf3] text-xs sm:text-sm focus:outline-none focus:ring-0 p-0 font-mono caret-[#10b981]"
-          placeholder="skriv 'help', 'school', 'swim', 'cat about.txt'..."
+          placeholder="type 'help', 'school', 'swim', 'cat whoami.md'..."
+          data-i18n-placeholder="term_input_placeholder"
         />
-        <button type="submit" class="sr-only">Kör kommando</button>
+        <button type="submit" class="sr-only">Run command</button>
       </form>
     </div>
   </div>
@@ -361,7 +448,7 @@ const dynamicFileSystem = {
         var card = document.getElementById('terminal-closed-card');
         if (!sec) return;
 
-        // Om sidan laddades om (refresh / F5 / Ctrl+R) -> rensa sparad historik enligt önskemål
+        // Om sidan laddades om (refresh / F5 / Ctrl+R) -> rensa sparad historik
         var navEntries = performance.getEntriesByType && performance.getEntriesByType('navigation');
         var isReload = (navEntries && navEntries[0] && navEntries[0].type === 'reload') || 
                        (window.performance && window.performance.navigation && window.performance.navigation.type === 1);
@@ -442,17 +529,125 @@ const dynamicFileSystem = {
     let isMinimized = false;
     let isMaximized = false;
 
-    // Dölj fönstret internt (anropas vid sidladdning på undersidor / mobil utan att markera closedByUser)
-    function hideWindowInternal() {
-      if (isMaximized) unmaximize();
-      if (isMinimized) unminimize();
-      termSection.classList.add('hidden');
+    function getSiteLang(): 'en' | 'sv' {
+      if (typeof window === 'undefined') return 'en';
+      return (localStorage.getItem('site_lang') as 'en' | 'sv') || 'en';
     }
 
-    // Aktiv användarstängning via ✕-knappen eller 'exit'/'close' i bash
+    // ==========================================
+    // 1. DYNAMIC VIRTUAL FILESYSTEM (EN / SV)
+    // ==========================================
+    type FileNode = {
+      type: 'file';
+      size: string;
+      description: string;
+      content: string;
+      actionUrl?: string;
+    };
+
+    type DirNode = {
+      type: 'dir';
+      children: Record<string, FileNode | DirNode>;
+    };
+
+    function loadFileSystem(lang: 'en' | 'sv'): DirNode {
+      const scriptEl = document.getElementById(`terminal-fs-${lang}`);
+      if (scriptEl && scriptEl.textContent) {
+        try {
+          return JSON.parse(scriptEl.textContent);
+        } catch (e) {}
+      }
+      return { type: 'dir', children: {} };
+    }
+
+    let activeLang: 'en' | 'sv' = getSiteLang();
+    let fileSystem: DirNode = loadFileSystem(activeLang);
+
+    // Fastfetch DOM updater when language toggles
+    function updateFastfetchDOM(lang: 'en' | 'sv') {
+      const scriptEl = document.getElementById(`terminal-fastfetch-${lang}`);
+      if (!scriptEl || !scriptEl.textContent) return;
+      try {
+        const data = JSON.parse(scriptEl.textContent);
+        const badgeEl = document.getElementById('fastfetch-badge');
+        const taglineEl = document.getElementById('fastfetch-tagline');
+        const userEl = document.getElementById('fastfetch-user');
+        const hostEl = document.getElementById('fastfetch-host');
+        const specsEl = document.getElementById('fastfetch-specs-list');
+
+        if (badgeEl) badgeEl.textContent = data.badge || 'CHALMERS // D-24';
+        if (taglineEl) taglineEl.textContent = data.tagline || (lang === 'sv' ? 'simmare • sysdev' : 'swimmer • sysdev');
+        if (userEl) userEl.textContent = data.user || 'gulo';
+        if (hostEl) hostEl.textContent = data.host || 'chalmers-station';
+
+        if (specsEl && Array.isArray(data.specs)) {
+          specsEl.innerHTML = data.specs.map((item: any) => {
+            const colorClass = item.color === 'emerald' ? 'text-[#10b981]' : item.color === 'amber' ? 'text-[#f59e0b]' : 'text-[#38bdf8]';
+            const onlineHtml = item.online
+              ? `<span class="text-[#10b981] font-medium flex items-center gap-1.5 spec-val-label"><span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-ping"></span>${escapeHtml(item.value)}</span>`
+              : `<span class="text-[#e6edf3] spec-val-label">${escapeHtml(item.value)}</span>`;
+
+            return `
+              <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2 fastfetch-spec-row">
+                <span class="${colorClass} font-semibold spec-key-label">${escapeHtml(item.key)}:</span>
+                ${onlineHtml}
+              </div>
+            `;
+          }).join('');
+        }
+      } catch (e) {}
+    }
+
+    // Uppdatera fastfetch DOM och placeholder initialt om vi är i SV läge
+    if (activeLang === 'sv') {
+      updateFastfetchDOM('sv');
+      if (input) {
+        input.placeholder = "skriv 'help', 'school', 'swim', 'cat whoami.md'...";
+      }
+    }
+
+    // Reagera på språkväxling direkt i terminalen!
+    window.addEventListener('lang-change', (e: any) => {
+      const newLang = (e.detail?.lang || getSiteLang()) as 'en' | 'sv';
+      activeLang = newLang;
+      fileSystem = loadFileSystem(newLang);
+      updateFastfetchDOM(newLang);
+      updateTitle();
+
+      if (input) {
+        input.placeholder = newLang === 'sv'
+          ? "skriv 'help', 'school', 'swim', 'cat whoami.md'..."
+          : "type 'help', 'school', 'swim', 'cat whoami.md'...";
+      }
+
+      const readyBanner = document.getElementById('terminal-ready-banner');
+      if (readyBanner) {
+        readyBanner.innerHTML = newLang === 'sv'
+          ? `Terminal redo. Skriv <code class="text-[#10b981] font-bold">help</code> för kommandolista (<code class="text-[#38bdf8]">school</code>, <code class="text-[#38bdf8]">swim</code>, <code class="text-[#38bdf8]">ls</code>, <code class="text-[#38bdf8]">cd</code>, <code class="text-[#38bdf8]">cat</code>, <code class="text-[#38bdf8]">open</code>). Tryck <code class="text-[#10b981]">Tab</code> för att autokomplettera.`
+          : `Terminal ready. Type <code class="text-[#10b981] font-bold">help</code> for command list (<code class="text-[#38bdf8]">school</code>, <code class="text-[#38bdf8]">swim</code>, <code class="text-[#38bdf8]">ls</code>, <code class="text-[#38bdf8]">cd</code>, <code class="text-[#38bdf8]">cat</code>, <code class="text-[#38bdf8]">open</code>). Press <code class="text-[#10b981]">Tab</code> to auto-complete.`;
+      }
+    });
+
+    // Dölj fönstret internt
+    function hideWindowInternal() {
+      if (isMaximized) unmaximize(true);
+      if (isMinimized) unminimize(true);
+      if (isSubpage) {
+        termSection.classList.add('hidden');
+      } else {
+        termSection.classList.remove('hidden');
+        termWindow.classList.add('hidden');
+        closedCard?.classList.remove('hidden');
+      }
+    }
+
+    // Användarstängning via ✕-knappen eller 'exit' med animerad exit
+    let isClosing = false;
     function userCloseWindow() {
-      if (isMaximized) unmaximize();
-      if (isMinimized) unminimize();
+      if (isClosing) return;
+      isClosing = true;
+      if (isMaximized) unmaximize(true);
+      if (isMinimized) unminimize(true);
       sessionStorage.setItem('terminal_closed_by_user', 'true');
       sessionStorage.removeItem('navigated_via_cli');
       sessionStorage.removeItem('terminal_history_html');
@@ -460,45 +655,86 @@ const dynamicFileSystem = {
       sessionStorage.removeItem('terminal_body_scroll');
       sessionStorage.removeItem('terminal_nav_scroll_y');
 
-      if (isSubpage) {
-        termSection.classList.add('hidden');
-      } else {
-        termWindow.classList.add('hidden');
-        closedCard?.classList.remove('hidden');
-      }
+      termWindow.classList.remove('term-opening');
+      termWindow.classList.add('term-closing');
+
+      setTimeout(() => {
+        termWindow.classList.remove('term-closing');
+        if (isSubpage) {
+          termSection.classList.add('hidden');
+        } else {
+          termSection.classList.remove('hidden');
+          termWindow.classList.add('hidden');
+          closedCard?.classList.remove('hidden');
+        }
+        isClosing = false;
+      }, 160);
     }
 
-    // Återställ och öppna fönstret
-    function restoreWindow() {
+    // Återställ och öppna fönstret med snärtig OS app-launch animation
+    function restoreWindow(skipAnimation = false) {
       sessionStorage.removeItem('terminal_closed_by_user');
       termSection.classList.remove('hidden');
-      termWindow.classList.remove('hidden');
+      termWindow.classList.remove('hidden', 'term-closing');
       closedCard?.classList.add('hidden');
-      if (isMinimized) unminimize();
+      if (isMinimized) unminimize(true);
       updateTitle();
+
+      if (!skipAnimation) {
+        termWindow.classList.remove('term-opening');
+        void termWindow.offsetWidth; // Force reflow för ren omstart av animation
+        termWindow.classList.add('term-opening');
+        setTimeout(() => {
+          termWindow.classList.remove('term-opening');
+        }, 240);
+      }
+
       setTimeout(() => input.focus({ preventScroll: true }), 50);
     }
 
+    // Växla synlighet (om öppen -> stäng; om stängd -> öppna)
+    function toggleTerminalVisibility() {
+      const isSectionHidden = termSection.classList.contains('hidden');
+      const isWindowHidden = termWindow.classList.contains('hidden');
+      const isClosed = isSubpage ? isSectionHidden : (isSectionHidden || isWindowHidden);
+
+      if (isClosed || isClosing) {
+        restoreWindow(false);
+      } else {
+        userCloseWindow();
+      }
+    }
+
     // Unmaximize helper
-    function unmaximize() {
+    function unmaximize(skipAnim = false) {
       isMaximized = false;
       document.body.classList.remove('overflow-hidden');
       termWindow.classList.remove('fixed', 'inset-3', 'z-50', 'ring-2', 'ring-[#10b981]', 'h-[calc(100vh-1.5rem)]');
       termWindow.classList.add('max-h-[min(880px,78vh)]', 'flex', 'flex-col');
+      if (!skipAnim) {
+        termWindow.classList.remove('term-maximizing');
+        void termWindow.offsetWidth;
+        termWindow.classList.add('term-maximizing');
+        setTimeout(() => termWindow.classList.remove('term-maximizing'), 220);
+      }
       fullscreenHint?.classList.add('hidden');
       updateTitle();
     }
 
     // Maximize helper
     function applyMaximize() {
-      if (isMinimized) unminimize();
+      if (isMinimized) unminimize(true);
       isMaximized = true;
       document.body.classList.add('overflow-hidden');
       termWindow.classList.remove('max-h-[min(880px,78vh)]');
       termWindow.classList.add('fixed', 'inset-3', 'z-50', 'ring-2', 'ring-[#10b981]', 'h-[calc(100vh-1.5rem)]', 'flex', 'flex-col');
+      termWindow.classList.remove('term-maximizing');
+      void termWindow.offsetWidth;
+      termWindow.classList.add('term-maximizing');
       fullscreenHint?.classList.remove('hidden');
-      if (titleText) titleText.textContent = `bash — gulo@playground: ${getCwdLabel()} [MAXIMERAD FULLSKÄRM]`;
+      updateTitle();
       input.focus({ preventScroll: true });
+      setTimeout(() => termWindow.classList.remove('term-maximizing'), 220);
     }
 
     function toggleMaximize() {
@@ -510,9 +746,9 @@ const dynamicFileSystem = {
     }
 
     // Unminimize helper
-    function unminimize() {
+    function unminimize(skipAnim = false) {
       isMinimized = false;
-      termBody.classList.remove('hidden');
+      termBody.classList.remove('is-minimized', 'hidden');
       statusPill?.classList.add('hidden');
       updateTitle();
       input.focus({ preventScroll: true });
@@ -520,11 +756,11 @@ const dynamicFileSystem = {
 
     // Minimize helper
     function applyMinimize() {
-      if (isMaximized) unmaximize();
+      if (isMaximized) unmaximize(true);
       isMinimized = true;
-      termBody.classList.add('hidden');
+      termBody.classList.add('is-minimized');
       statusPill?.classList.remove('hidden');
-      if (titleText) titleText.textContent = `bash — gulo@playground: ${getCwdLabel()} (klicka för att öppna)`;
+      updateTitle();
     }
 
     function toggleMinimize() {
@@ -550,16 +786,50 @@ const dynamicFileSystem = {
       toggleMaximize();
     });
 
-    titleBar?.addEventListener('click', () => {
-      if (isMinimized) unminimize();
+    // Klick på listen: enkeltryck = minimera/återställ, dubbeltryck = maximera
+    let titleClickTimer: number | null = null;
+    let lastTitleClickTime = 0;
+
+    titleBar?.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('#btn-win-close') || target.closest('#btn-win-minimize') || target.closest('#btn-win-maximize')) {
+        return;
+      }
+
+      const now = Date.now();
+      const timeDiff = now - lastTitleClickTime;
+      lastTitleClickTime = now;
+
+      // Om andra klicket kommer inom 280ms eller om e.detail >= 2 -> DUBBELKLICK!
+      if (timeDiff < 280 || e.detail >= 2) {
+        if (titleClickTimer !== null) {
+          clearTimeout(titleClickTimer);
+          titleClickTimer = null;
+        }
+        toggleMaximize();
+      } else {
+        // Enkelklick: vänta 260ms för att se om det blir ett dubbelklick innan minimering körs
+        titleClickTimer = window.setTimeout(() => {
+          titleClickTimer = null;
+          toggleMinimize();
+        }, 260);
+      }
     });
 
-    titleBar?.addEventListener('dblclick', toggleMaximize);
-    reopenBtn?.addEventListener('click', restoreWindow);
+    titleBar?.addEventListener('dblclick', (e) => {
+      e.preventDefault();
+      // Click-hanteraren ovan tar hand om dubbelklick för att undvika dubbla anrop
+    });
+
+    reopenBtn?.addEventListener('click', () => restoreWindow(false));
+
+    // Lyssna på header-knappens växlings-event
+    window.addEventListener('toggle-terminal', () => {
+      toggleTerminalVisibility();
+    });
 
     window.addEventListener('restore-terminal', () => {
-      restoreWindow();
-      termSection.scrollIntoView({ behavior: 'smooth' });
+      restoreWindow(false);
     });
 
     window.addEventListener('keydown', (e) => {
@@ -569,16 +839,11 @@ const dynamicFileSystem = {
       }
       if ((e.ctrlKey || e.metaKey) && e.key === '`') {
         e.preventDefault();
-        if (termSection.classList.contains('hidden') || termWindow.classList.contains('hidden')) {
-          restoreWindow();
-        } else {
-          toggleMinimize();
-        }
+        toggleTerminalVisibility();
       }
     });
 
-    // Om användaren klickar på en vanlig länk på sidan (navigerar utan terminal),
-    // ska terminalen vara stängd by default på nästa sida!
+    // Klick på vanliga webblänkar rensar CLI-flaggan så terminalen är stängd by default på nästa sida
     document.addEventListener('click', (e) => {
       const anchor = (e.target as HTMLElement)?.closest('a');
       if (anchor && anchor.href && anchor.origin === window.location.origin && !anchor.target) {
@@ -588,29 +853,7 @@ const dynamicFileSystem = {
       }
     });
 
-    // ==========================================
-    // 2. DYNAMIC VIRTUAL FILESYSTEM & BASH ENGINE
-    // ==========================================
-    type FileNode = {
-      type: 'file';
-      size: string;
-      description: string;
-      content: string;
-      actionUrl?: string;
-    };
-
-    type DirNode = {
-      type: 'dir';
-      children: Record<string, FileNode | DirNode>;
-    };
-
-    // Läs dynamiskt filsystem från inbäddat server-data
-    const fsScript = document.getElementById('terminal-fs-data');
-    const fileSystem: DirNode = fsScript && fsScript.textContent 
-      ? JSON.parse(fsScript.textContent) 
-      : { type: 'dir', children: {} };
-
-    // Kontextmedvetenhet: Terminalen startar i den katalog som motsvarar aktuell sida!
+    // Startmapp synkad med aktuell sida
     const pathname = window.location.pathname.replace(/\/$/, '') || '/';
     let currentPath: string[] = [];
     if (pathname.startsWith('/projects')) {
@@ -631,8 +874,13 @@ const dynamicFileSystem = {
     }
 
     function updateTitle() {
+      const lang = getSiteLang();
+      const maxLabel = lang === 'sv' ? ' [MAXIMERAD FULLSKÄRM]' : ' [MAXIMIZED FULLSCREEN]';
+      const minLabel = lang === 'sv' ? ' (klicka för att öppna)' : ' (click to open)';
       if (titleText && !isMinimized) {
-        titleText.textContent = `bash — gulo@playground: ${getCwdLabel()}${isMaximized ? ' [MAXIMERAD FULLSKÄRM]' : ''}`;
+        titleText.textContent = `bash — gulo@playground: ${getCwdLabel()}${isMaximized ? maxLabel : ''}`;
+      } else if (titleText && isMinimized) {
+        titleText.textContent = `bash — gulo@playground: ${getCwdLabel()}${minLabel}`;
       }
       if (promptCwd) {
         promptCwd.textContent = getCwdLabel();
@@ -641,8 +889,39 @@ const dynamicFileSystem = {
 
     updateTitle();
 
-    // Helper för att spara historik och navigera med CLI utan att tappa terminalinnehåll
-    function navigateWithCli(url: string, messageHtml?: string) {
+    // Normalisera sökvägar för att förhindra falska dupliceringar
+    function normalizePath(p: string): string {
+      if (!p) return '/';
+      let clean = p.split('?')[0].split('#')[0].trim();
+      if (!clean.startsWith('/')) clean = '/' + clean;
+      clean = clean.replace(/\/+$/, '') || '/';
+      return clean;
+    }
+
+    // Helper för CLI navigation med historikbevarande och detektering av samma sida
+    function navigateWithCli(url: string, messageHtml?: string): boolean {
+      const isExternalOrFile = url.startsWith('http') || url.includes('/downloads/');
+      const curPage = normalizePath(window.location.pathname);
+      const targetPage = normalizePath(url);
+
+      // Om användaren redan är på den sidan: skriv ut varning och avbryt!
+      if (!isExternalOrFile && curPage === targetPage) {
+        const lang = getSiteLang();
+        const notice = lang === 'sv'
+          ? `Du är redan på den här sidan (${targetPage})`
+          : `Already on this page (${targetPage})`;
+        if (history) {
+          const resBox = document.createElement('div');
+          resBox.className = 'text-xs pl-3 border-l border-[#f59e0b] my-1 font-mono text-[#f59e0b]';
+          resBox.textContent = notice;
+          history.appendChild(resBox);
+        }
+        if (termBody) {
+          termBody.scrollTop = termBody.scrollHeight;
+        }
+        return false;
+      }
+
       sessionStorage.setItem('navigated_via_cli', 'true');
 
       if (messageHtml && history) {
@@ -662,13 +941,13 @@ const dynamicFileSystem = {
         sessionStorage.setItem('terminal_body_scroll', 'bottom');
       }
 
-      // Spara fönstrets scrollposition så att användaren inte kastas runt vid sidbytet!
       sessionStorage.setItem('terminal_nav_scroll_y', String(window.scrollY));
 
       window.location.href = url;
+      return true;
     }
 
-    // Helper för att rendera stiliga informationsrutor från Markdown-filer (whoami.md, contact.md)
+    // Render markdown cards (whoami.md, contact.md, school.md, swim.md)
     function renderMarkdownCard(rawMd: string): string {
       if (!rawMd) return '';
       const lines = rawMd.split('\n');
@@ -718,21 +997,17 @@ const dynamicFileSystem = {
 </div>`;
     }
 
-    // Visningsregler för dator vs mobil/tablet:
-    // - Dator (>= 1024px): startsida öppen by default (om inte stängd av användaren). Subpages stängda om man inte navigerat med CLI.
-    // - Mobil / iPad (< 1024px): stängd by default överallt, men CLI-navigation håller den öppen.
+    // Visningsregler för dator vs mobil/tablet
     const isDesktop = window.innerWidth >= 1024;
     const navigatedViaCli = sessionStorage.getItem('navigated_via_cli') === 'true';
     const closedByUser = sessionStorage.getItem('terminal_closed_by_user') === 'true';
 
     if (navigatedViaCli) {
-      // 1. Återställ terminalhistorik sparad före sidbyte
       const savedHtml = sessionStorage.getItem('terminal_history_html');
       if (savedHtml && history) {
         history.innerHTML = savedHtml;
       }
 
-      // 2. Återställ kommandohistorik (piltangent upp/ned)
       const savedCmds = sessionStorage.getItem('terminal_cmd_history');
       if (savedCmds) {
         try {
@@ -741,10 +1016,8 @@ const dynamicFileSystem = {
         } catch (e) {}
       }
 
-      // 3. Öppna terminalen
-      restoreWindow();
+      restoreWindow(true);
 
-      // 4. Autoscrolla terminalen till botten så att senaste output och prompt alltid syns vid overflow
       const scrollToBottom = () => {
         if (termBody) {
           termBody.scrollTop = termBody.scrollHeight;
@@ -756,17 +1029,18 @@ const dynamicFileSystem = {
       setTimeout(scrollToBottom, 150);
       setTimeout(scrollToBottom, 300);
 
-      // 5. Återställ sidans scrollposition exakt utan att rycka hela sidan
       const savedWindowY = sessionStorage.getItem('terminal_nav_scroll_y');
       if (savedWindowY !== null) {
         window.scrollTo({ top: Number(savedWindowY), behavior: 'instant' });
       }
     } else if (!isSubpage && isDesktop && !closedByUser) {
-      restoreWindow();
-    } else if (!isSubpage && isDesktop && closedByUser) {
+      restoreWindow(true);
+    } else if (!isSubpage) {
+      // Startsidan på mobiler eller när terminalen stängts av användaren:
+      // Terminalfönstret är dolt men "Vem är gulo?" är ALLTID synligt!
+      termSection.classList.remove('hidden');
       termWindow.classList.add('hidden');
       closedCard?.classList.remove('hidden');
-      termSection.classList.remove('hidden');
     } else {
       hideWindowInternal();
     }
@@ -810,9 +1084,11 @@ const dynamicFileSystem = {
       return (resolveNode(currentPath) as DirNode) || fileSystem;
     }
 
-    // Commands dictionary
+    // Commands dictionary - fullständig flerspråkig terminalmotor
     const commands: Record<string, (args: string[]) => string | void> = {
-      help: () => `
+      help: () => {
+        const lang = getSiteLang();
+        if (lang === 'sv') return `
 <div class="text-[#e6edf3] space-y-2 font-mono">
   <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">BASH KOMMANDOTOLK // TILLGÄNGLIGA KOMMANDON</div>
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-xs">
@@ -849,24 +1125,53 @@ const dynamicFileSystem = {
   <div class="text-[11px] text-[#8b949e] pt-1 border-t border-[#30363d]/40">
     Tryck <kbd class="text-[#10b981]">Tab</kbd> för att komplettera kommandon och filnamn (även i <code class="text-[#38bdf8]">../</code>).
   </div>
-</div>`,
+</div>`;
+        return `
+<div class="text-[#e6edf3] space-y-2 font-mono">
+  <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">BASH SHELL // AVAILABLE COMMANDS</div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-xs">
+    <div>
+      <div class="text-[#38bdf8] font-bold mb-1">Info &amp; Studies:</div>
+      <div><span class="text-[#10b981] font-semibold">school / chalmers</span> : Chalmers studies &amp; courses</div>
+      <div><span class="text-[#10b981] font-semibold">swim</span> : Swimming sessions &amp; times</div>
+      <div><span class="text-[#10b981] font-semibold">whoami</span> : Personal background &amp; profile</div>
+      <div><span class="text-[#10b981] font-semibold">contact</span> : GitHub, email &amp; Discord</div>
+      <div><span class="text-[#10b981] font-semibold">fastfetch</span> : System overview &amp; status</div>
+    </div>
+    <div>
+      <div class="text-[#f59e0b] font-bold mb-1">Navigation &amp; Pages:</div>
+      <div><span class="text-[#10b981] font-semibold">open &lt;target&gt;</span> : Open project, article, file or section</div>
+      <div><span class="text-[#10b981] font-semibold">projects</span> : Go to /projects (Portfolio)</div>
+      <div><span class="text-[#10b981] font-semibold">thoughts</span> : Go to /thoughts (Blog)</div>
+      <div><span class="text-[#10b981] font-semibold">files</span> : Go to /files (File archive)</div>
+    </div>
+    <div>
+      <div class="text-[#a78bfa] font-bold mb-1">Filesystem &amp; Bash:</div>
+      <div><span class="text-[#10b981] font-semibold">ls [-la]</span> : List files &amp; directories</div>
+      <div><span class="text-[#10b981] font-semibold">cd &lt;dir&gt;</span> : Change directory (cd .., cd ~, cd ../projects)</div>
+      <div><span class="text-[#10b981] font-semibold">pwd</span> : Print working directory</div>
+      <div><span class="text-[#10b981] font-semibold">cat &lt;file&gt;</span> : Print file contents</div>
+      <div><span class="text-[#10b981] font-semibold">grep &lt;word&gt; [file]</span> : Search text in files</div>
+    </div>
+    <div>
+      <div class="text-[#8b949e] font-bold mb-1">Window &amp; Tools:</div>
+      <div><span class="text-[#10b981] font-semibold">clear (Ctrl+L)</span> : Clear terminal</div>
+      <div><span class="text-[#10b981] font-semibold">date / uptime</span> : System status &amp; uptime</div>
+      <div><span class="text-[#10b981] font-semibold">exit / close</span> : Close terminal</div>
+    </div>
+  </div>
+  <div class="text-[11px] text-[#8b949e] pt-1 border-t border-[#30363d]/40">
+    Press <kbd class="text-[#10b981]">Tab</kbd> to autocomplete commands and filenames (including <code class="text-[#38bdf8]">../</code> paths).
+  </div>
+</div>`;
+      },
 
       school: () => {
         const fileNode = fileSystem.children['school.md'] || fileSystem.children['chalmers.md'] || fileSystem.children['chalmers.txt'];
         if (fileNode && fileNode.type === 'file' && fileNode.content) {
           return renderMarkdownCard(fileNode.content);
         }
-        return `
-<div class="text-[#e6edf3] space-y-1 text-xs font-mono p-3 rounded bg-[#0d1117] border border-[#30363d]">
-  <div class="text-[#38bdf8] font-bold border-b border-[#30363d] pb-1">
-    CHALMERS TEKNISKA HÖGSKOLA — CIVILINGENJÖR DATATEKNIK (D-24)
-  </div>
-  <div><span class="text-[#8b949e]">Status:</span> Årskurs 2 / Civilingenjör</div>
-  <div><span class="text-[#8b949e]">Campus:</span> Johanneberg, Göteborg (EDIT-huset)</div>
-  <div><span class="text-[#8b949e]">Aktuella kurser:</span> Operativsystem, Datorarkitektur, Datakommunikation, Algoritmer</div>
-  <div><span class="text-[#8b949e]">Laborationer:</span> Flertrådade schemaläggare i C, kontextbyten för RISC-V, minneshantering</div>
-  <div class="text-[#10b981] pt-1">Skriv <code class="text-[#e6edf3]">open chalmers-sys-sched</code> för att läsa projektet, eller <code class="text-[#e6edf3]">projects</code> för portfolion.</div>
-</div>`;
+        return `<div class="text-[#8b949e] font-mono">Chalmers University of Technology — Computer Science & Engineering (D-24)</div>`;
       },
 
       swim: () => {
@@ -874,17 +1179,7 @@ const dynamicFileSystem = {
         if (fileNode && fileNode.type === 'file' && fileNode.content) {
           return renderMarkdownCard(fileNode.content);
         }
-        return `
-<div class="text-[#e6edf3] space-y-1 text-xs font-mono p-3 rounded bg-[#0d1117] border border-[#30363d]">
-  <div class="text-[#38bdf8] font-bold border-b border-[#30363d] pb-1">
-    🏊 KAPPLÖPNINGSSIMNING // VALHALLABADET
-  </div>
-  <div><span class="text-[#8b949e]">Bassäng:</span> Valhallabadet, Göteborg (50m)</div>
-  <div><span class="text-[#8b949e]">Pass:</span> 5-6 dagar/vecka</div>
-  <div><span class="text-[#8b949e]">Huvudgrenar:</span> 50m och 100m frisim &amp; fjärilsim</div>
-  <div><span class="text-[#8b949e]">Filosofi:</span> Den bästa motvikten till skärmtid och fastkörda algoritmer.</div>
-  <div class="text-[#10b981] pt-1">Läs min artikel med kommandot: <code class="text-[#e6edf3]">open chalmers-simning-kod</code></div>
-</div>`;
+        return `<div class="text-[#38bdf8] font-mono">Valhallabadet 50m — Competitive swimming (5-6 sessions/week)</div>`;
       },
 
       whoami: () => {
@@ -892,13 +1187,7 @@ const dynamicFileSystem = {
         if (fileNode && fileNode.type === 'file' && fileNode.content) {
           return renderMarkdownCard(fileNode.content);
         }
-        return `
-<div class="text-[#e6edf3] space-y-1 text-xs font-mono p-3 rounded bg-[#0d1117] border border-[#30363d]">
-  <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">gulo // Chalmersstudent, simmare &amp; utvecklare</div>
-  <div><span class="text-[#8b949e]">Studier:</span> Datateknik på Chalmers Tekniska Högskola (Göteborg).</div>
-  <div><span class="text-[#8b949e]">Fysik:</span> Tävlingssimmare i frisim och fjäril.</div>
-  <div><span class="text-[#8b949e]">Intressen:</span> Självhostade servrar, Linux-tuning, Minecraft, analog fotografi (35mm) och dotfiles.</div>
-</div>`;
+        return `<div class="text-[#10b981] font-mono">gulo // Chalmers student, swimmer & developer</div>`;
       },
 
       contact: () => {
@@ -906,15 +1195,7 @@ const dynamicFileSystem = {
         if (fileNode && fileNode.type === 'file' && fileNode.content) {
           return renderMarkdownCard(fileNode.content);
         }
-        return `
-<div class="text-[#e6edf3] space-y-1.5 text-xs font-mono p-3 rounded bg-[#0d1117] border border-[#30363d]">
-  <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">📫 KONTAKT &amp; LÄNKAR // GULO</div>
-  <div><span class="text-[#38bdf8] font-semibold">GitHub:</span> <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="text-[#e6edf3] hover:underline hover:text-[#10b981]">github.com/gulo ↗</a></div>
-  <div><span class="text-[#38bdf8] font-semibold">Email:</span> <a href="mailto:gulo@example.com" class="text-[#e6edf3] hover:underline hover:text-[#10b981]">gulo@example.com ↗</a></div>
-  <div><span class="text-[#38bdf8] font-semibold">Discord:</span> <span class="text-[#e6edf3]">gulo#0001 (eller pinga på Chalmers Discord-servern)</span></div>
-  <div><span class="text-[#38bdf8] font-semibold">Chalmers:</span> <span class="text-[#e6edf3]">EDIT-huset, Maskingränd / Johanneberg</span></div>
-  <div class="text-[#8b949e] text-[11px] pt-1">Hör gärna av dig om homelab, simning, Rust eller projektidéer!</div>
-</div>`;
+        return `<div class="text-[#10b981] font-mono">GitHub: github.com/gulo | Email: gulo@example.com</div>`;
       },
 
       ls: (args) => {
@@ -929,7 +1210,8 @@ const dynamicFileSystem = {
           const target = nonFlags[0].replace(/\/$/, '');
           const node = target === '~' ? fileSystem : targetDir.children[target];
           if (!node) {
-            return `<div class="text-[#f85149]">ls: kan inte komma åt '${escapeHtml(nonFlags[0])}': Ingen sådan fil eller katalog</div>`;
+            const _lsErr = getSiteLang() === 'sv' ? `kan inte komma åt '${escapeHtml(nonFlags[0])}': Ingen sådan fil eller katalog` : `cannot access '${escapeHtml(nonFlags[0])}': No such file or directory`;
+            return `<div class="text-[#f85149]">ls: ${_lsErr}</div>`;
           }
           if (node.type === 'file') {
             return `<div class="text-[#e6edf3]">${escapeHtml(target)} (${node.size})</div>`;
@@ -942,7 +1224,7 @@ const dynamicFileSystem = {
           entries = entries.filter(([name]) => !name.startsWith('.'));
         }
 
-        if (entries.length === 0) return `<div class="text-[#8b949e]">Katalogen är tom.</div>`;
+        if (entries.length === 0) return `<div class="text-[#8b949e]">${getSiteLang() === 'sv' ? 'Katalogen är tom.' : 'Directory is empty.'}</div>`;
 
         if (isLong) {
           let rows = '';
@@ -1009,17 +1291,17 @@ const dynamicFileSystem = {
             currentPath = targetSegments;
             updateTitle();
           } else {
-            return `<div class="text-[#f85149]">cd: '${escapeHtml(dest)}': Inte en katalog</div>`;
+            return `<div class="text-[#f85149]">cd: '${escapeHtml(dest)}': ${getSiteLang() === 'sv' ? 'Inte en katalog' : 'Not a directory'}</div>`;
           }
         } else {
-          return `<div class="text-[#f85149]">cd: '${escapeHtml(dest)}': Ingen sådan fil eller katalog</div>`;
+          return `<div class="text-[#f85149]">cd: '${escapeHtml(dest)}': ${getSiteLang() === 'sv' ? 'Ingen sådan fil eller katalog' : 'No such file or directory'}</div>`;
         }
       },
 
       pwd: () => `<div class="text-[#8b949e]">/home/gulo${currentPath.length > 0 ? '/' + currentPath.join('/') : ''}</div>`,
 
       cat: (args) => {
-        if (!args[0]) return `<div class="text-[#f85149]">Användning: cat &lt;filnamn&gt;</div>`;
+        if (!args[0]) return `<div class="text-[#f85149]">${getSiteLang() === 'sv' ? 'Användning' : 'Usage'}: cat &lt;${getSiteLang() === 'sv' ? 'filnamn' : 'filename'}&gt;</div>`;
         const filename = args[0].trim();
         const targetSegments = resolvePath(currentPath, filename);
         let node = resolveNode(targetSegments);
@@ -1028,8 +1310,8 @@ const dynamicFileSystem = {
           node = fileSystem.children[filename];
         }
 
-        if (!node) return `<div class="text-[#f85149]">cat: ${escapeHtml(filename)}: Ingen sådan fil</div>`;
-        if (node.type === 'dir') return `<div class="text-[#f85149]">cat: ${escapeHtml(filename)}: Är en katalog.</div>`;
+        if (!node) return `<div class="text-[#f85149]">cat: ${escapeHtml(filename)}: ${getSiteLang() === 'sv' ? 'Ingen sådan fil' : 'No such file'}</div>`;
+        if (node.type === 'dir') return `<div class="text-[#f85149]">cat: ${escapeHtml(filename)}: ${getSiteLang() === 'sv' ? 'Är en katalog' : 'Is a directory'}</div>`;
 
         return `
 <div class="p-3 rounded bg-[#0d1117] border border-[#30363d] text-xs text-[#e6edf3] whitespace-pre-wrap leading-relaxed font-mono">
@@ -1038,7 +1320,7 @@ ${escapeHtml(node.content)}
       },
 
       grep: (args) => {
-        if (!args[0]) return `<div class="text-[#f85149]">Användning: grep &lt;sökord&gt; [fil]</div>`;
+        if (!args[0]) return `<div class="text-[#f85149]">${getSiteLang() === 'sv' ? 'Användning' : 'Usage'}: grep &lt;${getSiteLang() === 'sv' ? 'sökord' : 'keyword'}&gt; [${getSiteLang() === 'sv' ? 'fil' : 'file'}]</div>`;
         const query = args[0].toLowerCase();
         const targetFile = args[1];
         const current = getCurrentDir();
@@ -1057,7 +1339,7 @@ ${escapeHtml(node.content)}
         if (targetFile) {
           const targetSegments = resolvePath(currentPath, targetFile);
           const node = resolveNode(targetSegments);
-          if (!node || node.type !== 'file') return `<div class="text-[#f85149]">grep: ${escapeHtml(targetFile)}: Ingen sådan fil</div>`;
+          if (!node || node.type !== 'file') return `<div class="text-[#f85149]">grep: ${escapeHtml(targetFile)}: ${getSiteLang() === 'sv' ? 'Ingen sådan fil' : 'No such file'}</div>`;
           scanFile(targetFile, node as FileNode);
         } else {
           for (const [name, node] of Object.entries(current.children)) {
@@ -1065,27 +1347,30 @@ ${escapeHtml(node.content)}
           }
         }
 
-        if (matches.length === 0) return `<div class="text-[#8b949e]">Inga träffar för '${escapeHtml(query)}'.</div>`;
+        if (matches.length === 0) return `<div class="text-[#8b949e]">${getSiteLang() === 'sv' ? 'Inga träffar för' : 'No matches for'} '${escapeHtml(query)}'.</div>`;
         return `<div class="text-xs space-y-1 font-mono">${matches.join('<br/>')}</div>`;
       },
 
       open: (args) => {
         const rawTarget = args[0] ? args[0].trim() : '.';
         const target = rawTarget.toLowerCase().replace(/\/$/, '').replace(/\.md$/, '');
+        const _lang = getSiteLang();
+        const _opening = (p: string) => `<div class="text-[#10b981]">${_lang === 'sv' ? `Öppnar ${escapeHtml(p)} på webben...` : `Opening ${escapeHtml(p)} on web...`}</div>`;
+        const _navTo = (p: string) => `<div class="text-[#10b981]">${_lang === 'sv' ? `Navigerar till ${escapeHtml(p)}...` : `Navigating to ${escapeHtml(p)}...`}</div>`;
 
-        // 1. "open" eller "open ." -> öppnar katalogen användaren befinner sig i!
+        // 1. "open" eller "open ." -> öppnar katalogen användaren befinner sig i
         if (target === '.' || target === '') {
           if (currentPath.length === 0) {
-            navigateWithCli('/', `<div class="text-[#10b981]">Öppnar startsidan /...</div>`);
+            navigateWithCli('/', _opening('/'));
             return;
           }
           const folder = currentPath[0];
-          navigateWithCli(`/${folder}`, `<div class="text-[#10b981]">Öppnar mappen /${escapeHtml(folder)} på webben...</div>`);
+          navigateWithCli(`/${folder}`, _opening(`/${folder}`));
           return;
         }
 
         if (target === '..' || target === '~') {
-          navigateWithCli('/', `<div class="text-[#10b981]">Öppnar hemkatalogen / på webben...</div>`);
+          navigateWithCli('/', _opening('/'));
           return;
         }
 
@@ -1096,10 +1381,10 @@ ${escapeHtml(node.content)}
         if (resolvedNode) {
           if (resolvedNode.type === 'dir') {
             const dirUrl = targetSegments.length === 0 ? '/' : `/${targetSegments.join('/')}`;
-            navigateWithCli(dirUrl, `<div class="text-[#10b981]">Öppnar ${escapeHtml(dirUrl)} på webben...</div>`);
+            navigateWithCli(dirUrl, _opening(dirUrl));
             return;
           } else if (resolvedNode.type === 'file' && resolvedNode.actionUrl) {
-            navigateWithCli(resolvedNode.actionUrl, `<div class="text-[#10b981]">Öppnar ${escapeHtml(rawTarget)} (${escapeHtml(resolvedNode.actionUrl)})...</div>`);
+            navigateWithCli(resolvedNode.actionUrl, _opening(`${rawTarget} (${resolvedNode.actionUrl})`));
             return;
           }
         }
@@ -1109,7 +1394,7 @@ ${escapeHtml(node.content)}
         if (current.children[rawTarget] && current.children[rawTarget].type === 'file') {
           const f = current.children[rawTarget] as FileNode;
           if (f.actionUrl) {
-            navigateWithCli(f.actionUrl, `<div class="text-[#10b981]">Öppnar ${escapeHtml(rawTarget)} (${escapeHtml(f.actionUrl)})...</div>`);
+            navigateWithCli(f.actionUrl, _opening(`${rawTarget} (${f.actionUrl})`));
             return;
           }
         }
@@ -1125,7 +1410,7 @@ ${escapeHtml(node.content)}
                 const baseFname = fname.toLowerCase().replace(/\.md$/, '');
                 if (cleanTarget === baseFname || cleanTarget === fname.toLowerCase() || baseFname.includes(cleanTarget) || cleanTarget.includes(baseFname)) {
                   if (node.actionUrl) {
-                    navigateWithCli(node.actionUrl, `<div class="text-[#38bdf8]">Öppnar ${escapeHtml(fname)} (${escapeHtml(node.actionUrl)})...</div>`);
+                    navigateWithCli(node.actionUrl, `<div class="text-[#38bdf8]">${_lang === 'sv' ? 'Öppnar' : 'Opening'} ${escapeHtml(fname)} (${escapeHtml(node.actionUrl)})...</div>`);
                     return;
                   }
                 }
@@ -1136,51 +1421,55 @@ ${escapeHtml(node.content)}
 
         // 4. Snabbgenvägar till sektioner
         if (cleanTarget === 'projects' || cleanTarget === 'projekt') {
-          navigateWithCli('/projects', `<div class="text-[#10b981]">Navigerar till /projects...</div>`);
+          navigateWithCli('/projects', _navTo('/projects'));
           return;
         }
         if (cleanTarget === 'thoughts' || cleanTarget === 'tankar' || cleanTarget === 'blog' || cleanTarget === 'blogg' || cleanTarget === 'anteckningar') {
-          navigateWithCli('/thoughts', `<div class="text-[#10b981]">Navigerar till /thoughts...</div>`);
+          navigateWithCli('/thoughts', _navTo('/thoughts'));
           return;
         }
         if (cleanTarget === 'files' || cleanTarget === 'filer' || cleanTarget === 'downloads') {
-          navigateWithCli('/files', `<div class="text-[#10b981]">Navigerar till /files...</div>`);
+          navigateWithCli('/files', _navTo('/files'));
           return;
         }
 
         // 5. Direktladdningar
+        const _dl = (f: string) => `<div class="text-[#10b981]">${_lang === 'sv' ? 'Laddar ner' : 'Downloading'} ${f}...</div>`;
         if (cleanTarget.includes('fabric')) {
           window.location.href = '/downloads/fabric-1.20.4-optimized.zip';
-          return `<div class="text-[#10b981]">Laddar ner fabric-1.20.4-optimized.zip...</div>`;
+          return _dl('fabric-1.20.4-optimized.zip');
         }
         if (cleanTarget.includes('backup')) {
           window.location.href = '/downloads/backup-world.sh';
-          return `<div class="text-[#10b981]">Laddar ner backup-world.sh...</div>`;
+          return _dl('backup-world.sh');
         }
         if (cleanTarget.includes('cv') || cleanTarget.includes('resume')) {
           window.location.href = '/downloads/cv-gulo-datateknik.pdf';
-          return `<div class="text-[#10b981]">Laddar ner cv-gulo-datateknik.pdf...</div>`;
+          return _dl('cv-gulo-datateknik.pdf');
         }
         if (cleanTarget.includes('dotfiles') || cleanTarget.includes('nvim')) {
           window.location.href = '/downloads/nvim-dotfiles.tar.gz';
-          return `<div class="text-[#10b981]">Laddar ner nvim-dotfiles.tar.gz...</div>`;
+          return _dl('nvim-dotfiles.tar.gz');
         }
 
-        return `<div class="text-[#f85149]">Känner inte igen '${escapeHtml(rawTarget)}'. Skriv 'help' eller 'ls'.</div>`;
+        return `<div class="text-[#f85149]">${_lang === 'sv' ? `Känner inte igen '${escapeHtml(rawTarget)}'. Skriv 'help' eller 'ls'.` : `Unrecognized target '${escapeHtml(rawTarget)}'. Type 'help' or 'ls'.`}</div>`;
       },
 
       projects: () => {
-        navigateWithCli('/projects', `<div class="text-[#a78bfa]">Öppnar /projects (Portfolio)...</div>`);
+        const l = getSiteLang();
+        navigateWithCli('/projects', `<div class="text-[#a78bfa]">${l === 'sv' ? 'Öppnar /projects (Portfolio)...' : 'Opening /projects (Portfolio)...'}</div>`);
         return;
       },
 
       thoughts: () => {
-        navigateWithCli('/thoughts', `<div class="text-[#f59e0b]">Öppnar /thoughts (Blogg & Anteckningar)...</div>`);
+        const l = getSiteLang();
+        navigateWithCli('/thoughts', `<div class="text-[#f59e0b]">${l === 'sv' ? 'Öppnar /thoughts (Blogg & Anteckningar)...' : 'Opening /thoughts (Blog & Notes)...'}</div>`);
         return;
       },
 
       files: () => {
-        navigateWithCli('/files', `<div class="text-[#10b981]">Öppnar /files...</div>`);
+        const l = getSiteLang();
+        navigateWithCli('/files', `<div class="text-[#10b981]">${l === 'sv' ? 'Öppnar /files...' : 'Opening /files...'}</div>`);
         return;
       },
 
@@ -1193,18 +1482,7 @@ ${escapeHtml(node.content)}
         const user = cfg?.user || 'gulo';
         const host = cfg?.host || 'chalmers-station';
         const badge = cfg?.badge || 'CHALMERS // D-24';
-        const specs = cfg?.specs || [
-          { key: 'OS', value: 'Debian GNU/Linux 12 (bookworm) x86_64', color: 'sky' },
-          { key: 'Host', value: 'chalmers-workstation', color: 'sky' },
-          { key: 'Kernel', value: 'Linux 6.12.8-zen1', color: 'sky' },
-          { key: 'Uptime', value: '42 dagar, 8 timmar, 14 min', color: 'sky' },
-          { key: 'Shell', value: 'zsh 5.9 / bash 5.2 • kitty', color: 'sky' },
-          { key: 'Editor', value: 'Neovim v0.10.2 (Lua dotfiles)', color: 'sky' },
-          { key: 'Utbildning', value: 'Civilingenjör Datateknik @ Chalmers (Åk 2)', color: 'emerald' },
-          { key: 'Simning', value: 'Valhallabadet (5-6 pass/v, frisim/fjäril)', color: 'emerald' },
-          { key: 'Homelab', value: 'PaperMC SMP-kluster, Docker, Velocity', color: 'emerald' },
-          { key: 'Status', value: '[● ONLINE] Tentavecka & serverdrift', color: 'amber' }
-        ];
+        const specs = cfg?.specs || [];
 
         const specRows = specs.map((s: any) => {
           const colClass = s.color === 'emerald' ? 'text-[#10b981]' : s.color === 'amber' ? 'text-[#f59e0b]' : 'text-[#38bdf8]';
@@ -1233,7 +1511,9 @@ ${escapeHtml(node.content)}
 </div>`;
       },
 
-      tldr: () => `
+      tldr: () => {
+        const l = getSiteLang();
+        if (l === 'sv') return `
 <div class="p-3 rounded bg-[#0d1117] border border-[#30363d] space-y-1.5 font-mono text-xs text-[#e6edf3]">
   <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">⚡ TL;DR // GULO COCKPIT</div>
   <div><span class="text-[#38bdf8] font-semibold">Vem:</span> Civilingenjörsstudent i Datateknik (Chalmers D-24) &amp; tävlingssimmare.</div>
@@ -1241,17 +1521,41 @@ ${escapeHtml(node.content)}
   <div><span class="text-[#38bdf8] font-semibold">Homelab:</span> Eget 20.0 TPS PaperMC SMP-kluster med Velocity, Docker &amp; Debian 12.</div>
   <div><span class="text-[#38bdf8] font-semibold">Filer:</span> CV, Neovim dotfiles, Fabric modpack och backup-skript tillgängliga på <code class="text-[#10b981]">/files</code>.</div>
   <div><span class="text-[#38bdf8] font-semibold">Kommandon:</span> <code class="text-[#10b981]">projects</code>, <code class="text-[#10b981]">thoughts</code>, <code class="text-[#10b981]">files</code>, <code class="text-[#10b981]">school</code>, <code class="text-[#10b981]">swim</code>, <code class="text-[#10b981]">ls -la</code>.</div>
-</div>`,
+</div>`;
+        return `
+<div class="p-3 rounded bg-[#0d1117] border border-[#30363d] space-y-1.5 font-mono text-xs text-[#e6edf3]">
+  <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">⚡ TL;DR // GULO COCKPIT</div>
+  <div><span class="text-[#38bdf8] font-semibold">Who:</span> M.Sc. Computer Science &amp; Eng student (Chalmers D-24) &amp; competitive swimmer.</div>
+  <div><span class="text-[#38bdf8] font-semibold">Swimming:</span> Valhallabadet 50m (freestyle/butterfly). Best antidote to screen fatigue.</div>
+  <div><span class="text-[#38bdf8] font-semibold">Homelab:</span> Custom 20.0 TPS PaperMC SMP cluster with Velocity, Docker &amp; Debian 12.</div>
+  <div><span class="text-[#38bdf8] font-semibold">Files:</span> CV, Neovim dotfiles, Fabric modpack and backup scripts available at <code class="text-[#10b981]">/files</code>.</div>
+  <div><span class="text-[#38bdf8] font-semibold">Commands:</span> <code class="text-[#10b981]">projects</code>, <code class="text-[#10b981]">thoughts</code>, <code class="text-[#10b981]">files</code>, <code class="text-[#10b981]">school</code>, <code class="text-[#10b981]">swim</code>, <code class="text-[#10b981]">ls -la</code>.</div>
+</div>`;
+      },
 
-      // Easter egg aliases defined in .bashrc
-      study: () => `<div class="text-[#10b981] font-mono">Kompilerar operativsystem för RISC-V... Tentan godkänd med beröm! 💯</div>`,
-      sleep: () => `<div class="text-[#f85149] font-mono">Error 404: Sleep Not Found under tentavecka på Chalmers. Fyller på kaffekoppen... ☕</div>`,
-      mc: () => `<div class="text-[#10b981] font-mono">Docker SMP-kluster startat på port 25565. 20.0 TPS garanterat. 🟩</div>`,
+      study: () => {
+        const l = getSiteLang();
+        return l === 'sv' 
+          ? `<div class="text-[#10b981] font-mono">Kompilerar operativsystem för RISC-V... Tentan godkänd med beröm! 💯</div>`
+          : `<div class="text-[#10b981] font-mono">Compiling operating systems for RISC-V... Exam passed with honors! 💯</div>`;
+      },
+      sleep: () => {
+        const l = getSiteLang();
+        return l === 'sv'
+          ? `<div class="text-[#f85149] font-mono">Error 404: Sleep Not Found under tentavecka på Chalmers. Fyller på kaffekoppen... ☕</div>`
+          : `<div class="text-[#f85149] font-mono">Error 404: Sleep Not Found during exam week at Chalmers. Refilling coffee... ☕</div>`;
+      },
+      mc: () => {
+        const l = getSiteLang();
+        return l === 'sv'
+          ? `<div class="text-[#10b981] font-mono">Docker SMP-kluster startat på port 25565. 20.0 TPS garanterat. 🟩</div>`
+          : `<div class="text-[#10b981] font-mono">Docker SMP cluster started on port 25565. 20.0 TPS guaranteed. 🟩</div>`;
+      },
       alias: () => `
 <div class="text-xs space-y-1 font-mono text-[#8b949e]">
-  <div><span class="text-[#38bdf8]">alias swim</span>='echo "Dyk i! Valhallabadet kl 06:00, 400m insim redo."'</div>
-  <div><span class="text-[#38bdf8]">alias study</span>='echo "Kompilerar operativsystem... tentan godkänd!"'</div>
-  <div><span class="text-[#38bdf8]">alias sleep</span>='echo "Error: 404 Sleep Not Found under tentavecka"'</div>
+  <div><span class="text-[#38bdf8]">alias swim</span>='echo "Dive in! Valhallabadet 06:00, 400m warmup ready."'</div>
+  <div><span class="text-[#38bdf8]">alias study</span>='echo "Compiling OS kernels... exam passed!"'</div>
+  <div><span class="text-[#38bdf8]">alias sleep</span>='echo "Error: 404 Sleep Not Found during exam week"'</div>
   <div><span class="text-[#38bdf8]">alias mc</span>='docker compose -f ~/homelab/docker-compose.yml up -d'</div>
 </div>`,
 
@@ -1262,8 +1566,8 @@ ${escapeHtml(node.content)}
         return;
       },
 
-      date: () => `<div class="text-[#8b949e]">${new Date().toLocaleString('sv-SE')} (Europe/Stockholm)</div>`,
-      uptime: () => `<div class="text-[#10b981]">Uptime: 42 dagar, 8 timmar, load: 0.18, 0.22, 0.35</div>`,
+      date: () => `<div class="text-[#8b949e]">${new Date().toLocaleString(getSiteLang() === 'sv' ? 'sv-SE' : 'en-GB')} (Europe/Stockholm)</div>`,
+      uptime: () => `<div class="text-[#10b981]">Uptime: ${getSiteLang() === 'sv' ? '42 dagar, 8 timmar' : '42 days, 8 hours'}, load: 0.18, 0.22, 0.35</div>`,
       exit: () => { userCloseWindow(); return; },
       close: () => { userCloseWindow(); return; }
     };
@@ -1273,14 +1577,12 @@ ${escapeHtml(node.content)}
     commands['neofetch'] = commands['fastfetch'];
     commands['fetch'] = commands['fastfetch'];
 
-    // Smidiga alias för whoami
     commands['whoisgulo'] = commands['whoami'];
     commands['whoamgulo'] = commands['whoami'];
     commands['gulo'] = commands['whoami'];
     commands['whois'] = commands['whoami'];
     commands['who'] = commands['whoami'];
 
-    // Smidiga alias för contact (Discord, phone, number, kontakt, socials, mail, email)
     commands['discord'] = commands['contact'];
     commands['phone'] = commands['contact'];
     commands['number'] = commands['contact'];
@@ -1321,7 +1623,10 @@ ${escapeHtml(node.content)}
       } else {
         const errBox = document.createElement('div');
         errBox.className = 'text-xs text-[#f85149] pl-3 border-l border-[#f85149]/40 my-1';
-        errBox.innerHTML = `Kommando hittades inte: '${escapeHtml(cleanCmd)}'. Skriv <span class="text-[#10b981] font-bold">help</span> för hjälplista.`;
+        const _errLang = getSiteLang();
+        errBox.innerHTML = _errLang === 'sv'
+          ? `Kommando hittades inte: '${escapeHtml(cleanCmd)}'. Skriv <span class="text-[#10b981] font-bold">help</span> för hjälplista.`
+          : `Command not found: '${escapeHtml(cleanCmd)}'. Type <span class="text-[#10b981] font-bold">help</span> for available commands.`;
         history.appendChild(errBox);
       }
 
@@ -1341,13 +1646,13 @@ ${escapeHtml(node.content)}
     });
 
     // ==========================================
-    // 3. ROBUST TAB COMPLETION, CTRL+C & HISTORY
+    // 3. ROBUST TAB COMPLETION, CTRL+C & SHORTCUTS
     // ==========================================
     input.addEventListener('keydown', (e) => {
-      // Ctrl+C för att avbryta påbörjat kommando som i bash
+      // Ctrl+C för att avbryta kommando
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
         const sel = window.getSelection()?.toString();
-        if (sel && sel.length > 0) return; // Tillåt vanlig textkopiering
+        if (sel && sel.length > 0) return;
 
         e.preventDefault();
         const currentCmd = input.value;
@@ -1369,7 +1674,7 @@ ${escapeHtml(node.content)}
         return;
       }
 
-      // Ctrl+L för att rensa historik som i bash (Terminal redo-raden bevaras ovanför)
+      // Ctrl+L för att rensa
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'l') {
         e.preventDefault();
         history.innerHTML = '';
@@ -1402,7 +1707,7 @@ ${escapeHtml(node.content)}
         const tokens = currentVal.split(' ');
         const lastToken = tokens[tokens.length - 1] || '';
 
-        // If typing first token -> autocomplete command names
+        // Tab på första ordet -> komplettera kommando
         if (tokens.length <= 1) {
           const cmdList = [
             'help', 'school', 'swim', 'whoami', 'contact', 'discord', 'phone', 'number', 'kontakt',
@@ -1415,7 +1720,6 @@ ${escapeHtml(node.content)}
           if (matches.length === 1) {
             input.value = matches[0] + ' ';
           } else if (matches.length > 1) {
-            // Förhindra duplikation vid upprepade Tab-tryck!
             const lastChild = history.lastElementChild;
             if (lastChild && lastChild.classList.contains('tab-hint-row')) {
               return;
@@ -1428,7 +1732,7 @@ ${escapeHtml(node.content)}
           return;
         }
 
-        // If typing second token or later -> autocomplete filesystem nodes, flags or open targets
+        // Tab på argument -> komplettera sökvägar / filer
         const mainCmd = tokens[0].toLowerCase();
         let availableItems: string[] = [];
 
@@ -1442,10 +1746,6 @@ ${escapeHtml(node.content)}
           return;
         }
 
-        // Dela upp lastToken i katalogprefix (dirPrefix) och sökterm (basePrefix)
-        // Exempel: "../p" -> dirPrefix: "../", basePrefix: "p"
-        // Exempel: "../projects/" -> dirPrefix: "../projects/", basePrefix: ""
-        // Exempel: "c" -> dirPrefix: "", basePrefix: "c"
         const lastSlashIdx = lastToken.lastIndexOf('/');
         let dirPrefix = '';
         let basePrefix = lastToken;
@@ -1455,13 +1755,11 @@ ${escapeHtml(node.content)}
           basePrefix = lastToken.slice(lastSlashIdx + 1);
         }
 
-        // Slå upp målkatalog baserat på dirPrefix
         const targetDirSegments = dirPrefix ? resolvePath(currentPath, dirPrefix) : currentPath;
         const targetDirNode = resolveNode(targetDirSegments);
 
         if (targetDirNode && targetDirNode.type === 'dir') {
           for (const [name, node] of Object.entries(targetDirNode.children)) {
-            // Dölj punkt-filer om inte användaren aktivt startade med '.'
             if (name.startsWith('.') && !basePrefix.startsWith('.')) continue;
 
             if (mainCmd === 'cd') {
@@ -1473,14 +1771,11 @@ ${escapeHtml(node.content)}
             }
           }
 
-          // Om vi är i en underkatalog och användaren inte redan skrivit ../
           if (targetDirSegments.length > 0 && !dirPrefix.endsWith('../')) {
             availableItems.push('../');
           }
         }
 
-        // Om kommandot är 'open' och användaren inte angett specifik sökväg med slash:
-        // Erbjuda också standardsektioner och alla dynamiska slugs
         if (mainCmd === 'open' && !dirPrefix) {
           const openTargets = ['projects', 'thoughts', 'files'];
           openTargets.forEach(t => {
@@ -1507,7 +1802,6 @@ ${escapeHtml(node.content)}
           tokens[tokens.length - 1] = dirPrefix + matches[0];
           input.value = tokens.join(' ');
         } else if (matches.length > 1) {
-          // Förhindra duplikation vid upprepade Tab-tryck!
           const lastChild = history.lastElementChild;
           if (lastChild && lastChild.classList.contains('tab-hint-row')) {
             return;
@@ -1539,10 +1833,87 @@ ${escapeHtml(node.content)}
 </script>
 
 <style>
+  /* Native App Window Launch Animation */
+  @keyframes termWindowOpen {
+    0% {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.96);
+      filter: blur(1px);
+    }
+    60% {
+      opacity: 0.95;
+      transform: translateY(2px) scale(1.008);
+      filter: blur(0);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+  }
+
+  /* Native App Window Exit Animation */
+  @keyframes termWindowClose {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(6px) scale(0.96);
+      filter: blur(1px);
+    }
+  }
+
+  /* Maximize pop animation */
+  @keyframes termWindowMaximize {
+    0% {
+      transform: scale(0.98);
+      opacity: 0.92;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .term-opening {
+    animation: termWindowOpen 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform-origin: top center;
+  }
+
+  .term-closing {
+    animation: termWindowClose 0.16s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
+    transform-origin: center center;
+    pointer-events: none;
+  }
+
+  .term-maximizing {
+    animation: termWindowMaximize 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Smooth collapsible body for minimizing / unminimizing */
   #terminal-body {
     scrollbar-width: thin;
     scrollbar-color: #30363d #0d1117;
+    transform-origin: top center;
+    transition: max-height 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.18s ease-out,
+                padding 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   }
+
+  #terminal-body.is-minimized {
+    max-height: 0 !important;
+    opacity: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    overflow: hidden !important;
+    transform: scaleY(0.95);
+    pointer-events: none;
+  }
+
   #terminal-body::-webkit-scrollbar {
     width: 6px;
     height: 6px;

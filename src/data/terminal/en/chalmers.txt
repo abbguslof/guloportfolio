@@ -1,0 +1,4 @@
+Chalmers University of Technology — Computer Science & Engineering D-24
+Campus: Johanneberg (EDIT building), Gothenburg
+Current coursework: Operating Systems, Computer Architecture, Data Communications, Algorithms.
+Labs: Multithreaded schedulers in C, RISC-V context switching, and cache models.

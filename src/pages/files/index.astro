@@ -24,8 +24,8 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
 ---
 
 <Layout 
-  title="Fildelning & Resurser // gulo" 
-  description="Nedladdningsbara skript, CV, Minecraft-serverpaket, dotfiles och konfigurationer med användarguider och referenser."
+  title="File Sharing & Resources // gulo" 
+  description="Downloadable scripts, resume, Minecraft server packages, dotfiles, and configurations with usage guides."
 >
   <Header />
 
@@ -36,24 +36,24 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
     <!-- Breadcrumb & Top Header -->
     <div class="border-b border-[#30363d] pb-6">
       <div class="flex items-center gap-2 text-xs text-[#8b949e] mb-3">
-        <a href="/" class="hover:text-[#10b981] transition-colors">[~/hem]</a>
+        <a href="/" class="hover:text-[#10b981] transition-colors" data-i18n="files_breadcrumb_home">[~/home]</a>
         <span>/</span>
-        <span class="text-[#e6edf3]">filer</span>
+        <span class="text-[#e6edf3]" data-i18n="files_breadcrumb_current">files</span>
       </div>
 
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 class="text-2xl sm:text-3xl font-bold text-[#e6edf3] tracking-tight">
-            Fildelning &amp; Resurser
+          <h1 class="text-2xl sm:text-3xl font-bold text-[#e6edf3] tracking-tight" data-i18n="files_title">
+            File Sharing &amp; Resources
           </h1>
-          <p class="text-xs sm:text-sm text-[#8b949e] mt-1">
-            Optimerade modpacks, Linux-skript, CV och dotfiles. Klicka på en resurs för snabbguide och refererade projekt.
+          <p class="text-xs sm:text-sm text-[#8b949e] mt-1" data-i18n="files_subtitle">
+            Optimized modpacks, Linux scripts, resume, and dotfiles. Click any resource for usage guide and linked projects.
           </p>
         </div>
 
         <div class="flex items-center gap-3 text-xs text-[#8b949e]">
           <span class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981]">
-            <span id="file-count-badge">{downloads.length}</span> filer tillgängliga
+            <span id="file-count-badge">{downloads.length}</span> <span data-i18n="files_count_suffix">files available</span>
           </span>
         </div>
       </div>
@@ -68,7 +68,8 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
           <input 
             type="text" 
             id="file-search-input"
-            placeholder="Sök på filnamn, beskrivning, kategori eller tagg (t.ex. 'cv', 'bash', 'minecraft')..." 
+            data-i18n-placeholder="files_search_placeholder"
+            placeholder="Search filename, description, category, or tag (e.g. 'cv', 'bash', 'minecraft')..." 
             class="w-full bg-[#161b22] text-[#e6edf3] text-xs pl-16 pr-4 py-2 rounded-lg border border-[#30363d] focus:outline-none focus:border-[#10b981] placeholder-[#8b949e]/60 font-mono transition-colors"
           />
         </div>
@@ -77,7 +78,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-xs">
           <!-- Categories -->
           <div class="flex flex-wrap items-center gap-2" id="file-categories">
-            <span class="text-[#8b949e] text-[11px] mr-1">Kategori:</span>
+            <span class="text-[#8b949e] text-[11px] mr-1" data-i18n="files_filter_category">Category:</span>
             {categories.map((cat, i) => (
               <button 
                 type="button" 
@@ -88,21 +89,21 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
                 }`}
                 data-cat={cat.toLowerCase()}
               >
-                [{cat}]
+                {i === 0 ? <span data-i18n="files_filter_all">[{cat === 'Alla' ? 'All' : cat}]</span> : `[${cat}]`}
               </button>
             ))}
           </div>
 
           <!-- Sorting -->
           <div class="flex items-center gap-2">
-            <span class="text-[#8b949e] text-[11px]">Sortera:</span>
+            <span class="text-[#8b949e] text-[11px]" data-i18n="files_sort_label">Sort:</span>
             <select 
               id="file-sort-select" 
               class="bg-[#161b22] text-[#e6edf3] text-xs px-2.5 py-1 rounded border border-[#30363d] focus:outline-none focus:border-[#10b981] cursor-pointer font-mono"
             >
-              <option value="newest">Senast uppdaterad</option>
-              <option value="name">Namn (A-Ö)</option>
-              <option value="size">Filstorlek</option>
+              <option value="newest" data-i18n="files_sort_newest">Recently updated</option>
+              <option value="name" data-i18n="files_sort_name_asc">Name (A-Z)</option>
+              <option value="size" data-i18n="files_sort_size_desc">File size</option>
             </select>
           </div>
         </div>
@@ -298,7 +299,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
     <div class="pt-8 border-t border-[#30363d] flex items-center justify-between text-xs text-[#8b949e]">
       <a href="/" class="hover:text-[#10b981] transition-colors flex items-center gap-1.5">
         <span>←</span>
-        <span>[Tillbaka till cockpit]</span>
+        <span data-i18n="projects_back_home">[Back to the cockpit]</span>
       </a>
       <span>gulo // file archives</span>
     </div>

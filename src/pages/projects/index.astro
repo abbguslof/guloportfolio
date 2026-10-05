@@ -9,14 +9,11 @@ import { getCollection } from 'astro:content';
 
 const projects = await getCollection('projects');
 const sortedProjects = projects.sort((a, b) => a.data.order - b.data.order);
-
-// Samla alla kategorier dynamiskt från innehållet
-const categories = ['Alla', ...Array.from(new Set(sortedProjects.map(p => p.data.category))).sort()];
 ---
 
 <Layout 
-  title="Projekt & Portfolio // gulo" 
-  description="Portfolio över systemprogrammering, Chalmers Datateknik, Minecraft-infrastruktur och homelab."
+  title="Projects & Portfolio // gulo" 
+  description="Portfolio of systems programming, Chalmers Datateknik coursework, Minecraft infrastructure, and homelab setups."
 >
   <Header />
 
@@ -27,24 +24,24 @@ const categories = ['Alla', ...Array.from(new Set(sortedProjects.map(p => p.data
     <!-- Breadcrumb & Top Header -->
     <div class="border-b border-[#30363d] pb-6">
       <div class="flex items-center gap-2 text-xs font-mono text-[#8b949e] mb-3">
-        <a href="/" class="hover:text-[#10b981] transition-colors">[~/hem]</a>
+        <a href="/" class="hover:text-[#10b981] transition-colors" data-i18n="projects_breadcrumb_home">[~/home]</a>
         <span>/</span>
-        <span class="text-[#e6edf3]">projekt</span>
+        <span class="text-[#e6edf3]" data-i18n="projects_breadcrumb_current">projects</span>
       </div>
 
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 class="text-2xl sm:text-3xl font-bold font-mono text-[#e6edf3] tracking-tight">
-            Projekt, Homelab &amp; Kod
+          <h1 class="text-2xl sm:text-3xl font-bold font-mono text-[#e6edf3] tracking-tight" data-i18n="projects_title">
+            Projects, Homelab &amp; Code
           </h1>
-          <p class="text-xs sm:text-sm text-[#8b949e] mt-1 font-mono">
-            Tekniska djupdykningar, laborationer från Chalmers och självhostad infrastruktur.
+          <p class="text-xs sm:text-sm text-[#8b949e] mt-1 font-mono" data-i18n="projects_subtitle">
+            Technical deep dives, Chalmers lab coursework, and self-hosted infrastructure.
           </p>
         </div>
 
         <div class="flex items-center gap-3 text-xs font-mono text-[#8b949e]">
           <span class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981] font-mono text-xs">
-            <span id="project-count-badge">{sortedProjects.length}</span> projekt tillgängliga
+            <span id="project-count-badge">{sortedProjects.length}</span> <span data-i18n="projects_count_suffix">projects available</span>
           </span>
         </div>
       </div>
@@ -59,32 +56,36 @@ const categories = ['Alla', ...Array.from(new Set(sortedProjects.map(p => p.data
           <input 
             type="text" 
             id="project-search-input"
-            placeholder="Sök på projektnamn, teknologi, kategori eller beskrivning (t.ex. 'rust', 'c', 'minecraft')..." 
+            data-i18n-placeholder="projects_search_placeholder"
+            placeholder="Search project name, technology, category, or description (e.g. 'rust', 'c', 'minecraft')..." 
             class="w-full bg-[#161b22] text-[#e6edf3] text-xs pl-16 pr-4 py-2 rounded-lg border border-[#30363d] focus:outline-none focus:border-[#10b981] placeholder-[#8b949e]/60 font-mono transition-colors"
           />
         </div>
 
         <!-- Category Filter Tabs -->
         <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
-          <span class="text-[#8b949e] text-[11px] mr-1">Kategori:</span>
+          <span class="text-[#8b949e] text-[11px] mr-1" data-i18n="projects_filter_label">Category:</span>
           <button 
             type="button" 
             class="proj-filter-btn active px-3 py-1 rounded bg-[#10b981] text-[#0d1117] font-semibold border border-[#10b981] transition-all cursor-pointer"
             data-category="all"
+            data-i18n="projects_filter_all"
           >
-            [Alla]
+            [All]
           </button>
           <button 
             type="button" 
             class="proj-filter-btn px-3 py-1 rounded bg-[#161b22] text-[#8b949e] border border-[#30363d] hover:text-[#e6edf3] transition-all cursor-pointer"
             data-category="school"
+            data-i18n="projects_filter_school"
           >
-            [Chalmers / Skola]
+            [Chalmers / School]
           </button>
           <button 
             type="button" 
             class="proj-filter-btn px-3 py-1 rounded bg-[#161b22] text-[#8b949e] border border-[#30363d] hover:text-[#e6edf3] transition-all cursor-pointer"
             data-category="minecraft"
+            data-i18n="projects_filter_minecraft"
           >
             [Minecraft]
           </button>
@@ -92,6 +93,7 @@ const categories = ['Alla', ...Array.from(new Set(sortedProjects.map(p => p.data
             type="button" 
             class="proj-filter-btn px-3 py-1 rounded bg-[#161b22] text-[#8b949e] border border-[#30363d] hover:text-[#e6edf3] transition-all cursor-pointer"
             data-category="homelab"
+            data-i18n="projects_filter_homelab"
           >
             [Homelab / Linux]
           </button>
@@ -124,14 +126,14 @@ const categories = ['Alla', ...Array.from(new Set(sortedProjects.map(p => p.data
     </div>
 
     <div id="no-projects-msg" class="py-12 text-center text-xs font-mono text-[#8b949e] hidden">
-      Inga projekt matchar din sökning eller det valda filtret.
+      No projects found matching the query.
     </div>
 
     <!-- Bottom return navigation -->
     <div class="pt-8 border-t border-[#30363d] flex items-center justify-between text-xs font-mono text-[#8b949e]">
       <a href="/" class="hover:text-[#10b981] transition-colors flex items-center gap-1.5">
         <span>←</span>
-        <span>[Tillbaka till cockpit]</span>
+        <span data-i18n="projects_back_home">[Back to the cockpit]</span>
       </a>
       <span>gulo // portfolio matrix</span>
     </div>

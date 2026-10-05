@@ -43,15 +43,17 @@ const statusColors: Record<string, string> = {
         href="/projects" 
         class="inline-flex items-center gap-1.5 text-xs font-mono text-[#8b949e] hover:text-[#10b981] transition-colors px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d]"
       >
-        <span>←</span>
-        <span>[~/projekt]</span>
+        <span data-i18n="projects_back_btn">← [~/projects]</span>
       </a>
     </div>
 
     <!-- Project Header -->
     <header class="pb-6 mb-8 border-b border-[#30363d]">
       <div class="flex items-center gap-2 mb-3">
-        <span class="text-xs font-mono uppercase px-2 py-0.5 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e]">
+        <span 
+          class="text-xs font-mono uppercase px-2 py-0.5 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e]"
+          data-i18n={`projects_cat_${project.data.category.toLowerCase()}`}
+        >
           {project.data.category}
         </span>
         <span class={`text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#161b22] border ${statusColors[project.data.status] || 'text-[#10b981]'}`}>
@@ -118,8 +120,8 @@ const statusColors: Record<string, string> = {
     <!-- Attached Downloads if applicable -->
     {project.data.category === 'Minecraft' && (
       <div class="mt-12 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-        <div class="text-xs font-mono font-bold text-[#10b981] mb-2">
-          RELATERADE NEDLADDNINGAR FÖR DETTA PROJEKT:
+        <div class="text-xs font-mono font-bold text-[#10b981] mb-2" data-i18n="projects_downloads_title">
+          DOWNLOADABLE RESOURCES LINKED TO THIS PROJECT:
         </div>
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
           <div>
@@ -130,8 +132,9 @@ const statusColors: Record<string, string> = {
             href="/downloads/fabric-1.20.4-optimized.zip" 
             download="fabric-1.20.4-optimized.zip"
             class="px-3 py-1 rounded bg-[#0d1117] border border-[#30363d] text-[#10b981] hover:border-[#10b981] transition-all text-xs text-center"
+            data-i18n="projects_download_pack"
           >
-            [Ladda ner pack ↓]
+            [Download pack ↓]
           </a>
         </div>
       </div>
@@ -139,9 +142,14 @@ const statusColors: Record<string, string> = {
 
     <!-- Return Nav -->
     <div class="mt-12 pt-6 border-t border-[#30363d] flex items-center justify-between text-xs font-mono">
-      <a href="/projects" class="text-[#8b949e] hover:text-[#10b981] transition-colors">
-        [← Tillbaka till alla projekt]
-      </a>
+      <div class="flex items-center gap-4">
+        <a href="/projects" class="text-[#8b949e] hover:text-[#10b981] transition-colors">
+          <span data-i18n="projects_back_all">[← Return to all projects]</span>
+        </a>
+        <a href="/" class="text-[#8b949e] hover:text-[#10b981] transition-colors">
+          <span data-i18n="projects_back_home">[Back to the cockpit]</span>
+        </a>
+      </div>
       <span class="text-[#8b949e]">slug: {project.id}</span>
     </div>
   </main>

@@ -1,65 +1,161 @@
 ---
-// Header.astro - Clean Cockpit Top Navigation
+// Header.astro - Silky Smooth Floating Cockpit Navigation with Continuous Edge Gliding
 ---
 
-<header class="border-b border-[#30363d] pb-4 mb-8">
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    <!-- Brand / Title -->
-    <div class="flex items-center gap-3">
-      <a href="/" class="group flex items-center gap-2 text-sm font-semibold tracking-tight transition-colors">
-        <span class="px-2 py-0.5 rounded bg-[#161b22] border border-[#30363d] font-mono text-xs font-bold text-[#10b981] group-hover:border-[#10b981] transition-colors">
-          GULO
-        </span>
-        <span class="text-xs font-mono text-[#8b949e] group-hover:text-[#e6edf3] transition-colors">
-          chalmers.d <span class="text-[#30363d]">//</span> playground
-        </span>
-      </a>
+<!-- Placeholder div in normal document flow to guarantee 0px layout shift -->
+<div class="h-16 w-full mb-8 select-none pointer-events-none" aria-hidden="true"></div>
 
-      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#161b22] border border-[#30363d] text-[#10b981]">
-        <span class="w-1.5 h-1.5 mr-1 rounded-full bg-[#10b981] animate-pulse"></span>
-        ONLINE
-      </span>
+<!-- Full-width Fixed Header: spans 100vw so background never cuts off -->
+<header id="site-header" class="fixed top-0 left-0 right-0 w-full z-50 pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.2,0.8,0.25,1)]">
+  <div 
+    id="header-surface" 
+    class="pointer-events-auto w-full max-w-[1400px] mx-auto px-4 sm:px-8 py-3.5 transition-all duration-300 ease-[cubic-bezier(0.2,0.8,0.25,1)]"
+  >
+    <div class="w-full flex items-center justify-between gap-3 sm:gap-6">
+      <!-- Brand / Logo (Far left to maximize center reading area) -->
+      <div id="header-brand" class="flex items-center gap-2.5 sm:gap-3 shrink-0">
+        <a href="/" class="group flex items-center gap-2 text-sm font-semibold tracking-tight transition-colors">
+          <span class="px-2 py-0.5 rounded bg-[#161b22] border border-[#30363d] font-mono text-xs font-bold text-[#10b981] group-hover:border-[#10b981] transition-colors">
+            GULO
+          </span>
+          <span class="text-xs font-mono text-[#8b949e] group-hover:text-[#e6edf3] transition-colors hidden min-[360px]:inline">
+            chalmers.d <span class="text-[#30363d]">//</span> playground
+          </span>
+        </a>
+
+        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#161b22] border border-[#30363d] text-[#10b981]">
+          <span class="w-1.5 h-1.5 mr-1 rounded-full bg-[#10b981] animate-pulse"></span>
+          ONLINE
+        </span>
+      </div>
+
+      <!-- Navigation & Controls (Far right to maximize center reading area) -->
+      <nav id="header-nav" class="flex items-center flex-wrap gap-1.5 sm:gap-2.5 text-xs font-mono shrink-0" aria-label="Huvudnavigation">
+        <button 
+          type="button" 
+          id="header-terminal-toggle" 
+          class="px-2 sm:px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981] hover:text-[#e6edf3] hover:border-[#10b981] transition-all cursor-pointer flex items-center gap-1 sm:gap-1.5 shadow-sm text-xs"
+          title="Toggle terminal (open/close)"
+        >
+          <span>&gt;_</span>
+          <span data-i18n="nav_terminal">terminal</span>
+        </button>
+        <a href="/projects" class="px-2 sm:px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#a78bfa] transition-all" data-i18n="nav_projects">
+          projects
+        </a>
+        <a href="/thoughts" class="px-2 sm:px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#f59e0b] transition-all" data-i18n="nav_thoughts">
+          blog / thoughts
+        </a>
+        <a href="/files" class="px-2 sm:px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#38bdf8] transition-all" data-i18n="nav_files">
+          files
+        </a>
+        <a 
+          href="https://github.com" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="px-1.5 sm:px-2 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#e6edf3] transition-all hidden sm:inline-flex items-center gap-1"
+          aria-label="GitHub profil (öppnas i ny flik)"
+        >
+          <span>gh</span><span class="text-[10px]">↗</span>
+        </a>
+
+        <!-- Language Switcher [ EN | SV ] -->
+        <div class="flex items-center p-0.5 rounded bg-[#161b22] border border-[#30363d] select-none ml-0.5" id="lang-toggle-container" title="Switch language (EN/SV)">
+          <button 
+            type="button" 
+            id="btn-lang-en" 
+            class="lang-btn px-1.5 sm:px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#10b981] bg-[#0d1117] border border-[#10b981]/40 shadow-sm"
+            aria-label="Switch to English"
+          >
+            EN
+          </button>
+          <button 
+            type="button" 
+            id="btn-lang-sv" 
+            class="lang-btn px-1.5 sm:px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]"
+            aria-label="Växla till svenska"
+          >
+            SV
+          </button>
+        </div>
+      </nav>
     </div>
-
-    <!-- Quick Navigation Links -->
-    <nav class="flex items-center flex-wrap gap-2 text-xs font-mono" aria-label="Huvudnavigation">
-      <button 
-        type="button" 
-        id="header-terminal-toggle" 
-        class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981] hover:text-[#e6edf3] hover:border-[#10b981] transition-all cursor-pointer flex items-center gap-1.5"
-        title="Fokusera eller öppna terminalen"
-      >
-        <span>&gt;_</span>
-        <span>terminal</span>
-      </button>
-      <a href="/projects" class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#a78bfa] transition-all">
-        projekt
-      </a>
-      <a href="/thoughts" class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#f59e0b] transition-all">
-        blogg / tankar
-      </a>
-      <a href="/files" class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#38bdf8] transition-all">
-        filer
-      </a>
-      <a 
-        href="https://github.com" 
-        target="_blank" 
-        rel="noopener noreferrer" 
-        class="px-2 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#e6edf3] transition-all inline-flex items-center gap-1"
-        aria-label="GitHub profil (öppnas i ny flik)"
-      >
-        <span>gh</span><span class="text-[10px]">↗</span>
-      </a>
-    </nav>
   </div>
 </header>
 
+<style>
+  /* Header spans 100vw so the background and border never cut off */
+  #site-header {
+    background-color: transparent;
+    border-bottom: 1px solid rgba(48, 54, 61, 0.25);
+  }
+
+  #site-header.is-scrolled {
+    background-color: rgba(13, 17, 23, 0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(48, 54, 61, 0.85);
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Scrolled inner container contracts vertically for maximum reading height */
+  #header-surface.is-scrolled {
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+    max-width: 1440px;
+  }
+
+  @media (min-width: 1280px) {
+    #header-surface.is-scrolled {
+      padding-left: 2.5rem;
+      padding-right: 2.5rem;
+    }
+  }
+</style>
+
 <script>
-  // Terminal button
+  import { setSiteLang } from '../scripts/i18n-client';
+
+  const siteHeader = document.getElementById('site-header');
+  const headerSurface = document.getElementById('header-surface');
+  let isScrolled = false;
+  let ticking = false;
+
+  function onScroll() {
+    const scrollY = window.scrollY;
+    if (scrollY > 60 && !isScrolled) {
+      isScrolled = true;
+      siteHeader?.classList.add('is-scrolled');
+      headerSurface?.classList.add('is-scrolled');
+    } else if (scrollY < 20 && isScrolled) {
+      isScrolled = false;
+      siteHeader?.classList.remove('is-scrolled');
+      headerSurface?.classList.remove('is-scrolled');
+    }
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(onScroll);
+      ticking = true;
+    }
+  }, { passive: true });
+
+  // Initial check
+  onScroll();
+
+  // Terminal button - toggles terminal open or closed
   document.getElementById('header-terminal-toggle')?.addEventListener('click', () => {
-    window.dispatchEvent(new CustomEvent('restore-terminal'));
-    const term = document.getElementById('terminal-window') || document.getElementById('terminal-section');
-    term?.scrollIntoView({ behavior: 'smooth' });
-    document.getElementById('terminal-input')?.focus();
+    window.dispatchEvent(new CustomEvent('toggle-terminal'));
+  });
+
+  // Language buttons
+  document.getElementById('btn-lang-en')?.addEventListener('click', () => {
+    setSiteLang('en');
+  });
+
+  document.getElementById('btn-lang-sv')?.addEventListener('click', () => {
+    setSiteLang('sv');
   });
 </script>
