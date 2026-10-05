@@ -1,0 +1,4 @@
+Chalmers Tekniska Högskola — Datateknik D-24
+Campus: Johanneberg (EDIT-huset), Göteborg
+Aktuella kurser: Operativsystem, Datorarkitektur, Datakommunikation, Algoritmer.
+Laborationer: Schemaläggare i C, kontextbyten för RISC-V och minnesmodeller.

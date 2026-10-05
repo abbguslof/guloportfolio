@@ -46,47 +46,114 @@ const allTags = Array.from(
         </div>
 
         <div class="flex items-center gap-2 text-xs font-mono text-[#8b949e]">
-          <span class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981]">
-            {sortedThoughts.length} inlägg
+          <span class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981] font-mono text-xs">
+            <span id="thought-count-badge">{sortedThoughts.length}</span> artiklar tillgängliga
           </span>
         </div>
       </div>
 
-      <!-- Tag Filters -->
-      <div class="flex flex-wrap items-center gap-2 mt-6 text-xs font-mono" id="blog-filter-bar">
-        <span class="text-[#8b949e] text-[11px] mr-1">Tagg:</span>
-        <button 
-          type="button" 
-          class="blog-filter-btn active px-3 py-1 rounded bg-[#10b981] text-[#0d1117] font-semibold border border-[#10b981] transition-all cursor-pointer"
-          data-tag="all"
-        >
-          [Alla]
-        </button>
-        {allTags.map((tag) => (
+      <!-- Search & Filters Bar -->
+      <div class="mt-6 pt-4 border-t border-[#30363d]/60 space-y-4">
+        <!-- Live Search Bar -->
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-xs text-[#8b949e]">
+            <span>grep:</span>
+          </div>
+          <input 
+            type="text" 
+            id="thought-search-input"
+            placeholder="Sök i artiklar på rubrik, beskrivning eller tagg (t.ex. 'simning', 'chalmers', 'jvm')..." 
+            class="w-full bg-[#161b22] text-[#e6edf3] text-xs pl-16 pr-4 py-2 rounded-lg border border-[#30363d] focus:outline-none focus:border-[#10b981] placeholder-[#8b949e]/60 font-mono transition-colors"
+          />
+        </div>
+
+        <!-- Tag Filters -->
+        <div class="flex flex-wrap items-center gap-2 text-xs font-mono" id="blog-filter-bar">
+          <span class="text-[#8b949e] text-[11px] mr-1">Tagg:</span>
           <button 
             type="button" 
-            class="blog-filter-btn px-3 py-1 rounded bg-[#161b22] text-[#8b949e] border border-[#30363d] hover:text-[#e6edf3] transition-all cursor-pointer"
-            data-tag={tag.toLowerCase()}
+            class="blog-filter-btn active px-3 py-1 rounded bg-[#10b981] text-[#0d1117] font-semibold border border-[#10b981] transition-all cursor-pointer"
+            data-tag="all"
           >
-            [{tag}]
+            [Alla]
           </button>
-        ))}
+          {allTags.map((tag) => (
+            <button 
+              type="button" 
+              class="blog-filter-btn px-3 py-1 rounded bg-[#161b22] text-[#8b949e] border border-[#30363d] hover:text-[#e6edf3] transition-all cursor-pointer"
+              data-tag={tag.toLowerCase()}
+            >
+              [{tag}]
+            </button>
+          ))}
+        </div>
       </div>
     </div>
 
-    <!-- Articles List -->
-    <div class="rounded-lg bg-[#161b22] border border-[#30363d] px-5 py-2 divide-y divide-[#30363d]/40">
-      {sortedThoughts.map((post) => (
-        <ThoughtRow 
-          title={post.data.title}
-          slug={post.id}
-          pubDate={post.data.pubDate}
-          tags={post.data.tags}
-        />
-      ))}
+    <!-- Articles Digital Garden / Log List -->
+    <div class="space-y-4" id="thoughts-list">
+      {sortedThoughts.map((post) => {
+        const formattedDate = post.data.pubDate.toISOString().slice(0, 10);
+        return (
+          <article 
+            class="thought-card rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#f59e0b]/60 transition-all p-5 space-y-3 group"
+            data-tags={(post.data.tags || []).join(',').toLowerCase()}
+            data-title={post.data.title.toLowerCase()}
+            data-desc={(post.data.description || '').toLowerCase()}
+          >
+            <!-- Meta row -->
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-[#8b949e]">
+              <div class="flex items-center gap-2">
+                <span class="text-[11px] font-bold text-[#f59e0b] px-1.5 py-0.5 rounded bg-[#0d1117] border border-[#f59e0b]/40">
+                  [ANTECKNING // {formattedDate}]
+                </span>
+                <span class="text-[11px] text-[#8b949e]">~2-3 min läsning</span>
+              </div>
 
-      <div id="no-articles-msg" class="py-8 text-center text-xs font-mono text-[#8b949e] hidden">
-        Inga artiklar matchade det valda filtret.
+              <!-- Tags -->
+              <div class="flex items-center gap-1.5 flex-wrap">
+                {(post.data.tags || []).map((tag) => (
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-[#0d1117] border border-[#30363d] text-[#8b949e] group-hover:text-[#38bdf8] transition-colors">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <!-- Title -->
+            <h2 class="text-base sm:text-lg font-bold text-[#e6edf3] group-hover:text-[#10b981] transition-colors">
+              <a href={`/thoughts/${post.id}`} class="hover:underline flex items-center justify-between gap-2">
+                <span>{post.data.title}</span>
+                <span class="text-xs text-[#8b949e] group-hover:text-[#10b981] group-hover:translate-x-1 transition-all shrink-0">
+                  läs →
+                </span>
+              </a>
+            </h2>
+
+            <!-- Editorial Excerpt Quote -->
+            {post.data.description && (
+              <blockquote class="text-xs sm:text-sm text-[#8b949e] border-l-2 border-[#f59e0b]/70 pl-3.5 italic leading-relaxed py-0.5 font-mono">
+                "{post.data.description}"
+              </blockquote>
+            )}
+
+            <!-- Footer link -->
+            <div class="pt-2 border-t border-[#30363d]/40 flex items-center justify-between text-xs">
+              <a 
+                href={`/thoughts/${post.id}`} 
+                class="text-[#38bdf8] hover:text-[#e6edf3] hover:underline flex items-center gap-1"
+              >
+                <span>[Öppna fullständig text</span>
+                <span class="text-[10px]">↗]</span>
+              </a>
+              <span class="text-[11px] text-[#8b949e]">slug: {post.id}</span>
+            </div>
+          </article>
+        );
+      })}
+
+      <div id="no-articles-msg" class="py-12 text-center text-xs font-mono text-[#8b949e] hidden">
+        Inga anteckningar matchar din sökning eller det valda filtret.
       </div>
     </div>
 
@@ -106,12 +173,40 @@ const allTags = Array.from(
 <script>
   function initBlogFilters() {
     const btns = document.querySelectorAll('.blog-filter-btn');
-    const items = document.querySelectorAll<HTMLElement>('.thought-item');
+    const items = Array.from(document.querySelectorAll<HTMLElement>('.thought-card'));
+    const searchInput = document.getElementById('thought-search-input') as HTMLInputElement | null;
     const noMsg = document.getElementById('no-articles-msg');
+    const countBadge = document.getElementById('thought-count-badge');
+
+    let currentTag = 'all';
+    let searchQuery = '';
+
+    function filterThoughts() {
+      let visibleCount = 0;
+      items.forEach((item) => {
+        const tags = (item.getAttribute('data-tags') || '').split(',');
+        const title = item.getAttribute('data-title') || '';
+        const desc = item.getAttribute('data-desc') || '';
+
+        const tagMatches = currentTag === 'all' || tags.includes(currentTag);
+        const searchMatches = 
+          !searchQuery || 
+          title.includes(searchQuery) || 
+          desc.includes(searchQuery) || 
+          tags.some((t) => t.includes(searchQuery));
+
+        const isMatch = tagMatches && searchMatches;
+        item.style.display = isMatch ? '' : 'none';
+        if (isMatch) visibleCount++;
+      });
+
+      if (noMsg) noMsg.classList.toggle('hidden', visibleCount > 0);
+      if (countBadge) countBadge.textContent = String(visibleCount);
+    }
 
     btns.forEach((btn) => {
       btn.addEventListener('click', () => {
-        const tag = btn.getAttribute('data-tag') || 'all';
+        currentTag = btn.getAttribute('data-tag') || 'all';
 
         btns.forEach((b) => {
           b.classList.remove('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]');
@@ -121,21 +216,13 @@ const allTags = Array.from(
         btn.classList.remove('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]');
         btn.classList.add('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]');
 
-        let count = 0;
-        items.forEach((item) => {
-          const tags = (item.getAttribute('data-tags') || '').split(',');
-          if (tag === 'all' || tags.includes(tag)) {
-            item.style.display = '';
-            count++;
-          } else {
-            item.style.display = 'none';
-          }
-        });
-
-        if (noMsg) {
-          noMsg.classList.toggle('hidden', count > 0);
-        }
+        filterThoughts();
       });
+    });
+
+    searchInput?.addEventListener('input', () => {
+      searchQuery = (searchInput.value || '').trim().toLowerCase();
+      filterThoughts();
     });
   }
 

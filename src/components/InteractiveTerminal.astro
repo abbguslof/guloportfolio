@@ -1,10 +1,105 @@
 ---
-// InteractiveTerminal.astro - Ergonomic TUI Terminal with snug Chafa portrait, global subpage support, and fixed window states
+import { getCollection } from 'astro:content';
+import fs from 'node:fs';
+import path from 'node:path';
+
 interface Props {
   isSubpage?: boolean;
 }
 
 const { isSubpage = false } = Astro.props;
+
+// 1. Läs statiska terminalfiler och easter eggs (.gitignore, .bashrc, .secret, about.txt, chalmers.txt, swim.txt)
+const terminalDir = path.join(process.cwd(), 'src/data/terminal');
+const staticFiles: Record<string, { size: string; description: string; content: string }> = {};
+
+if (fs.existsSync(terminalDir)) {
+  const fileEntries = fs.readdirSync(terminalDir);
+  for (const f of fileEntries) {
+    const fullPath = path.join(terminalDir, f);
+    const stat = fs.statSync(fullPath);
+    const content = fs.readFileSync(fullPath, 'utf-8');
+    const sizeStr = stat.size < 1024 ? `${stat.size} B` : `${(stat.size / 1024).toFixed(1)} KB`;
+    staticFiles[f] = {
+      size: sizeStr,
+      description: f,
+      content,
+    };
+  }
+}
+
+// 2. Läs dynamiska projekt (konfigurerbar sammanfattning så att cat visar relevant info utan att dumpa hela filen)
+const rawProjects = await getCollection('projects');
+const projectNodes: Record<string, any> = {};
+for (const p of rawProjects) {
+  const preview = `# ${p.data.title}\nStatus: [${p.data.status}] | Kategori: ${p.data.category}\nTech: ${(p.data.tech || []).join(', ')}\n\n${p.data.description}\n\nLäs hela projektet på webben: open ${p.id}`;
+  projectNodes[`${p.id}.md`] = {
+    type: 'file',
+    size: '1.4 KB',
+    description: p.data.description,
+    content: preview,
+    actionUrl: `/projects/${p.id}`,
+  };
+}
+
+// 3. Läs dynamiska tankar & blogginlägg
+const rawThoughts = await getCollection('thoughts');
+const thoughtNodes: Record<string, any> = {};
+for (const t of rawThoughts) {
+  const dateStr = t.data.pubDate ? new Date(t.data.pubDate).toISOString().split('T')[0] : '2026';
+  const preview = `${t.data.title}\nDatum: ${dateStr} | Taggar: ${(t.data.tags || []).join(', ')}\n\n"${t.data.description}"\n\nLäs hela artikeln: open ${t.id}`;
+  thoughtNodes[`${t.id}.md`] = {
+    type: 'file',
+    size: '1.8 KB',
+    description: t.data.description,
+    content: preview,
+    actionUrl: `/thoughts/${t.id}`,
+  };
+}
+
+// 4. Läs dynamiska nedladdningsbara filer
+const rawDownloads = await getCollection('downloads');
+const downloadNodes: Record<string, any> = {};
+for (const d of rawDownloads) {
+  const preview = `${d.data.name} (${d.data.filename})\nStorlek: ${d.data.size} | Kategori: ${d.data.category}\n${d.data.description}\n\nSnabbkommando: ${d.data.usage || 'curl -O ' + d.data.fileUrl}\nLadda ner direkt: open ${d.data.filename}`;
+  downloadNodes[d.data.filename] = {
+    type: 'file',
+    size: d.data.size,
+    description: d.data.description,
+    content: preview,
+    actionUrl: d.data.fileUrl,
+  };
+}
+
+// Slutlig virtuell filsystemstruktur
+const dynamicFileSystem = {
+  type: 'dir',
+  children: {
+    projects: {
+      type: 'dir',
+      children: projectNodes,
+    },
+    thoughts: {
+      type: 'dir',
+      children: thoughtNodes,
+    },
+    files: {
+      type: 'dir',
+      children: downloadNodes,
+    },
+    ...Object.fromEntries(
+      Object.entries(staticFiles).map(([fname, data]) => [
+        fname,
+        {
+          type: 'file',
+          size: data.size,
+          description: data.description,
+          content: data.content,
+        }
+      ])
+    )
+  }
+};
 ---
 
 <section 
@@ -13,6 +108,9 @@ const { isSubpage = false } = Astro.props;
   data-is-subpage={isSubpage ? 'true' : 'false'}
   aria-label="Interaktiv TUI Terminal"
 >
+  <!-- Embedded dynamic filesystem data for terminal client -->
+  <script id="terminal-fs-data" type="application/json" set:html={JSON.stringify(dynamicFileSystem)} />
+
   <!-- Static Human-Readable "About Me" Card (Only on homepage when terminal is closed via ✕) -->
   {!isSubpage && (
     <div 
@@ -136,16 +234,22 @@ const { isSubpage = false } = Astro.props;
     <div id="terminal-body" class="p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto transition-all">
       <!-- Authentic Neofetch / Fastfetch Layout -->
       <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-5 border-b border-[#30363d]/80">
-        <!-- Chafa Dithered CRT Terminal Avatar (Left column) -->
-        <div class="shrink-0">
-          <div class="relative w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 rounded border border-[#30363d] bg-[#0d1117] overflow-hidden shadow-md group">
-            <img 
-              src="/images/avatar.jpg" 
-              alt="gulo — dev & swimmer avatar" 
-              class="w-full h-full object-cover grayscale contrast-125 brightness-95 group-hover:grayscale-0 group-hover:brightness-105 transition-all duration-300"
-            />
-            <!-- Authentic subtle CRT phosphor scanlines -->
-            <div class="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-emerald-500/5 to-transparent opacity-60 mix-blend-overlay"></div>
+        <!-- Authentic Fastfetch ASCII Emblem (Left column) -->
+        <div class="shrink-0 select-none font-mono text-[11px] sm:text-xs leading-[1.2] p-3 rounded bg-[#0d1117] border border-[#30363d]/80 flex flex-col justify-center items-center text-center">
+          <pre class="leading-tight text-center font-mono">
+<span class="text-[#38bdf8]">     /\_____/\     </span>
+<span class="text-[#38bdf8]">    /</span>  <span class="text-[#e6edf3] font-bold">o</span>   <span class="text-[#e6edf3] font-bold">o</span>  <span class="text-[#38bdf8]">\    </span>
+<span class="text-[#10b981]">   (</span> <span class="text-[#38bdf8]">==</span>  <span class="text-[#10b981] font-bold">^</span>  <span class="text-[#38bdf8]">==</span> <span class="text-[#10b981]">)   </span>
+<span class="text-[#10b981]">    )</span>   <span class="text-[#e6edf3] font-bold">GULO</span>  <span class="text-[#10b981]">)    </span>
+<span class="text-[#10b981]">   (</span>  <span class="text-[#38bdf8]">[D-24]</span>   <span class="text-[#10b981]">)   </span>
+<span class="text-[#10b981]">  (</span> <span class="text-[#38bdf8]">(  )</span>   <span class="text-[#38bdf8]">(  )</span> <span class="text-[#10b981]">)  </span>
+<span class="text-[#38bdf8]"> (__(__)___(__)__) </span>
+          </pre>
+          <div class="mt-2 text-[10px] font-bold text-[#10b981] tracking-wider uppercase">
+            CHALMERS // D-24
+          </div>
+          <div class="text-[9px] text-[#8b949e]">
+            swimmer • sysdev
           </div>
         </div>
 
@@ -289,7 +393,8 @@ const { isSubpage = false } = Astro.props;
     function closeWindow() {
       if (isMaximized) unmaximize();
       if (isMinimized) unminimize();
-      sessionStorage.setItem('terminal_open', 'false');
+      sessionStorage.setItem('terminal_closed_by_user', 'true');
+      sessionStorage.removeItem('navigated_via_cli');
 
       if (isSubpage) {
         termSection.classList.add('hidden');
@@ -301,7 +406,7 @@ const { isSubpage = false } = Astro.props;
 
     // Återställ fönstret
     function restoreWindow() {
-      sessionStorage.setItem('terminal_open', 'true');
+      sessionStorage.removeItem('terminal_closed_by_user');
       termSection.classList.remove('hidden');
       termWindow.classList.remove('hidden');
       closedCard?.classList.add('hidden');
@@ -350,7 +455,7 @@ const { isSubpage = false } = Astro.props;
 
     // Minimize helper
     function applyMinimize() {
-      if (isMaximized) unmaximize(); // Avsluta alltid fullskärm vid minimering så sidan syns!
+      if (isMaximized) unmaximize();
       isMinimized = true;
       termBody.classList.add('hidden');
       statusPill?.classList.remove('hidden');
@@ -380,23 +485,18 @@ const { isSubpage = false } = Astro.props;
       toggleMaximize();
     });
 
-    // Klicka var som helst på namnlisten när minimerad -> återställ!
-    titleBar?.addEventListener('click', (e) => {
-      if (isMinimized) {
-        unminimize();
-      }
+    titleBar?.addEventListener('click', () => {
+      if (isMinimized) unminimize();
     });
 
     titleBar?.addEventListener('dblclick', toggleMaximize);
     reopenBtn?.addEventListener('click', restoreWindow);
 
-    // Lyssna på header-knappen oavsett sida
     window.addEventListener('restore-terminal', () => {
       restoreWindow();
       termSection.scrollIntoView({ behavior: 'smooth' });
     });
 
-    // Escape stänger fullskärm
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && isMaximized) {
         e.preventDefault();
@@ -412,18 +512,17 @@ const { isSubpage = false } = Astro.props;
       }
     });
 
-    // Bevara terminalens öppna status när användaren klickar på interna länkar
+    // Om användaren klickar på en vanlig länk på sidan (navigerar utan terminal),
+    // ska terminalen vara stängd by default på nästa sida!
     document.addEventListener('click', (e) => {
       const anchor = (e.target as HTMLElement)?.closest('a');
       if (anchor && anchor.href && anchor.origin === window.location.origin && !anchor.target) {
-        if (!termSection.classList.contains('hidden') && !termWindow.classList.contains('hidden')) {
-          sessionStorage.setItem('terminal_open', 'true');
-        }
+        sessionStorage.removeItem('navigated_via_cli');
       }
     });
 
     // ==========================================
-    // 2. VIRTUAL FILESYSTEM & BASH ENGINE
+    // 2. DYNAMIC VIRTUAL FILESYSTEM & BASH ENGINE
     // ==========================================
     type FileNode = {
       type: 'file';
@@ -438,119 +537,11 @@ const { isSubpage = false } = Astro.props;
       children: Record<string, FileNode | DirNode>;
     };
 
-    const fileSystem: DirNode = {
-      type: 'dir',
-      children: {
-        'projects': {
-          type: 'dir',
-          children: {
-            'mc-cluster.md': {
-              type: 'file',
-              size: '1.4 KB',
-              description: 'PaperMC Homelab Cluster & Proxy',
-              content: `# PaperMC Homelab Cluster & Proxy\nStatus: [ACTIVE] | Kategori: Minecraft\nTech: Docker, Linux/Debian, Java 21, Velocity, Spark\n\nEtt självhostat Minecraft-nätverk optimerat för 20.0 TPS.\nLäs hela projektet på webben: open mc-cluster`,
-              actionUrl: '/projects/mc-cluster',
-            },
-            'chalmers-sys-sched.md': {
-              type: 'file',
-              size: '1.2 KB',
-              description: 'Preemptive CPU-schemaläggare (Chalmers D)',
-              content: `# Preemptive CPU-schemaläggare (Chalmers D)\nStatus: [COMPLETED] | Kategori: Skola / Datateknik\nTech: Rust, C, RISC-V, Operating Systems\n\nSimulering av round-robin och flernivå prioritetsschemaläggning för RISC-V.\nLäs hela projektet på webben: open chalmers-sys-sched`,
-              actionUrl: '/projects/chalmers-sys-sched',
-            }
-          }
-        },
-        'thoughts': {
-          type: 'dir',
-          children: {
-            'chalmers-simning-kod.md': {
-              type: 'file',
-              size: '2.1 KB',
-              description: 'Från 50m bassängen till tentaveckan på Chalmers',
-              content: `Från 50m bassängen till tentaveckan på Chalmers\n\n"Det finns en märklig parallell mellan att simma 4000 meter i Valhallabadet och att felsöka ett komplext minnesläckage i C...\nLäs artikeln: open chalmers-simning-kod`,
-              actionUrl: '/thoughts/chalmers-simning-kod',
-            },
-            'mc-jvm-flags.md': {
-              type: 'file',
-              size: '1.8 KB',
-              description: 'Optimerade JVM-flaggor för PaperMC 1.20',
-              content: `Optimerade JVM-flaggor för PaperMC 1.20\n\nHur jag konfigurerade Aikar's flags och G1GC för stabil 20 TPS under hög belastning.\nLäs artikeln: open mc-jvm-flags`,
-              actionUrl: '/thoughts/mc-jvm-flags',
-            }
-          }
-        },
-        'files': {
-          type: 'dir',
-          children: {
-            'fabric-1.20.4-optimized.zip': {
-              type: 'file',
-              size: '4.8 MB',
-              description: 'Fabric Performance Pack 1.20.4',
-              content: `Binary zip archive: Fabric Performance Pack med Lithium, FerriteCore och Spark.\nLadda ner: open fabric-1.20.4-optimized.zip`,
-              actionUrl: '/downloads/fabric-1.20.4-optimized.zip',
-            },
-            'backup-world.sh': {
-              type: 'file',
-              size: '2.8 KB',
-              description: 'Automated World Backup & Prune Script',
-              content: `#!/usr/bin/env bash\n# Automated World Backup Script\ntar --zstd -cf "$BACKUP_FILE" world\nfind "$BACKUP_DIR" -name "world_*.tar.zst" -mtime +14 -delete\nLadda ner: open backup-world.sh`,
-              actionUrl: '/downloads/backup-world.sh',
-            },
-            'cv-gulo-datateknik.pdf': {
-              type: 'file',
-              size: '142 KB',
-              description: 'CV — Civilingenjör Datateknik (Chalmers)',
-              content: `PDF-dokument: Curriculum Vitae för gulo (Datateknik @ Chalmers).\nLadda ner: open cv-gulo-datateknik.pdf`,
-              actionUrl: '/downloads/cv-gulo-datateknik.pdf',
-            },
-            'nvim-dotfiles.tar.gz': {
-              type: 'file',
-              size: '1.2 MB',
-              description: 'Neovim Lua Dotfiles (Lazy.nvim & LSP)',
-              content: `Arkiv: Neovim dotfiles i Lua med LSP-zero och Treesitter.\nLadda ner: open nvim-dotfiles.tar.gz`,
-              actionUrl: '/downloads/nvim-dotfiles.tar.gz',
-            }
-          }
-        },
-        // Easter Eggs & Hidden Dotfiles
-        '.gitignore': {
-          type: 'file',
-          size: '348 B',
-          description: 'Git ignore rules',
-          content: `# Saker vi ignorerar på Chalmers & i livet\n/node_modules/\n/target/\n/dist/\n/400m_medley_mjölksyra.log\n/dålig_kod.c\n/tentastress.tmp\n/kaffe_överdos.pid\n/minnesläcka_malloc_utan_free.core\n/morgonträning_kl_0530_i_regn.dump`,
-        },
-        '.bashrc': {
-          type: 'file',
-          size: '460 B',
-          description: 'Bash runtime configuration',
-          content: `# ~/.bashrc - gulo interactive terminal configuration\nexport PS1="\\[\\033[01;32m\\]visitor@playground\\[\\033[00m\\]:\\[\\033[01;34m\\]\\w\\[\\033[00m\\]\\$ "\nexport EDITOR="nvim"\nexport SWIM_POOL="Valhallabadet 50m"\n\nalias swim="echo 'Dyk i! Valhallabadet kl 06:00, 400m insim redo.'"\nalias study="echo 'Kompilerar operativsystem... tentan godkänd!'"\nalias sleep="echo 'Error: 404 Sleep Not Found under tentavecka'"\nalias mc="docker compose -f ~/homelab/docker-compose.yml up -d"`,
-        },
-        '.secret': {
-          type: 'file',
-          size: '190 B',
-          description: 'Top secret flag',
-          content: `🚩 Grattis! Du hittade den dolda filen via ls -la!\nFlag: CTF{chalmers_swimmer_homelab_master_2026}\nTips: Skriv 'swim', 'school' eller 'cat .gitignore' för fler roliga upptäckter!`,
-        },
-        'about.txt': {
-          type: 'file',
-          size: '340 B',
-          description: 'Om mig och mina intressen',
-          content: `Vem är gulo?\n- Utbildning: Civilingenjör Datateknik @ Chalmers Tekniska Högskola (Åk 2)\n- Sport: Kapplöpningssimmare (Valhallabadet, 50m frisim & fjäril)\n- Tech: Homelab, Linux, Rust, C, Docker, Minecraft-servrar\n- Fritid: Analogt fotografi (35mm film), Gaming, Dotfiles`,
-        },
-        'chalmers.txt': {
-          type: 'file',
-          size: '280 B',
-          description: 'Aktuell status på Chalmers Datateknik',
-          content: `Chalmers Tekniska Högskola — Datateknik D-24\nAktuella kurser: Operativsystem, Datorarkitektur, Datakommunikation.\nLaborationer i EDIT-huset: Schemaläggare i C, kontextbyten och minnesmodeller.`,
-        },
-        'swim.txt': {
-          type: 'file',
-          size: '250 B',
-          description: 'Simträning och passlogg',
-          content: `Simning & Fysik:\nBassäng: Valhallabadet 50m\nFokus: Uthållighet och teknik i frisim & fjärilsim.\nPass: 5-6 dagar i veckan. Bästa botemedlet mot fastkörda algoritmer.`,
-        }
-      }
-    };
+    // Läs dynamiskt filsystem från inbäddat server-data
+    const fsScript = document.getElementById('terminal-fs-data');
+    const fileSystem: DirNode = fsScript && fsScript.textContent 
+      ? JSON.parse(fsScript.textContent) 
+      : { type: 'dir', children: {} };
 
     // Kontextmedvetenhet: Terminalen startar i den katalog som motsvarar aktuell sida!
     const pathname = window.location.pathname.replace(/\/$/, '') || '/';
@@ -583,11 +574,18 @@ const { isSubpage = false } = Astro.props;
 
     updateTitle();
 
-    // Persistens mellan sidbyten: Om terminalen var öppen tidigare, behåll den öppen!
-    const wasOpen = sessionStorage.getItem('terminal_open');
-    if (wasOpen === 'true') {
+    // Visningsregler för dator vs mobil/tablet:
+    // - Dator (>= 1024px): startsida öppen by default (om inte stängd av användaren). Subpages stängda om man inte navigerat med CLI.
+    // - Mobil / iPad (< 1024px): stängd by default överallt, men CLI-navigation håller den öppen.
+    const isDesktop = window.innerWidth >= 1024;
+    const navigatedViaCli = sessionStorage.getItem('navigated_via_cli') === 'true';
+    const closedByUser = sessionStorage.getItem('terminal_closed_by_user') === 'true';
+
+    if (navigatedViaCli) {
       restoreWindow();
-    } else if (wasOpen === 'false' && !isSubpage) {
+    } else if (!isSubpage && isDesktop && !closedByUser) {
+      restoreWindow();
+    } else {
       closeWindow();
     }
 
@@ -869,31 +867,43 @@ ${escapeHtml(node.content)}
           window.location.href = '/projects/mc-cluster';
           return `<div class="text-[#38bdf8]">Navigerar till /projects/mc-cluster...</div>`;
         }
+        // 1. Projects
+        if (target.includes('mc-cluster') || target === 'cluster') {
+          sessionStorage.setItem('navigated_via_cli', 'true');
+          window.location.href = '/projects/mc-cluster';
+          return `<div class="text-[#38bdf8]">Navigerar till /projects/mc-cluster...</div>`;
+        }
         if (target.includes('sched') || target.includes('chalmers-sys')) {
+          sessionStorage.setItem('navigated_via_cli', 'true');
           window.location.href = '/projects/chalmers-sys-sched';
           return `<div class="text-[#38bdf8]">Navigerar till /projects/chalmers-sys-sched...</div>`;
         }
         if (target === 'projects' || target === 'projekt') {
+          sessionStorage.setItem('navigated_via_cli', 'true');
           window.location.href = '/projects';
           return `<div class="text-[#10b981]">Navigerar till /projects...</div>`;
         }
 
-        // 4. Thoughts
+        // 2. Thoughts
         if (target.includes('simning') || target.includes('chalmers-simning')) {
+          sessionStorage.setItem('navigated_via_cli', 'true');
           window.location.href = '/thoughts/chalmers-simning-kod';
           return `<div class="text-[#38bdf8]">Navigerar till /thoughts/chalmers-simning-kod...</div>`;
         }
         if (target.includes('jvm') || target.includes('mc-jvm-flags') || target.includes('flags')) {
+          sessionStorage.setItem('navigated_via_cli', 'true');
           window.location.href = '/thoughts/mc-jvm-flags';
           return `<div class="text-[#38bdf8]">Navigerar till /thoughts/mc-jvm-flags...</div>`;
         }
         if (target === 'thoughts' || target === 'tankar' || target === 'blog' || target === 'blogg') {
+          sessionStorage.setItem('navigated_via_cli', 'true');
           window.location.href = '/thoughts';
           return `<div class="text-[#10b981]">Navigerar till /thoughts...</div>`;
         }
 
-        // 5. Files downloads / section
+        // 3. Files downloads / section
         if (target === 'files' || target === 'filer' || target === 'downloads') {
+          sessionStorage.setItem('navigated_via_cli', 'true');
           window.location.href = '/files';
           return `<div class="text-[#10b981]">Navigerar till /files...</div>`;
         }
@@ -918,22 +928,62 @@ ${escapeHtml(node.content)}
       },
 
       projects: () => {
-        sessionStorage.setItem('terminal_open', 'true');
+        sessionStorage.setItem('navigated_via_cli', 'true');
         window.location.href = '/projects';
         return `<div class="text-[#a78bfa]">Öppnar /projects (Portfolio)...</div>`;
       },
 
       thoughts: () => {
-        sessionStorage.setItem('terminal_open', 'true');
+        sessionStorage.setItem('navigated_via_cli', 'true');
         window.location.href = '/thoughts';
         return `<div class="text-[#f59e0b]">Öppnar /thoughts (Blogg)...</div>`;
       },
 
       files: () => {
-        sessionStorage.setItem('terminal_open', 'true');
+        sessionStorage.setItem('navigated_via_cli', 'true');
         window.location.href = '/files';
         return `<div class="text-[#10b981]">Öppnar /files...</div>`;
       },
+
+      fastfetch: () => `
+<div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 p-3 rounded bg-[#0d1117] border border-[#30363d] my-1 font-mono text-xs">
+  <div class="shrink-0 select-none text-[11px] leading-[1.2] text-center">
+    <pre class="leading-tight text-center text-[#10b981]">
+<span class="text-[#38bdf8]">     /\_____/\     </span>
+<span class="text-[#38bdf8]">    /</span>  <span class="text-[#e6edf3] font-bold">o</span>   <span class="text-[#e6edf3] font-bold">o</span>  <span class="text-[#38bdf8]">\    </span>
+<span class="text-[#10b981]">   (</span> <span class="text-[#38bdf8]">==</span>  <span class="text-[#10b981] font-bold">^</span>  <span class="text-[#38bdf8]">==</span> <span class="text-[#10b981]">)   </span>
+<span class="text-[#10b981]">    )</span>   <span class="text-[#e6edf3] font-bold">GULO</span>  <span class="text-[#10b981]">)    </span>
+<span class="text-[#10b981]">   (</span>  <span class="text-[#38bdf8]">[D-24]</span>   <span class="text-[#10b981]">)   </span>
+<span class="text-[#10b981]">  (</span> <span class="text-[#38bdf8]">(  )</span>   <span class="text-[#38bdf8]">(  )</span> <span class="text-[#10b981]">)  </span>
+<span class="text-[#38bdf8]"> (__(__)___(__)__) </span>
+    </pre>
+    <div class="text-[10px] font-bold text-[#10b981] mt-1">CHALMERS // D-24</div>
+  </div>
+  <div class="flex-1 space-y-1 text-xs">
+    <div><span class="text-[#10b981] font-bold">gulo</span><span class="text-[#8b949e]">@</span><span class="text-[#38bdf8] font-bold">chalmers-station</span></div>
+    <div class="text-[#30363d]">--------------------------------------</div>
+    <div><span class="text-[#38bdf8] font-semibold">OS:</span> Debian GNU/Linux 12 (bookworm) x86_64</div>
+    <div><span class="text-[#38bdf8] font-semibold">Host:</span> chalmers-workstation</div>
+    <div><span class="text-[#38bdf8] font-semibold">Kernel:</span> Linux 6.12.8-zen1</div>
+    <div><span class="text-[#38bdf8] font-semibold">Uptime:</span> 42 dagar, 8 timmar, 14 min</div>
+    <div><span class="text-[#38bdf8] font-semibold">Shell:</span> zsh 5.9 / bash 5.2 • kitty</div>
+    <div><span class="text-[#38bdf8] font-semibold">Editor:</span> Neovim v0.10.2 (Lua dotfiles)</div>
+    <div><span class="text-[#10b981] font-semibold">Utbildning:</span> Civilingenjör Datateknik @ Chalmers (Åk 2)</div>
+    <div><span class="text-[#10b981] font-semibold">Simning:</span> Valhallabadet (5-6 pass/v, frisim/fjäril)</div>
+    <div><span class="text-[#10b981] font-semibold">Homelab:</span> PaperMC SMP-kluster, Docker, Velocity</div>
+    <div><span class="text-[#f59e0b] font-semibold">Status:</span> [● ONLINE] Tentavecka &amp; serverdrift</div>
+  </div>
+</div>`,
+
+      tldr: () => `
+<div class="p-3 rounded bg-[#0d1117] border border-[#30363d] space-y-1.5 font-mono text-xs text-[#e6edf3]">
+  <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">⚡ TL;DR // GULO COCKPIT</div>
+  <div><span class="text-[#38bdf8] font-semibold">Vem:</span> Civilingenjörsstudent i Datateknik (Chalmers D-24) &amp; tävlingssimmare.</div>
+  <div><span class="text-[#38bdf8] font-semibold">Simning:</span> Valhallabadet 50m (frisim/fjäril). Bästa botemedlet mot skärmtrötthet.</div>
+  <div><span class="text-[#38bdf8] font-semibold">Homelab:</span> Eget 20.0 TPS PaperMC SMP-kluster med Velocity, Docker &amp; Debian 12.</div>
+  <div><span class="text-[#38bdf8] font-semibold">Filer:</span> CV, Neovim dotfiles, Fabric modpack och backup-skript tillgängliga på <code class="text-[#10b981]">/files</code>.</div>
+  <div><span class="text-[#38bdf8] font-semibold">Kommandon:</span> <code class="text-[#10b981]">projects</code>, <code class="text-[#10b981]">thoughts</code>, <code class="text-[#10b981]">files</code>, <code class="text-[#10b981]">school</code>, <code class="text-[#10b981]">swim</code>, <code class="text-[#10b981]">ls -la</code>.</div>
+</div>`,
 
       // Easter egg aliases defined in .bashrc
       study: () => `<div class="text-[#10b981] font-mono">Kompilerar operativsystem för RISC-V... Tentan godkänd med beröm! 💯</div>`,
@@ -960,6 +1010,8 @@ ${escapeHtml(node.content)}
 
     commands['chalmers'] = commands['school'];
     commands['dir'] = commands['ls'];
+    commands['neofetch'] = commands['fastfetch'];
+    commands['fetch'] = commands['fastfetch'];
 
     function execute(rawCmd: string) {
       const cleanCmd = rawCmd.trim();
@@ -1006,9 +1058,29 @@ ${escapeHtml(node.content)}
     });
 
     // ==========================================
-    // 3. ROBUST TAB COMPLETION & HISTORY
+    // 3. ROBUST TAB COMPLETION, CTRL+C & HISTORY
     // ==========================================
     input.addEventListener('keydown', (e) => {
+      // Ctrl+C för att avbryta påbörjat kommando som i bash
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+        const sel = window.getSelection()?.toString();
+        if (sel && sel.length > 0) return; // Tillåt vanlig textkopiering
+
+        e.preventDefault();
+        const currentCmd = input.value;
+        const cancelRow = document.createElement('div');
+        cancelRow.className = 'flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#8b949e] pt-1 font-mono';
+        cancelRow.innerHTML = `
+          <span class="text-[#10b981]">visitor@playground</span><span class="text-[#8b949e]">:</span><span class="text-[#38bdf8]">${escapeHtml(getCwdLabel())}</span><span class="text-[#e6edf3]">$</span>
+          <span class="text-[#e6edf3]">${escapeHtml(currentCmd)}</span><span class="text-[#f85149] font-bold ml-1">^C</span>
+        `;
+        history.appendChild(cancelRow);
+        input.value = '';
+        historyIndex = cmdHistory.length;
+        history.scrollTop = history.scrollHeight;
+        return;
+      }
+
       if (e.key === 'ArrowUp') {
         e.preventDefault();
         if (cmdHistory.length > 0 && historyIndex > 0) {
@@ -1034,14 +1106,23 @@ ${escapeHtml(node.content)}
 
         // If typing first token -> autocomplete command names
         if (tokens.length <= 1) {
-          const cmdList = ['help', 'school', 'swim', 'whoami', 'contact', 'ls', 'cd', 'cat', 'pwd', 'grep', 'open', 'projects', 'thoughts', 'files', 'clear', 'date', 'uptime', 'study', 'sleep', 'mc', 'alias', 'exit'];
+          const cmdList = [
+            'help', 'school', 'swim', 'whoami', 'contact', 'ls', 'cd', 'cat', 'pwd', 
+            'grep', 'open', 'projects', 'thoughts', 'files', 'clear', 'date', 'uptime', 
+            'fastfetch', 'neofetch', 'fetch', 'tldr', 'study', 'sleep', 'mc', 'alias', 'exit'
+          ];
           const matches = cmdList.filter(c => c.startsWith(lastToken.toLowerCase()));
 
           if (matches.length === 1) {
             input.value = matches[0] + ' ';
           } else if (matches.length > 1) {
+            // Förhindra duplikation vid upprepade Tab-tryck!
+            const lastChild = history.lastElementChild;
+            if (lastChild && lastChild.classList.contains('tab-hint-row')) {
+              return;
+            }
             const hint = document.createElement('div');
-            hint.className = 'text-xs text-[#38bdf8] pl-3 my-1 font-mono';
+            hint.className = 'tab-hint-row text-xs text-[#38bdf8] pl-3 my-1 font-mono';
             hint.textContent = matches.join('   ');
             history.appendChild(hint);
           }
@@ -1090,8 +1171,13 @@ ${escapeHtml(node.content)}
           tokens[tokens.length - 1] = matches[0];
           input.value = tokens.join(' ');
         } else if (matches.length > 1) {
+          // Förhindra duplikation vid upprepade Tab-tryck!
+          const lastChild = history.lastElementChild;
+          if (lastChild && lastChild.classList.contains('tab-hint-row')) {
+            return;
+          }
           const hint = document.createElement('div');
-          hint.className = 'text-xs text-[#38bdf8] pl-3 my-1 font-mono';
+          hint.className = 'tab-hint-row text-xs text-[#38bdf8] pl-3 my-1 font-mono';
           hint.textContent = matches.join('   ');
           history.appendChild(hint);
         }

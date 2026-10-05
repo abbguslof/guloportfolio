@@ -1,0 +1,10 @@
+# Saker vi ignorerar på Chalmers & i livet
+/node_modules/
+/target/
+/dist/
+/400m_medley_mjölksyra.log
+/dålig_kod.c
+/tentastress.tmp
+/kaffe_överdos.pid
+/minnesläcka_malloc_utan_free.core
+/morgonträning_kl_0530_i_regn.dump

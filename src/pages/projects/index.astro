@@ -43,50 +43,72 @@ const categories = ['Alla', 'School', 'Homelab', 'Minecraft'];
         </div>
 
         <div class="flex items-center gap-3 text-xs font-mono text-[#8b949e]">
-          <span class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981]">
-            {sortedProjects.length} projekt listade
+          <span class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981] font-mono text-xs">
+            <span id="project-count-badge">{sortedProjects.length}</span> projekt tillgängliga
           </span>
         </div>
       </div>
 
-      <!-- Category Filter Tabs -->
-      <div class="flex flex-wrap items-center gap-2 mt-6 text-xs font-mono">
-        <span class="text-[#8b949e] text-[11px] mr-1">Kategori:</span>
-        <button 
-          type="button" 
-          class="proj-filter-btn active px-3 py-1 rounded bg-[#10b981] text-[#0d1117] font-semibold border border-[#10b981] transition-all cursor-pointer"
-          data-category="all"
-        >
-          [Alla]
-        </button>
-        <button 
-          type="button" 
-          class="proj-filter-btn px-3 py-1 rounded bg-[#161b22] text-[#8b949e] border border-[#30363d] hover:text-[#e6edf3] transition-all cursor-pointer"
-          data-category="school"
-        >
-          [Chalmers / Skola]
-        </button>
-        <button 
-          type="button" 
-          class="proj-filter-btn px-3 py-1 rounded bg-[#161b22] text-[#8b949e] border border-[#30363d] hover:text-[#e6edf3] transition-all cursor-pointer"
-          data-category="minecraft"
-        >
-          [Minecraft]
-        </button>
-        <button 
-          type="button" 
-          class="proj-filter-btn px-3 py-1 rounded bg-[#161b22] text-[#8b949e] border border-[#30363d] hover:text-[#e6edf3] transition-all cursor-pointer"
-          data-category="homelab"
-        >
-          [Homelab / Linux]
-        </button>
+      <!-- Search & Filters Bar -->
+      <div class="mt-6 pt-4 border-t border-[#30363d]/60 space-y-4">
+        <!-- Live Search Bar -->
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-xs text-[#8b949e]">
+            <span>grep:</span>
+          </div>
+          <input 
+            type="text" 
+            id="project-search-input"
+            placeholder="Sök på projektnamn, teknologi, kategori eller beskrivning (t.ex. 'rust', 'c', 'minecraft')..." 
+            class="w-full bg-[#161b22] text-[#e6edf3] text-xs pl-16 pr-4 py-2 rounded-lg border border-[#30363d] focus:outline-none focus:border-[#10b981] placeholder-[#8b949e]/60 font-mono transition-colors"
+          />
+        </div>
+
+        <!-- Category Filter Tabs -->
+        <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
+          <span class="text-[#8b949e] text-[11px] mr-1">Kategori:</span>
+          <button 
+            type="button" 
+            class="proj-filter-btn active px-3 py-1 rounded bg-[#10b981] text-[#0d1117] font-semibold border border-[#10b981] transition-all cursor-pointer"
+            data-category="all"
+          >
+            [Alla]
+          </button>
+          <button 
+            type="button" 
+            class="proj-filter-btn px-3 py-1 rounded bg-[#161b22] text-[#8b949e] border border-[#30363d] hover:text-[#e6edf3] transition-all cursor-pointer"
+            data-category="school"
+          >
+            [Chalmers / Skola]
+          </button>
+          <button 
+            type="button" 
+            class="proj-filter-btn px-3 py-1 rounded bg-[#161b22] text-[#8b949e] border border-[#30363d] hover:text-[#e6edf3] transition-all cursor-pointer"
+            data-category="minecraft"
+          >
+            [Minecraft]
+          </button>
+          <button 
+            type="button" 
+            class="proj-filter-btn px-3 py-1 rounded bg-[#161b22] text-[#8b949e] border border-[#30363d] hover:text-[#e6edf3] transition-all cursor-pointer"
+            data-category="homelab"
+          >
+            [Homelab / Linux]
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- Portfolio Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="projects-grid">
       {sortedProjects.map((project) => (
-        <div class="project-item" data-cat={project.data.category.toLowerCase()}>
+        <div 
+          class="project-item" 
+          data-cat={project.data.category.toLowerCase()}
+          data-title={project.data.title.toLowerCase()}
+          data-desc={project.data.description.toLowerCase()}
+          data-tech={(project.data.tech || []).join(' ').toLowerCase()}
+        >
           <ProjectCard 
             title={project.data.title}
             description={project.data.description}
@@ -99,6 +121,10 @@ const categories = ['Alla', 'School', 'Homelab', 'Minecraft'];
           />
         </div>
       ))}
+    </div>
+
+    <div id="no-projects-msg" class="py-12 text-center text-xs font-mono text-[#8b949e] hidden">
+      Inga projekt matchar din sökning eller det valda filtret.
     </div>
 
     <!-- Bottom return navigation -->
@@ -117,11 +143,42 @@ const categories = ['Alla', 'School', 'Homelab', 'Minecraft'];
 <script>
   function initProjectFilters() {
     const btns = document.querySelectorAll('.proj-filter-btn');
-    const items = document.querySelectorAll<HTMLElement>('.project-item');
+    const items = Array.from(document.querySelectorAll<HTMLElement>('.project-item'));
+    const searchInput = document.getElementById('project-search-input') as HTMLInputElement | null;
+    const noMsg = document.getElementById('no-projects-msg');
+    const countBadge = document.getElementById('project-count-badge');
+
+    let currentCat = 'all';
+    let searchQuery = '';
+
+    function filterProjects() {
+      let visibleCount = 0;
+      items.forEach((item) => {
+        const cat = item.getAttribute('data-cat') || '';
+        const title = item.getAttribute('data-title') || '';
+        const desc = item.getAttribute('data-desc') || '';
+        const tech = item.getAttribute('data-tech') || '';
+
+        const catMatches = currentCat === 'all' || cat === currentCat;
+        const searchMatches = 
+          !searchQuery || 
+          title.includes(searchQuery) || 
+          desc.includes(searchQuery) || 
+          tech.includes(searchQuery) ||
+          cat.includes(searchQuery);
+
+        const isMatch = catMatches && searchMatches;
+        item.style.display = isMatch ? '' : 'none';
+        if (isMatch) visibleCount++;
+      });
+
+      if (noMsg) noMsg.classList.toggle('hidden', visibleCount > 0);
+      if (countBadge) countBadge.textContent = String(visibleCount);
+    }
 
     btns.forEach((btn) => {
       btn.addEventListener('click', () => {
-        const cat = btn.getAttribute('data-category') || 'all';
+        currentCat = btn.getAttribute('data-category') || 'all';
 
         btns.forEach((b) => {
           b.classList.remove('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]');
@@ -131,15 +188,13 @@ const categories = ['Alla', 'School', 'Homelab', 'Minecraft'];
         btn.classList.remove('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]');
         btn.classList.add('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]');
 
-        items.forEach((item) => {
-          const itemCat = item.getAttribute('data-cat') || '';
-          if (cat === 'all' || itemCat === cat) {
-            item.style.display = '';
-          } else {
-            item.style.display = 'none';
-          }
-        });
+        filterProjects();
       });
+    });
+
+    searchInput?.addEventListener('input', () => {
+      searchQuery = (searchInput.value || '').trim().toLowerCase();
+      filterProjects();
     });
   }
 
