@@ -20,14 +20,8 @@
   <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(13,17,23,0.52)_100%)]"></div>
 </div>
 
-<!-- Local effect runtime & preloaded effect shaders for instant 0ms switching -->
-<script src="/vendor/aifx/runtime/v1.js" defer></script>
-<script src="/vendor/aifx/fx/topo-lines/v1.js" defer></script>
-<script src="/vendor/aifx/fx/dither/v1.js" defer></script>
-<script src="/vendor/aifx/fx/ascii/v1.js" defer></script>
-<script src="/vendor/aifx/fx/dot-grid-wave/v1.js" defer></script>
-<script src="/vendor/aifx/fx/blocky/v1.js" defer></script>
-<script src="/vendor/aifx/fx/noise-shimmer/v1.js" defer></script>
+<!-- Local unified effect runtime & pre-registered shaders for instant 0ms switching -->
+<script is:inline src="/vendor/aifx/bundle.js"></script>
 
 <!-- Interactive Live Switcher in bottom-right corner with close '×' -->
 <aside 
