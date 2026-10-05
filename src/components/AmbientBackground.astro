@@ -17,7 +17,7 @@
   ></div>
 
   <!-- 3. Cockpit subtle radial vignette for smooth blending into #0d1117 -->
-  <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(13,17,23,0.52)_100%)]"></div>
+  <div id="bg-vignette-overlay" class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(13,17,23,0.52)_100%)]"></div>
 </div>
 
 <!-- Local unified effect runtime & pre-registered shaders for instant 0ms switching -->
@@ -242,15 +242,15 @@
     }
 
     function applyEffect(mode: BgMode) {
+      const container = document.getElementById('ambient-bg-container');
+      const vignette = document.getElementById('bg-vignette-overlay');
+      if (!container) return;
+
       // 1. Handle Standard Canvas (our original Topo)
       if (mode === 'standard') {
-        if (aifxLayer) {
-          aifxLayer.style.display = 'none';
-          const existingAttrs = Array.from(aifxLayer.attributes).map(a => a.name);
-          for (const attr of existingAttrs) {
-            if (attr.startsWith('data-aifx')) aifxLayer.removeAttribute(attr);
-          }
-        }
+        const oldLayer = document.getElementById('active-aifx-layer');
+        if (oldLayer) oldLayer.remove();
+
         if (stdCanvas) {
           stdCanvas.style.display = 'block';
           stdCanvas.style.opacity = '0.88';
@@ -274,35 +274,36 @@
         stdCtx.clearRect(0, 0, stdWidth, stdHeight);
       }
 
+      // Remove previous WebGL layer cleanly
+      const oldLayer = document.getElementById('active-aifx-layer');
+      if (oldLayer) oldLayer.remove();
+
       // 2. Handle Off or Reduced Motion
-      if (!aifxLayer) return;
-
-      const existingAttrs = Array.from(aifxLayer.attributes).map(a => a.name);
-      for (const attr of existingAttrs) {
-        if (attr.startsWith('data-aifx')) {
-          aifxLayer.removeAttribute(attr);
-        }
-      }
-
       if (mode === 'off' || motionQuery.matches) {
-        aifxLayer.style.display = 'none';
-        aifxLayer.innerHTML = '';
         return;
       }
 
-      // 3. Handle WebGL Effect with calibrated subtle opacity
-      aifxLayer.style.display = 'block';
-      const targetOpacity = FX_OPACITIES[mode] ?? 0.44;
-      aifxLayer.style.opacity = String(targetOpacity);
+      // 3. Create fresh new WebGL layer and attach all attributes BEFORE adding to DOM
+      // This prevents attribute-mutation thrashing and avoids the 2-second webglcontextlost retry backoff!
+      const newLayer = document.createElement('div');
+      newLayer.id = 'active-aifx-layer';
+      newLayer.className = 'absolute inset-0 pointer-events-none transition-opacity duration-700';
+      newLayer.style.opacity = String(FX_OPACITIES[mode] ?? 0.44);
 
       const config = FX_CONFIGS[mode];
       if (config) {
         for (const [key, value] of Object.entries(config)) {
-          aifxLayer.setAttribute(key, value);
+          newLayer.setAttribute(key, value);
         }
       }
 
-      // Trigger runtime mount (all shaders preloaded, instant mount!)
+      if (vignette) {
+        container.insertBefore(newLayer, vignette);
+      } else {
+        container.appendChild(newLayer);
+      }
+
+      // Synchronously scan and mount right away without waiting for MutationObserver
       // @ts-ignore
       if (typeof window.AIFX !== 'undefined' && typeof window.AIFX.rescan === 'function') {
         // @ts-ignore

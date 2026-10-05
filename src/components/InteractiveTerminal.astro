@@ -531,6 +531,8 @@ const dynamicFileSystemSv = {
 
     function getSiteLang(): 'en' | 'sv' {
       if (typeof window === 'undefined') return 'en';
+      const docLang = (document.documentElement.lang || document.documentElement.getAttribute('data-lang')) as 'en' | 'sv';
+      if (docLang === 'sv' || docLang === 'en') return docLang;
       return (localStorage.getItem('site_lang') as 'en' | 'sv') || 'en';
     }
 
@@ -1571,11 +1573,48 @@ ${escapeHtml(node.content)}
         const _l = getSiteLang();
         const validModes = ['standard', 'topo', 'dither', 'ascii', 'dots', 'blocky', 'shimmer', 'off'];
 
+        // Help / list
+        if (mode === 'help' || mode === 'list' || mode === '--help' || mode === '-h') {
+          const listItems = _l === 'sv' ? [
+            { cmd: 'standard', desc: 'Ursprunglig mjuk topografi (Standard Canvas 2D)' },
+            { cmd: 'topo', desc: 'WebGL topografiska nivåkurvor' },
+            { cmd: 'dither', desc: 'Retro 4-färg Bayer dither plasma' },
+            { cmd: 'ascii', desc: 'CRT fosforgrön terminalmatris' },
+            { cmd: 'dots', desc: 'Interaktiv partikelvågsmatris' },
+            { cmd: 'pixel', desc: 'Cybernetisk blockgrid (alias: blocky)' },
+            { cmd: 'shimmer', desc: 'Eterisk smaragddimma & filmkorn (alias: noise)' },
+            { cmd: 'off', desc: 'Helt avstängd bakgrund', danger: true },
+            { cmd: 'next', desc: 'Växla cykliskt till nästa stil' },
+            { cmd: 'toggle', desc: 'Visa/dölj hörnpanelen (HUD)' },
+          ] : [
+            { cmd: 'standard', desc: 'Original smooth elevation contours (Standard Canvas 2D)' },
+            { cmd: 'topo', desc: 'WebGL topographic elevation contours' },
+            { cmd: 'dither', desc: 'Retro 4-color Bayer dither plasma' },
+            { cmd: 'ascii', desc: 'CRT phosphor green terminal matrix' },
+            { cmd: 'dots', desc: 'Interactive particle wave matrix' },
+            { cmd: 'pixel', desc: 'Cybernetic block grid (alias: blocky)' },
+            { cmd: 'shimmer', desc: 'Ethereal emerald mist & film grain (alias: noise)' },
+            { cmd: 'off', desc: 'Pure blackout (no effects)', danger: true },
+            { cmd: 'next', desc: 'Cycle to next background style' },
+            { cmd: 'toggle', desc: 'Toggle corner HUD picker on/off' },
+          ];
+
+          return `
+<div class="space-y-1.5 font-mono text-xs text-[#e6edf3]">
+  <div class="text-[#38bdf8] font-bold border-b border-[#30363d] pb-1">
+    ${_l === 'sv' ? 'BAKGRUNDSSTYRNING // TILLGÄNGLIGA STILAR' : 'BACKGROUND CONTROLLER // AVAILABLE STYLES'}
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-[11px] pt-1">
+    ${listItems.map(it => `<div><code class="${it.danger ? 'text-[#f85149]' : 'text-[#10b981]'} font-semibold">bg ${it.cmd}</code> : <span class="text-[#8b949e]">${escapeHtml(it.desc)}</span></div>`).join('')}
+  </div>
+</div>`;
+        }
+
         // 1. Cycle to next background style
         if (mode === 'next' || mode === 'cycle') {
           window.dispatchEvent(new CustomEvent('cycle-bg-mode'));
           const current = localStorage.getItem('site_bg_mode') || 'standard';
-          return `<div class="text-[#10b981] font-mono">${_l === 'sv' ? 'Växlade till nästa bakgrundsstil:' : 'Cycled to next background style:'} <span class="font-bold">${escapeHtml(current)}</span></div>`;
+          return `<div class="text-[#10b981] font-mono">${_l === 'sv' ? 'Växlade till nästa bakgrundsstil:' : 'Switched to next background style:'} <span class="font-bold">${escapeHtml(current)}</span></div>`;
         }
 
         // 2. Toggle corner HUD box
@@ -1588,7 +1627,7 @@ ${escapeHtml(node.content)}
   <div>${_l === 'sv' ? 'Aktiv bakgrundsstil:' : 'Active background style:'} <span class="text-[#10b981] font-bold">${escapeHtml(current)}</span></div>
   <div class="text-[#8b949e]">${_l === 'sv' ? 'Hörnpanel (HUD):' : 'Corner HUD:'} <span class="text-[#38bdf8] font-bold">${isNowOpen ? (_l === 'sv' ? 'SYNLIG' : 'VISIBLE') : (_l === 'sv' ? 'DOLD' : 'HIDDEN')}</span></div>
   <div class="text-[#8b949e] text-[11px] pt-1">
-    ${_l === 'sv' ? 'Byt stil med:' : 'Switch styles with:'} 
+    ${_l === 'sv' ? 'Byt stil direkt med:' : 'Switch style directly with:'} 
     <code class="text-[#38bdf8]">bg standard</code>, 
     <code class="text-[#38bdf8]">bg topo</code>, 
     <code class="text-[#38bdf8]">bg dither</code>, 
@@ -1599,23 +1638,48 @@ ${escapeHtml(node.content)}
     <code class="text-[#38bdf8]">bg off</code>,
     <code class="text-[#38bdf8]">bg next</code>
   </div>
+  <div class="text-[#8b949e] text-[10px] pt-0.5">
+    ${_l === 'sv' ? 'Tips: Skriv <code class="text-[#38bdf8]">bg help</code> för en översikt av alla stilar.' : 'Tip: Type <code class="text-[#38bdf8]">bg help</code> for an overview of all styles.'}
+  </div>
 </div>`;
         }
 
         // Normalize mode aliases
+        const rawInput = mode;
         if (mode === 'default') mode = 'standard';
         if (mode === 'pixel') mode = 'blocky';
         if (mode === 'noise') mode = 'shimmer';
 
         if (validModes.includes(mode)) {
           window.dispatchEvent(new CustomEvent('set-bg-mode', { detail: mode }));
-          return `<div class="text-[#10b981] font-mono">${_l === 'sv' ? 'Bakgrundsstil ändrad till:' : 'Background style set to:'} <span class="font-bold">${escapeHtml(mode)}</span></div>`;
+          const label = rawInput === 'pixel' ? 'pixel' : (rawInput === 'noise' ? 'shimmer (noise)' : mode);
+          return `<div class="text-[#10b981] font-mono">${_l === 'sv' ? 'Bakgrundsstil ändrad till:' : 'Background style set to:'} <span class="font-bold">${escapeHtml(label)}</span></div>`;
         }
-        return `<div class="text-[#f85149] font-mono">${_l === 'sv' ? 'Ogiltig stil. Välj mellan: standard, topo, dither, ascii, dots, pixel, shimmer, off, next.' : 'Invalid style. Choose from: standard, topo, dither, ascii, dots, pixel, shimmer, off, next.'}</div>`;
+        return `<div class="text-[#f85149] font-mono">${_l === 'sv' ? `Ogiltig bakgrundsstil '${escapeHtml(rawInput)}'. Välj mellan: standard, topo, dither, ascii, dots, pixel, shimmer, off, next. (Skriv 'bg help' för detaljer).` : `Invalid background style '${escapeHtml(rawInput)}'. Choose from: standard, topo, dither, ascii, dots, pixel, shimmer, off, next. (Type 'bg help' for details).`}</div>`;
       },
 
       secret: () => {
         const _l = getSiteLang();
+        const items = _l === 'sv' ? [
+          { cmd: 'bg standard', desc: 'Ursprunglig mjuk topo (Standard)' },
+          { cmd: 'bg topo', desc: 'WebGL topografiska kurvor' },
+          { cmd: 'bg dither', desc: 'Retro 4-färg Bayer dither' },
+          { cmd: 'bg ascii', desc: 'CRT fosforgrön terminalmatris' },
+          { cmd: 'bg dots', desc: 'Interaktiv partikelvåg' },
+          { cmd: 'bg pixel', desc: 'Cybernetisk blockgrid' },
+          { cmd: 'bg shimmer', desc: 'Eterisk smaragddimma & filmkorn' },
+          { cmd: 'bg off', desc: 'Helt avstängd bakgrund', danger: true },
+        ] : [
+          { cmd: 'bg standard', desc: 'Original smooth elevation topo (Standard)' },
+          { cmd: 'bg topo', desc: 'WebGL topographic contours' },
+          { cmd: 'bg dither', desc: 'Retro 4-color Bayer dither' },
+          { cmd: 'bg ascii', desc: 'CRT phosphor terminal matrix' },
+          { cmd: 'bg dots', desc: 'Interactive particle wave' },
+          { cmd: 'bg pixel', desc: 'Cybernetic blocky grid' },
+          { cmd: 'bg shimmer', desc: 'Ethereal emerald mist & film grain' },
+          { cmd: 'bg off', desc: 'Pure blackout (no effects)', danger: true },
+        ];
+
         return `
 <div class="space-y-2 font-mono text-xs text-[#e6edf3]">
   <div class="text-[#38bdf8] font-bold border-b border-[#30363d] pb-1">
@@ -1627,14 +1691,7 @@ ${escapeHtml(node.content)}
       : 'You found the display driver! Use <code class="text-[#10b981] font-bold">bg &lt;style&gt;</code> or <code class="text-[#10b981] font-bold">bg next</code> to control the background:'}
   </div>
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 pl-2 text-[11px]">
-    <div><span class="text-[#10b981] font-semibold">bg standard</span> : Ursprunglig mjuk topo (Standard)</div>
-    <div><span class="text-[#10b981] font-semibold">bg topo</span> : WebGL topografiska kurvor</div>
-    <div><span class="text-[#10b981] font-semibold">bg dither</span> : Retro 4-färg Bayer dither</div>
-    <div><span class="text-[#10b981] font-semibold">bg ascii</span> : CRT phosphor terminal matrix</div>
-    <div><span class="text-[#10b981] font-semibold">bg dots</span> : Interaktiv partikelvåg</div>
-    <div><span class="text-[#10b981] font-semibold">bg pixel</span> : Cybernetisk blockgrid</div>
-    <div><span class="text-[#10b981] font-semibold">bg shimmer</span> : Eterisk smaragddimma &amp; filmkorn</div>
-    <div><span class="text-[#f85149] font-semibold">bg off</span> : Helt avstängd bakgrund</div>
+    ${items.map(it => `<div><span class="${it.danger ? 'text-[#f85149]' : 'text-[#10b981]'} font-semibold">${it.cmd}</span> : ${escapeHtml(it.desc)}</div>`).join('')}
   </div>
   <div class="text-[11px] text-[#8b949e] pt-1 border-t border-[#30363d]/40">
     ${_l === 'sv' 
@@ -1823,7 +1880,7 @@ ${escapeHtml(node.content)}
         let availableItems: string[] = [];
 
         if ((mainCmd === 'bg' || mainCmd === 'background') && tokens.length === 2) {
-          availableItems = ['standard', 'topo', 'dither', 'ascii', 'dots', 'pixel', 'shimmer', 'off', 'next'];
+          availableItems = ['standard', 'topo', 'dither', 'ascii', 'dots', 'pixel', 'shimmer', 'off', 'next', 'help', 'toggle'];
           const matches = availableItems.filter(item => item.toLowerCase().startsWith(lastToken.toLowerCase()));
           if (matches.length === 1) {
             tokens[tokens.length - 1] = matches[0];
