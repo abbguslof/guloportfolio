@@ -1,86 +1,147 @@
 ---
-// InteractiveTerminal.astro - Neofetch + Interactive Command Shell
+// InteractiveTerminal.astro - Realistic TUI Terminal with functional window controls & Bash emulator
 ---
 
-<section id="about" class="w-full mb-12" aria-label="Terminal Hero">
+<section id="terminal-section" class="w-full mb-12" aria-label="Interaktiv TUI Terminal">
+  <!-- Closed State Restore Bar (Hidden by default) -->
+  <div 
+    id="terminal-closed-bar" 
+    class="hidden mb-6 p-3 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#10b981] transition-all flex items-center justify-between cursor-pointer group"
+  >
+    <div class="flex items-center gap-2 text-xs font-mono text-[#8b949e] group-hover:text-[#e6edf3]">
+      <span class="text-[#10b981] font-bold">&gt;_</span>
+      <span>Terminalen är minimerad till dockan. Klicka här eller tryck <kbd class="px-1.5 py-0.5 rounded bg-[#0d1117] border border-[#30363d] text-[#10b981]">Ctrl + \`</kbd> för att öppna den igen.</span>
+    </div>
+    <button 
+      type="button" 
+      id="terminal-restore-btn" 
+      class="text-xs font-mono px-2.5 py-1 rounded bg-[#0d1117] border border-[#30363d] text-[#10b981] hover:border-[#10b981] transition-all"
+    >
+      [Återställ terminal ⤢]
+    </button>
+  </div>
+
   <!-- Terminal Window Container -->
-  <div class="rounded-lg border border-[#30363d] bg-[#161b22] shadow-2xl overflow-hidden">
-    <!-- Window Title Bar -->
-    <div class="flex items-center justify-between px-4 py-2.5 bg-[#0d1117] border-b border-[#30363d] select-none">
+  <div 
+    id="terminal-window" 
+    class="rounded-lg border border-[#30363d] bg-[#161b22] shadow-2xl transition-all duration-200 overflow-hidden"
+  >
+    <!-- Window Title Bar with FUNCTIONING Controls -->
+    <div 
+      id="terminal-titlebar"
+      class="flex items-center justify-between px-4 py-2.5 bg-[#0d1117] border-b border-[#30363d] select-none cursor-pointer"
+      title="Dubbelklicka för att minimera/maximera"
+    >
+      <!-- Real Interactive Window Action Buttons -->
       <div class="flex items-center space-x-2">
-        <span class="w-3 h-3 rounded-full bg-[#f85149] inline-block"></span>
-        <span class="w-3 h-3 rounded-full bg-[#f59e0b] inline-block"></span>
-        <span class="w-3 h-3 rounded-full bg-[#2ea043] inline-block"></span>
+        <button 
+          type="button" 
+          id="btn-win-close" 
+          class="w-3 h-3 rounded-full bg-[#f85149] hover:brightness-125 hover:ring-1 hover:ring-white/40 transition-all flex items-center justify-center text-[8px] font-bold text-[#0d1117] opacity-90 group" 
+          title="Stäng terminalfönstret"
+          aria-label="Stäng terminal"
+        >
+          <span class="hidden group-hover:inline leading-none select-none">✕</span>
+        </button>
+        <button 
+          type="button" 
+          id="btn-win-minimize" 
+          class="w-3 h-3 rounded-full bg-[#f59e0b] hover:brightness-125 hover:ring-1 hover:ring-white/40 transition-all flex items-center justify-center text-[8px] font-bold text-[#0d1117] opacity-90 group" 
+          title="Minimera / fäll ihop terminalen"
+          aria-label="Minimera terminal"
+        >
+          <span class="hidden group-hover:inline leading-none select-none">−</span>
+        </button>
+        <button 
+          type="button" 
+          id="btn-win-maximize" 
+          class="w-3 h-3 rounded-full bg-[#2ea043] hover:brightness-125 hover:ring-1 hover:ring-white/40 transition-all flex items-center justify-center text-[8px] font-bold text-[#0d1117] opacity-90 group" 
+          title="Förstora / maximera terminalen"
+          aria-label="Maximera terminal"
+        >
+          <span class="hidden group-hover:inline leading-none select-none">+</span>
+        </button>
       </div>
+
+      <!-- Window Title & Path -->
       <div class="text-xs text-[#8b949e] font-mono tracking-wide flex items-center gap-2">
-        <span>bash — gulo@playground: ~</span>
+        <span id="window-title-text" class="text-[#e6edf3]">bash — gulo@playground: ~</span>
+        <span id="window-status-pill" class="text-[10px] text-[#10b981] bg-[#161b22] px-1.5 py-0.2 rounded border border-[#30363d] hidden">
+          MINIMERAD
+        </span>
       </div>
-      <div class="text-[11px] text-[#8b949e] hidden sm:block">
-        utf-8
+
+      <!-- Terminal details -->
+      <div class="text-[11px] font-mono text-[#8b949e] hidden sm:flex items-center gap-2">
+        <span class="text-[#38bdf8]">tty1</span>
+        <span>•</span>
+        <span>utf-8</span>
       </div>
     </div>
 
-    <!-- Terminal Body -->
-    <div class="p-4 sm:p-6 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto">
-      <!-- Neofetch Display -->
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 pb-6 border-b border-[#30363d]/60">
-        <!-- ASCII Art Column -->
-        <div class="md:col-span-4 text-[#10b981] select-none font-bold text-[11px] sm:text-xs leading-none flex items-center justify-center sm:justify-start">
-          <pre class="overflow-hidden">
-   __ _ _   _ _  ___  
-  / _` | | | | |/ _ \ 
- | (_| | |_| | | (_) |
-  \__, |\__,_|_|\___/ 
-  |___/  chalmers.d   
-   <span class="text-[#38bdf8]">▲</span> <span class="text-[#a78bfa]">~</span> <span class="text-[#f59e0b]">≈</span> <span class="text-[#10b981]">●</span> <span class="text-[#e6edf3]">sys.tui</span>
-          </pre>
+    <!-- Terminal Collapsible Body -->
+    <div id="terminal-body" class="p-4 sm:p-6 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto transition-all">
+      <!-- Fastfetch / System Info (Redesigned for ultra clarity and high contrast) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-6 border-b border-[#30363d]/80">
+        <!-- Visual TUI ASCII Badge -->
+        <div class="lg:col-span-4 text-[#10b981] select-none font-bold text-xs leading-tight flex flex-col justify-center">
+          <div class="p-3 rounded bg-[#0d1117] border border-[#30363d] inline-block font-mono">
+            <div class="text-[#38bdf8] pb-1 font-bold">┌─── GULO.SYS ─────────┐</div>
+            <div class="text-[#e6edf3]">│ chalmers datateknik  │</div>
+            <div class="text-[#8b949e]">│ simning • homelab    │</div>
+            <div class="text-[#10b981]">│ [● ONLINE] 20.0 TPS  │</div>
+            <div class="text-[#38bdf8] pt-1">└──────────────────────┘</div>
+            <div class="pt-2 text-[11px] text-[#8b949e] flex items-center gap-1.5">
+              <span>färger:</span>
+              <span class="inline-block w-2.5 h-2.5 rounded-sm bg-[#f85149]"></span>
+              <span class="inline-block w-2.5 h-2.5 rounded-sm bg-[#10b981]"></span>
+              <span class="inline-block w-2.5 h-2.5 rounded-sm bg-[#f59e0b]"></span>
+              <span class="inline-block w-2.5 h-2.5 rounded-sm bg-[#38bdf8]"></span>
+              <span class="inline-block w-2.5 h-2.5 rounded-sm bg-[#a78bfa]"></span>
+            </div>
+          </div>
         </div>
 
-        <!-- Info / Specs Column -->
-        <div class="md:col-span-8 space-y-1.5 text-xs sm:text-sm">
-          <div class="pb-1">
-            <span class="text-[#10b981] font-bold">gulo</span><span class="text-[#8b949e]">@</span><span class="text-[#38bdf8] font-bold">chalmers-box</span>
-            <div class="text-[#30363d] select-none">---------------------------------</div>
+        <!-- System Specs Table (High contrast & readable) -->
+        <div class="lg:col-span-8 space-y-1.5 text-xs sm:text-sm">
+          <div class="pb-1 border-b border-[#30363d]/60">
+            <span class="text-[#10b981] font-bold text-sm">gulo</span>
+            <span class="text-[#8b949e]">@</span>
+            <span class="text-[#38bdf8] font-bold text-sm">chalmers-box</span>
+            <span class="text-[#8b949e] text-xs ml-2">(Gothenburg, Sweden)</span>
           </div>
 
-          <div class="grid grid-cols-[105px_1fr] gap-x-2">
-            <span class="text-[#8b949e]">Program:</span>
-            <span class="text-[#e6edf3] font-medium">Datateknik @ Chalmers Tekniska Högskola</span>
+          <div class="grid grid-cols-[130px_1fr] gap-x-2 pt-1">
+            <span class="text-[#38bdf8] font-medium">Utbildning:</span>
+            <span class="text-[#e6edf3]">Chalmers Tekniska Högskola — Civilingenjör Datateknik (Åk 2)</span>
           </div>
 
-          <div class="grid grid-cols-[105px_1fr] gap-x-2">
-            <span class="text-[#8b949e]">Sport / Fysik:</span>
-            <span class="text-[#38bdf8]">Simmare (Kapplöpningssimning & uthållighet)</span>
+          <div class="grid grid-cols-[130px_1fr] gap-x-2">
+            <span class="text-[#38bdf8] font-medium">Sport / Fysik:</span>
+            <span class="text-[#e6edf3]">Kapplöpningssimmare (Valhallabadet — 50m/100m frisim & fjärilsim)</span>
           </div>
 
-          <div class="grid grid-cols-[105px_1fr] gap-x-2">
-            <span class="text-[#8b949e]">Fokus / Intresse:</span>
-            <span class="text-[#e6edf3]">Systemprogrammering, Homelab, Minecraft-servrar, Dotfiles</span>
+          <div class="grid grid-cols-[130px_1fr] gap-x-2">
+            <span class="text-[#38bdf8] font-medium">Homelab:</span>
+            <span class="text-[#e6edf3]">Debian 12, PaperMC 1.20 SMP-kluster, Docker, WireGuard</span>
           </div>
 
-          <div class="grid grid-cols-[105px_1fr] gap-x-2">
-            <span class="text-[#8b949e]">Kärna / OS:</span>
-            <span class="text-[#8b949e]">Linux 6.12 x86_64 / Arch + Debian Servers</span>
+          <div class="grid grid-cols-[130px_1fr] gap-x-2">
+            <span class="text-[#38bdf8] font-medium">Intressen:</span>
+            <span class="text-[#e6edf3]">Systemprogrammering (C/Rust), Analog foto (35mm), Gaming, Dotfiles</span>
           </div>
 
-          <div class="grid grid-cols-[105px_1fr] gap-x-2">
-            <span class="text-[#8b949e]">Aktuell status:</span>
-            <span class="text-[#10b981] flex items-center gap-1.5">
+          <div class="grid grid-cols-[130px_1fr] gap-x-2">
+            <span class="text-[#38bdf8] font-medium">Miljö & Editor:</span>
+            <span class="text-[#8b949e]">Arch Linux / Hyprland • Neovim (Lua) • Kitty terminal</span>
+          </div>
+
+          <div class="grid grid-cols-[130px_1fr] gap-x-2 pt-1 border-t border-[#30363d]/40">
+            <span class="text-[#10b981] font-medium">Status:</span>
+            <span class="text-[#10b981] flex items-center gap-1.5 font-medium">
               <span class="w-2 h-2 rounded-full bg-[#10b981] animate-ping"></span>
-              [● ONLINE] Tentaperiod, bassängpass & serverdrift
+              [● AKTIV] Tentavecka @ Chalmers, pass i bassängen & serverdrift
             </span>
-          </div>
-
-          <!-- Color palette swatches (TUI signature) -->
-          <div class="pt-2 flex items-center space-x-1.5" aria-hidden="true">
-            <span class="w-3.5 h-3.5 rounded-sm bg-[#0d1117] border border-[#30363d]"></span>
-            <span class="w-3.5 h-3.5 rounded-sm bg-[#161b22] border border-[#30363d]"></span>
-            <span class="w-3.5 h-3.5 rounded-sm bg-[#f85149]"></span>
-            <span class="w-3.5 h-3.5 rounded-sm bg-[#2ea043]"></span>
-            <span class="w-3.5 h-3.5 rounded-sm bg-[#f59e0b]"></span>
-            <span class="w-3.5 h-3.5 rounded-sm bg-[#38bdf8]"></span>
-            <span class="w-3.5 h-3.5 rounded-sm bg-[#a78bfa]"></span>
-            <span class="w-3.5 h-3.5 rounded-sm bg-[#e6edf3]"></span>
           </div>
         </div>
       </div>
@@ -88,14 +149,14 @@
       <!-- Terminal Output History -->
       <div id="terminal-history" class="pt-4 space-y-3" aria-live="polite">
         <div class="text-[#8b949e] text-xs">
-          Välkommen till min digitala trädgård & playground. Skriv <code class="text-[#10b981] font-bold">help</code> för att se kommandon, eller navigera via sidan nedanför.
+          Terminal redo. Skriv <code class="text-[#10b981] font-bold">help</code> för kommandolista, eller använd vanliga bash-kommandon (<code class="text-[#38bdf8]">ls</code>, <code class="text-[#38bdf8]">cd</code>, <code class="text-[#38bdf8]">cat</code>, <code class="text-[#38bdf8]">grep</code>, <code class="text-[#38bdf8]">open</code>).
         </div>
       </div>
 
-      <!-- Active Prompt Row -->
-      <form id="terminal-form" class="mt-3 flex items-center gap-2 pt-2 border-t border-[#30363d]/40">
-        <label for="terminal-input" class="text-xs sm:text-sm text-[#10b981] font-semibold whitespace-nowrap select-none flex items-center gap-1">
-          <span>visitor@playground</span><span class="text-[#8b949e]">:</span><span class="text-[#38bdf8]">~</span><span class="text-[#e6edf3]">$</span>
+      <!-- Active Interactive Prompt Row -->
+      <form id="terminal-form" class="mt-4 flex items-center gap-2 pt-2 border-t border-[#30363d]/40">
+        <label id="terminal-prompt-label" for="terminal-input" class="text-xs sm:text-sm text-[#10b981] font-semibold whitespace-nowrap select-none flex items-center gap-1">
+          <span>visitor@playground</span><span class="text-[#8b949e]">:</span><span id="prompt-cwd" class="text-[#38bdf8]">~</span><span class="text-[#e6edf3]">$</span>
         </label>
         <input 
           id="terminal-input" 
@@ -105,142 +166,592 @@
           autocapitalize="off" 
           spellcheck="false" 
           class="flex-1 bg-transparent border-none text-[#e6edf3] text-xs sm:text-sm focus:outline-none focus:ring-0 p-0 font-mono caret-[#10b981]"
-          placeholder="skriv 'help' eller klicka nedan..."
+          placeholder="skriv 'help', 'ls', 'whoami'..."
         />
         <button type="submit" class="sr-only">Kör kommando</button>
       </form>
-
-      <!-- Quick Command Buttons (Helpful on mobile and desktop) -->
-      <div class="mt-4 flex flex-wrap items-center gap-1.5 text-[11px] text-[#8b949e]">
-        <span class="mr-1 select-none">Snabbkommandon:</span>
-        <button type="button" class="term-quick-btn px-2 py-0.5 rounded bg-[#0d1117] border border-[#30363d] text-[#10b981] hover:border-[#10b981] hover:text-[#e6edf3] transition-all" data-cmd="help">
-          help
-        </button>
-        <button type="button" class="term-quick-btn px-2 py-0.5 rounded bg-[#0d1117] border border-[#30363d] text-[#38bdf8] hover:border-[#38bdf8] hover:text-[#e6edf3] transition-all" data-cmd="projects">
-          projects
-        </button>
-        <button type="button" class="term-quick-btn px-2 py-0.5 rounded bg-[#0d1117] border border-[#30363d] text-[#f59e0b] hover:border-[#f59e0b] hover:text-[#e6edf3] transition-all" data-cmd="thoughts">
-          thoughts
-        </button>
-        <button type="button" class="term-quick-btn px-2 py-0.5 rounded bg-[#0d1117] border border-[#30363d] text-[#a78bfa] hover:border-[#a78bfa] hover:text-[#e6edf3] transition-all" data-cmd="files">
-          files
-        </button>
-        <button type="button" class="term-quick-btn px-2 py-0.5 rounded bg-[#0d1117] border border-[#30363d] text-[#e6edf3] hover:border-[#e6edf3] transition-all" data-cmd="school">
-          school
-        </button>
-        <button type="button" class="term-quick-btn px-2 py-0.5 rounded bg-[#0d1117] border border-[#30363d] text-[#38bdf8] hover:border-[#38bdf8] hover:text-[#e6edf3] transition-all" data-cmd="swim">
-          swim
-        </button>
-        <button type="button" class="term-quick-btn px-2 py-0.5 rounded bg-[#0d1117] border border-[#30363d] text-[#f85149] hover:border-[#f85149] hover:text-[#e6edf3] transition-all" data-cmd="clear">
-          clear
-        </button>
-      </div>
     </div>
   </div>
 </section>
 
 <script>
-  // Vanilla JS terminal logic - zero framework overhead
-  function initTerminal() {
+  // Full-featured Bash-style interactive shell & window controls
+  function initTerminalEngine() {
+    const termWindow = document.getElementById('terminal-window');
+    const termBody = document.getElementById('terminal-body');
+    const closedBar = document.getElementById('terminal-closed-bar');
+    const restoreBtn = document.getElementById('terminal-restore-btn');
+    const titleBar = document.getElementById('terminal-titlebar');
+    const titleText = document.getElementById('window-title-text');
+    const statusPill = document.getElementById('window-status-pill');
+
+    const btnClose = document.getElementById('btn-win-close');
+    const btnMinimize = document.getElementById('btn-win-minimize');
+    const btnMaximize = document.getElementById('btn-win-maximize');
+
     const form = document.getElementById('terminal-form') as HTMLFormElement | null;
     const input = document.getElementById('terminal-input') as HTMLInputElement | null;
     const history = document.getElementById('terminal-history') as HTMLDivElement | null;
-    const quickBtns = document.querySelectorAll('.term-quick-btn');
+    const promptCwd = document.getElementById('prompt-cwd');
 
-    if (!form || !input || !history) return;
+    if (!termWindow || !termBody || !form || !input || !history) return;
 
+    // ==========================================
+    // 1. WINDOW CONTROLS LOGIC
+    // ==========================================
+    let isMinimized = false;
+    let isMaximized = false;
+
+    function closeWindow() {
+      termWindow.classList.add('hidden');
+      closedBar?.classList.remove('hidden');
+    }
+
+    function restoreWindow() {
+      termWindow.classList.remove('hidden');
+      closedBar?.classList.add('hidden');
+      if (isMinimized) toggleMinimize();
+      input.focus();
+    }
+
+    function toggleMinimize() {
+      isMinimized = !isMinimized;
+      if (isMinimized) {
+        termBody.classList.add('hidden');
+        statusPill?.classList.remove('hidden');
+        if (titleText) titleText.textContent = 'bash — gulo@playground: ~ (minimerad - klicka för att öppna)';
+      } else {
+        termBody.classList.remove('hidden');
+        statusPill?.classList.add('hidden');
+        updateTitle();
+        input.focus();
+      }
+    }
+
+    function toggleMaximize() {
+      isMaximized = !isMaximized;
+      if (isMaximized) {
+        termWindow.classList.add('ring-2', 'ring-[#10b981]/50');
+        termBody.style.maxHeight = '75vh';
+        termBody.style.overflowY = 'auto';
+      } else {
+        termWindow.classList.remove('ring-2', 'ring-[#10b981]/50');
+        termBody.style.maxHeight = '';
+        termBody.style.overflowY = '';
+      }
+      input.focus();
+    }
+
+    btnClose?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeWindow();
+    });
+
+    btnMinimize?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMinimize();
+    });
+
+    btnMaximize?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMaximize();
+    });
+
+    titleBar?.addEventListener('dblclick', toggleMaximize);
+    restoreBtn?.addEventListener('click', restoreWindow);
+    closedBar?.addEventListener('click', restoreWindow);
+
+    window.addEventListener('restore-terminal', restoreWindow);
+
+    // Keyboard shortcut Ctrl + ` to toggle terminal
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === '`') {
+        e.preventDefault();
+        if (termWindow.classList.contains('hidden')) {
+          restoreWindow();
+        } else {
+          toggleMinimize();
+        }
+      }
+    });
+
+    // ==========================================
+    // 2. VIRTUAL FILESYSTEM & BASH ENGINE
+    // ==========================================
+    type FileNode = {
+      type: 'file';
+      size: string;
+      description: string;
+      content: string;
+      actionUrl?: string;
+    };
+
+    type DirNode = {
+      type: 'dir';
+      children: Record<string, FileNode | DirNode>;
+    };
+
+    const fileSystem: DirNode = {
+      type: 'dir',
+      children: {
+        'projects': {
+          type: 'dir',
+          children: {
+            'mc-cluster.md': {
+              type: 'file',
+              size: '1.4 KB',
+              description: 'PaperMC Homelab Cluster & Proxy',
+              content: `# PaperMC Homelab Cluster & Proxy\nStatus: [ACTIVE] | Kategori: Minecraft\nTech: Docker, Linux/Debian, Java 21, Velocity, Spark\n\nEtt självhostat Minecraft-nätverk optimerat för maximal tick-stabilitet (20.0 TPS). Körs med isolerade containrar och Prometheus telemetry.`,
+              actionUrl: '#projects',
+            },
+            'chalmers-sys-sched.md': {
+              type: 'file',
+              size: '1.2 KB',
+              description: 'Preemptive CPU-schemaläggare (Chalmers D)',
+              content: `# Preemptive CPU-schemaläggare (Chalmers D)\nStatus: [COMPLETED] | Kategori: Skola / Datateknik\nTech: Rust, C, RISC-V, Operating Systems\n\nSimulering av round-robin och prioritetsschemaläggning för RISC-V arkitektur utvecklad på Chalmers Datateknik.`,
+              actionUrl: '#projects',
+            }
+          }
+        },
+        'thoughts': {
+          type: 'dir',
+          children: {
+            'chalmers-simning-kod.md': {
+              type: 'file',
+              size: '2.1 KB',
+              description: 'Från 50m bassängen till tentaveckan på Chalmers',
+              content: `Från 50m bassängen till tentaveckan på Chalmers (2026-03-28)\n\n"Det finns en märklig parallell mellan att simma 4000 meter i Valhallabadet och att felsöka ett komplext minnesläckage i C...\nLäs hela artikeln via: open chalmers-simning-kod`,
+              actionUrl: '/thoughts/chalmers-simning-kod',
+            },
+            'mc-jvm-flags.md': {
+              type: 'file',
+              size: '1.8 KB',
+              description: 'Optimerade JVM-flaggor för PaperMC 1.20',
+              content: `Optimerade JVM-flaggor för PaperMC 1.20 (2026-03-15)\n\nHur jag konfigurerade Aikar's flags och G1GC för stabil 20 TPS under hög belastning.\nLäs hela artikeln via: open mc-jvm-flags`,
+              actionUrl: '/thoughts/mc-jvm-flags',
+            }
+          }
+        },
+        'files': {
+          type: 'dir',
+          children: {
+            'fabric-1.20.4-optimized.zip': {
+              type: 'file',
+              size: '4.8 MB',
+              description: 'Fabric Performance Pack 1.20.4',
+              content: `Binary zip archive: Fabric Performance Pack med Lithium, FerriteCore och Spark.\nLadda ner via: open fabric-1.20.4-optimized.zip`,
+              actionUrl: '/downloads/fabric-1.20.4-optimized.zip',
+            },
+            'backup-world.sh': {
+              type: 'file',
+              size: '2.8 KB',
+              description: 'Automated World Backup & Prune Script',
+              content: `#!/usr/bin/env bash\n# Automated World Backup Script\ntar --zstd -cf "$BACKUP_FILE" world\nfind "$BACKUP_DIR" -name "world_*.tar.zst" -mtime +14 -delete`,
+              actionUrl: '/downloads/backup-world.sh',
+            }
+          }
+        },
+        'about.txt': {
+          type: 'file',
+          size: '340 B',
+          description: 'Information om mig och mina intressen',
+          content: `Vem är gulo?\n- Studerar: Civilingenjör Datateknik @ Chalmers Tekniska Högskola (Åk 2)\n- Sport: Kapplöpningssimmare (Valhallabadet, 50m frisim & fjäril)\n- Tech: Homelab, Linux, Rust, C, Docker, Minecraft-servrar\n- Fritid: Analogt fotografi (35mm film), Gaming, Dotfiles`,
+        },
+        'chalmers.txt': {
+          type: 'file',
+          size: '280 B',
+          description: 'Aktuell status på Chalmers Datateknik',
+          content: `Chalmers Tekniska Högskola — Datateknik D-24\nAktuella kurser: Operativsystem, Datorarkitektur, Datakommunikation.\nLaborationer i EDIT-huset: Schemaläggare i C, kontextbyten och minnesmodeller.`,
+        },
+        'swim.txt': {
+          type: 'file',
+          size: '250 B',
+          description: 'Simträning och passlogg',
+          content: `Simning & Fysik:\nBassäng: Valhallabadet 50m\nFokus: Uthållighet och teknik i frisim & fjärilsim.\nPass: 5-6 dagar i veckan. Bästa botemedlet mot fastkörda algoritmer.`,
+        },
+        'contact.txt': {
+          type: 'file',
+          size: '180 B',
+          description: 'Kontaktvägar och sociala medier',
+          content: `Kontakt:\n• GitHub: https://github.com\n• Chalmers mail / kontakt: gulo@example.com\n• Discord: gulo#0001`,
+        }
+      }
+    };
+
+    let currentPath: string[] = []; // empty array = ~ (root)
     let cmdHistory: string[] = [];
     let historyIndex = -1;
 
-    const commands: Record<string, () => string | void> = {
+    function getCwdLabel(): string {
+      return currentPath.length === 0 ? '~' : `~/${currentPath.join('/')}`;
+    }
+
+    function updateTitle() {
+      if (titleText && !isMinimized) {
+        titleText.textContent = `bash — gulo@playground: ${getCwdLabel()}`;
+      }
+      if (promptCwd) {
+        promptCwd.textContent = getCwdLabel();
+      }
+    }
+
+    function resolveNode(pathArr: string[]): DirNode | FileNode | null {
+      let current: DirNode | FileNode = fileSystem;
+      for (const seg of pathArr) {
+        if (current.type !== 'dir') return null;
+        if (!current.children[seg]) return null;
+        current = current.children[seg];
+      }
+      return current;
+    }
+
+    function getCurrentDir(): DirNode {
+      return resolveNode(currentPath) as DirNode;
+    }
+
+    // Command implementations
+    const commands: Record<string, (args: string[]) => string | void> = {
       help: () => `
-<div class="text-[#e6edf3] space-y-1">
-  <div class="text-[#10b981] font-bold">Tillgängliga kommandon:</div>
-  <div class="grid grid-cols-[110px_1fr] gap-x-2 text-xs">
-    <span class="text-[#38bdf8]">projects</span><span>Rullar ner till projekt & homelab</span>
-    <span class="text-[#38bdf8]">thoughts</span><span>Rullar ner till artiklar & tankar</span>
-    <span class="text-[#38bdf8]">files</span><span>Rullar ner till filarkiv & nedladdningar</span>
-    <span class="text-[#38bdf8]">school</span><span>Visar aktuell status för Chalmers Datateknik</span>
-    <span class="text-[#38bdf8]">swim</span><span>Simträningsstatistik och tankar från bassängen</span>
-    <span class="text-[#38bdf8]">whoami</span><span>Vem är gulo? Bakgrund och personlighet</span>
-    <span class="text-[#38bdf8]">contact</span><span>Kontaktvägar och sociala länkar</span>
-    <span class="text-[#38bdf8]">uptime</span><span>Visar systemtid och status</span>
-    <span class="text-[#38bdf8]">clear</span><span>Rensar terminalfönstret</span>
+<div class="text-[#e6edf3] space-y-2 font-mono">
+  <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">BASH KOMMANDOTOLK // HJÄLPMENY</div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-xs">
+    <div>
+      <div class="text-[#38bdf8] font-bold mb-1">Filsystem:</div>
+      <div><span class="text-[#10b981] font-semibold">ls [-la]</span> : Lista filer & kataloger</div>
+      <div><span class="text-[#10b981] font-semibold">cd &lt;katalog&gt;</span> : Byt mapp (cd .., cd ~, cd projects)</div>
+      <div><span class="text-[#10b981] font-semibold">pwd</span> : Visa nuvarande sökväg</div>
+      <div><span class="text-[#10b981] font-semibold">cat &lt;fil&gt;</span> : Visa filens innehåll</div>
+      <div><span class="text-[#10b981] font-semibold">grep &lt;ord&gt; [fil]</span> : Sök text i filer</div>
+      <div><span class="text-[#10b981] font-semibold">find &lt;namn&gt;</span> : Hitta filer efter namn</div>
+    </div>
+    <div>
+      <div class="text-[#f59e0b] font-bold mb-1">Navigering & Handling:</div>
+      <div><span class="text-[#10b981] font-semibold">open &lt;mål&gt;</span> : Öppna artikel, ladda ner fil, scrolla</div>
+      <div><span class="text-[#10b981] font-semibold">projects</span> : Scrolla till projekt & homelab</div>
+      <div><span class="text-[#10b981] font-semibold">thoughts</span> : Scrolla till tankar & anteckningar</div>
+      <div><span class="text-[#10b981] font-semibold">files</span> : Scrolla till fildelning</div>
+      <div><span class="text-[#10b981] font-semibold">now / school</span> : Visa Chalmers & aktuell status</div>
+    </div>
+    <div>
+      <div class="text-[#a78bfa] font-bold mb-1">Information:</div>
+      <div><span class="text-[#10b981] font-semibold">whoami</span> : Om gulo & bakgrund</div>
+      <div><span class="text-[#10b981] font-semibold">swim</span> : Simträning & Valhallabadet</div>
+      <div><span class="text-[#10b981] font-semibold">fastfetch</span> : Kör systemöversikten igen</div>
+      <div><span class="text-[#10b981] font-semibold">contact</span> : GitHub, mail & Discord</div>
+    </div>
+    <div>
+      <div class="text-[#8b949e] font-bold mb-1">Fönster & System:</div>
+      <div><span class="text-[#10b981] font-semibold">clear (Ctrl+L)</span> : Rensa utdata</div>
+      <div><span class="text-[#10b981] font-semibold">date / uptime</span> : Systemtid & driftstatus</div>
+      <div><span class="text-[#10b981] font-semibold">exit / close</span> : Stäng/minimera fönstret</div>
+    </div>
+  </div>
+  <div class="text-[11px] text-[#8b949e] pt-1 border-t border-[#30363d]/40">
+    Tips: Använd <kbd class="text-[#10b981]">Tab</kbd> för auto-komplettering och <kbd class="text-[#10b981]">↑/↓</kbd> för kommandohistorik.
   </div>
 </div>`,
 
+      ls: (args) => {
+        let targetDir = getCurrentDir();
+        let targetLabel = getCwdLabel();
+
+        if (args[0] && !args[0].startsWith('-')) {
+          const target = args[0].replace(/\/$/, '');
+          const node = target === '~' ? fileSystem : targetDir.children[target];
+          if (!node) {
+            return `<div class="text-[#f85149]">ls: kan inte komma åt '${escapeHtml(args[0])}': Ingen sådan fil eller katalog</div>`;
+          }
+          if (node.type === 'file') {
+            return `<div class="text-[#e6edf3]">${escapeHtml(target)} (${node.size})</div>`;
+          }
+          targetDir = node as DirNode;
+          targetLabel = target;
+        }
+
+        const entries = Object.entries(targetDir.children);
+        if (entries.length === 0) return `<div class="text-[#8b949e]">Katalogen är tom.</div>`;
+
+        const isLong = args.includes('-l') || args.includes('-la');
+
+        if (isLong) {
+          const rows = entries.map(([name, node]) => {
+            const isDir = node.type === 'dir';
+            const perm = isDir ? 'drwxr-xr-x' : '-rw-r--r--';
+            const size = isDir ? '4.0 KB' : node.size;
+            const color = isDir ? 'text-[#38bdf8] font-bold' : 'text-[#e6edf3]';
+            return `<div class="grid grid-cols-[100px_70px_1fr] gap-2">
+              <span class="text-[#8b949e]">${perm}</span>
+              <span class="text-[#8b949e] text-right">${size}</span>
+              <span class="${color}">${escapeHtml(name)}${isDir ? '/' : ''}</span>
+            </div>`;
+          }).join('');
+          return `<div class="font-mono text-xs space-y-1">${rows}</div>`;
+        }
+
+        // Standard column view
+        const pills = entries.map(([name, node]) => {
+          if (node.type === 'dir') {
+            return `<span class="text-[#38bdf8] font-bold">${escapeHtml(name)}/</span>`;
+          }
+          return `<span class="text-[#e6edf3]">${escapeHtml(name)}</span>`;
+        }).join('&nbsp;&nbsp;&nbsp;&nbsp;');
+
+        return `<div class="flex flex-wrap gap-x-6 gap-y-1 text-xs sm:text-sm">${pills}</div>`;
+      },
+
+      cd: (args) => {
+        const dest = args[0] ? args[0].replace(/\/$/, '') : '~';
+        if (dest === '~' || dest === '') {
+          currentPath = [];
+          updateTitle();
+          return;
+        }
+        if (dest === '..') {
+          if (currentPath.length > 0) currentPath.pop();
+          updateTitle();
+          return;
+        }
+        if (dest === '.') return;
+
+        const current = getCurrentDir();
+        if (current.children[dest]) {
+          if (current.children[dest].type === 'dir') {
+            currentPath.push(dest);
+            updateTitle();
+          } else {
+            return `<div class="text-[#f85149]">cd: '${escapeHtml(dest)}': Inte en katalog</div>`;
+          }
+        } else {
+          return `<div class="text-[#f85149]">cd: '${escapeHtml(dest)}': Ingen sådan fil eller katalog</div>`;
+        }
+      },
+
+      pwd: () => {
+        return `<div class="text-[#8b949e]">/home/visitor${currentPath.length > 0 ? '/' + currentPath.join('/') : ''}</div>`;
+      },
+
+      cat: (args) => {
+        if (!args[0]) return `<div class="text-[#f85149]">Användning: cat &lt;filnamn&gt;</div>`;
+        const filename = args[0];
+        const current = getCurrentDir();
+
+        let node = current.children[filename];
+        // If not in current, search root if at subfolder
+        if (!node && currentPath.length > 0 && fileSystem.children[filename]) {
+          node = fileSystem.children[filename];
+        }
+
+        if (!node) {
+          return `<div class="text-[#f85149]">cat: ${escapeHtml(filename)}: Ingen sådan fil</div>`;
+        }
+        if (node.type === 'dir') {
+          return `<div class="text-[#f85149]">cat: ${escapeHtml(filename)}: Är en katalog. Använd 'ls' eller 'cd'.</div>`;
+        }
+
+        return `
+<div class="p-3 rounded bg-[#0d1117] border border-[#30363d] text-xs text-[#e6edf3] whitespace-pre-wrap leading-relaxed font-mono">
+${escapeHtml(node.content)}
+</div>`;
+      },
+
+      grep: (args) => {
+        if (!args[0]) return `<div class="text-[#f85149]">Användning: grep &lt;sökord&gt; [fil]</div>`;
+        const query = args[0].toLowerCase();
+        const targetFile = args[1];
+        const current = getCurrentDir();
+
+        let matches: string[] = [];
+
+        function scanFile(name: string, f: FileNode) {
+          const lines = f.content.split('\n');
+          lines.forEach((line, idx) => {
+            if (line.toLowerCase().includes(query)) {
+              matches.push(`<span class="text-[#38bdf8]">${escapeHtml(name)}:${idx + 1}:</span> ${escapeHtml(line)}`);
+            }
+          });
+        }
+
+        if (targetFile) {
+          const node = current.children[targetFile];
+          if (!node || node.type !== 'file') {
+            return `<div class="text-[#f85149]">grep: ${escapeHtml(targetFile)}: Ingen sådan fil</div>`;
+          }
+          scanFile(targetFile, node);
+        } else {
+          // Scan all files in current folder
+          for (const [name, node] of Object.entries(current.children)) {
+            if (node.type === 'file') scanFile(name, node);
+          }
+        }
+
+        if (matches.length === 0) {
+          return `<div class="text-[#8b949e]">Inga träffar för '${escapeHtml(query)}'.</div>`;
+        }
+        return `<div class="text-xs space-y-1 font-mono">${matches.join('<br/>')}</div>`;
+      },
+
+      find: (args) => {
+        const query = (args[0] || '').toLowerCase();
+        let results: string[] = [];
+
+        function walk(node: DirNode, path: string) {
+          for (const [name, child] of Object.entries(node.children)) {
+            const currentPath = path ? `${path}/${name}` : name;
+            if (name.toLowerCase().includes(query)) {
+              const isDir = child.type === 'dir';
+              results.push(`<span class="${isDir ? 'text-[#38bdf8] font-bold' : 'text-[#10b981]'}">${currentPath}${isDir ? '/' : ''}</span>`);
+            }
+            if (child.type === 'dir') walk(child, currentPath);
+          }
+        }
+        walk(fileSystem, '~');
+        return `<div class="text-xs space-y-1">${results.join('<br/>')}</div>`;
+      },
+
+      open: (args) => {
+        if (!args[0]) return `<div class="text-[#f85149]">Användning: open &lt;artikel/projekt/fil/sektion&gt;</div>`;
+        const target = args[0].toLowerCase();
+
+        // 1. Check sections
+        if (target === 'projects' || target === 'projekt') {
+          document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+          return `<div class="text-[#10b981]">Rullar till [~/projekt]...</div>`;
+        }
+        if (target === 'thoughts' || target === 'tankar') {
+          document.getElementById('thoughts')?.scrollIntoView({ behavior: 'smooth' });
+          return `<div class="text-[#10b981]">Rullar till [~/tankar]...</div>`;
+        }
+        if (target === 'files' || target === 'filer' || target === 'downloads') {
+          document.getElementById('files')?.scrollIntoView({ behavior: 'smooth' });
+          return `<div class="text-[#10b981]">Rullar till [~/filer]...</div>`;
+        }
+        if (target === 'now' || target === 'school' || target === 'skola') {
+          document.getElementById('now')?.scrollIntoView({ behavior: 'smooth' });
+          return `<div class="text-[#10b981]">Rullar till [~/just-nu]...</div>`;
+        }
+
+        // 2. Check articles directly
+        if (target.includes('simning') || target.includes('chalmers-simning')) {
+          window.location.href = '/thoughts/chalmers-simning-kod';
+          return `<div class="text-[#38bdf8]">Navigerar till /thoughts/chalmers-simning-kod...</div>`;
+        }
+        if (target.includes('jvm') || target.includes('mc-jvm-flags') || target.includes('paper')) {
+          window.location.href = '/thoughts/mc-jvm-flags';
+          return `<div class="text-[#38bdf8]">Navigerar till /thoughts/mc-jvm-flags...</div>`;
+        }
+
+        // 3. Check downloadable files
+        if (target.includes('fabric')) {
+          window.location.href = '/downloads/fabric-1.20.4-optimized.zip';
+          return `<div class="text-[#10b981]">Startar nedladdning av fabric-1.20.4-optimized.zip...</div>`;
+        }
+        if (target.includes('backup')) {
+          window.location.href = '/downloads/backup-world.sh';
+          return `<div class="text-[#10b981]">Startar nedladdning av backup-world.sh...</div>`;
+        }
+
+        return `<div class="text-[#f85149]">Känner inte igen målet '${escapeHtml(target)}'. Skriv 'help' eller 'ls'.</div>`;
+      },
+
+      whoami: () => `
+<div class="text-[#e6edf3] space-y-1 text-xs">
+  <div class="text-[#10b981] font-bold">gulo — Chalmersstudent, simmare & homelab-tinkerer</div>
+  <div class="text-[#8b949e]">Plugg: Datateknik @ Chalmers Tekniska Högskola.</div>
+  <div class="text-[#8b949e]">Sport: Tränar och tävlar i kapplöpningssimning i Göteborg.</div>
+  <div class="text-[#8b949e]">Teknik: Föredrar Linux, enkla system, självhostade tjänster, prestandatuning och bra typografi.</div>
+</div>`,
+
+      school: () => {
+        document.getElementById('now')?.scrollIntoView({ behavior: 'smooth' });
+        return `
+<div class="text-[#e6edf3] space-y-1 text-xs">
+  <div class="text-[#38bdf8] font-bold">Chalmers Tekniska Högskola — Datateknik (Civilingenjör)</div>
+  <div class="text-[#8b949e]">Aktuellt: Operativsystem, datorarkitektur, RISC-V och distribuerade nätverk.</div>
+</div>`;
+      },
+
+      swim: () => `
+<div class="text-[#e6edf3] space-y-1 text-xs">
+  <div class="text-[#38bdf8] font-bold">🏊 Kapplöpningssimning</div>
+  <div>Hemmabassäng: Valhallabadet, Göteborg.</div>
+  <div>Distanser: 50m / 100m frisim och fjäril. Träning 5-6 dagar i veckan.</div>
+  <div class="text-[#8b949e]">Läs min text om simning och algoritmer med kommandot: <code class="text-[#10b981]">open chalmers-simning</code></div>
+</div>`,
+
+      fastfetch: () => {
+        return `
+<div class="text-[#e6edf3] space-y-1 text-xs border-l-2 border-[#10b981] pl-3">
+  <div><span class="text-[#10b981] font-bold">gulo@chalmers-box</span></div>
+  <div><span class="text-[#38bdf8]">OS:</span> Arch Linux x86_64 / Hyprland</div>
+  <div><span class="text-[#38bdf8]">Host:</span> ThinkPad T14s Gen 4 / Ryzen 7 PRO</div>
+  <div><span class="text-[#38bdf8]">Server:</span> Debian 12 (Homelab PufferPanel + WireGuard)</div>
+  <div><span class="text-[#38bdf8]">Shell:</span> zsh 5.9 + kitty terminal</div>
+  <div><span class="text-[#38bdf8]">Uptime:</span> 42d 8h 14m</div>
+</div>`;
+      },
+
       projects: () => {
-        const el = document.getElementById('projects');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-        return `<div class="text-[#38bdf8]">Navigerar till [~/projekt]...</div>`;
+        document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+        return `<div class="text-[#a78bfa]">Navigerar till [~/projekt]...</div>`;
       },
 
       thoughts: () => {
-        const el = document.getElementById('thoughts');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('thoughts')?.scrollIntoView({ behavior: 'smooth' });
         return `<div class="text-[#f59e0b]">Navigerar till [~/tankar]...</div>`;
       },
 
       files: () => {
-        const el = document.getElementById('files');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-        return `<div class="text-[#a78bfa]">Navigerar till [~/filer]...</div>`;
-      },
-
-      downloads: () => {
-        const el = document.getElementById('files');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-        return `<div class="text-[#a78bfa]">Navigerar till filarkivet...</div>`;
-      },
-
-      school: () => {
-        const el = document.getElementById('now');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-        return `
-<div class="text-[#e6edf3] space-y-1">
-  <div class="text-[#38bdf8] font-bold">Chalmers Tekniska Högskola — Datateknik (Civilingenjör)</div>
-  <div class="text-[#8b949e]">Aktuellt fokus: Operativsystem, distribuerade system, C/Rust & algoritmer.</div>
-</div>`;
+        document.getElementById('files')?.scrollIntoView({ behavior: 'smooth' });
+        return `<div class="text-[#10b981]">Navigerar till [~/filer]...</div>`;
       },
 
       now: () => {
-        const el = document.getElementById('now');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-        return `<div class="text-[#10b981]">Navigerar till 'Just nu'-sektionen...</div>`;
+        document.getElementById('now')?.scrollIntoView({ behavior: 'smooth' });
+        return `<div class="text-[#38bdf8]">Navigerar till [~/just-nu]...</div>`;
       },
-
-      swim: () => `
-<div class="text-[#e6edf3] space-y-1">
-  <div class="text-[#38bdf8] font-bold">🏊 Simning & Uthållighet</div>
-  <div class="text-[#8b949e]">Hemmabassäng: Valhallabadet, Göteborg.</div>
-  <div>Träning: 4-6 pass/vecka (frisim & fjärilsim). Bästa sättet att rensa huvudet från minnesläckor i C!</div>
-</div>`,
-
-      whoami: () => `
-<div class="text-[#e6edf3] space-y-1">
-  <div class="text-[#10b981] font-bold">gulo — Chalmersstudent, simmare och utvecklare</div>
-  <div class="text-[#8b949e]">Gillar självhostade servrar, Linux-tuning, Minecraft, fotografering och att bygga saker från grunden.</div>
-</div>`,
-
-      uptime: () => {
-        return `<div class="text-[#8b949e]">System uptime: 42 dagar, 14 timmar, 22 minuter (load: 0.28, 0.32, 0.40)</div>`;
-      },
-
-      contact: () => `
-<div class="text-[#e6edf3] space-y-1">
-  <div class="text-[#10b981] font-bold">Kontakt & Profiler:</div>
-  <div class="text-xs">
-    <div>• GitHub: <a href="https://github.com" target="_blank" class="text-[#38bdf8] underline">github.com</a></div>
-    <div>• Email: <span class="text-[#f59e0b]">kontakt@chalmers-box.local</span></div>
-    <div>• Discord: <span class="text-[#a78bfa]">gulo#0001</span></div>
-  </div>
-</div>`,
 
       clear: () => {
         history.innerHTML = '';
         return;
+      },
+
+      date: () => {
+        return `<div class="text-[#8b949e]">${new Date().toLocaleString('sv-SE')} (Europe/Stockholm)</div>`;
+      },
+
+      uname: (args) => {
+        return `<div class="text-[#8b949e]">Linux chalmers-box 6.12.8-arch1-1 #1 SMP PREEMPT_DYNAMIC x86_64 GNU/Linux</div>`;
+      },
+
+      uptime: () => {
+        return `<div class="text-[#10b981]">Uptime: 42 dagar, 8 timmar, load: 0.18, 0.22, 0.35</div>`;
+      },
+
+      contact: () => `
+<div class="text-xs space-y-1">
+  <div>• GitHub: <a href="https://github.com" target="_blank" class="text-[#38bdf8] underline">github.com</a></div>
+  <div>• Chalmers mail: <span class="text-[#f59e0b]">gulo@example.com</span></div>
+  <div>• Discord: <span class="text-[#a78bfa]">gulo#0001</span></div>
+</div>`,
+
+      echo: (args) => {
+        return `<div class="text-[#e6edf3]">${escapeHtml(args.join(' '))}</div>`;
+      },
+
+      exit: () => {
+        closeWindow();
+        return;
+      },
+
+      close: () => {
+        closeWindow();
+        return;
       }
     };
+
+    // Alias
+    commands['dir'] = commands['ls'];
+    commands['neofetch'] = commands['fastfetch'];
 
     function execute(rawCmd: string) {
       const cleanCmd = rawCmd.trim();
@@ -249,47 +760,34 @@
       cmdHistory.push(cleanCmd);
       historyIndex = cmdHistory.length;
 
-      // Render user command row
+      // Render prompt execution line
       const cmdRow = document.createElement('div');
-      cmdRow.className = 'flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#8b949e]';
+      cmdRow.className = 'flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#8b949e] pt-1';
       cmdRow.innerHTML = `
-        <span class="text-[#10b981]">visitor@playground</span><span class="text-[#8b949e]">:</span><span class="text-[#38bdf8]">~</span><span class="text-[#e6edf3]">$</span>
+        <span class="text-[#10b981]">visitor@playground</span><span class="text-[#8b949e]">:</span><span class="text-[#38bdf8]">${escapeHtml(getCwdLabel())}</span><span class="text-[#e6edf3]">$</span>
         <span class="text-[#e6edf3]">${escapeHtml(cleanCmd)}</span>
       `;
       history.appendChild(cmdRow);
 
-      const parts = cleanCmd.split(' ');
+      const parts = cleanCmd.split(' ').filter(Boolean);
       const main = parts[0].toLowerCase();
+      const args = parts.slice(1);
 
-      // Check cat command
-      if (main === 'cat') {
-        const target = parts[1];
-        const resBox = document.createElement('div');
-        resBox.className = 'text-xs text-[#8b949e] pl-4 border-l border-[#30363d]';
-        if (target === 'about.txt' || target === 'whoami.txt') {
-          resBox.innerHTML = `Chalmers Datateknik-student med passion för system, simning och homelab.`;
-        } else if (target === 'backup-world.sh') {
-          resBox.innerHTML = `Se full fil i sektionen [~/filer] nedanför.`;
-        } else {
-          resBox.innerHTML = `cat: ${escapeHtml(target || '')}: Ingen sådan fil i arbetskatalogen.`;
-        }
-        history.appendChild(resBox);
-      } else if (commands[main]) {
-        const res = commands[main]();
+      if (commands[main]) {
+        const res = commands[main](args);
         if (res) {
           const resBox = document.createElement('div');
-          resBox.className = 'text-xs pl-4 border-l border-[#30363d] text-[#8b949e]';
+          resBox.className = 'text-xs pl-3 border-l border-[#30363d] my-1';
           resBox.innerHTML = res;
           history.appendChild(resBox);
         }
       } else {
         const errBox = document.createElement('div');
-        errBox.className = 'text-xs text-[#f85149] pl-4 border-l border-[#f85149]/40';
-        errBox.innerHTML = `Kommando hittades inte: '${escapeHtml(cleanCmd)}'. Skriv <span class="text-[#10b981] font-bold">help</span> för lista.`;
+        errBox.className = 'text-xs text-[#f85149] pl-3 border-l border-[#f85149]/40 my-1';
+        errBox.innerHTML = `Kommando hittades inte: '${escapeHtml(cleanCmd)}'. Skriv <span class="text-[#10b981] font-bold">help</span> för lista över tillgängliga kommandon.`;
         history.appendChild(errBox);
       }
 
-      // Keep scrolled
       input.value = '';
       input.focus();
     }
@@ -299,7 +797,7 @@
       execute(input.value);
     });
 
-    // History navigation with arrow keys
+    // Arrow keys history & tab completion
     input.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowUp') {
         e.preventDefault();
@@ -316,17 +814,23 @@
           historyIndex = cmdHistory.length;
           input.value = '';
         }
-      }
-    });
+      } else if (e.key === 'Tab') {
+        e.preventDefault();
+        // Auto complete
+        const val = input.value.trim().toLowerCase();
+        const available = ['help', 'ls', 'cd', 'cat', 'pwd', 'grep', 'find', 'open', 'whoami', 'swim', 'school', 'projects', 'thoughts', 'files', 'clear', 'fastfetch'];
+        const current = getCurrentDir();
+        const filesAndDirs = Object.keys(current.children);
+        const candidates = [...available, ...filesAndDirs];
 
-    // Quick buttons
-    quickBtns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const cmd = btn.getAttribute('data-cmd');
-        if (cmd) {
-          execute(cmd);
+        const match = candidates.find(c => c.startsWith(val) && c !== val);
+        if (match) {
+          input.value = match;
         }
-      });
+      } else if (e.ctrlKey && e.key.toLowerCase() === 'l') {
+        e.preventDefault();
+        history.innerHTML = '';
+      }
     });
 
     function escapeHtml(str: string) {
@@ -334,10 +838,9 @@
     }
   }
 
-  // Initialize on page load
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initTerminal);
+    document.addEventListener('DOMContentLoaded', initTerminalEngine);
   } else {
-    initTerminal();
+    initTerminalEngine();
   }
 </script>

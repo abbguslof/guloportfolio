@@ -1,5 +1,5 @@
 ---
-// DownloadTable.astro - Structured download catalog for configs, scripts, and archives
+// DownloadTable.astro - Structured download catalog with direct download & copyable SHA checksum
 interface DownloadItem {
   id?: string;
   name: string;
@@ -44,7 +44,7 @@ function getExtensionBadge(filename: string): { label: string; colorClass: strin
   {downloads.map((item) => {
     const ext = getExtensionBadge(item.filename);
     return (
-      <div class="group p-4 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#484f58] transition-all">
+      <div class="group p-4 rounded-lg bg-[#161b22] border border-[#30363d] hover:bg-[#1f242c] hover:border-[#484f58] transition-all">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <!-- Left: File Badge & Title -->
           <div class="space-y-1 flex-1">
@@ -52,9 +52,13 @@ function getExtensionBadge(filename: string): { label: string; colorClass: strin
               <span class={`text-[11px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#0d1117] border ${ext.colorClass}`}>
                 {ext.label}
               </span>
-              <span class="text-sm font-semibold text-[#e6edf3] group-hover:text-[#38bdf8] transition-colors">
+              <a 
+                href={item.fileUrl} 
+                download={item.filename}
+                class="text-sm font-semibold text-[#e6edf3] group-hover:text-[#38bdf8] hover:underline transition-colors"
+              >
                 {item.name}
-              </span>
+              </a>
               <span class="text-xs font-mono text-[#8b949e]">
                 ({item.filename})
               </span>
@@ -65,7 +69,7 @@ function getExtensionBadge(filename: string): { label: string; colorClass: strin
               {item.description}
             </p>
 
-            <!-- Metadata info (Size, Category, Updated) -->
+            <!-- Metadata info (Size, Category, Updated, Copy Checksum) -->
             <div class="flex flex-wrap items-center gap-3 pt-2 text-[11px] font-mono text-[#8b949e]">
               <span>Kategori: <span class="text-[#e6edf3]">{item.category}</span></span>
               <span>•</span>
@@ -75,20 +79,26 @@ function getExtensionBadge(filename: string): { label: string; colorClass: strin
               {item.checksum && (
                 <>
                   <span class="hidden md:inline">•</span>
-                  <span class="hidden md:inline text-[10px] text-[#8b949e]/80">
-                    SHA: <code class="text-[#8b949e]">{item.checksum}</code>
-                  </span>
+                  <button 
+                    type="button" 
+                    class="copy-sha-btn text-[10px] text-[#8b949e] hover:text-[#10b981] transition-colors cursor-pointer"
+                    data-sha={item.checksum}
+                    title="Klicka för att kopiera SHA-checksumma"
+                  >
+                    <span>SHA: <code>{item.checksum}</code></span>
+                    <span class="copy-status ml-1 text-[#10b981] hidden">✓</span>
+                  </button>
                 </>
               )}
             </div>
           </div>
 
-          <!-- Right: Download Action Button -->
+          <!-- Right: Direct Download Button -->
           <div class="flex items-center sm:self-center shrink-0 pt-2 sm:pt-0">
             <a 
               href={item.fileUrl}
               download={item.filename}
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#0d1117] border border-[#30363d] text-xs font-mono font-medium text-[#10b981] hover:bg-[#10b981] hover:text-[#0d1117] hover:border-[#10b981] transition-all"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#0d1117] border border-[#30363d] text-xs font-mono font-medium text-[#10b981] hover:bg-[#10b981] hover:text-[#0d1117] hover:border-[#10b981] transition-all cursor-pointer"
               aria-label={`Ladda ner ${item.name}`}
             >
               <span>[Ladda ner</span>
@@ -100,3 +110,22 @@ function getExtensionBadge(filename: string): { label: string; colorClass: strin
     );
   })}
 </div>
+
+<script>
+  // Copy SHA Checksum
+  document.querySelectorAll('.copy-sha-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const sha = btn.getAttribute('data-sha');
+      if (sha) {
+        navigator.clipboard.writeText(sha).then(() => {
+          const status = btn.querySelector('.copy-status');
+          if (status) {
+            status.classList.remove('hidden');
+            setTimeout(() => status.classList.add('hidden'), 2000);
+          }
+        });
+      }
+    });
+  });
+</script>

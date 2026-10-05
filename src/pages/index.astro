@@ -32,90 +32,101 @@ const downloads = rawDownloads.map((d) => ({
   title="gulo // digital garden & playground" 
   description="Personlig playground, portfolio och filarkiv. Chalmers Datateknik, simning, Minecraft homelab och systemprogrammering."
 >
-  <!-- Header -->
+  <!-- Clean Header (No fake prompts, no duplicate dots) -->
   <Header />
 
   <main class="w-full">
-    <!-- 1. Hero: Interactive Terminal & Neofetch -->
+    <!-- 1. Hero: Interactive Terminal med fungerande fönsterknappar & Bash shell -->
     <InteractiveTerminal />
 
-    <!-- 2. Just nu / Skola-sektion -->
-    <NowSection />
+    <!-- 2. Cockpit Grid: Utnyttjar skärmbredden optimalt istället för en smal mittspalt -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- Vänster kolumn (7 av 12 kolumner): Skolstatus, träning och projekt -->
+      <div class="lg:col-span-7 space-y-12">
+        <!-- Just nu / Skola-sektion (Klickbara kort) -->
+        <NowSection />
 
-    <!-- 3. Projektsektion (Utan thumbnails, strikt TUI-estetik) -->
-    <section id="projects" class="w-full mb-14" aria-labelledby="projects-heading">
-      <div class="flex items-center justify-between pb-3 mb-6 border-b border-[#30363d]">
-        <div class="flex items-center gap-2">
-          <span class="text-[#a78bfa] font-bold">#</span>
-          <h2 id="projects-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]">
-            Projekt & Homelab
-          </h2>
-        </div>
-        <span class="text-xs text-[#8b949e] font-mono">
-          [{sortedProjects.length} aktiva/slutförda]
-        </span>
+        <!-- Projektsektion (Utan thumbnails, strikt TUI-estetik, klickbara kort) -->
+        <section id="projects" class="w-full" aria-labelledby="projects-heading">
+          <div class="flex items-center justify-between pb-3 mb-5 border-b border-[#30363d]">
+            <div class="flex items-center gap-2">
+              <span class="text-[#a78bfa] font-bold">#</span>
+              <h2 id="projects-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]">
+                Projekt & Homelab
+              </h2>
+            </div>
+            <span class="text-xs text-[#8b949e] font-mono">
+              [{sortedProjects.length} aktiva/slutförda]
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {sortedProjects.map((project) => (
+              <ProjectCard 
+                title={project.data.title}
+                description={project.data.description}
+                status={project.data.status}
+                category={project.data.category}
+                tech={project.data.tech}
+                repoUrl={project.data.repoUrl}
+                liveUrl={project.data.liveUrl}
+                slug={project.id}
+              />
+            ))}
+          </div>
+        </section>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {sortedProjects.map((project) => (
-          <ProjectCard 
-            title={project.data.title}
-            description={project.data.description}
-            status={project.data.status}
-            category={project.data.category}
-            tech={project.data.tech}
-            repoUrl={project.data.repoUrl}
-            liveUrl={project.data.liveUrl}
-            slug={project.id}
-          />
-        ))}
-      </div>
-    </section>
+      <!-- Höger kolumn (5 av 12 kolumner): Tankar och Nedladdningsarkiv -->
+      <div class="lg:col-span-5 space-y-12">
+        <!-- Tankar & Anteckningar (Text-first arkiv med datum och taggar) -->
+        <section id="thoughts" class="w-full" aria-labelledby="thoughts-heading">
+          <div class="flex items-center justify-between pb-3 mb-5 border-b border-[#30363d]">
+            <div class="flex items-center gap-2">
+              <span class="text-[#f59e0b] font-bold">#</span>
+              <h2 id="thoughts-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]">
+                Tankar & Anteckningar
+              </h2>
+            </div>
+            <span class="text-xs text-[#8b949e] font-mono">
+              [{sortedThoughts.length} publicerade]
+            </span>
+          </div>
 
-    <!-- 4. Tankar & Anteckningar (Text-first arkiv) -->
-    <section id="thoughts" class="w-full mb-14" aria-labelledby="thoughts-heading">
-      <div class="flex items-center justify-between pb-3 mb-4 border-b border-[#30363d]">
-        <div class="flex items-center gap-2">
-          <span class="text-[#f59e0b] font-bold">#</span>
-          <h2 id="thoughts-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]">
-            Tankar & Anteckningar
-          </h2>
-        </div>
-        <span class="text-xs text-[#8b949e] font-mono">
-          [{sortedThoughts.length} publicerade]
-        </span>
-      </div>
+          <div class="rounded-lg bg-[#161b22] border border-[#30363d] px-4 py-1 divide-y divide-[#30363d]/40">
+            {sortedThoughts.map((post) => (
+              <ThoughtRow 
+                title={post.data.title}
+                slug={post.id}
+                pubDate={post.data.pubDate}
+                tags={post.data.tags}
+              />
+            ))}
+          </div>
+        </section>
 
-      <div class="rounded-lg bg-[#161b22] border border-[#30363d] px-4 py-2 divide-y divide-[#30363d]/40">
-        {sortedThoughts.map((post) => (
-          <ThoughtRow 
-            title={post.data.title}
-            slug={post.id}
-            pubDate={post.data.pubDate}
-            tags={post.data.tags}
-          />
-        ))}
-      </div>
-    </section>
+        <!-- Nedladdningsarkiv (Fildelning, modpacks, dotfiles, scripts) -->
+        <section id="files" class="w-full" aria-labelledby="files-heading">
+          <div class="flex items-center justify-between pb-3 mb-5 border-b border-[#30363d]">
+            <div class="flex items-center gap-2">
+              <span class="text-[#2ea043] font-bold">#</span>
+              <h2 id="files-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]">
+                Fildelning & Resurser
+              </h2>
+            </div>
+            <span class="text-xs text-[#8b949e] font-mono">
+              [{downloads.length} filer tillgängliga]
+            </span>
+          </div>
 
-    <!-- 5. Nedladdningsarkiv (Fildelning, modpacks, dotfiles, scripts) -->
-    <section id="files" class="w-full mb-12" aria-labelledby="files-heading">
-      <div class="flex items-center justify-between pb-3 mb-6 border-b border-[#30363d]">
-        <div class="flex items-center gap-2">
-          <span class="text-[#2ea043] font-bold">#</span>
-          <h2 id="files-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]">
-            Fildelning & Resurser
-          </h2>
-        </div>
-        <span class="text-xs text-[#8b949e] font-mono">
-          [{downloads.length} filer tillgängliga]
-        </span>
+          <DownloadTable downloads={downloads} />
+        </section>
       </div>
 
-      <DownloadTable downloads={downloads} />
-    </section>
+    </div>
   </main>
 
-  <!-- Footer -->
+  <!-- Footer med telemetri -->
   <Footer />
 </Layout>
