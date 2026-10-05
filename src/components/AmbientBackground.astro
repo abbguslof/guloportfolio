@@ -1,31 +1,45 @@
 ---
-// src/components/AmbientBackground.astro - WebGL Ambient Background Engine
-// 6 custom tuned modes: Topo Lines, Riso Dither, ASCII Plasma, Dot Grid Wave, Pixel Grid, Noise Shimmer + Off
-// Self-hosted, 0 external network calls, full prefers-reduced-motion support
+// src/components/AmbientBackground.astro - Cockpit Ambient Background Engine
+// Default: "Standard" (our original, smooth, lightweight Canvas 2D elevation contour curves)
+// + 6 custom tuned WebGL effects (Topo, Dither, ASCII, Dots, Pixel, Shimmer) + Off
+// Preloaded shaders for instant 0ms switching, calibrated subtle opacities, corner HUD with close '×', and terminal integration
 ---
 
 <div id="ambient-bg-container" class="fixed inset-0 pointer-events-none overflow-hidden select-none z-0" aria-hidden="true">
-  <!-- Dynamic WebGL effect layer -->
+  <!-- 1. HTML5 Canvas for "Standard" mode (Original smooth topographic contour elevation curves) -->
+  <canvas id="standard-canvas" class="absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-700"></canvas>
+
+  <!-- 2. Dynamic WebGL effect layer for the alternative modes -->
   <div 
     id="active-aifx-layer" 
     class="absolute inset-0 pointer-events-none transition-opacity duration-700"
     aria-hidden="true"
   ></div>
-  <!-- Cockpit subtle radial vignette for smooth blending into #0d1117 -->
-  <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(13,17,23,0.48)_100%)]"></div>
+
+  <!-- 3. Cockpit subtle radial vignette for smooth blending into #0d1117 -->
+  <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(13,17,23,0.52)_100%)]"></div>
 </div>
 
-<!-- Local effect runtime -->
+<!-- Local effect runtime & preloaded effect shaders for instant 0ms switching -->
 <script src="/vendor/aifx/runtime/v1.js" defer></script>
+<script src="/vendor/aifx/fx/topo-lines/v1.js" defer></script>
+<script src="/vendor/aifx/fx/dither/v1.js" defer></script>
+<script src="/vendor/aifx/fx/ascii/v1.js" defer></script>
+<script src="/vendor/aifx/fx/dot-grid-wave/v1.js" defer></script>
+<script src="/vendor/aifx/fx/blocky/v1.js" defer></script>
+<script src="/vendor/aifx/fx/noise-shimmer/v1.js" defer></script>
 
-<!-- Interactive Live Switcher in bottom-right corner -->
+<!-- Interactive Live Switcher in bottom-right corner with close '×' -->
 <aside 
   id="bg-style-switcher" 
-  class="fixed bottom-3 right-3 sm:bottom-4 sm:right-4 z-40 flex items-center gap-1 p-1 rounded-lg bg-[#161b22]/95 border border-[#30363d] backdrop-blur-md text-[11px] font-mono shadow-xl select-none"
+  class="fixed bottom-3 right-3 sm:bottom-4 sm:right-4 z-40 flex items-center gap-1 p-1 rounded-lg bg-[#161b22]/95 border border-[#30363d] backdrop-blur-md text-[11px] font-mono shadow-xl select-none transition-all duration-300"
   aria-label="Background style picker"
 >
   <span class="text-[#8b949e] pl-1.5 pr-1 hidden lg:inline text-[10px] font-bold uppercase tracking-wider">BG:</span>
-  <button type="button" data-bg="topo" class="bg-mode-btn px-2 py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]">
+  <button type="button" data-bg="standard" class="bg-mode-btn px-2 py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]" title="Ursprunglig mjuk topo (Standard)">
+    Standard
+  </button>
+  <button type="button" data-bg="topo" class="bg-mode-btn px-2 py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]" title="WebGL Topo Lines">
     Topo
   </button>
   <button type="button" data-bg="dither" class="bg-mode-btn px-2 py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]">
@@ -46,31 +60,51 @@
   <button type="button" data-bg="off" class="bg-mode-btn px-1.5 py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#f85149]" title="Turn background off">
     Off
   </button>
+  <!-- Dismiss / Close button -->
+  <button 
+    type="button" 
+    id="bg-close-btn" 
+    class="text-[#8b949e] hover:text-[#f85149] px-1.5 py-0.5 rounded transition-colors ml-0.5 cursor-pointer font-bold text-xs" 
+    title="Stäng (skriv 'bg' i terminalen för att öppna igen)"
+    aria-label="Close background picker"
+  >
+    ✕
+  </button>
 </aside>
 
 <script>
-  (function initAifxEngine() {
-    type BgMode = 'topo' | 'dither' | 'ascii' | 'dots' | 'blocky' | 'shimmer' | 'off';
+  (function initBgEngine() {
+    type BgMode = 'standard' | 'topo' | 'dither' | 'ascii' | 'dots' | 'blocky' | 'shimmer' | 'off';
 
-    const layer = document.getElementById('active-aifx-layer');
+    const ALL_MODES: BgMode[] = ['standard', 'topo', 'dither', 'ascii', 'dots', 'blocky', 'shimmer', 'off'];
+
+    const stdCanvas = document.getElementById('standard-canvas') as HTMLCanvasElement | null;
+    const aifxLayer = document.getElementById('active-aifx-layer');
     const switcher = document.getElementById('bg-style-switcher');
+    const closeBtn = document.getElementById('bg-close-btn');
     const buttons = switcher?.querySelectorAll<HTMLButtonElement>('.bg-mode-btn') || [];
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-    if (!layer) return;
+    const stdCtx = stdCanvas?.getContext('2d', { alpha: true });
 
-    // Calibrated subtle opacity per effect so they blend seamlessly into the #0d1117 cockpit background
-    const FX_OPACITIES: Record<Exclude<BgMode, 'off'>, number> = {
-      topo: 0.80,
-      dither: 0.78,
-      ascii: 0.72,
-      dots: 0.78,
-      blocky: 0.75,
-      shimmer: 0.85
+    // Restored original canvas state
+    let stdWidth = 0;
+    let stdHeight = 0;
+    let stdDpr = 1;
+    let stdRafId: number | null = null;
+
+    // Calibrated subtle opacities for the WebGL effects so they blend smoothly into #0d1117 without feeling out of place
+    const FX_OPACITIES: Record<string, number> = {
+      topo: 0.46,
+      dither: 0.42,
+      ascii: 0.38,
+      dots: 0.44,
+      blocky: 0.40,
+      shimmer: 0.48
     };
 
     // Full custom tuned configs from remix sessions
-    const FX_CONFIGS: Record<Exclude<BgMode, 'off'>, Record<string, string>> = {
+    const FX_CONFIGS: Record<string, Record<string, string>> = {
       topo: {
         'data-aifx': 'topo-lines',
         'data-aifx-colors': '#34d399,#10b981,#047857,#064e3b',
@@ -145,37 +179,136 @@
       }
     };
 
-    let currentMode: BgMode = (localStorage.getItem('site_bg_mode') as BgMode) || 'topo';
+    // Standard mode is the default
+    let savedMode = localStorage.getItem('site_bg_mode') as BgMode | null;
+    let currentMode: BgMode = (savedMode && ALL_MODES.includes(savedMode)) ? savedMode : 'standard';
+
+    // -------------------------------------------------------------
+    // OUR ORIGINAL TOPO (Smooth topographic contour elevation waves)
+    // -------------------------------------------------------------
+    function renderStandardTopo(time: number) {
+      if (!stdCtx) return;
+      stdCtx.clearRect(0, 0, stdWidth, stdHeight);
+
+      const lineCount = Math.max(12, Math.floor(stdHeight / 65));
+      const spacing = stdHeight / (lineCount - 2);
+
+      for (let i = 0; i < lineCount; i++) {
+        const baseY = (i - 1) * spacing;
+        stdCtx.beginPath();
+        stdCtx.moveTo(-40, baseY);
+
+        const step = 24;
+        for (let x = -40; x <= stdWidth + 40; x += step) {
+          const wave1 = Math.sin(x * 0.0024 + time * 0.0003 + i * 0.35) * 32;
+          const wave2 = Math.cos(x * 0.006 - time * 0.00025 + i * 0.5) * 18;
+          const wave3 = Math.sin((x + baseY) * 0.0018 + time * 0.00015) * 22;
+          const y = baseY + wave1 + wave2 + wave3;
+          stdCtx.lineTo(x, y);
+        }
+
+        const ratio = i / lineCount;
+        let strokeColor;
+        if (ratio < 0.45) {
+          strokeColor = `rgba(16, 185, 129, ${0.12 + ratio * 0.16})`; // emerald
+        } else if (ratio < 0.8) {
+          strokeColor = `rgba(56, 189, 248, ${0.14 + (ratio - 0.45) * 0.16})`; // cyan
+        } else {
+          strokeColor = `rgba(167, 139, 250, ${0.16 + (ratio - 0.8) * 0.16})`; // purple
+        }
+
+        stdCtx.strokeStyle = strokeColor;
+        stdCtx.lineWidth = 1.3;
+        stdCtx.stroke();
+      }
+    }
+
+    function stdLoop(time: number) {
+      if (currentMode !== 'standard') return;
+      if (motionQuery.matches) {
+        renderStandardTopo(0);
+        return;
+      }
+      renderStandardTopo(time);
+      stdRafId = requestAnimationFrame(stdLoop);
+    }
+
+    function resizeStdCanvas() {
+      if (!stdCanvas || !stdCtx) return;
+      stdDpr = Math.min(window.devicePixelRatio || 1, 2);
+      stdWidth = window.innerWidth;
+      stdHeight = window.innerHeight;
+      stdCanvas.width = Math.round(stdWidth * stdDpr);
+      stdCanvas.height = Math.round(stdHeight * stdDpr);
+      stdCtx.setTransform(stdDpr, 0, 0, stdDpr, 0, 0);
+
+      if (currentMode === 'standard') {
+        renderStandardTopo(0);
+      }
+    }
 
     function applyEffect(mode: BgMode) {
-      if (!layer) return;
+      // 1. Handle Standard Canvas (our original Topo)
+      if (mode === 'standard') {
+        if (aifxLayer) {
+          aifxLayer.style.display = 'none';
+          const existingAttrs = Array.from(aifxLayer.attributes).map(a => a.name);
+          for (const attr of existingAttrs) {
+            if (attr.startsWith('data-aifx')) aifxLayer.removeAttribute(attr);
+          }
+        }
+        if (stdCanvas) {
+          stdCanvas.style.display = 'block';
+          stdCanvas.style.opacity = '0.88';
+        }
+        if (stdRafId) cancelAnimationFrame(stdRafId);
+        if (motionQuery.matches) {
+          renderStandardTopo(0);
+        } else {
+          stdRafId = requestAnimationFrame(stdLoop);
+        }
+        return;
+      }
 
-      // Clean existing attributes
-      const existingAttrs = Array.from(layer.attributes).map(a => a.name);
+      // Stop standard canvas loop if switching away
+      if (stdRafId) {
+        cancelAnimationFrame(stdRafId);
+        stdRafId = null;
+      }
+      if (stdCanvas && stdCtx) {
+        stdCanvas.style.display = 'none';
+        stdCtx.clearRect(0, 0, stdWidth, stdHeight);
+      }
+
+      // 2. Handle Off or Reduced Motion
+      if (!aifxLayer) return;
+
+      const existingAttrs = Array.from(aifxLayer.attributes).map(a => a.name);
       for (const attr of existingAttrs) {
         if (attr.startsWith('data-aifx')) {
-          layer.removeAttribute(attr);
+          aifxLayer.removeAttribute(attr);
         }
       }
 
       if (mode === 'off' || motionQuery.matches) {
-        layer.style.display = 'none';
-        layer.innerHTML = '';
+        aifxLayer.style.display = 'none';
+        aifxLayer.innerHTML = '';
         return;
       }
 
-      layer.style.display = 'block';
-      const targetOpacity = FX_OPACITIES[mode] ?? 0.80;
-      layer.style.opacity = String(targetOpacity);
+      // 3. Handle WebGL Effect with calibrated subtle opacity
+      aifxLayer.style.display = 'block';
+      const targetOpacity = FX_OPACITIES[mode] ?? 0.44;
+      aifxLayer.style.opacity = String(targetOpacity);
 
       const config = FX_CONFIGS[mode];
       if (config) {
         for (const [key, value] of Object.entries(config)) {
-          layer.setAttribute(key, value);
+          aifxLayer.setAttribute(key, value);
         }
       }
 
-      // Trigger runtime mount if already loaded
+      // Trigger runtime mount (all shaders preloaded, instant mount!)
       // @ts-ignore
       if (typeof window.AIFX !== 'undefined' && typeof window.AIFX.rescan === 'function') {
         // @ts-ignore
@@ -205,6 +338,26 @@
       applyEffect(mode);
     }
 
+    function cycleMode() {
+      const idx = ALL_MODES.indexOf(currentMode);
+      const nextIdx = (idx + 1) % ALL_MODES.length;
+      setMode(ALL_MODES[nextIdx]);
+    }
+
+    function toggleSwitcher(force?: boolean) {
+      if (!switcher) return;
+      const isCurrentlyHidden = switcher.classList.contains('hidden');
+      const shouldShow = typeof force === 'boolean' ? force : isCurrentlyHidden;
+      if (shouldShow) {
+        switcher.classList.remove('hidden');
+        localStorage.setItem('site_bg_switcher_open', 'true');
+      } else {
+        switcher.classList.add('hidden');
+        localStorage.setItem('site_bg_switcher_open', 'false');
+      }
+    }
+
+    // Button click listeners
     buttons.forEach((btn) => {
       btn.addEventListener('click', () => {
         const mode = btn.getAttribute('data-bg') as BgMode;
@@ -212,16 +365,41 @@
       });
     });
 
-    // Listen for custom terminal command
+    // Close button listener
+    closeBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleSwitcher(false);
+    });
+
+    // Check if user previously closed the switcher
+    if (localStorage.getItem('site_bg_switcher_open') === 'false') {
+      switcher?.classList.add('hidden');
+    }
+
+    // Terminal event listeners
     window.addEventListener('set-bg-mode', ((e: CustomEvent) => {
       if (e.detail) {
-        let target = e.detail.toLowerCase();
+        let target = e.detail.toLowerCase().trim();
+        if (target === 'default') target = 'standard';
         if (target === 'pixel') target = 'blocky';
-        if (['topo', 'dither', 'ascii', 'dots', 'blocky', 'shimmer', 'off'].includes(target)) {
+        if (target === 'noise') target = 'shimmer';
+        if (ALL_MODES.includes(target as BgMode)) {
           setMode(target as BgMode);
         }
       }
     }) as EventListener);
+
+    window.addEventListener('cycle-bg-mode', () => {
+      cycleMode();
+    });
+
+    window.addEventListener('toggle-bg-switcher', ((e: CustomEvent) => {
+      const force = e.detail && typeof e.detail.show === 'boolean' ? e.detail.show : undefined;
+      toggleSwitcher(force);
+    }) as EventListener);
+
+    // Window resize
+    window.addEventListener('resize', resizeStdCanvas, { passive: true });
 
     // prefers-reduced-motion listener
     motionQuery.addEventListener('change', () => {
@@ -229,6 +407,7 @@
     });
 
     // Initial setup
+    resizeStdCanvas();
     setMode(currentMode);
   })();
 </script>
@@ -239,7 +418,8 @@
   }
 
   /* Smooth opacity transition so effect blends seamlessly into #0d1117 */
-  #active-aifx-layer {
+  #active-aifx-layer,
+  #standard-canvas {
     transition: opacity 0.6s ease;
   }
 
@@ -251,7 +431,7 @@
     visibility: hidden !important;
   }
 
-  /* prefers-reduced-motion: hide canvas, keep calm solid background */
+  /* prefers-reduced-motion: hide WebGL canvas, keep calm resting canvas */
   @media (prefers-reduced-motion: reduce) {
     #active-aifx-layer {
       display: none !important;

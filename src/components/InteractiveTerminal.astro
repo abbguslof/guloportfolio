@@ -1568,31 +1568,50 @@ ${escapeHtml(node.content)}
 
       bg: (args) => {
         let mode = (args[0] || '').toLowerCase().trim();
-        if (mode === 'pixel') mode = 'blocky';
-        if (mode === 'noise') mode = 'shimmer';
-        const validModes = ['topo', 'dither', 'ascii', 'dots', 'blocky', 'shimmer', 'off'];
         const _l = getSiteLang();
-        if (!mode) {
-          const current = localStorage.getItem('site_bg_mode') || 'topo';
+        const validModes = ['standard', 'topo', 'dither', 'ascii', 'dots', 'blocky', 'shimmer', 'off'];
+
+        // 1. Cycle to next background style
+        if (mode === 'next' || mode === 'cycle') {
+          window.dispatchEvent(new CustomEvent('cycle-bg-mode'));
+          const current = localStorage.getItem('site_bg_mode') || 'standard';
+          return `<div class="text-[#10b981] font-mono">${_l === 'sv' ? 'Växlade till nästa bakgrundsstil:' : 'Cycled to next background style:'} <span class="font-bold">${escapeHtml(current)}</span></div>`;
+        }
+
+        // 2. Toggle corner HUD box
+        if (!mode || mode === 'toggle' || mode === 'hud' || mode === 'box') {
+          window.dispatchEvent(new CustomEvent('toggle-bg-switcher'));
+          const current = localStorage.getItem('site_bg_mode') || 'standard';
+          const isNowOpen = localStorage.getItem('site_bg_switcher_open') !== 'false';
           return `
 <div class="space-y-1 font-mono text-xs">
   <div>${_l === 'sv' ? 'Aktiv bakgrundsstil:' : 'Active background style:'} <span class="text-[#10b981] font-bold">${escapeHtml(current)}</span></div>
-  <div class="text-[#8b949e]">${_l === 'sv' ? 'Tillgängliga stilar:' : 'Available styles:'} 
+  <div class="text-[#8b949e]">${_l === 'sv' ? 'Hörnpanel (HUD):' : 'Corner HUD:'} <span class="text-[#38bdf8] font-bold">${isNowOpen ? (_l === 'sv' ? 'SYNLIG' : 'VISIBLE') : (_l === 'sv' ? 'DOLD' : 'HIDDEN')}</span></div>
+  <div class="text-[#8b949e] text-[11px] pt-1">
+    ${_l === 'sv' ? 'Byt stil med:' : 'Switch styles with:'} 
+    <code class="text-[#38bdf8]">bg standard</code>, 
     <code class="text-[#38bdf8]">bg topo</code>, 
     <code class="text-[#38bdf8]">bg dither</code>, 
     <code class="text-[#38bdf8]">bg ascii</code>, 
     <code class="text-[#38bdf8]">bg dots</code>, 
     <code class="text-[#38bdf8]">bg pixel</code>, 
     <code class="text-[#38bdf8]">bg shimmer</code>, 
-    <code class="text-[#38bdf8]">bg off</code>
+    <code class="text-[#38bdf8]">bg off</code>,
+    <code class="text-[#38bdf8]">bg next</code>
   </div>
 </div>`;
         }
+
+        // Normalize mode aliases
+        if (mode === 'default') mode = 'standard';
+        if (mode === 'pixel') mode = 'blocky';
+        if (mode === 'noise') mode = 'shimmer';
+
         if (validModes.includes(mode)) {
           window.dispatchEvent(new CustomEvent('set-bg-mode', { detail: mode }));
           return `<div class="text-[#10b981] font-mono">${_l === 'sv' ? 'Bakgrundsstil ändrad till:' : 'Background style set to:'} <span class="font-bold">${escapeHtml(mode)}</span></div>`;
         }
-        return `<div class="text-[#f85149] font-mono">${_l === 'sv' ? 'Ogiltig stil. Välj mellan: topo, dither, ascii, dots, pixel, shimmer, off.' : 'Invalid style. Choose from: topo, dither, ascii, dots, pixel, shimmer, off.'}</div>`;
+        return `<div class="text-[#f85149] font-mono">${_l === 'sv' ? 'Ogiltig stil. Välj mellan: standard, topo, dither, ascii, dots, pixel, shimmer, off, next.' : 'Invalid style. Choose from: standard, topo, dither, ascii, dots, pixel, shimmer, off, next.'}</div>`;
       },
 
       secret: () => {
@@ -1604,22 +1623,23 @@ ${escapeHtml(node.content)}
   </div>
   <div class="text-[#8b949e]">
     ${_l === 'sv' 
-      ? 'Du hittade grafikdrivrutinen! Använd kommandot <code class="text-[#10b981] font-bold">bg &lt;stil&gt;</code> för att byta bakgrundsdynamik:'
-      : 'You found the display driver! Use <code class="text-[#10b981] font-bold">bg &lt;style&gt;</code> to switch background styles:'}
+      ? 'Du har hittat grafikdrivrutinen! Använd kommandot <code class="text-[#10b981] font-bold">bg &lt;stil&gt;</code> eller <code class="text-[#10b981] font-bold">bg next</code> för att styra bakgrunden:'
+      : 'You found the display driver! Use <code class="text-[#10b981] font-bold">bg &lt;style&gt;</code> or <code class="text-[#10b981] font-bold">bg next</code> to control the background:'}
   </div>
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 pl-2 text-[11px]">
-    <div><span class="text-[#10b981] font-semibold">bg topo</span> : Topografiska kurvor (Standard)</div>
+    <div><span class="text-[#10b981] font-semibold">bg standard</span> : Ursprunglig mjuk topo (Standard)</div>
+    <div><span class="text-[#10b981] font-semibold">bg topo</span> : WebGL topografiska kurvor</div>
     <div><span class="text-[#10b981] font-semibold">bg dither</span> : Retro 4-färg Bayer dither</div>
     <div><span class="text-[#10b981] font-semibold">bg ascii</span> : CRT phosphor terminal matrix</div>
-    <div><span class="text-[#10b981] font-semibold">bg dots</span> : Interaktiv vågmatris</div>
+    <div><span class="text-[#10b981] font-semibold">bg dots</span> : Interaktiv partikelvåg</div>
     <div><span class="text-[#10b981] font-semibold">bg pixel</span> : Cybernetisk blockgrid</div>
     <div><span class="text-[#10b981] font-semibold">bg shimmer</span> : Eterisk smaragddimma &amp; filmkorn</div>
     <div><span class="text-[#f85149] font-semibold">bg off</span> : Helt avstängd bakgrund</div>
   </div>
   <div class="text-[11px] text-[#8b949e] pt-1 border-t border-[#30363d]/40">
     ${_l === 'sv' 
-      ? 'Tips: Tryck <kbd class="text-[#10b981]">Tab</kbd> efter <code class="text-[#38bdf8]">bg </code> för att autokomplettera stilarna.'
-      : 'Protip: Press <kbd class="text-[#10b981]">Tab</kbd> after <code class="text-[#38bdf8]">bg </code> to autocomplete styles.'}
+      ? 'Tips: Skriv <code class="text-[#38bdf8]">bg</code> för att visa/dölja hörnpanelen, eller tryck <kbd class="text-[#10b981]">Tab</kbd> efter <code class="text-[#38bdf8]">bg </code>.'
+      : 'Protip: Type <code class="text-[#38bdf8]">bg</code> to toggle the corner HUD, or press <kbd class="text-[#10b981]">Tab</kbd> after <code class="text-[#38bdf8]">bg </code>.'}
   </div>
 </div>`;
       },
@@ -1779,7 +1799,7 @@ ${escapeHtml(node.content)}
             'help', 'school', 'swim', 'whoami', 'contact', 'discord', 'phone', 'number', 'kontakt',
             'ls', 'cd', 'cat', 'pwd', 'grep', 'open', 'projects', 'thoughts', 'files', 'clear', 
             'date', 'uptime', 'fastfetch', 'neofetch', 'fetch', 'tldr', 'study', 'sleep', 'mc', 
-            'bg', 'background', 'secret', 'matrix', 'alias', 'whoisgulo', 'gulo', 'exit'
+            'alias', 'whoisgulo', 'gulo', 'exit'
           ];
           const matches = cmdList.filter(c => c.startsWith(lastToken.toLowerCase()));
 
@@ -1803,7 +1823,7 @@ ${escapeHtml(node.content)}
         let availableItems: string[] = [];
 
         if ((mainCmd === 'bg' || mainCmd === 'background') && tokens.length === 2) {
-          availableItems = ['topo', 'dither', 'ascii', 'dots', 'pixel', 'shimmer', 'off'];
+          availableItems = ['standard', 'topo', 'dither', 'ascii', 'dots', 'pixel', 'shimmer', 'off', 'next'];
           const matches = availableItems.filter(item => item.toLowerCase().startsWith(lastToken.toLowerCase()));
           if (matches.length === 1) {
             tokens[tokens.length - 1] = matches[0];
