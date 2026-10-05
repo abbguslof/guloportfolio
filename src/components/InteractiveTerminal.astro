@@ -745,15 +745,16 @@ const dynamicFileSystem = {
       restoreWindow();
 
       // 4. Autoscrolla terminalen till botten så att senaste output och prompt alltid syns vid overflow
-      if (termBody) {
-        termBody.scrollTop = termBody.scrollHeight;
-        requestAnimationFrame(() => {
-          if (termBody) termBody.scrollTop = termBody.scrollHeight;
-        });
-        setTimeout(() => {
-          if (termBody) termBody.scrollTop = termBody.scrollHeight;
-        }, 50);
-      }
+      const scrollToBottom = () => {
+        if (termBody) {
+          termBody.scrollTop = termBody.scrollHeight;
+        }
+      };
+      scrollToBottom();
+      requestAnimationFrame(scrollToBottom);
+      setTimeout(scrollToBottom, 50);
+      setTimeout(scrollToBottom, 150);
+      setTimeout(scrollToBottom, 300);
 
       // 5. Återställ sidans scrollposition exakt utan att rycka hela sidan
       const savedWindowY = sessionStorage.getItem('terminal_nav_scroll_y');
@@ -1328,6 +1329,9 @@ ${escapeHtml(node.content)}
       input.focus({ preventScroll: true });
       if (termBody) {
         termBody.scrollTop = termBody.scrollHeight;
+        requestAnimationFrame(() => {
+          if (termBody) termBody.scrollTop = termBody.scrollHeight;
+        });
       }
     }
 
@@ -1356,7 +1360,12 @@ ${escapeHtml(node.content)}
         history.appendChild(cancelRow);
         input.value = '';
         historyIndex = cmdHistory.length;
-        history.scrollTop = history.scrollHeight;
+        if (termBody) {
+          termBody.scrollTop = termBody.scrollHeight;
+          requestAnimationFrame(() => {
+            if (termBody) termBody.scrollTop = termBody.scrollHeight;
+          });
+        }
         return;
       }
 
@@ -1509,6 +1518,9 @@ ${escapeHtml(node.content)}
           history.appendChild(hint);
           if (termBody) {
             termBody.scrollTop = termBody.scrollHeight;
+            requestAnimationFrame(() => {
+              if (termBody) termBody.scrollTop = termBody.scrollHeight;
+            });
           }
         }
       }
