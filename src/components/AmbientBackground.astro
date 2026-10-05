@@ -1,82 +1,413 @@
 ---
-// src/components/AmbientBackground.astro - Super minimal, calm ambient background
-// Pure CSS, ultra-low opacity, zero noise, respects prefers-reduced-motion
+// src/components/AmbientBackground.astro - Interactive Multi-style Background
+// Supports the 4 styles: Topo Lines, Noise Shimmer, ASCII, and Dither + Off
+// Fully respects prefers-reduced-motion, GPU-optimized, 0 external dependencies
 ---
 
 <div id="ambient-bg-container" class="fixed inset-0 pointer-events-none overflow-hidden select-none z-0" aria-hidden="true">
-  <!-- Subtle, calm ambient glow: very soft and slow -->
-  <div class="ambient-glow glow-top"></div>
-  <div class="ambient-glow glow-bottom"></div>
+  <!-- HTML5 Canvas for Topo, ASCII and Dither modes -->
+  <canvas id="ambient-canvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
 
-  <!-- Ultra-subtle, crisp tech dot grid -->
-  <div class="ambient-grid"></div>
+  <!-- CSS Shimmer Layer for Noise Shimmer mode -->
+  <div id="ambient-shimmer-layer" class="absolute inset-0 pointer-events-none hidden">
+    <div class="shimmer-blob s-blob-1"></div>
+    <div class="shimmer-blob s-blob-2"></div>
+    <div class="shimmer-blob s-blob-3"></div>
+    <div class="shimmer-grain"></div>
+  </div>
 </div>
+
+<!-- Interactive Live Switcher in bottom-right so user can test and choose easily -->
+<aside 
+  id="bg-style-switcher" 
+  class="fixed bottom-3 right-3 sm:bottom-4 sm:right-4 z-40 flex items-center gap-1 p-1 rounded-lg bg-[#161b22]/95 border border-[#30363d] backdrop-blur-md text-[11px] font-mono shadow-xl select-none transition-opacity duration-300"
+  aria-label="Background style picker"
+>
+  <span class="text-[#8b949e] pl-1.5 pr-1 hidden md:inline text-[10px] font-bold uppercase tracking-wider">BG:</span>
+  <button type="button" data-bg="topo" class="bg-mode-btn px-2 py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]">
+    Topo
+  </button>
+  <button type="button" data-bg="shimmer" class="bg-mode-btn px-2 py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]">
+    Shimmer
+  </button>
+  <button type="button" data-bg="ascii" class="bg-mode-btn px-2 py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]">
+    ASCII
+  </button>
+  <button type="button" data-bg="dither" class="bg-mode-btn px-2 py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]">
+    Dither
+  </button>
+  <button type="button" data-bg="off" class="bg-mode-btn px-1.5 py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#f85149]" title="Turn background off">
+    Off
+  </button>
+</aside>
+
+<script>
+  (function initAmbientEngine() {
+    type BgMode = 'topo' | 'shimmer' | 'ascii' | 'dither' | 'off';
+
+    const canvas = document.getElementById('ambient-canvas') as HTMLCanvasElement | null;
+    const shimmerLayer = document.getElementById('ambient-shimmer-layer');
+    const switcher = document.getElementById('bg-style-switcher');
+    const buttons = switcher?.querySelectorAll<HTMLButtonElement>('.bg-mode-btn') || [];
+
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d', { alpha: true });
+    if (!ctx) return;
+
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    let currentMode: BgMode = (localStorage.getItem('site_bg_mode') as BgMode) || 'topo';
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+    let rafId: number | null = null;
+    let startTime = performance.now();
+
+    function resize() {
+      if (!canvas) return;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      ctx?.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      // Render static frame immediately if reduced motion
+      if (motionQuery.matches) {
+        renderFrame(0);
+      }
+    }
+
+    // -------------------------------------------------------------
+    // 1. TOPO LINES (Smooth topographic contour elevation waves)
+    // -------------------------------------------------------------
+    function renderTopo(time: number) {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, width, height);
+
+      const lineCount = Math.max(12, Math.floor(height / 65));
+      const spacing = height / (lineCount - 2);
+
+      for (let i = 0; i < lineCount; i++) {
+        const baseY = (i - 1) * spacing;
+        ctx.beginPath();
+        ctx.moveTo(-40, baseY);
+
+        const step = 24;
+        for (let x = -40; x <= width + 40; x += step) {
+          const wave1 = Math.sin(x * 0.0024 + time * 0.0003 + i * 0.35) * 32;
+          const wave2 = Math.cos(x * 0.006 - time * 0.00025 + i * 0.5) * 18;
+          const wave3 = Math.sin((x + baseY) * 0.0018 + time * 0.00015) * 22;
+          const y = baseY + wave1 + wave2 + wave3;
+          ctx.lineTo(x, y);
+        }
+
+        const ratio = i / lineCount;
+        let strokeColor;
+        if (ratio < 0.45) {
+          strokeColor = `rgba(16, 185, 129, ${0.12 + ratio * 0.16})`; // emerald
+        } else if (ratio < 0.8) {
+          strokeColor = `rgba(56, 189, 248, ${0.14 + (ratio - 0.45) * 0.16})`; // cyan
+        } else {
+          strokeColor = `rgba(167, 139, 250, ${0.16 + (ratio - 0.8) * 0.16})`; // purple
+        }
+
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = 1.3;
+        ctx.stroke();
+      }
+    }
+
+    // -------------------------------------------------------------
+    // 2. ASCII MATRIX (Procedural flowing terminal character field)
+    // -------------------------------------------------------------
+    const asciiChars = [' ', '·', ':', '+', '*', 'x', '#', '@'];
+    function renderAscii(time: number) {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, width, height);
+
+      const cellSize = 32;
+      const cols = Math.ceil(width / cellSize);
+      const rows = Math.ceil(height / cellSize);
+
+      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      const t = time * 0.0004;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const x = c * cellSize + cellSize / 2;
+          const y = r * cellSize + cellSize / 2;
+
+          // Spatial wave formula for organic density flow
+          const val = Math.sin(c * 0.18 + t) + Math.cos(r * 0.22 - t * 0.8) + Math.sin((c + r) * 0.12 + t * 0.5);
+          const norm = (val + 3) / 6; // 0 to 1
+
+          if (norm < 0.35) continue; // Sparse background
+
+          const charIndex = Math.min(asciiChars.length - 1, Math.floor(norm * asciiChars.length));
+          const ch = asciiChars[charIndex];
+
+          const alpha = 0.08 + norm * 0.22;
+          if (norm > 0.7) {
+            ctx.fillStyle = `rgba(16, 185, 129, ${alpha})`; // emerald highlight
+          } else if (norm > 0.5) {
+            ctx.fillStyle = `rgba(56, 189, 248, ${alpha})`; // cyan midtone
+          } else {
+            ctx.fillStyle = `rgba(139, 148, 158, ${alpha * 0.7})`; // muted
+          }
+
+          ctx.fillText(ch, x, y);
+        }
+      }
+    }
+
+    // -------------------------------------------------------------
+    // 3. DITHER (Bayer 4x4 matrix quantized plasma wave)
+    // -------------------------------------------------------------
+    const bayer4 = [
+      [ 0,  8,  2, 10],
+      [12,  4, 14,  6],
+      [ 3, 11,  1,  9],
+      [15,  7, 13,  5]
+    ];
+
+    function renderDither(time: number) {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, width, height);
+
+      const pixelSize = 8; // Chunky retro riso pixel size
+      const cols = Math.ceil(width / pixelSize);
+      const rows = Math.ceil(height / pixelSize);
+
+      const t = time * 0.00035;
+
+      for (let r = 0; r < rows; r += 2) {
+        for (let c = 0; c < cols; c += 2) {
+          const fx = c * 0.035;
+          const fy = r * 0.035;
+          const plasma = (Math.sin(fx + t) + Math.cos(fy - t * 0.7) + Math.sin((fx + fy) * 0.5 + t * 0.5) + 3) / 6;
+
+          const threshold = bayer4[r % 4][c % 4] / 16;
+          if (plasma > threshold) {
+            const x = c * pixelSize;
+            const y = r * pixelSize;
+
+            const alpha = 0.06 + plasma * 0.16;
+            if (plasma > 0.65) {
+              ctx.fillStyle = `rgba(16, 185, 129, ${alpha})`;
+            } else if (plasma > 0.45) {
+              ctx.fillStyle = `rgba(56, 189, 248, ${alpha})`;
+            } else {
+              ctx.fillStyle = `rgba(167, 139, 250, ${alpha * 0.8})`;
+            }
+
+            ctx.fillRect(x, y, pixelSize * 1.8, pixelSize * 1.8);
+          }
+        }
+      }
+    }
+
+    // Render single frame based on currentMode
+    function renderFrame(now: number) {
+      if (currentMode === 'topo') {
+        renderTopo(now);
+      } else if (currentMode === 'ascii') {
+        renderAscii(now);
+      } else if (currentMode === 'dither') {
+        renderDither(now);
+      } else {
+        ctx?.clearRect(0, 0, width, height);
+      }
+    }
+
+    // Animation Loop
+    function loop(now: number) {
+      if (motionQuery.matches) {
+        renderFrame(0);
+        return;
+      }
+
+      if (currentMode === 'topo' || currentMode === 'ascii' || currentMode === 'dither') {
+        renderFrame(now);
+        rafId = requestAnimationFrame(loop);
+      } else {
+        ctx?.clearRect(0, 0, width, height);
+        rafId = null;
+      }
+    }
+
+    function setMode(mode: BgMode) {
+      currentMode = mode;
+      localStorage.setItem('site_bg_mode', mode);
+
+      // UI switcher button states
+      buttons.forEach((btn) => {
+        const isActive = btn.getAttribute('data-bg') === mode;
+        btn.classList.toggle('bg-[#0d1117]', isActive);
+        btn.classList.toggle('border', isActive);
+        btn.classList.toggle('border-[#10b981]/50', isActive);
+        btn.classList.toggle('text-[#10b981]', isActive);
+        btn.classList.toggle('font-bold', isActive);
+        btn.classList.toggle('shadow-sm', isActive);
+        if (!isActive) {
+          btn.classList.remove('bg-[#0d1117]', 'border', 'border-[#10b981]/50', 'text-[#10b981]', 'font-bold', 'shadow-sm');
+          btn.classList.add('text-[#8b949e]');
+        }
+      });
+
+      // Shimmer layer toggle
+      if (shimmerLayer) {
+        if (mode === 'shimmer') {
+          shimmerLayer.classList.remove('hidden');
+        } else {
+          shimmerLayer.classList.add('hidden');
+        }
+      }
+
+      // Canvas animation toggle
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+
+      if (mode === 'topo' || mode === 'ascii' || mode === 'dither') {
+        canvas.style.display = 'block';
+        if (motionQuery.matches) {
+          renderFrame(0);
+        } else {
+          rafId = requestAnimationFrame(loop);
+        }
+      } else {
+        ctx?.clearRect(0, 0, width, height);
+        if (mode === 'off') {
+          canvas.style.display = 'none';
+        }
+      }
+    }
+
+    // Event listeners
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const mode = btn.getAttribute('data-bg') as BgMode;
+        if (mode) setMode(mode);
+      });
+    });
+
+    window.addEventListener('resize', resize, { passive: true });
+
+    // Handle prefers-reduced-motion toggling
+    motionQuery.addEventListener('change', (e) => {
+      if (e.matches) {
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+        renderFrame(0);
+      } else {
+        if (currentMode === 'topo' || currentMode === 'ascii' || currentMode === 'dither') {
+          rafId = requestAnimationFrame(loop);
+        }
+      }
+    });
+
+    // Custom terminal command bridge (allows user to run e.g. "bg ascii" in terminal)
+    window.addEventListener('set-bg-mode', ((e: CustomEvent) => {
+      if (e.detail && ['topo', 'shimmer', 'ascii', 'dither', 'off'].includes(e.detail)) {
+        setMode(e.detail as BgMode);
+      }
+    }) as EventListener);
+
+    resize();
+    setMode(currentMode);
+  })();
+</script>
 
 <style>
   #ambient-bg-container {
     background-color: transparent;
   }
 
-  /* Super soft, slow, breathing ambient gradients */
-  .ambient-glow {
+  /* -------------------------------------------------------------
+     SHIMMER LAYER (Pure fluid iridescent ribbons + fine grain)
+     ------------------------------------------------------------- */
+  #ambient-shimmer-layer {
+    position: absolute;
+    inset: 0;
+  }
+
+  .shimmer-blob {
     position: absolute;
     border-radius: 9999px;
     filter: blur(120px);
     pointer-events: none;
-    will-change: opacity, transform;
+    will-change: transform, opacity;
   }
 
-  /* Top subtle emerald / cyan aura */
-  .glow-top {
-    width: 600px;
-    height: 320px;
-    top: -60px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.09) 0%, rgba(56, 189, 248, 0.04) 50%, transparent 80%);
-    animation: pulse-slow 16s ease-in-out infinite alternate;
-  }
-
-  /* Bottom subtle cyan / violet aura */
-  .glow-bottom {
+  .s-blob-1 {
     width: 650px;
-    height: 350px;
-    bottom: -80px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: radial-gradient(ellipse at center, rgba(56, 189, 248, 0.06) 0%, rgba(167, 139, 250, 0.03) 50%, transparent 80%);
-    animation: pulse-slow 20s ease-in-out infinite alternate 4s;
+    height: 650px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, rgba(16, 185, 129, 0.05) 50%, transparent 75%);
+    top: -80px;
+    left: -100px;
+    animation: shimmer-drift-1 22s ease-in-out infinite alternate;
   }
 
-  @keyframes pulse-slow {
-    0% {
-      opacity: 0.45;
-      transform: translateX(-50%) scale(0.95);
-    }
-    100% {
-      opacity: 0.85;
-      transform: translateX(-50%) scale(1.05);
-    }
+  .s-blob-2 {
+    width: 750px;
+    height: 750px;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.20) 0%, rgba(56, 189, 248, 0.05) 50%, transparent 75%);
+    bottom: -100px;
+    right: -120px;
+    animation: shimmer-drift-2 26s ease-in-out infinite alternate;
   }
 
-  /* Ultra-subtle, crisp dot grid */
-  .ambient-grid {
+  .s-blob-3 {
+    width: 550px;
+    height: 550px;
+    background: radial-gradient(circle, rgba(167, 139, 250, 0.16) 0%, rgba(167, 139, 250, 0.04) 50%, transparent 75%);
+    top: 35%;
+    left: 40%;
+    animation: shimmer-drift-3 24s ease-in-out infinite alternate;
+  }
+
+  @keyframes shimmer-drift-1 {
+    0% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(140px, 90px, 0) scale(1.15); }
+    100% { transform: translate3d(-60px, 150px, 0) scale(0.92); }
+  }
+
+  @keyframes shimmer-drift-2 {
+    0% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(-120px, -90px, 0) scale(1.2); }
+    100% { transform: translate3d(90px, -130px, 0) scale(0.88); }
+  }
+
+  @keyframes shimmer-drift-3 {
+    0% { transform: translate3d(-50%, -50%, 0) scale(0.92); }
+    50% { transform: translate3d(-35%, -65%, 0) scale(1.22); }
+    100% { transform: translate3d(-65%, -35%, 0) scale(1); }
+  }
+
+  /* Fine analog film grain overlay */
+  .shimmer-grain {
     position: absolute;
     inset: 0;
-    background-image: radial-gradient(rgba(230, 237, 243, 0.08) 1px, transparent 1px);
-    background-size: 24px 24px;
-    opacity: 0.45;
-    mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 20%, transparent 90%);
-    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 20%, transparent 90%);
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    pointer-events: none;
   }
 
-  /* Complete prefers-reduced-motion compliance: completely stops breathing pulse */
+  /* =====================================================================
+     PREFERS-REDUCED-MOTION SUPPORT
+     ===================================================================== */
   @media (prefers-reduced-motion: reduce) {
-    .glow-top,
-    .glow-bottom {
+    .shimmer-blob {
       animation: none !important;
-      opacity: 0.6 !important;
-      transform: translateX(-50%) !important;
+      opacity: 0.14 !important;
+      transform: none !important;
     }
   }
 </style>

@@ -1566,11 +1566,32 @@ ${escapeHtml(node.content)}
         return;
       },
 
+      bg: (args) => {
+        const mode = (args[0] || '').toLowerCase().trim();
+        const validModes = ['topo', 'shimmer', 'ascii', 'dither', 'off'];
+        const _l = getSiteLang();
+        if (!mode) {
+          const current = localStorage.getItem('site_bg_mode') || 'topo';
+          return `
+<div class="space-y-1 font-mono text-xs">
+  <div>${_l === 'sv' ? 'Aktiv bakgrundsstil:' : 'Active background style:'} <span class="text-[#10b981] font-bold">${escapeHtml(current)}</span></div>
+  <div class="text-[#8b949e]">${_l === 'sv' ? 'Välj stil:' : 'Select style:'} <code class="text-[#38bdf8]">bg topo</code>, <code class="text-[#38bdf8]">bg shimmer</code>, <code class="text-[#38bdf8]">bg ascii</code>, <code class="text-[#38bdf8]">bg dither</code>, <code class="text-[#38bdf8]">bg off</code></div>
+</div>`;
+        }
+        if (validModes.includes(mode)) {
+          window.dispatchEvent(new CustomEvent('set-bg-mode', { detail: mode }));
+          return `<div class="text-[#10b981] font-mono">${_l === 'sv' ? 'Bakgrundsstil ändrad till:' : 'Background style set to:'} <span class="font-bold">${escapeHtml(mode)}</span></div>`;
+        }
+        return `<div class="text-[#f85149] font-mono">${_l === 'sv' ? 'Ogiltig stil. Välj mellan: topo, shimmer, ascii, dither, off.' : 'Invalid style. Choose from: topo, shimmer, ascii, dither, off.'}</div>`;
+      },
+
       date: () => `<div class="text-[#8b949e]">${new Date().toLocaleString(getSiteLang() === 'sv' ? 'sv-SE' : 'en-GB')} (Europe/Stockholm)</div>`,
       uptime: () => `<div class="text-[#10b981]">Uptime: ${getSiteLang() === 'sv' ? '42 dagar, 8 timmar' : '42 days, 8 hours'}, load: 0.18, 0.22, 0.35</div>`,
       exit: () => { userCloseWindow(); return; },
       close: () => { userCloseWindow(); return; }
     };
+
+    commands['background'] = commands['bg'];
 
     commands['chalmers'] = commands['school'];
     commands['dir'] = commands['ls'];
@@ -1713,7 +1734,7 @@ ${escapeHtml(node.content)}
             'help', 'school', 'swim', 'whoami', 'contact', 'discord', 'phone', 'number', 'kontakt',
             'ls', 'cd', 'cat', 'pwd', 'grep', 'open', 'projects', 'thoughts', 'files', 'clear', 
             'date', 'uptime', 'fastfetch', 'neofetch', 'fetch', 'tldr', 'study', 'sleep', 'mc', 
-            'alias', 'whoisgulo', 'gulo', 'exit'
+            'bg', 'background', 'alias', 'whoisgulo', 'gulo', 'exit'
           ];
           const matches = cmdList.filter(c => c.startsWith(lastToken.toLowerCase()));
 
