@@ -1,5 +1,5 @@
 ---
-// ProjectCard.astro - Thumbnail-free TUI Project Card (Full Card Clickable)
+// ProjectCard.astro - Thumbnail-free TUI Project Card
 interface Props {
   title: string;
   description: string;
@@ -8,47 +8,22 @@ interface Props {
   tech: string[];
   repoUrl?: string;
   liveUrl?: string;
-  slug?: string;
+  slug: string;
 }
 
-const { title, description, status, category, tech, repoUrl, liveUrl } = Astro.props;
+const { title, description, status, category, tech, repoUrl, liveUrl, slug } = Astro.props;
 
 // Status styling mapping
-const statusMap: Record<string, { label: string; textClass: string; borderClass: string; dotClass: string }> = {
-  ACTIVE: {
-    label: '[● ACTIVE]',
-    textClass: 'text-[#10b981]',
-    borderClass: 'border-[#10b981]/40',
-    dotClass: 'bg-[#10b981]',
-  },
-  COMPLETED: {
-    label: '[✓ COMPLETED]',
-    textClass: 'text-[#38bdf8]',
-    borderClass: 'border-[#38bdf8]/40',
-    dotClass: 'bg-[#38bdf8]',
-  },
-  WIP: {
-    label: '[⚡ WIP]',
-    textClass: 'text-[#f59e0b]',
-    borderClass: 'border-[#f59e0b]/40',
-    dotClass: 'bg-[#f59e0b]',
-  },
-  MAINTAINED: {
-    label: '[⟳ MAINTAINED]',
-    textClass: 'text-[#a78bfa]',
-    borderClass: 'border-[#a78bfa]/40',
-    dotClass: 'bg-[#a78bfa]',
-  },
-  ARCHIVED: {
-    label: '[× ARCHIVED]',
-    textClass: 'text-[#8b949e]',
-    borderClass: 'border-[#8b949e]/40',
-    dotClass: 'bg-[#8b949e]',
-  },
+const statusMap: Record<string, { label: string; textClass: string }> = {
+  ACTIVE: { label: '[● ACTIVE]', textClass: 'text-[#10b981]' },
+  COMPLETED: { label: '[✓ COMPLETED]', textClass: 'text-[#38bdf8]' },
+  WIP: { label: '[⚡ WIP]', textClass: 'text-[#f59e0b]' },
+  MAINTAINED: { label: '[⟳ MAINTAINED]', textClass: 'text-[#a78bfa]' },
+  ARCHIVED: { label: '[× ARCHIVED]', textClass: 'text-[#8b949e]' },
 };
 
 const currentStatus = statusMap[status] || statusMap.ACTIVE;
-const targetLink = repoUrl || liveUrl || '#';
+const projectUrl = `/projects/${slug}`;
 ---
 
 <div class="group relative flex flex-col justify-between p-5 rounded-lg bg-[#161b22] border border-[#30363d] hover:bg-[#1f242c] hover:border-[#38bdf8]/70 hover:shadow-lg transition-all">
@@ -63,11 +38,12 @@ const targetLink = repoUrl || liveUrl || '#';
       </span>
     </div>
 
-    <!-- Title (Primary Click target) -->
+    <!-- Title (Primary Click target -> Goes to /projects/[slug]) -->
     <h3 class="text-base font-semibold text-[#e6edf3] group-hover:text-[#38bdf8] transition-colors mb-2">
-      <a href={targetLink} target={targetLink.startsWith('http') ? '_blank' : '_self'} rel="noopener noreferrer" class="focus:outline-none">
+      <a href={projectUrl} class="focus:outline-none flex items-center justify-between">
         <span class="absolute inset-0" aria-hidden="true"></span>
-        {title}
+        <span>{title}</span>
+        <span class="text-xs text-[#8b949e] group-hover:text-[#38bdf8] group-hover:translate-x-0.5 transition-all">→</span>
       </a>
     </h3>
 
@@ -87,27 +63,25 @@ const targetLink = repoUrl || liveUrl || '#';
       ))}
     </div>
 
-    <!-- Action links -->
-    <div class="flex items-center gap-3 text-xs font-mono">
+    <!-- Secondary external action links -->
+    <div class="flex items-center justify-between text-xs font-mono">
+      <a 
+        href={projectUrl} 
+        class="text-xs text-[#38bdf8] hover:underline z-20 flex items-center gap-1"
+      >
+        <span>[Läs mer om projektet</span>
+        <span class="text-[10px]">→]</span>
+      </a>
+
       {repoUrl && (
         <a 
           href={repoUrl} 
           target="_blank" 
           rel="noopener noreferrer" 
-          class="text-[#38bdf8] hover:text-[#e6edf3] flex items-center gap-1 transition-colors z-20"
+          class="text-[#8b949e] hover:text-[#e6edf3] flex items-center gap-1 transition-colors z-20"
+          title="Visa GitHub repository"
         >
-          <span>[Källkod / Repo</span>
-          <span class="text-[10px] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">↗]</span>
-        </a>
-      )}
-      {liveUrl && (
-        <a 
-          href={liveUrl} 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="text-[#10b981] hover:text-[#e6edf3] flex items-center gap-1 transition-colors z-20"
-        >
-          <span>[Live demo</span>
+          <span>[GitHub</span>
           <span class="text-[10px]">↗]</span>
         </a>
       )}

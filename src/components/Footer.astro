@@ -29,7 +29,7 @@
         </div>
         <div>
           <span class="block text-[#8b949e]">HOST UPTIME:</span>
-          <span class="text-[#10b981]">99.98% / 42d 14h</span>
+          <span class="text-[#10b981]">99.98% / 42d 8h</span>
         </div>
       </div>
     </div>
@@ -67,6 +67,13 @@
         >
           <span>chalmers.se</span><span class="text-[10px]">↗</span>
         </a>
+        <button 
+          type="button" 
+          id="footer-files-trigger" 
+          class="text-[#38bdf8] hover:text-[#e6edf3] hover:underline transition-colors flex items-center gap-1 cursor-pointer"
+        >
+          <span>filer &amp; resurser</span><span class="text-[10px]">↓</span>
+        </button>
       </div>
 
       <div class="text-[11px] text-[#8b949e]">
@@ -75,3 +82,9 @@
     </div>
   </div>
 </footer>
+
+<script>
+  document.getElementById('footer-files-trigger')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('open-files-modal'));
+  });
+</script>

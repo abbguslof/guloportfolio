@@ -1,5 +1,5 @@
 ---
-// ThoughtRow.astro - Minimalist single-row article link
+// ThoughtRow.astro - Minimalist single-row article link with filter tags support
 interface Props {
   title: string;
   slug: string;
@@ -11,11 +11,13 @@ const { title, slug, pubDate, tags = [] } = Astro.props;
 
 // Format date as YYYY-MM-DD
 const formattedDate = pubDate.toISOString().slice(0, 10);
+const tagsData = tags.map((t) => t.toLowerCase()).join(',');
 ---
 
 <a 
   href={`/thoughts/${slug}`}
-  class="group flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 px-3 -mx-3 rounded hover:bg-[#161b22] border-b border-[#30363d]/40 last:border-b-0 transition-colors"
+  class="thought-item group flex flex-col sm:flex-row sm:items-center sm:justify-between py-3.5 px-3 -mx-3 rounded hover:bg-[#161b22] border-b border-[#30363d]/40 last:border-b-0 transition-all"
+  data-tags={tagsData}
 >
   <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 flex-1 pr-2">
     <!-- Date: YYYY-MM-DD -->
@@ -31,7 +33,7 @@ const formattedDate = pubDate.toISOString().slice(0, 10);
 
   <!-- Right: Tag badges & arrow -->
   <div class="flex items-center gap-2 mt-2 sm:mt-0">
-    {tags.slice(0, 2).map((tag) => (
+    {tags.slice(0, 3).map((tag) => (
       <span class="text-[11px] font-mono text-[#8b949e] group-hover:text-[#38bdf8] px-1.5 py-0.5 rounded bg-[#0d1117] border border-[#30363d] transition-colors">
         [{tag}]
       </span>

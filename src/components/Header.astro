@@ -1,5 +1,5 @@
 ---
-// Header.astro - Clean Cockpit Top Navigation (No duplicate window dots or fake prompts)
+// Header.astro - Clean Cockpit Top Navigation
 ---
 
 <header class="border-b border-[#30363d] pb-4 mb-8">
@@ -26,24 +26,27 @@
       <button 
         type="button" 
         id="header-terminal-toggle" 
-        class="px-2 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981] hover:text-[#e6edf3] hover:border-[#10b981] transition-all cursor-pointer flex items-center gap-1"
+        class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981] hover:text-[#e6edf3] hover:border-[#10b981] transition-all cursor-pointer flex items-center gap-1.5"
         title="Fokusera eller öppna terminalen"
       >
         <span>&gt;_</span>
         <span>terminal</span>
       </button>
-      <a href="#now" class="px-2 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#38bdf8] transition-all">
-        just-nu
-      </a>
       <a href="#projects" class="px-2 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#a78bfa] transition-all">
         projekt
       </a>
       <a href="#thoughts" class="px-2 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#f59e0b] transition-all">
         tankar
       </a>
-      <a href="#files" class="px-2 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#2ea043] transition-all">
-        filer
-      </a>
+      <button 
+        type="button" 
+        id="header-files-btn"
+        class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#38bdf8] hover:text-[#e6edf3] hover:border-[#38bdf8] transition-all cursor-pointer flex items-center gap-1"
+        title="Öppna nedladdningsarkiv & resurser"
+      >
+        <span>filer &amp; resurser</span>
+        <span class="text-[10px] bg-[#0d1117] px-1 py-0.2 rounded border border-[#30363d]">2</span>
+      </button>
       <a 
         href="https://github.com" 
         target="_blank" 
@@ -51,18 +54,23 @@
         class="px-2 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#e6edf3] transition-all inline-flex items-center gap-1"
         aria-label="GitHub profil (öppnas i ny flik)"
       >
-        <span>github</span><span class="text-[10px]">↗</span>
+        <span>gh</span><span class="text-[10px]">↗</span>
       </a>
     </nav>
   </div>
 </header>
 
 <script>
-  // Allow header terminal button to wake/focus terminal
+  // Terminal button
   document.getElementById('header-terminal-toggle')?.addEventListener('click', () => {
     window.dispatchEvent(new CustomEvent('restore-terminal'));
-    const term = document.getElementById('terminal-window') || document.getElementById('about');
+    const term = document.getElementById('terminal-window') || document.getElementById('terminal-section');
     term?.scrollIntoView({ behavior: 'smooth' });
     document.getElementById('terminal-input')?.focus();
+  });
+
+  // Files modal trigger
+  document.getElementById('header-files-btn')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('open-files-modal'));
   });
 </script>

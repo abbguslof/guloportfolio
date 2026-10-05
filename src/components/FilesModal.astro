@@ -1,0 +1,163 @@
+---
+// FilesModal.astro - Popup / Drawer för fildelning och resurser
+interface DownloadItem {
+  id?: string;
+  name: string;
+  filename: string;
+  size: string;
+  category: string;
+  fileUrl: string;
+  description: string;
+  updatedAt: string;
+  checksum?: string;
+}
+
+interface Props {
+  downloads: DownloadItem[];
+}
+
+const { downloads } = Astro.props;
+---
+
+<!-- Modal Backdrop & Window -->
+<div 
+  id="files-modal-backdrop" 
+  class="fixed inset-0 z-50 bg-[#0d1117]/80 backdrop-blur-sm hidden flex items-center justify-center p-4"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="modal-title"
+>
+  <div 
+    id="files-modal-content"
+    class="w-full max-w-2xl bg-[#161b22] border border-[#30363d] rounded-lg shadow-2xl overflow-hidden font-mono text-xs animate-in fade-in zoom-in-95 duration-150"
+  >
+    <!-- Modal Header -->
+    <div class="flex items-center justify-between px-5 py-3.5 bg-[#0d1117] border-b border-[#30363d]">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#10b981]"></span>
+        <h3 id="modal-title" class="font-bold text-[#e6edf3] tracking-wide">
+          FILARKIV & RESURSER <span class="text-[#8b949e]">({downloads.length} filer)</span>
+        </h3>
+      </div>
+      <button 
+        type="button" 
+        id="btn-close-files-modal" 
+        class="text-xs px-2 py-0.5 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#f85149] transition-all cursor-pointer"
+        aria-label="Stäng modal"
+      >
+        [Stäng Esc ✕]
+      </button>
+    </div>
+
+    <!-- Modal List -->
+    <div class="p-5 max-h-[70vh] overflow-y-auto space-y-4">
+      <p class="text-xs text-[#8b949e] leading-relaxed pb-1 border-b border-[#30363d]/40">
+        Nedladdningsbara Minecraft-konfigurationer, automatiserade backup-skript och resurser kopplade till mina projekt och anteckningar.
+      </p>
+
+      <div class="space-y-3">
+        {downloads.map((item) => (
+          <div class="p-3.5 rounded bg-[#0d1117] border border-[#30363d] hover:border-[#10b981]/50 transition-all flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="text-[#10b981] font-bold">[{item.category}]</span>
+                <span class="text-sm font-semibold text-[#e6edf3]">{item.name}</span>
+                <span class="text-[#8b949e] text-[11px]">({item.filename})</span>
+              </div>
+              <p class="text-[11px] text-[#8b949e] leading-relaxed">
+                {item.description}
+              </p>
+              <div class="flex flex-wrap items-center gap-2 text-[10px] text-[#8b949e] pt-1">
+                <span>Storlek: <strong class="text-[#e6edf3]">{item.size}</strong></span>
+                <span>•</span>
+                <span>Uppdaterad: {item.updatedAt}</span>
+                {item.checksum && (
+                  <>
+                    <span>•</span>
+                    <button 
+                      type="button" 
+                      class="modal-copy-sha hover:text-[#10b981] transition-colors cursor-pointer"
+                      data-sha={item.checksum}
+                      title="Klicka för att kopiera SHA"
+                    >
+                      SHA: <code>{item.checksum}</code>
+                      <span class="copied-indicator ml-1 text-[#10b981] hidden">✓</span>
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div class="shrink-0 self-start sm:self-center">
+              <a 
+                href={item.fileUrl}
+                download={item.filename}
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#161b22] border border-[#30363d] text-xs font-mono font-medium text-[#10b981] hover:bg-[#10b981] hover:text-[#0d1117] hover:border-[#10b981] transition-all cursor-pointer"
+              >
+                <span>[Ladda ner</span>
+                <span class="text-[10px]">↓]</span>
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="px-5 py-2.5 bg-[#0d1117] border-t border-[#30363d] text-[11px] text-[#8b949e] flex items-center justify-between">
+      <span>Alla filer körs och testas i Linux-miljö.</span>
+      <span>Tryck <kbd class="px-1 py-0.5 rounded bg-[#161b22] border border-[#30363d]">Esc</kbd> för att stänga</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  function initFilesModal() {
+    const backdrop = document.getElementById('files-modal-backdrop');
+    const closeBtn = document.getElementById('btn-close-files-modal');
+    const content = document.getElementById('files-modal-content');
+
+    function openModal() {
+      backdrop?.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      backdrop?.classList.add('hidden');
+    }
+
+    window.addEventListener('open-files-modal', openModal);
+    closeBtn?.addEventListener('click', closeModal);
+
+    backdrop?.addEventListener('click', (e) => {
+      if (e.target === backdrop) closeModal();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !backdrop?.classList.contains('hidden')) {
+        closeModal();
+      }
+    });
+
+    // Copy SHA inside modal
+    document.querySelectorAll('.modal-copy-sha').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const sha = btn.getAttribute('data-sha');
+        if (sha) {
+          navigator.clipboard.writeText(sha).then(() => {
+            const ind = btn.querySelector('.copied-indicator');
+            if (ind) {
+              ind.classList.remove('hidden');
+              setTimeout(() => ind.classList.add('hidden'), 2000);
+            }
+          });
+        }
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFilesModal);
+  } else {
+    initFilesModal();
+  }
+</script>
