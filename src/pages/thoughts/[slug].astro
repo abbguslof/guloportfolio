@@ -18,7 +18,18 @@ const { post } = Astro.props;
 const { Content } = await render(post);
 
 const formattedDate = post.data.pubDate.toISOString().slice(0, 10);
+const category = post.data.category || 'tanke';
 const hasDownloads = post.data.tags.some(t => t.toLowerCase() === 'minecraft' || t.toLowerCase() === 'sysadmin');
+
+let catBadgeClass = 'text-[#f59e0b] border-[#f59e0b]/40 bg-[#f59e0b]/10';
+let catLabel = 'TANKE';
+if (category === 'guide') {
+  catBadgeClass = 'text-[#38bdf8] border-[#38bdf8]/40 bg-[#38bdf8]/10';
+  catLabel = 'GUIDE';
+} else if (category === 'anteckning') {
+  catBadgeClass = 'text-[#10b981] border-[#10b981]/40 bg-[#10b981]/10';
+  catLabel = 'ANTECKNING';
+}
 ---
 
 <Layout 
@@ -56,6 +67,9 @@ const hasDownloads = post.data.tags.some(t => t.toLowerCase() === 'minecraft' ||
     <!-- Article Header -->
     <header class="pb-6 mb-8 border-b border-[#30363d]">
       <div class="flex items-center gap-3 text-xs font-mono text-[#8b949e] mb-3">
+        <span class={`text-[11px] font-bold px-2 py-0.5 rounded border ${catBadgeClass}`}>
+          [{catLabel}]
+        </span>
         <time datetime={formattedDate}>{formattedDate}</time>
         <span>•</span>
         <span>gulo</span>

@@ -2,6 +2,7 @@
 title: "Optimerade JVM-flaggor för PaperMC 1.20"
 description: "Hur jag konfigurerade Aikar's flags och G1GC för stabil 20 TPS under hög serverbelastning."
 pubDate: 2026-03-15
+category: "guide"
 tags: ["Minecraft", "Linux", "Sysadmin"]
 draft: false
 ---

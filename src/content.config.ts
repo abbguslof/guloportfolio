@@ -8,6 +8,7 @@ const thoughts = defineCollection({
     description: z.string().optional(),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
+    category: z.enum(['tanke', 'guide', 'anteckning']).default('tanke'),
     tags: z.array(z.string()).default([]),
     featured: z.boolean().default(false),
     draft: z.boolean().default(false),

@@ -2,6 +2,7 @@
 title: "Från 50m bassängen till tentaveckan på Chalmers"
 description: "Om rytm, mental återhämtning och varför simträning är det bästa botemedlet mot fastkörda algoritmer."
 pubDate: 2026-03-28
+category: "tanke"
 tags: ["Chalmers", "Livet", "Simning", "Datateknik"]
 draft: false
 ---

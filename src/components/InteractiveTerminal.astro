@@ -47,7 +47,8 @@ const rawThoughts = await getCollection('thoughts');
 const thoughtNodes: Record<string, any> = {};
 for (const t of rawThoughts) {
   const dateStr = t.data.pubDate ? new Date(t.data.pubDate).toISOString().split('T')[0] : '2026';
-  const preview = `${t.data.title}\nDatum: ${dateStr} | Taggar: ${(t.data.tags || []).join(', ')}\n\n"${t.data.description}"\n\nLäs hela artikeln: open ${t.id}`;
+  const catLabel = (t.data.category || 'tanke').toUpperCase();
+  const preview = `[${catLabel}] ${t.data.title}\nDatum: ${dateStr} | Kategori: ${t.data.category || 'tanke'} | Taggar: ${(t.data.tags || []).join(', ')}\n\n"${t.data.description}"\n\nLäs hela artikeln: open ${t.id}`;
   thoughtNodes[`${t.id}.md`] = {
     type: 'file',
     size: '1.8 KB',
@@ -359,6 +360,39 @@ const dynamicFileSystem = {
       </form>
     </div>
   </div>
+
+  <!-- Blixtsnabb synk-script för att eliminera split-sekund flimmer vid sidnavigering -->
+  <script is:inline>
+    (function() {
+      try {
+        var sec = document.getElementById('terminal-section');
+        var win = document.getElementById('terminal-window');
+        var card = document.getElementById('terminal-closed-card');
+        if (!sec) return;
+
+        var isSub = sec.getAttribute('data-is-subpage') === 'true';
+        var isDesk = window.innerWidth >= 1024;
+        var viaCli = sessionStorage.getItem('navigated_via_cli') === 'true';
+        var closedByUser = sessionStorage.getItem('terminal_closed_by_user') === 'true';
+
+        if (viaCli) {
+          sec.classList.remove('hidden');
+          if (win) win.classList.remove('hidden');
+          if (card) card.classList.add('hidden');
+        } else if (!isSub && isDesk && !closedByUser) {
+          sec.classList.remove('hidden');
+          if (win) win.classList.remove('hidden');
+          if (card) card.classList.add('hidden');
+        } else if (!isSub && isDesk && closedByUser) {
+          sec.classList.remove('hidden');
+          if (win) win.classList.add('hidden');
+          if (card) card.classList.remove('hidden');
+        } else {
+          sec.classList.add('hidden');
+        }
+      } catch (e) {}
+    })();
+  </script>
 </section>
 
 <script>
@@ -389,8 +423,15 @@ const dynamicFileSystem = {
     let isMinimized = false;
     let isMaximized = false;
 
-    // Stäng (✕)
-    function closeWindow() {
+    // Dölj fönstret internt (anropas vid sidladdning på undersidor / mobil utan att markera closedByUser)
+    function hideWindowInternal() {
+      if (isMaximized) unmaximize();
+      if (isMinimized) unminimize();
+      termSection.classList.add('hidden');
+    }
+
+    // Aktiv användarstängning via ✕-knappen eller 'exit'/'close' i bash
+    function userCloseWindow() {
       if (isMaximized) unmaximize();
       if (isMinimized) unminimize();
       sessionStorage.setItem('terminal_closed_by_user', 'true');
@@ -404,14 +445,15 @@ const dynamicFileSystem = {
       }
     }
 
-    // Återställ fönstret
+    // Återställ och öppna fönstret
     function restoreWindow() {
       sessionStorage.removeItem('terminal_closed_by_user');
       termSection.classList.remove('hidden');
       termWindow.classList.remove('hidden');
       closedCard?.classList.add('hidden');
       if (isMinimized) unminimize();
-      input.focus();
+      updateTitle();
+      setTimeout(() => input.focus(), 50);
     }
 
     // Unmaximize helper
@@ -472,7 +514,7 @@ const dynamicFileSystem = {
 
     btnClose?.addEventListener('click', (e) => {
       e.stopPropagation();
-      closeWindow();
+      userCloseWindow();
     });
 
     btnMinimize?.addEventListener('click', (e) => {
@@ -585,8 +627,12 @@ const dynamicFileSystem = {
       restoreWindow();
     } else if (!isSubpage && isDesktop && !closedByUser) {
       restoreWindow();
+    } else if (!isSubpage && isDesktop && closedByUser) {
+      termWindow.classList.add('hidden');
+      closedCard?.classList.remove('hidden');
+      termSection.classList.remove('hidden');
     } else {
-      closeWindow();
+      hideWindowInternal();
     }
 
     function resolveNode(pathArr: string[]): DirNode | FileNode | null {
@@ -831,7 +877,7 @@ ${escapeHtml(node.content)}
 
       open: (args) => {
         // Behåll alltid terminalen öppen när man navigerar med CLI
-        sessionStorage.setItem('terminal_open', 'true');
+        sessionStorage.setItem('navigated_via_cli', 'true');
 
         const rawTarget = args[0] ? args[0].trim() : '.';
         const target = rawTarget.toLowerCase().replace(/\/$/, '').replace(/\.md$/, '');
@@ -862,51 +908,38 @@ ${escapeHtml(node.content)}
           }
         }
 
-        // 3. Projects
-        if (target.includes('mc-cluster') || target === 'cluster') {
-          window.location.href = '/projects/mc-cluster';
-          return `<div class="text-[#38bdf8]">Navigerar till /projects/mc-cluster...</div>`;
+        // 3. Sök i alla kända underkataloger i virtuella filsystemet
+        for (const [dirName, dirNode] of Object.entries(fileSystem.children)) {
+          if (dirNode.type === 'dir') {
+            for (const [fname, node] of Object.entries(dirNode.children)) {
+              if (node.type === 'file') {
+                const baseFname = fname.toLowerCase().replace(/\.md$/, '');
+                if (target === baseFname || target === fname.toLowerCase()) {
+                  if (node.actionUrl) {
+                    window.location.href = node.actionUrl;
+                    return `<div class="text-[#38bdf8]">Öppnar ${escapeHtml(fname)} (${escapeHtml(node.actionUrl)})...</div>`;
+                  }
+                }
+              }
+            }
+          }
         }
-        // 1. Projects
-        if (target.includes('mc-cluster') || target === 'cluster') {
-          sessionStorage.setItem('navigated_via_cli', 'true');
-          window.location.href = '/projects/mc-cluster';
-          return `<div class="text-[#38bdf8]">Navigerar till /projects/mc-cluster...</div>`;
-        }
-        if (target.includes('sched') || target.includes('chalmers-sys')) {
-          sessionStorage.setItem('navigated_via_cli', 'true');
-          window.location.href = '/projects/chalmers-sys-sched';
-          return `<div class="text-[#38bdf8]">Navigerar till /projects/chalmers-sys-sched...</div>`;
-        }
+
+        // 4. Snabbgenvägar till sektioner
         if (target === 'projects' || target === 'projekt') {
-          sessionStorage.setItem('navigated_via_cli', 'true');
           window.location.href = '/projects';
           return `<div class="text-[#10b981]">Navigerar till /projects...</div>`;
         }
-
-        // 2. Thoughts
-        if (target.includes('simning') || target.includes('chalmers-simning')) {
-          sessionStorage.setItem('navigated_via_cli', 'true');
-          window.location.href = '/thoughts/chalmers-simning-kod';
-          return `<div class="text-[#38bdf8]">Navigerar till /thoughts/chalmers-simning-kod...</div>`;
-        }
-        if (target.includes('jvm') || target.includes('mc-jvm-flags') || target.includes('flags')) {
-          sessionStorage.setItem('navigated_via_cli', 'true');
-          window.location.href = '/thoughts/mc-jvm-flags';
-          return `<div class="text-[#38bdf8]">Navigerar till /thoughts/mc-jvm-flags...</div>`;
-        }
-        if (target === 'thoughts' || target === 'tankar' || target === 'blog' || target === 'blogg') {
-          sessionStorage.setItem('navigated_via_cli', 'true');
+        if (target === 'thoughts' || target === 'tankar' || target === 'blog' || target === 'blogg' || target === 'anteckningar') {
           window.location.href = '/thoughts';
           return `<div class="text-[#10b981]">Navigerar till /thoughts...</div>`;
         }
-
-        // 3. Files downloads / section
         if (target === 'files' || target === 'filer' || target === 'downloads') {
-          sessionStorage.setItem('navigated_via_cli', 'true');
           window.location.href = '/files';
           return `<div class="text-[#10b981]">Navigerar till /files...</div>`;
         }
+
+        // 5. Direktladdningar
         if (target.includes('fabric')) {
           window.location.href = '/downloads/fabric-1.20.4-optimized.zip';
           return `<div class="text-[#10b981]">Laddar ner fabric-1.20.4-optimized.zip...</div>`;
@@ -936,7 +969,7 @@ ${escapeHtml(node.content)}
       thoughts: () => {
         sessionStorage.setItem('navigated_via_cli', 'true');
         window.location.href = '/thoughts';
-        return `<div class="text-[#f59e0b]">Öppnar /thoughts (Blogg)...</div>`;
+        return `<div class="text-[#f59e0b]">Öppnar /thoughts (Blogg & Anteckningar)...</div>`;
       },
 
       files: () => {
@@ -1004,8 +1037,8 @@ ${escapeHtml(node.content)}
 
       date: () => `<div class="text-[#8b949e]">${new Date().toLocaleString('sv-SE')} (Europe/Stockholm)</div>`,
       uptime: () => `<div class="text-[#10b981]">Uptime: 42 dagar, 8 timmar, load: 0.18, 0.22, 0.35</div>`,
-      exit: () => { closeWindow(); return; },
-      close: () => { closeWindow(); return; }
+      exit: () => { userCloseWindow(); return; },
+      close: () => { userCloseWindow(); return; }
     };
 
     commands['chalmers'] = commands['school'];

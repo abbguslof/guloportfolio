@@ -1,10 +1,9 @@
 ---
-// src/pages/thoughts/index.astro - Fullständig Blogg- & Tankesida
+// src/pages/thoughts/index.astro - Fullständig Blogg-, Tanke- & Anteckningsarkiv
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import InteractiveTerminal from '../../components/InteractiveTerminal.astro';
 import Footer from '../../components/Footer.astro';
-import ThoughtRow from '../../components/ThoughtRow.astro';
 import { getCollection } from 'astro:content';
 
 const thoughts = await getCollection('thoughts');
@@ -12,21 +11,27 @@ const sortedThoughts = thoughts
   .filter((post) => !post.data.draft)
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 
+// Räkna antal per kategori
+const countAll = sortedThoughts.length;
+const countTankar = sortedThoughts.filter((t) => t.data.category === 'tanke').length;
+const countGuider = sortedThoughts.filter((t) => t.data.category === 'guide').length;
+const countAnteckningar = sortedThoughts.filter((t) => t.data.category === 'anteckning').length;
+
 const allTags = Array.from(
   new Set(sortedThoughts.flatMap((post) => post.data.tags))
 ).sort();
 ---
 
 <Layout 
-  title="Tankar & Blogg // gulo" 
-  description="Personliga anteckningar om Chalmers Datateknik, simning, Minecraft-servrar, Linux och programmering."
+  title="Tankar, Guider & Anteckningar // gulo" 
+  description="Personliga anteckningar från Chalmers Datateknik, simbassängen, Minecraft homelab och systemprogrammering i C/Linux."
 >
   <Header />
 
   <!-- Global terminal on subpages (opens on header button click) -->
   <InteractiveTerminal isSubpage={true} />
 
-  <main class="w-full py-4 space-y-10">
+  <main class="w-full py-4 space-y-8">
     <!-- Breadcrumb & Top Header -->
     <div class="border-b border-[#30363d] pb-6">
       <div class="flex items-center gap-2 text-xs font-mono text-[#8b949e] mb-3">
@@ -38,23 +43,90 @@ const allTags = Array.from(
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 class="text-2xl sm:text-3xl font-bold font-mono text-[#e6edf3] tracking-tight">
-            Tankar, Anteckningar &amp; Blogg
+            Tankar, Guider &amp; Anteckningar
           </h1>
           <p class="text-xs sm:text-sm text-[#8b949e] mt-1 font-mono">
-            En text-first digital trädgård. Reflektioner från simbassängen, tentaveckor och serverkonfigurationer.
+            En text-first digital trädgård. Uppdelad i djupare tankar, tekniska guider och snabba labbanteckningar.
           </p>
         </div>
 
         <div class="flex items-center gap-2 text-xs font-mono text-[#8b949e]">
           <span class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981] font-mono text-xs">
-            <span id="thought-count-badge">{sortedThoughts.length}</span> artiklar tillgängliga
+            <span id="thought-count-badge">{sortedThoughts.length}</span> poster synliga
           </span>
         </div>
       </div>
 
-      <!-- Search & Filters Bar -->
-      <div class="mt-6 pt-4 border-t border-[#30363d]/60 space-y-4">
-        <!-- Live Search Bar -->
+      <!-- Controls Panel: Categories, Sorting, Search & Tags -->
+      <div class="mt-6 pt-5 border-t border-[#30363d]/60 space-y-4">
+        <!-- 1. Kategori-väljare (Huvudfiltrering) -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-2 text-xs font-mono" id="category-filter-bar">
+            <span class="text-[#8b949e] text-[11px] mr-1 uppercase font-semibold">Kategori:</span>
+            <button 
+              type="button" 
+              class="cat-filter-btn active px-3 py-1.5 rounded bg-[#10b981] text-[#0d1117] font-bold border border-[#10b981] transition-all cursor-pointer flex items-center gap-1.5"
+              data-cat="all"
+            >
+              <span>[Alla]</span>
+              <span class="opacity-75 text-[10px]">({countAll})</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="cat-filter-btn px-3 py-1.5 rounded bg-[#161b22] text-[#f59e0b] border border-[#30363d] hover:border-[#f59e0b] hover:bg-[#f59e0b]/10 transition-all cursor-pointer flex items-center gap-1.5 font-medium"
+              data-cat="tanke"
+            >
+              <span>[Tankar]</span>
+              <span class="text-[#8b949e] text-[10px]">({countTankar})</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="cat-filter-btn px-3 py-1.5 rounded bg-[#161b22] text-[#38bdf8] border border-[#30363d] hover:border-[#38bdf8] hover:bg-[#38bdf8]/10 transition-all cursor-pointer flex items-center gap-1.5 font-medium"
+              data-cat="guide"
+            >
+              <span>[Guider]</span>
+              <span class="text-[#8b949e] text-[10px]">({countGuider})</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="cat-filter-btn px-3 py-1.5 rounded bg-[#161b22] text-[#10b981] border border-[#30363d] hover:border-[#10b981] hover:bg-[#10b981]/10 transition-all cursor-pointer flex items-center gap-1.5 font-medium"
+              data-cat="anteckning"
+            >
+              <span>[Anteckningar]</span>
+              <span class="text-[#8b949e] text-[10px]">({countAnteckningar})</span>
+            </button>
+          </div>
+
+          <!-- Datumsortering (Nyast först vs Äldst först) -->
+          <div class="flex items-center gap-2 text-xs font-mono" id="sort-controls">
+            <span class="text-[#8b949e] text-[11px]">Datum:</span>
+            <div class="inline-flex rounded-lg p-0.5 bg-[#0d1117] border border-[#30363d]">
+              <button 
+                type="button" 
+                id="btn-sort-newest" 
+                class="sort-btn active px-2.5 py-1 rounded text-[11px] font-semibold bg-[#161b22] text-[#e6edf3] border border-[#30363d] cursor-pointer transition-all"
+                data-order="desc"
+                title="Sortera efter nyast publiceringsdatum först"
+              >
+                Nyast ↓
+              </button>
+              <button 
+                type="button" 
+                id="btn-sort-oldest" 
+                class="sort-btn px-2.5 py-1 rounded text-[11px] text-[#8b949e] hover:text-[#e6edf3] cursor-pointer transition-all"
+                data-order="asc"
+                title="Sortera efter äldst publiceringsdatum först"
+              >
+                Äldst ↑
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Live Search Input -->
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-xs text-[#8b949e]">
             <span>grep:</span>
@@ -62,31 +134,55 @@ const allTags = Array.from(
           <input 
             type="text" 
             id="thought-search-input"
-            placeholder="Sök i artiklar på rubrik, beskrivning eller tagg (t.ex. 'simning', 'chalmers', 'jvm')..." 
+            placeholder="Sök på rubrik, beskrivning, tagg eller kategori (t.ex. 'simning', 'valgrind', 'tmux', 'jvm')..." 
             class="w-full bg-[#161b22] text-[#e6edf3] text-xs pl-16 pr-4 py-2 rounded-lg border border-[#30363d] focus:outline-none focus:border-[#10b981] placeholder-[#8b949e]/60 font-mono transition-colors"
           />
         </div>
 
-        <!-- Tag Filters -->
-        <div class="flex flex-wrap items-center gap-2 text-xs font-mono" id="blog-filter-bar">
+        <!-- 3. Tag Filters -->
+        <div class="flex flex-wrap items-center gap-1.5 text-xs font-mono" id="blog-tag-bar">
           <span class="text-[#8b949e] text-[11px] mr-1">Tagg:</span>
           <button 
             type="button" 
-            class="blog-filter-btn active px-3 py-1 rounded bg-[#10b981] text-[#0d1117] font-semibold border border-[#10b981] transition-all cursor-pointer"
+            class="tag-filter-btn active px-2 py-0.5 rounded bg-[#10b981] text-[#0d1117] font-semibold text-[11px] border border-[#10b981] transition-all cursor-pointer"
             data-tag="all"
           >
-            [Alla]
+            Alla
           </button>
           {allTags.map((tag) => (
             <button 
               type="button" 
-              class="blog-filter-btn px-3 py-1 rounded bg-[#161b22] text-[#8b949e] border border-[#30363d] hover:text-[#e6edf3] transition-all cursor-pointer"
+              class="tag-filter-btn px-2 py-0.5 rounded bg-[#161b22] text-[#8b949e] text-[11px] border border-[#30363d] hover:text-[#e6edf3] transition-all cursor-pointer"
               data-tag={tag.toLowerCase()}
             >
-              [{tag}]
+              #{tag}
             </button>
           ))}
         </div>
+      </div>
+    </div>
+
+    <!-- Category Explanations Box (Subtle context) -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">
+      <div class="p-3 rounded-lg bg-[#161b22]/70 border border-[#30363d]/60">
+        <span class="text-[#f59e0b] font-bold block mb-1">[TANKE]</span>
+        <p class="text-[#8b949e] text-[11px] leading-relaxed">
+          Djupare reflektioner, personlig filosofi kring simning, studier och teknik.
+        </p>
+      </div>
+
+      <div class="p-3 rounded-lg bg-[#161b22]/70 border border-[#30363d]/60">
+        <span class="text-[#38bdf8] font-bold block mb-1">[GUIDE]</span>
+        <p class="text-[#8b949e] text-[11px] leading-relaxed">
+          How-tos, JVM-tuning, dotfiles och terminalkonfigurationer för Linux.
+        </p>
+      </div>
+
+      <div class="p-3 rounded-lg bg-[#161b22]/70 border border-[#30363d]/60">
+        <span class="text-[#10b981] font-bold block mb-1">[ANTECKNING]</span>
+        <p class="text-[#8b949e] text-[11px] leading-relaxed">
+          Snabbt labbkladd från EDIT-huset, Valgrind-flaggor och systemd-units.
+        </p>
       </div>
     </div>
 
@@ -94,20 +190,43 @@ const allTags = Array.from(
     <div class="space-y-4" id="thoughts-list">
       {sortedThoughts.map((post) => {
         const formattedDate = post.data.pubDate.toISOString().slice(0, 10);
+        const category = post.data.category || 'tanke';
+        const timestamp = post.data.pubDate.getTime();
+
+        // Dynamisk badge-styling per kategori
+        let catBadgeClass = 'text-[#f59e0b] border-[#f59e0b]/40 bg-[#f59e0b]/10';
+        let catLabel = 'TANKE';
+        let readingLabel = '~3 min läsning';
+        if (category === 'guide') {
+          catBadgeClass = 'text-[#38bdf8] border-[#38bdf8]/40 bg-[#38bdf8]/10';
+          catLabel = 'GUIDE';
+          readingLabel = '~4-5 min läsning';
+        } else if (category === 'anteckning') {
+          catBadgeClass = 'text-[#10b981] border-[#10b981]/40 bg-[#10b981]/10';
+          catLabel = 'ANTECKNING';
+          readingLabel = '~1-2 min anteckning';
+        }
+
         return (
           <article 
             class="thought-card rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#f59e0b]/60 transition-all p-5 space-y-3 group"
+            data-category={category}
             data-tags={(post.data.tags || []).join(',').toLowerCase()}
             data-title={post.data.title.toLowerCase()}
             data-desc={(post.data.description || '').toLowerCase()}
+            data-timestamp={timestamp}
           >
             <!-- Meta row -->
-            <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-[#8b949e]">
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-[#8b949e]">
               <div class="flex items-center gap-2">
-                <span class="text-[11px] font-bold text-[#f59e0b] px-1.5 py-0.5 rounded bg-[#0d1117] border border-[#f59e0b]/40">
-                  [ANTECKNING // {formattedDate}]
+                <span class={`text-[11px] font-bold px-2 py-0.5 rounded border ${catBadgeClass}`}>
+                  [{catLabel}]
                 </span>
-                <span class="text-[11px] text-[#8b949e]">~2-3 min läsning</span>
+                <span class="text-xs text-[#8b949e]">
+                  {formattedDate}
+                </span>
+                <span class="text-[#30363d]">•</span>
+                <span class="text-[11px] text-[#8b949e]">{readingLabel}</span>
               </div>
 
               <!-- Tags -->
@@ -124,7 +243,7 @@ const allTags = Array.from(
             <h2 class="text-base sm:text-lg font-bold text-[#e6edf3] group-hover:text-[#10b981] transition-colors">
               <a href={`/thoughts/${post.id}`} class="hover:underline flex items-center justify-between gap-2">
                 <span>{post.data.title}</span>
-                <span class="text-xs text-[#8b949e] group-hover:text-[#10b981] group-hover:translate-x-1 transition-all shrink-0">
+                <span class="text-xs text-[#8b949e] group-hover:text-[#10b981] group-hover:translate-x-1 transition-all shrink-0 font-mono">
                   läs →
                 </span>
               </a>
@@ -132,13 +251,13 @@ const allTags = Array.from(
 
             <!-- Editorial Excerpt Quote -->
             {post.data.description && (
-              <blockquote class="text-xs sm:text-sm text-[#8b949e] border-l-2 border-[#f59e0b]/70 pl-3.5 italic leading-relaxed py-0.5 font-mono">
+              <blockquote class="text-xs sm:text-sm text-[#8b949e] border-l-2 border-[#30363d] group-hover:border-[#10b981] pl-3.5 italic leading-relaxed py-0.5 font-mono transition-colors">
                 "{post.data.description}"
               </blockquote>
             )}
 
             <!-- Footer link -->
-            <div class="pt-2 border-t border-[#30363d]/40 flex items-center justify-between text-xs">
+            <div class="pt-2 border-t border-[#30363d]/40 flex items-center justify-between text-xs font-mono">
               <a 
                 href={`/thoughts/${post.id}`} 
                 class="text-[#38bdf8] hover:text-[#e6edf3] hover:underline flex items-center gap-1"
@@ -153,7 +272,7 @@ const allTags = Array.from(
       })}
 
       <div id="no-articles-msg" class="py-12 text-center text-xs font-mono text-[#8b949e] hidden">
-        Inga anteckningar matchar din sökning eller det valda filtret.
+        Inga anteckningar eller artiklar matchar din sökning eller det valda filtret.
       </div>
     </div>
 
@@ -161,7 +280,7 @@ const allTags = Array.from(
     <div class="pt-8 border-t border-[#30363d] flex items-center justify-between text-xs font-mono text-[#8b949e]">
       <a href="/" class="hover:text-[#10b981] transition-colors flex items-center gap-1.5">
         <span>←</span>
-        <span>[Tillbaka till cockpit]</span>
+        <span>[Tillbaka till hem]</span>
       </a>
       <span>gulo // thoughts archive</span>
     </div>
@@ -171,44 +290,93 @@ const allTags = Array.from(
 </Layout>
 
 <script>
-  function initBlogFilters() {
-    const btns = document.querySelectorAll('.blog-filter-btn');
-    const items = Array.from(document.querySelectorAll<HTMLElement>('.thought-card'));
+  function initBlogSystem() {
+    const catBtns = document.querySelectorAll('.cat-filter-btn');
+    const tagBtns = document.querySelectorAll('.tag-filter-btn');
     const searchInput = document.getElementById('thought-search-input') as HTMLInputElement | null;
+    const listContainer = document.getElementById('thoughts-list');
+    const items = Array.from(document.querySelectorAll<HTMLElement>('.thought-card'));
     const noMsg = document.getElementById('no-articles-msg');
     const countBadge = document.getElementById('thought-count-badge');
+    const btnSortNewest = document.getElementById('btn-sort-newest');
+    const btnSortOldest = document.getElementById('btn-sort-oldest');
 
+    let currentCategory = 'all';
     let currentTag = 'all';
     let searchQuery = '';
+    let currentSort = 'desc'; // 'desc' = nyast först, 'asc' = äldst först
 
-    function filterThoughts() {
+    function applyFilterAndSort() {
+      // 1. Filtrera
       let visibleCount = 0;
       items.forEach((item) => {
+        const cat = item.getAttribute('data-category') || '';
         const tags = (item.getAttribute('data-tags') || '').split(',');
         const title = item.getAttribute('data-title') || '';
         const desc = item.getAttribute('data-desc') || '';
 
+        const catMatches = currentCategory === 'all' || cat === currentCategory;
         const tagMatches = currentTag === 'all' || tags.includes(currentTag);
         const searchMatches = 
           !searchQuery || 
           title.includes(searchQuery) || 
           desc.includes(searchQuery) || 
+          cat.includes(searchQuery) ||
           tags.some((t) => t.includes(searchQuery));
 
-        const isMatch = tagMatches && searchMatches;
+        const isMatch = catMatches && tagMatches && searchMatches;
         item.style.display = isMatch ? '' : 'none';
         if (isMatch) visibleCount++;
       });
+
+      // 2. Sortera i DOM
+      if (listContainer) {
+        const sortedItems = [...items].sort((a, b) => {
+          const tA = Number(a.getAttribute('data-timestamp') || 0);
+          const tB = Number(b.getAttribute('data-timestamp') || 0);
+          return currentSort === 'desc' ? tB - tA : tA - tB;
+        });
+
+        sortedItems.forEach((el) => {
+          listContainer.appendChild(el);
+        });
+
+        // Säkerställ att no-articles-msg ligger sist i listan
+        if (noMsg) listContainer.appendChild(noMsg);
+      }
 
       if (noMsg) noMsg.classList.toggle('hidden', visibleCount > 0);
       if (countBadge) countBadge.textContent = String(visibleCount);
     }
 
-    btns.forEach((btn) => {
+    // Kategori-knappar
+    catBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        currentCategory = btn.getAttribute('data-cat') || 'all';
+
+        catBtns.forEach((b) => {
+          b.classList.remove('bg-[#10b981]', 'text-[#0d1117]', 'font-bold', 'border-[#10b981]');
+          b.classList.add('bg-[#161b22]', 'border-[#30363d]');
+          const cat = b.getAttribute('data-cat');
+          if (cat === 'tanke') b.classList.add('text-[#f59e0b]');
+          else if (cat === 'guide') b.classList.add('text-[#38bdf8]');
+          else if (cat === 'anteckning') b.classList.add('text-[#10b981]');
+          else b.classList.add('text-[#8b949e]');
+        });
+
+        btn.classList.remove('bg-[#161b22]', 'text-[#f59e0b]', 'text-[#38bdf8]', 'text-[#10b981]', 'text-[#8b949e]', 'border-[#30363d]');
+        btn.classList.add('bg-[#10b981]', 'text-[#0d1117]', 'font-bold', 'border-[#10b981]');
+
+        applyFilterAndSort();
+      });
+    });
+
+    // Tagg-knappar
+    tagBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
         currentTag = btn.getAttribute('data-tag') || 'all';
 
-        btns.forEach((b) => {
+        tagBtns.forEach((b) => {
           b.classList.remove('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]');
           b.classList.add('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]');
         });
@@ -216,19 +384,41 @@ const allTags = Array.from(
         btn.classList.remove('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]');
         btn.classList.add('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]');
 
-        filterThoughts();
+        applyFilterAndSort();
       });
     });
 
+    // Live sökning
     searchInput?.addEventListener('input', () => {
       searchQuery = (searchInput.value || '').trim().toLowerCase();
-      filterThoughts();
+      applyFilterAndSort();
+    });
+
+    // Datum-sortering
+    btnSortNewest?.addEventListener('click', () => {
+      if (currentSort === 'desc') return;
+      currentSort = 'desc';
+      btnSortNewest.classList.add('active', 'bg-[#161b22]', 'text-[#e6edf3]', 'border', 'border-[#30363d]', 'font-semibold');
+      btnSortNewest.classList.remove('text-[#8b949e]');
+      btnSortOldest?.classList.remove('active', 'bg-[#161b22]', 'text-[#e6edf3]', 'border', 'border-[#30363d]', 'font-semibold');
+      btnSortOldest?.classList.add('text-[#8b949e]');
+      applyFilterAndSort();
+    });
+
+    btnSortOldest?.addEventListener('click', () => {
+      if (currentSort === 'asc') return;
+      currentSort = 'asc';
+      btnSortOldest.classList.add('active', 'bg-[#161b22]', 'text-[#e6edf3]', 'border', 'border-[#30363d]', 'font-semibold');
+      btnSortOldest.classList.remove('text-[#8b949e]');
+      btnSortNewest?.classList.remove('active', 'bg-[#161b22]', 'text-[#e6edf3]', 'border', 'border-[#30363d]', 'font-semibold');
+      btnSortNewest?.classList.add('text-[#8b949e]');
+      applyFilterAndSort();
     });
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initBlogFilters);
+    document.addEventListener('DOMContentLoaded', initBlogSystem);
   } else {
-    initBlogFilters();
+    initBlogSystem();
   }
 </script>

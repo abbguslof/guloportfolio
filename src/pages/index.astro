@@ -5,32 +5,22 @@ import Header from '../components/Header.astro';
 import InteractiveTerminal from '../components/InteractiveTerminal.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import ThoughtRow from '../components/ThoughtRow.astro';
-import CollapsibleDownloads from '../components/CollapsibleDownloads.astro';
 import Footer from '../components/Footer.astro';
 import { getCollection } from 'astro:content';
 
 // Hämta projekt
 const projects = await getCollection('projects');
 const sortedProjects = projects.sort((a, b) => a.data.order - b.data.order);
-// Utvalda projekt för startsidan (markerade som featured: true, eller de 2 högst prioriterade)
+// Utvalda projekt för startsidan
 const featuredProjects = sortedProjects.filter((p) => p.data.featured);
 const displayProjects = featuredProjects.length > 0 ? featuredProjects : sortedProjects.slice(0, 2);
 
-// Hämta tankar/inlägg
+// Hämta tankar & anteckningar (sorterade efter nyast först, max 5 för startsidan)
 const thoughts = await getCollection('thoughts');
 const sortedThoughts = thoughts
   .filter((post) => !post.data.draft)
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
-
-// Hämta alla nedladdningar
-const rawDownloads = await getCollection('downloads');
-const allDownloads = rawDownloads.map((d) => ({
-  id: d.id,
-  ...d.data,
-}));
-// Utvalda filer för startsidan (markerade som featured: true, eller de 4 första)
-const featuredDownloads = allDownloads.filter((d) => d.featured);
-const displayDownloads = featuredDownloads.length > 0 ? featuredDownloads : allDownloads.slice(0, 4);
+const latestThoughts = sortedThoughts.slice(0, 5);
 ---
 
 <Layout 
@@ -81,13 +71,13 @@ const displayDownloads = featuredDownloads.length > 0 ? featuredDownloads : allD
       </div>
     </section>
 
-    <!-- 3. Senaste Tankar & Blogginlägg (Ren lista med länk till /thoughts) -->
+    <!-- 3. Senaste Tankar, Guider & Anteckningar (Max 5 poster med kategori, datum & utdrag) -->
     <section id="thoughts" class="w-full" aria-labelledby="thoughts-heading">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-5 border-b border-[#30363d] gap-2">
         <div class="flex items-center gap-2">
           <span class="text-[#f59e0b] font-bold">#</span>
           <h2 id="thoughts-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]">
-            Senaste Tankar &amp; Anteckningar
+            Senaste Tankar, Guider &amp; Anteckningar
           </h2>
         </div>
 
@@ -102,21 +92,31 @@ const displayDownloads = featuredDownloads.length > 0 ? featuredDownloads : allD
         </div>
       </div>
 
-      <!-- Articles list container -->
-      <div class="rounded-lg bg-[#161b22] border border-[#30363d] px-4 py-1 divide-y divide-[#30363d]/40">
-        {sortedThoughts.slice(0, 5).map((post) => (
+      <!-- Articles list container with rich rows -->
+      <div class="rounded-lg bg-[#161b22] border border-[#30363d] p-3 divide-y divide-[#30363d]/40">
+        {latestThoughts.map((post) => (
           <ThoughtRow 
             title={post.data.title}
             slug={post.id}
             pubDate={post.data.pubDate}
+            category={post.data.category}
+            description={post.data.description}
             tags={post.data.tags}
           />
         ))}
       </div>
-    </section>
 
-    <!-- 4. Fildelning & Resurser (Utfällbar inline bullet-lista, stängd by default, med sortering) -->
-    <CollapsibleDownloads downloads={displayDownloads} totalCount={allDownloads.length} />
+      <!-- Bottom link to full archive -->
+      <div class="mt-4 text-center">
+        <a 
+          href="/thoughts" 
+          class="inline-flex items-center gap-2 text-xs font-mono text-[#8b949e] hover:text-[#10b981] px-4 py-2 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#10b981] transition-all"
+        >
+          <span>Visa alla tankar, guider och anteckningar i arkivet ({sortedThoughts.length} st)</span>
+          <span>→</span>
+        </a>
+      </div>
+    </section>
   </main>
 
   <!-- Footer -->
