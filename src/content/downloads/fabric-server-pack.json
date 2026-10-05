@@ -1,0 +1,11 @@
+{
+  "name": "Fabric Performance Pack 1.20.4",
+  "filename": "fabric-1.20.4-optimized.zip",
+  "size": "4.8 MB",
+  "category": "Minecraft",
+  "fileUrl": "/downloads/fabric-1.20.4-optimized.zip",
+  "description": "Förkonfigurerat serverpack med Lithium, FerriteCore, ModernFix och spark för minimal MSPT.",
+  "updatedAt": "2026-03-20",
+  "checksum": "sha256:8f4c2e91b6",
+  "tags": ["Fabric", "Server", "Optimization"]
+}

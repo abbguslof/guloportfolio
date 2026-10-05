@@ -1,0 +1,43 @@
+---
+// ThoughtRow.astro - Minimalist single-row article link
+interface Props {
+  title: string;
+  slug: string;
+  pubDate: Date;
+  tags?: string[];
+}
+
+const { title, slug, pubDate, tags = [] } = Astro.props;
+
+// Format date as YYYY-MM-DD
+const formattedDate = pubDate.toISOString().slice(0, 10);
+---
+
+<a 
+  href={`/thoughts/${slug}`}
+  class="group flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 px-3 -mx-3 rounded hover:bg-[#161b22] border-b border-[#30363d]/40 last:border-b-0 transition-colors"
+>
+  <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 flex-1 pr-2">
+    <!-- Date: YYYY-MM-DD -->
+    <time datetime={formattedDate} class="text-xs font-mono text-[#8b949e] whitespace-nowrap">
+      {formattedDate}
+    </time>
+
+    <!-- Title with hover underline & color -->
+    <span class="text-sm font-medium text-[#e6edf3] group-hover:text-[#10b981] group-hover:underline underline-offset-4 decoration-[#10b981]/50 transition-colors">
+      {title}
+    </span>
+  </div>
+
+  <!-- Right: Tag badges & arrow -->
+  <div class="flex items-center gap-2 mt-2 sm:mt-0">
+    {tags.slice(0, 2).map((tag) => (
+      <span class="text-[11px] font-mono text-[#8b949e] group-hover:text-[#38bdf8] px-1.5 py-0.5 rounded bg-[#0d1117] border border-[#30363d] transition-colors">
+        [{tag}]
+      </span>
+    ))}
+    <span class="text-xs text-[#8b949e] group-hover:text-[#10b981] group-hover:translate-x-0.5 transition-transform" aria-hidden="true">
+      ↗
+    </span>
+  </div>
+</a>

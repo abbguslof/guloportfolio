@@ -1,0 +1,51 @@
+---
+// Header.astro - Minimalist TUI Top Bar
+---
+
+<header class="border-b border-[#30363d] pb-4 mb-8">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <!-- Brand / Prompt Identity -->
+    <div class="flex items-center space-x-3">
+      <div class="flex space-x-1.5" aria-hidden="true">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#f85149]"></span>
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></span>
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#2ea043]"></span>
+      </div>
+      <a href="/" class="text-sm font-semibold tracking-tight text-[#e6edf3] hover:text-[#10b981] transition-colors">
+        <span class="text-[#2ea043]">gulo</span><span class="text-[#8b949e]">@</span><span class="text-[#38bdf8]">chalmers-box</span>:<span class="text-[#a78bfa]">~</span>$
+      </a>
+      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-[#161b22] border border-[#30363d] text-[#10b981]">
+        <span class="w-1.5 h-1.5 mr-1 rounded-full bg-[#10b981] animate-pulse"></span>
+        ONLINE
+      </span>
+    </div>
+
+    <!-- Navigation links -->
+    <nav class="flex items-center flex-wrap gap-2 text-xs" aria-label="Huvudnavigation">
+      <a href="#about" class="px-2 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#10b981] transition-all">
+        [~/about]
+      </a>
+      <a href="#now" class="px-2 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#38bdf8] transition-all">
+        [~/just-nu]
+      </a>
+      <a href="#projects" class="px-2 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#a78bfa] transition-all">
+        [~/projekt]
+      </a>
+      <a href="#thoughts" class="px-2 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#f59e0b] transition-all">
+        [~/tankar]
+      </a>
+      <a href="#files" class="px-2 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#2ea043] transition-all">
+        [~/filer]
+      </a>
+      <a 
+        href="https://github.com" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="px-2 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#e6edf3] transition-all inline-flex items-center gap-1"
+        aria-label="GitHub profil (öppnas i ny flik)"
+      >
+        <span>gh</span><span class="text-[10px]">↗</span>
+      </a>
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,112 @@
+---
+// ProjectCard.astro - Thumbnail-free TUI Project Card
+interface Props {
+  title: string;
+  description: string;
+  status: 'ACTIVE' | 'MAINTAINED' | 'COMPLETED' | 'WIP' | 'ARCHIVED';
+  category: 'School' | 'Homelab' | 'Minecraft' | 'Web' | 'Other';
+  tech: string[];
+  repoUrl?: string;
+  liveUrl?: string;
+  slug?: string;
+}
+
+const { title, description, status, category, tech, repoUrl, liveUrl } = Astro.props;
+
+// Status styling mapping
+const statusMap: Record<string, { label: string; textClass: string; borderClass: string; dotClass: string }> = {
+  ACTIVE: {
+    label: '[● ACTIVE]',
+    textClass: 'text-[#10b981]',
+    borderClass: 'border-[#10b981]/40',
+    dotClass: 'bg-[#10b981]',
+  },
+  COMPLETED: {
+    label: '[✓ COMPLETED]',
+    textClass: 'text-[#38bdf8]',
+    borderClass: 'border-[#38bdf8]/40',
+    dotClass: 'bg-[#38bdf8]',
+  },
+  WIP: {
+    label: '[⚡ WIP]',
+    textClass: 'text-[#f59e0b]',
+    borderClass: 'border-[#f59e0b]/40',
+    dotClass: 'bg-[#f59e0b]',
+  },
+  MAINTAINED: {
+    label: '[⟳ MAINTAINED]',
+    textClass: 'text-[#a78bfa]',
+    borderClass: 'border-[#a78bfa]/40',
+    dotClass: 'bg-[#a78bfa]',
+  },
+  ARCHIVED: {
+    label: '[× ARCHIVED]',
+    textClass: 'text-[#8b949e]',
+    borderClass: 'border-[#8b949e]/40',
+    dotClass: 'bg-[#8b949e]',
+  },
+};
+
+const currentStatus = statusMap[status] || statusMap.ACTIVE;
+---
+
+<div class="group relative flex flex-col justify-between p-5 rounded-lg bg-[#161b22] border border-[#30363d] hover:bg-[#1f242c] hover:border-[#484f58] transition-all">
+  <div>
+    <!-- Top Metadata: Category & Status -->
+    <div class="flex items-center justify-between gap-2 mb-3">
+      <span class="text-[11px] font-mono font-medium text-[#8b949e] uppercase tracking-wider px-2 py-0.5 rounded bg-[#0d1117] border border-[#30363d]">
+        {category}
+      </span>
+      <span class={`text-[11px] font-mono font-bold ${currentStatus.textClass}`}>
+        {currentStatus.label}
+      </span>
+    </div>
+
+    <!-- Title -->
+    <h3 class="text-base font-semibold text-[#e6edf3] group-hover:text-[#38bdf8] transition-colors mb-2">
+      {title}
+    </h3>
+
+    <!-- Description -->
+    <p class="text-xs sm:text-sm text-[#8b949e] leading-relaxed mb-4">
+      {description}
+    </p>
+  </div>
+
+  <div>
+    <!-- Tech stack pills -->
+    <div class="flex flex-wrap gap-1.5 pt-3 border-t border-[#30363d]/60 mb-4">
+      {tech.map((item) => (
+        <span class="text-[11px] font-mono text-[#8b949e] bg-[#0d1117] px-2 py-0.5 rounded border border-[#30363d]/80">
+          #{item}
+        </span>
+      ))}
+    </div>
+
+    <!-- Action links -->
+    <div class="flex items-center gap-3 text-xs font-mono">
+      {repoUrl && (
+        <a 
+          href={repoUrl} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="text-[#38bdf8] hover:text-[#e6edf3] flex items-center gap-1 transition-colors"
+        >
+          <span>[Källkod</span>
+          <span class="text-[10px] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">↗]</span>
+        </a>
+      )}
+      {liveUrl && (
+        <a 
+          href={liveUrl} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="text-[#10b981] hover:text-[#e6edf3] flex items-center gap-1 transition-colors"
+        >
+          <span>[Live demo</span>
+          <span class="text-[10px]">↗]</span>
+        </a>
+      )}
+    </div>
+  </div>
+</div>

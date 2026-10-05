@@ -1,0 +1,58 @@
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+@import "@fontsource/jetbrains-mono/700.css";
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@config "../../tailwind.config.mjs";
+
+@theme {
+  --color-tui-bg: #0d1117;
+  --color-tui-surface: #161b22;
+  --color-tui-surface-hover: #1f242c;
+  --color-tui-border: #30363d;
+  --color-tui-border-light: #484f58;
+  --color-tui-text: #e6edf3;
+  --color-tui-muted: #8b949e;
+  --color-tui-green: #2ea043;
+  --color-tui-emerald: #10b981;
+  --color-tui-amber: #f59e0b;
+  --color-tui-cyan: #38bdf8;
+  --color-tui-purple: #a78bfa;
+  --color-tui-red: #f85149;
+
+  --font-mono: "JetBrains Mono", "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-sans: Inter, Geist, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  background-color: #0d1117;
+  color: #e6edf3;
+  font-family: var(--font-mono);
+  scroll-behavior: smooth;
+}
+
+/* Custom terminal scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0d1117;
+}
+::-webkit-scrollbar-thumb {
+  background: #30363d;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #484f58;
+}
+
+/* Terminal selection */
+::selection {
+  background: #2ea043;
+  color: #0d1117;
+}

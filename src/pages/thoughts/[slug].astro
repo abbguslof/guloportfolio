@@ -1,0 +1,95 @@
+---
+// src/pages/thoughts/[slug].astro - Fullskärmsläsning av tanke/inlägg
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const thoughts = await getCollection('thoughts');
+  return thoughts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const formattedDate = post.data.pubDate.toISOString().slice(0, 10);
+---
+
+<Layout 
+  title={`${post.data.title} // gulo`}
+  description={post.data.description || post.data.title}
+>
+  <Header />
+
+  <main class="w-full max-w-3xl mx-auto py-4">
+    <!-- Back button -->
+    <div class="mb-8">
+      <a 
+        href="/#thoughts" 
+        class="inline-flex items-center gap-1.5 text-xs font-mono text-[#8b949e] hover:text-[#10b981] transition-colors px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d]"
+      >
+        <span>←</span>
+        <span>[~/tankar]</span>
+      </a>
+    </div>
+
+    <!-- Article Header -->
+    <header class="pb-6 mb-8 border-b border-[#30363d]">
+      <div class="flex items-center gap-3 text-xs font-mono text-[#8b949e] mb-3">
+        <time datetime={formattedDate}>{formattedDate}</time>
+        <span>•</span>
+        <span>gulo</span>
+        <span>•</span>
+        <div class="flex items-center gap-1.5">
+          {post.data.tags.map((tag) => (
+            <span class="text-[#38bdf8] bg-[#161b22] px-1.5 py-0.5 rounded border border-[#30363d]">
+              [{tag}]
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-[#e6edf3] tracking-tight leading-snug">
+        {post.data.title}
+      </h1>
+
+      {post.data.description && (
+        <p class="text-sm text-[#8b949e] mt-3 leading-relaxed border-l-2 border-[#10b981] pl-3">
+          {post.data.description}
+        </p>
+      )}
+    </header>
+
+    <!-- Article Body with Markdown Rendering -->
+    <article class="prose prose-invert max-w-none text-[#e6edf3] text-sm leading-relaxed 
+      prose-headings:text-[#e6edf3] prose-headings:font-bold prose-headings:font-mono
+      prose-h2:text-lg prose-h2:border-b prose-h2:border-[#30363d] prose-h2:pb-2 prose-h2:mt-8
+      prose-h3:text-base prose-h3:text-[#38bdf8]
+      prose-p:text-[#c9d1d9] prose-p:leading-relaxed
+      prose-code:text-[#10b981] prose-code:bg-[#161b22] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:border prose-code:border-[#30363d]
+      prose-pre:bg-[#161b22] prose-pre:border prose-pre:border-[#30363d] prose-pre:rounded-lg
+      prose-blockquote:border-l-[#10b981] prose-blockquote:text-[#8b949e] prose-blockquote:italic
+      prose-a:text-[#38bdf8] prose-a:underline hover:prose-a:text-[#10b981]">
+      <Content />
+    </article>
+
+    <!-- Bottom return navigation -->
+    <div class="mt-12 pt-6 border-t border-[#30363d] flex items-center justify-between text-xs font-mono">
+      <a 
+        href="/#thoughts" 
+        class="text-[#8b949e] hover:text-[#10b981] transition-colors"
+      >
+        [← Tillbaka till översikten]
+      </a>
+      <span class="text-[#8b949e]">
+        slug: {post.id}
+      </span>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

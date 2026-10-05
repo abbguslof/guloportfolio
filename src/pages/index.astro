@@ -1,0 +1,121 @@
+---
+// src/pages/index.astro - Huvudsida: Cockpit & Playground
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import InteractiveTerminal from '../components/InteractiveTerminal.astro';
+import NowSection from '../components/NowSection.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ThoughtRow from '../components/ThoughtRow.astro';
+import DownloadTable from '../components/DownloadTable.astro';
+import Footer from '../components/Footer.astro';
+import { getCollection } from 'astro:content';
+
+// Hämta projekt och sortera efter order
+const projects = await getCollection('projects');
+const sortedProjects = projects.sort((a, b) => a.data.order - b.data.order);
+
+// Hämta tankar/inlägg och sortera efter datum fallande
+const thoughts = await getCollection('thoughts');
+const sortedThoughts = thoughts
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+
+// Hämta nedladdningsbara filer
+const rawDownloads = await getCollection('downloads');
+const downloads = rawDownloads.map((d) => ({
+  id: d.id,
+  ...d.data,
+}));
+---
+
+<Layout 
+  title="gulo // digital garden & playground" 
+  description="Personlig playground, portfolio och filarkiv. Chalmers Datateknik, simning, Minecraft homelab och systemprogrammering."
+>
+  <!-- Header -->
+  <Header />
+
+  <main class="w-full">
+    <!-- 1. Hero: Interactive Terminal & Neofetch -->
+    <InteractiveTerminal />
+
+    <!-- 2. Just nu / Skola-sektion -->
+    <NowSection />
+
+    <!-- 3. Projektsektion (Utan thumbnails, strikt TUI-estetik) -->
+    <section id="projects" class="w-full mb-14" aria-labelledby="projects-heading">
+      <div class="flex items-center justify-between pb-3 mb-6 border-b border-[#30363d]">
+        <div class="flex items-center gap-2">
+          <span class="text-[#a78bfa] font-bold">#</span>
+          <h2 id="projects-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]">
+            Projekt & Homelab
+          </h2>
+        </div>
+        <span class="text-xs text-[#8b949e] font-mono">
+          [{sortedProjects.length} aktiva/slutförda]
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {sortedProjects.map((project) => (
+          <ProjectCard 
+            title={project.data.title}
+            description={project.data.description}
+            status={project.data.status}
+            category={project.data.category}
+            tech={project.data.tech}
+            repoUrl={project.data.repoUrl}
+            liveUrl={project.data.liveUrl}
+            slug={project.id}
+          />
+        ))}
+      </div>
+    </section>
+
+    <!-- 4. Tankar & Anteckningar (Text-first arkiv) -->
+    <section id="thoughts" class="w-full mb-14" aria-labelledby="thoughts-heading">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-[#30363d]">
+        <div class="flex items-center gap-2">
+          <span class="text-[#f59e0b] font-bold">#</span>
+          <h2 id="thoughts-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]">
+            Tankar & Anteckningar
+          </h2>
+        </div>
+        <span class="text-xs text-[#8b949e] font-mono">
+          [{sortedThoughts.length} publicerade]
+        </span>
+      </div>
+
+      <div class="rounded-lg bg-[#161b22] border border-[#30363d] px-4 py-2 divide-y divide-[#30363d]/40">
+        {sortedThoughts.map((post) => (
+          <ThoughtRow 
+            title={post.data.title}
+            slug={post.id}
+            pubDate={post.data.pubDate}
+            tags={post.data.tags}
+          />
+        ))}
+      </div>
+    </section>
+
+    <!-- 5. Nedladdningsarkiv (Fildelning, modpacks, dotfiles, scripts) -->
+    <section id="files" class="w-full mb-12" aria-labelledby="files-heading">
+      <div class="flex items-center justify-between pb-3 mb-6 border-b border-[#30363d]">
+        <div class="flex items-center gap-2">
+          <span class="text-[#2ea043] font-bold">#</span>
+          <h2 id="files-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]">
+            Fildelning & Resurser
+          </h2>
+        </div>
+        <span class="text-xs text-[#8b949e] font-mono">
+          [{downloads.length} filer tillgängliga]
+        </span>
+      </div>
+
+      <DownloadTable downloads={downloads} />
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <Footer />
+</Layout>

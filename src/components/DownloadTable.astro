@@ -1,0 +1,102 @@
+---
+// DownloadTable.astro - Structured download catalog for configs, scripts, and archives
+interface DownloadItem {
+  id?: string;
+  name: string;
+  filename: string;
+  size: string;
+  category: string;
+  fileUrl: string;
+  description: string;
+  updatedAt: string;
+  checksum?: string;
+  tags?: string[];
+}
+
+interface Props {
+  downloads: DownloadItem[];
+}
+
+const { downloads } = Astro.props;
+
+function getExtensionBadge(filename: string): { label: string; colorClass: string } {
+  const ext = filename.split('.').pop()?.toUpperCase() || 'FILE';
+  switch (ext) {
+    case 'ZIP':
+    case 'TAR':
+    case 'GZ':
+    case 'ZST':
+      return { label: `[${ext}]`, colorClass: 'text-[#f59e0b] border-[#f59e0b]/40' };
+    case 'SH':
+    case 'BASH':
+      return { label: `[${ext}]`, colorClass: 'text-[#10b981] border-[#10b981]/40' };
+    case 'JSON':
+    case 'YAML':
+    case 'CONF':
+      return { label: `[${ext}]`, colorClass: 'text-[#38bdf8] border-[#38bdf8]/40' };
+    default:
+      return { label: `[${ext}]`, colorClass: 'text-[#a78bfa] border-[#a78bfa]/40' };
+  }
+}
+---
+
+<div class="space-y-3">
+  {downloads.map((item) => {
+    const ext = getExtensionBadge(item.filename);
+    return (
+      <div class="group p-4 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#484f58] transition-all">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <!-- Left: File Badge & Title -->
+          <div class="space-y-1 flex-1">
+            <div class="flex items-center flex-wrap gap-2">
+              <span class={`text-[11px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#0d1117] border ${ext.colorClass}`}>
+                {ext.label}
+              </span>
+              <span class="text-sm font-semibold text-[#e6edf3] group-hover:text-[#38bdf8] transition-colors">
+                {item.name}
+              </span>
+              <span class="text-xs font-mono text-[#8b949e]">
+                ({item.filename})
+              </span>
+            </div>
+
+            <!-- Description -->
+            <p class="text-xs text-[#8b949e] leading-relaxed pt-1">
+              {item.description}
+            </p>
+
+            <!-- Metadata info (Size, Category, Updated) -->
+            <div class="flex flex-wrap items-center gap-3 pt-2 text-[11px] font-mono text-[#8b949e]">
+              <span>Kategori: <span class="text-[#e6edf3]">{item.category}</span></span>
+              <span>•</span>
+              <span>Storlek: <span class="text-[#e6edf3]">{item.size}</span></span>
+              <span>•</span>
+              <span>Uppdaterad: <span class="text-[#e6edf3]">{item.updatedAt}</span></span>
+              {item.checksum && (
+                <>
+                  <span class="hidden md:inline">•</span>
+                  <span class="hidden md:inline text-[10px] text-[#8b949e]/80">
+                    SHA: <code class="text-[#8b949e]">{item.checksum}</code>
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+
+          <!-- Right: Download Action Button -->
+          <div class="flex items-center sm:self-center shrink-0 pt-2 sm:pt-0">
+            <a 
+              href={item.fileUrl}
+              download={item.filename}
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#0d1117] border border-[#30363d] text-xs font-mono font-medium text-[#10b981] hover:bg-[#10b981] hover:text-[#0d1117] hover:border-[#10b981] transition-all"
+              aria-label={`Ladda ner ${item.name}`}
+            >
+              <span>[Ladda ner</span>
+              <span class="text-[11px]">↓]</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  })}
+</div>
