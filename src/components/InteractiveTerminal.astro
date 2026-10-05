@@ -389,6 +389,11 @@ const dynamicFileSystem = {
             hist.innerHTML = savedH;
           }
 
+          var body = document.getElementById('terminal-body');
+          if (body) {
+            body.scrollTop = body.scrollHeight;
+          }
+
           var savedY = sessionStorage.getItem('terminal_nav_scroll_y');
           if (savedY !== null) {
             window.scrollTo(0, Number(savedY));
@@ -653,7 +658,8 @@ const dynamicFileSystem = {
       sessionStorage.setItem('terminal_cmd_history', JSON.stringify(cmdHistory));
 
       if (termBody) {
-        sessionStorage.setItem('terminal_body_scroll', String(termBody.scrollTop));
+        termBody.scrollTop = termBody.scrollHeight;
+        sessionStorage.setItem('terminal_body_scroll', 'bottom');
       }
 
       // Spara fönstrets scrollposition så att användaren inte kastas runt vid sidbytet!
@@ -738,10 +744,15 @@ const dynamicFileSystem = {
       // 3. Öppna terminalen
       restoreWindow();
 
-      // 4. Mjuk och stabil scroll så användaren är kvar på det de kollar på
-      const savedScroll = sessionStorage.getItem('terminal_body_scroll');
-      if (savedScroll && termBody) {
-        termBody.scrollTop = Number(savedScroll);
+      // 4. Autoscrolla terminalen till botten så att senaste output och prompt alltid syns vid overflow
+      if (termBody) {
+        termBody.scrollTop = termBody.scrollHeight;
+        requestAnimationFrame(() => {
+          if (termBody) termBody.scrollTop = termBody.scrollHeight;
+        });
+        setTimeout(() => {
+          if (termBody) termBody.scrollTop = termBody.scrollHeight;
+        }, 50);
       }
 
       // 5. Återställ sidans scrollposition exakt utan att rycka hela sidan
