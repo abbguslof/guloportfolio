@@ -8,9 +8,11 @@
   <!-- Dynamic WebGL effect layer -->
   <div 
     id="active-aifx-layer" 
-    class="absolute inset-0 pointer-events-none transition-opacity duration-700 opacity-90"
+    class="absolute inset-0 pointer-events-none transition-opacity duration-700"
     aria-hidden="true"
   ></div>
+  <!-- Cockpit subtle radial vignette for smooth blending into #0d1117 -->
+  <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(13,17,23,0.48)_100%)]"></div>
 </div>
 
 <!-- Local effect runtime -->
@@ -57,6 +59,16 @@
 
     if (!layer) return;
 
+    // Calibrated subtle opacity per effect so they blend seamlessly into the #0d1117 cockpit background
+    const FX_OPACITIES: Record<Exclude<BgMode, 'off'>, number> = {
+      topo: 0.80,
+      dither: 0.78,
+      ascii: 0.72,
+      dots: 0.78,
+      blocky: 0.75,
+      shimmer: 0.85
+    };
+
     // Full custom tuned configs from remix sessions
     const FX_CONFIGS: Record<Exclude<BgMode, 'off'>, Record<string, string>> = {
       topo: {
@@ -92,6 +104,7 @@
       ascii: {
         'data-aifx': 'ascii',
         'data-aifx-colors': '#132e22,#10b981,#6ee7b7',
+        'data-aifx-bg': '#0d1117',
         'data-aifx-bg-alpha': '0.24',
         'data-aifx-speed': '0.33',
         'data-aifx-cell-size': '29',
@@ -152,6 +165,8 @@
       }
 
       layer.style.display = 'block';
+      const targetOpacity = FX_OPACITIES[mode] ?? 0.80;
+      layer.style.opacity = String(targetOpacity);
 
       const config = FX_CONFIGS[mode];
       if (config) {
@@ -223,9 +238,9 @@
     background-color: transparent;
   }
 
-  /* Soft blended opacity so effect stays ambient behind cards */
+  /* Smooth opacity transition so effect blends seamlessly into #0d1117 */
   #active-aifx-layer {
-    opacity: 0.88;
+    transition: opacity 0.6s ease;
   }
 
   /* Hide any potential watermark elements */

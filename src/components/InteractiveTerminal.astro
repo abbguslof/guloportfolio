@@ -1595,6 +1595,35 @@ ${escapeHtml(node.content)}
         return `<div class="text-[#f85149] font-mono">${_l === 'sv' ? 'Ogiltig stil. Välj mellan: topo, dither, ascii, dots, pixel, shimmer, off.' : 'Invalid style. Choose from: topo, dither, ascii, dots, pixel, shimmer, off.'}</div>`;
       },
 
+      secret: () => {
+        const _l = getSiteLang();
+        return `
+<div class="space-y-2 font-mono text-xs text-[#e6edf3]">
+  <div class="text-[#38bdf8] font-bold border-b border-[#30363d] pb-1">
+    ${_l === 'sv' ? 'KLASSIFICERAD DATA // COCKPIT DISPLAY DRIVER' : 'CLASSIFIED DATA // COCKPIT DISPLAY DRIVER'}
+  </div>
+  <div class="text-[#8b949e]">
+    ${_l === 'sv' 
+      ? 'Du hittade grafikdrivrutinen! Använd kommandot <code class="text-[#10b981] font-bold">bg &lt;stil&gt;</code> för att byta bakgrundsdynamik:'
+      : 'You found the display driver! Use <code class="text-[#10b981] font-bold">bg &lt;style&gt;</code> to switch background styles:'}
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 pl-2 text-[11px]">
+    <div><span class="text-[#10b981] font-semibold">bg topo</span> : Topografiska kurvor (Standard)</div>
+    <div><span class="text-[#10b981] font-semibold">bg dither</span> : Retro 4-färg Bayer dither</div>
+    <div><span class="text-[#10b981] font-semibold">bg ascii</span> : CRT phosphor terminal matrix</div>
+    <div><span class="text-[#10b981] font-semibold">bg dots</span> : Interaktiv vågmatris</div>
+    <div><span class="text-[#10b981] font-semibold">bg pixel</span> : Cybernetisk blockgrid</div>
+    <div><span class="text-[#10b981] font-semibold">bg shimmer</span> : Eterisk smaragddimma &amp; filmkorn</div>
+    <div><span class="text-[#f85149] font-semibold">bg off</span> : Helt avstängd bakgrund</div>
+  </div>
+  <div class="text-[11px] text-[#8b949e] pt-1 border-t border-[#30363d]/40">
+    ${_l === 'sv' 
+      ? 'Tips: Tryck <kbd class="text-[#10b981]">Tab</kbd> efter <code class="text-[#38bdf8]">bg </code> för att autokomplettera stilarna.'
+      : 'Protip: Press <kbd class="text-[#10b981]">Tab</kbd> after <code class="text-[#38bdf8]">bg </code> to autocomplete styles.'}
+  </div>
+</div>`;
+      },
+
       date: () => `<div class="text-[#8b949e]">${new Date().toLocaleString(getSiteLang() === 'sv' ? 'sv-SE' : 'en-GB')} (Europe/Stockholm)</div>`,
       uptime: () => `<div class="text-[#10b981]">Uptime: ${getSiteLang() === 'sv' ? '42 dagar, 8 timmar' : '42 days, 8 hours'}, load: 0.18, 0.22, 0.35</div>`,
       exit: () => { userCloseWindow(); return; },
@@ -1602,6 +1631,12 @@ ${escapeHtml(node.content)}
     };
 
     commands['background'] = commands['bg'];
+    commands['secrets'] = commands['secret'];
+    commands['easteregg'] = commands['secret'];
+    commands['matrix'] = () => {
+      window.dispatchEvent(new CustomEvent('set-bg-mode', { detail: 'ascii' }));
+      return '<div class="text-[#10b981] font-mono">Wake up, Neo... [Background switched to ASCII]</div>';
+    };
 
     commands['chalmers'] = commands['school'];
     commands['dir'] = commands['ls'];
@@ -1744,7 +1779,7 @@ ${escapeHtml(node.content)}
             'help', 'school', 'swim', 'whoami', 'contact', 'discord', 'phone', 'number', 'kontakt',
             'ls', 'cd', 'cat', 'pwd', 'grep', 'open', 'projects', 'thoughts', 'files', 'clear', 
             'date', 'uptime', 'fastfetch', 'neofetch', 'fetch', 'tldr', 'study', 'sleep', 'mc', 
-            'bg', 'background', 'alias', 'whoisgulo', 'gulo', 'exit'
+            'bg', 'background', 'secret', 'matrix', 'alias', 'whoisgulo', 'gulo', 'exit'
           ];
           const matches = cmdList.filter(c => c.startsWith(lastToken.toLowerCase()));
 
@@ -1763,9 +1798,31 @@ ${escapeHtml(node.content)}
           return;
         }
 
-        // Tab på argument -> komplettera sökvägar / filer
+        // Tab på argument -> komplettera sökvägar / filer / bakgrundsstilar
         const mainCmd = tokens[0].toLowerCase();
         let availableItems: string[] = [];
+
+        if ((mainCmd === 'bg' || mainCmd === 'background') && tokens.length === 2) {
+          availableItems = ['topo', 'dither', 'ascii', 'dots', 'pixel', 'shimmer', 'off'];
+          const matches = availableItems.filter(item => item.toLowerCase().startsWith(lastToken.toLowerCase()));
+          if (matches.length === 1) {
+            tokens[tokens.length - 1] = matches[0];
+            input.value = tokens.join(' ');
+          } else if (matches.length > 1) {
+            const lastChild = history.lastElementChild;
+            if (lastChild && lastChild.classList.contains('tab-hint-row')) {
+              return;
+            }
+            const hint = document.createElement('div');
+            hint.className = 'tab-hint-row text-xs text-[#38bdf8] pl-3 my-1 font-mono';
+            hint.textContent = matches.join('   ');
+            history.appendChild(hint);
+            if (termBody) {
+              termBody.scrollTop = termBody.scrollHeight;
+            }
+          }
+          return;
+        }
 
         if (mainCmd === 'ls' && lastToken.startsWith('-')) {
           availableItems = ['-a', '-l', '-la', '-al'];
