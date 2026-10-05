@@ -371,6 +371,18 @@ const dynamicFileSystem = {
         var card = document.getElementById('terminal-closed-card');
         if (!sec) return;
 
+        // Om sidan laddades om (refresh / F5 / Ctrl+R) -> rensa sparad historik enligt önskemål
+        var navEntries = performance.getEntriesByType && performance.getEntriesByType('navigation');
+        var isReload = (navEntries && navEntries[0] && navEntries[0].type === 'reload') || 
+                       (window.performance && window.performance.navigation && window.performance.navigation.type === 1);
+        if (isReload) {
+          sessionStorage.removeItem('terminal_history_html');
+          sessionStorage.removeItem('terminal_cmd_history');
+          sessionStorage.removeItem('terminal_body_scroll');
+          sessionStorage.removeItem('terminal_nav_scroll_y');
+          sessionStorage.removeItem('navigated_via_cli');
+        }
+
         var isSub = sec.getAttribute('data-is-subpage') === 'true';
         var isDesk = window.innerWidth >= 1024;
         var viaCli = sessionStorage.getItem('navigated_via_cli') === 'true';
@@ -380,6 +392,17 @@ const dynamicFileSystem = {
           sec.classList.remove('hidden');
           if (win) win.classList.remove('hidden');
           if (card) card.classList.add('hidden');
+
+          var hist = document.getElementById('terminal-history');
+          var savedH = sessionStorage.getItem('terminal_history_html');
+          if (hist && savedH) {
+            hist.innerHTML = savedH;
+          }
+
+          var savedY = sessionStorage.getItem('terminal_nav_scroll_y');
+          if (savedY !== null) {
+            window.scrollTo(0, Number(savedY));
+          }
         } else if (!isSub && isDesk && !closedByUser) {
           sec.classList.remove('hidden');
           if (win) win.classList.remove('hidden');
@@ -437,6 +460,10 @@ const dynamicFileSystem = {
       if (isMinimized) unminimize();
       sessionStorage.setItem('terminal_closed_by_user', 'true');
       sessionStorage.removeItem('navigated_via_cli');
+      sessionStorage.removeItem('terminal_history_html');
+      sessionStorage.removeItem('terminal_cmd_history');
+      sessionStorage.removeItem('terminal_body_scroll');
+      sessionStorage.removeItem('terminal_nav_scroll_y');
 
       if (isSubpage) {
         termSection.classList.add('hidden');
@@ -454,7 +481,7 @@ const dynamicFileSystem = {
       closedCard?.classList.add('hidden');
       if (isMinimized) unminimize();
       updateTitle();
-      setTimeout(() => input.focus(), 50);
+      setTimeout(() => input.focus({ preventScroll: true }), 50);
     }
 
     // Unmaximize helper
@@ -476,7 +503,7 @@ const dynamicFileSystem = {
       termBody.classList.add('flex-1', 'overflow-y-auto');
       fullscreenHint?.classList.remove('hidden');
       if (titleText) titleText.textContent = `bash — gulo@playground: ${getCwdLabel()} [MAXIMERAD FULLSKÄRM]`;
-      input.focus();
+      input.focus({ preventScroll: true });
     }
 
     function toggleMaximize() {
@@ -493,7 +520,7 @@ const dynamicFileSystem = {
       termBody.classList.remove('hidden');
       statusPill?.classList.add('hidden');
       updateTitle();
-      input.focus();
+      input.focus({ preventScroll: true });
     }
 
     // Minimize helper
@@ -561,6 +588,8 @@ const dynamicFileSystem = {
       const anchor = (e.target as HTMLElement)?.closest('a');
       if (anchor && anchor.href && anchor.origin === window.location.origin && !anchor.target) {
         sessionStorage.removeItem('navigated_via_cli');
+        sessionStorage.removeItem('terminal_history_html');
+        sessionStorage.removeItem('terminal_nav_scroll_y');
       }
     });
 
@@ -617,6 +646,82 @@ const dynamicFileSystem = {
 
     updateTitle();
 
+    // Helper för att spara historik och navigera med CLI utan att tappa terminalinnehåll
+    function navigateWithCli(url: string, messageHtml?: string) {
+      sessionStorage.setItem('navigated_via_cli', 'true');
+
+      if (messageHtml && history) {
+        const resBox = document.createElement('div');
+        resBox.className = 'text-xs pl-3 border-l border-[#30363d] my-1 font-mono';
+        resBox.innerHTML = messageHtml;
+        history.appendChild(resBox);
+      }
+
+      if (history) {
+        sessionStorage.setItem('terminal_history_html', history.innerHTML);
+      }
+      sessionStorage.setItem('terminal_cmd_history', JSON.stringify(cmdHistory));
+
+      if (termBody) {
+        sessionStorage.setItem('terminal_body_scroll', String(termBody.scrollTop));
+      }
+
+      // Spara fönstrets scrollposition så att användaren inte kastas runt vid sidbytet!
+      sessionStorage.setItem('terminal_nav_scroll_y', String(window.scrollY));
+
+      window.location.href = url;
+    }
+
+    // Helper för att rendera stiliga informationsrutor från Markdown-filer (whoami.md, contact.md)
+    function renderMarkdownCard(rawMd: string): string {
+      if (!rawMd) return '';
+      const lines = rawMd.split('\n');
+      let title = '';
+      let items: { label: string; value: string }[] = [];
+      let footer = '';
+      let inFooter = false;
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        if (trimmed.startsWith('# ')) {
+          title = trimmed.slice(2).trim();
+        } else if (trimmed === '---') {
+          inFooter = true;
+        } else if (inFooter) {
+          footer += (footer ? '<br/>' : '') + escapeHtml(trimmed);
+        } else if (trimmed.startsWith('- ')) {
+          const rest = trimmed.slice(2);
+          const colonIdx = rest.indexOf(':');
+          if (colonIdx !== -1) {
+            const label = rest.slice(0, colonIdx).trim();
+            const value = rest.slice(colonIdx + 1).trim();
+            items.push({ label, value });
+          } else {
+            items.push({ label: '', value: rest });
+          }
+        }
+      }
+
+      function formatVal(v: string): string {
+        return v.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_match, text, url) => {
+          return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="text-[#e6edf3] hover:underline hover:text-[#10b981]">${escapeHtml(text)}</a>`;
+        });
+      }
+
+      let rows = items.map(it => {
+        if (!it.label) return `<div>${formatVal(it.value)}</div>`;
+        return `<div><span class="text-[#38bdf8] font-semibold">${escapeHtml(it.label)}:</span> <span class="text-[#e6edf3]">${formatVal(it.value)}</span></div>`;
+      }).join('');
+
+      return `
+<div class="text-[#e6edf3] space-y-1.5 text-xs font-mono p-3 rounded bg-[#0d1117] border border-[#30363d]">
+  ${title ? `<div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">${escapeHtml(title)}</div>` : ''}
+  ${rows}
+  ${footer ? `<div class="text-[#8b949e] text-[11px] pt-1.5 border-t border-[#30363d]/40">${footer}</div>` : ''}
+</div>`;
+    }
+
     // Visningsregler för dator vs mobil/tablet:
     // - Dator (>= 1024px): startsida öppen by default (om inte stängd av användaren). Subpages stängda om man inte navigerat med CLI.
     // - Mobil / iPad (< 1024px): stängd by default överallt, men CLI-navigation håller den öppen.
@@ -625,7 +730,35 @@ const dynamicFileSystem = {
     const closedByUser = sessionStorage.getItem('terminal_closed_by_user') === 'true';
 
     if (navigatedViaCli) {
+      // 1. Återställ terminalhistorik sparad före sidbyte
+      const savedHtml = sessionStorage.getItem('terminal_history_html');
+      if (savedHtml && history) {
+        history.innerHTML = savedHtml;
+      }
+
+      // 2. Återställ kommandohistorik (piltangent upp/ned)
+      const savedCmds = sessionStorage.getItem('terminal_cmd_history');
+      if (savedCmds) {
+        try {
+          cmdHistory = JSON.parse(savedCmds);
+          historyIndex = cmdHistory.length;
+        } catch (e) {}
+      }
+
+      // 3. Öppna terminalen
       restoreWindow();
+
+      // 4. Mjuk och stabil scroll så användaren är kvar på det de kollar på
+      const savedScroll = sessionStorage.getItem('terminal_body_scroll');
+      if (savedScroll && termBody) {
+        termBody.scrollTop = Number(savedScroll);
+      }
+
+      // 5. Återställ sidans scrollposition exakt utan att rycka hela sidan
+      const savedWindowY = sessionStorage.getItem('terminal_nav_scroll_y');
+      if (savedWindowY !== null) {
+        window.scrollTo({ top: Number(savedWindowY), behavior: 'instant' });
+      }
     } else if (!isSubpage && isDesktop && !closedByUser) {
       restoreWindow();
     } else if (!isSubpage && isDesktop && closedByUser) {
@@ -714,15 +847,26 @@ const dynamicFileSystem = {
   <div class="text-[#10b981] pt-1">Läs min artikel med kommandot: <code class="text-[#e6edf3]">open chalmers-simning-kod</code></div>
 </div>`,
 
-      whoami: () => `
+      whoami: () => {
+        const fileNode = fileSystem.children['whoami.md'];
+        if (fileNode && fileNode.type === 'file' && fileNode.content) {
+          return renderMarkdownCard(fileNode.content);
+        }
+        return `
 <div class="text-[#e6edf3] space-y-1 text-xs font-mono p-3 rounded bg-[#0d1117] border border-[#30363d]">
   <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">gulo // Chalmersstudent, simmare &amp; utvecklare</div>
   <div><span class="text-[#8b949e]">Studier:</span> Datateknik på Chalmers Tekniska Högskola (Göteborg).</div>
   <div><span class="text-[#8b949e]">Fysik:</span> Tävlingssimmare i frisim och fjäril.</div>
   <div><span class="text-[#8b949e]">Intressen:</span> Självhostade servrar, Linux-tuning, Minecraft, analog fotografi (35mm) och dotfiles.</div>
-</div>`,
+</div>`;
+      },
 
-      contact: () => `
+      contact: () => {
+        const fileNode = fileSystem.children['contact.md'];
+        if (fileNode && fileNode.type === 'file' && fileNode.content) {
+          return renderMarkdownCard(fileNode.content);
+        }
+        return `
 <div class="text-[#e6edf3] space-y-1.5 text-xs font-mono p-3 rounded bg-[#0d1117] border border-[#30363d]">
   <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">📫 KONTAKT &amp; LÄNKAR // GULO</div>
   <div><span class="text-[#38bdf8] font-semibold">GitHub:</span> <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="text-[#e6edf3] hover:underline hover:text-[#10b981]">github.com/gulo ↗</a></div>
@@ -730,7 +874,8 @@ const dynamicFileSystem = {
   <div><span class="text-[#38bdf8] font-semibold">Discord:</span> <span class="text-[#e6edf3]">gulo#0001 (eller pinga på Chalmers Discord-servern)</span></div>
   <div><span class="text-[#38bdf8] font-semibold">Chalmers:</span> <span class="text-[#e6edf3]">EDIT-huset, Maskingränd / Johanneberg</span></div>
   <div class="text-[#8b949e] text-[11px] pt-1">Hör gärna av dig om homelab, simning, Rust eller projektidéer!</div>
-</div>`,
+</div>`;
+      },
 
       ls: (args) => {
         let targetDir = getCurrentDir();
@@ -887,26 +1032,23 @@ ${escapeHtml(node.content)}
       },
 
       open: (args) => {
-        // Behåll alltid terminalen öppen när man navigerar med CLI
-        sessionStorage.setItem('navigated_via_cli', 'true');
-
         const rawTarget = args[0] ? args[0].trim() : '.';
         const target = rawTarget.toLowerCase().replace(/\/$/, '').replace(/\.md$/, '');
 
         // 1. "open" eller "open ." -> öppnar katalogen användaren befinner sig i!
         if (target === '.' || target === '') {
           if (currentPath.length === 0) {
-            window.location.href = '/';
-            return `<div class="text-[#10b981]">Öppnar startsidan /...</div>`;
+            navigateWithCli('/', `<div class="text-[#10b981]">Öppnar startsidan /...</div>`);
+            return;
           }
           const folder = currentPath[0];
-          window.location.href = `/${folder}`;
-          return `<div class="text-[#10b981]">Öppnar mappen /${escapeHtml(folder)} på webben...</div>`;
+          navigateWithCli(`/${folder}`, `<div class="text-[#10b981]">Öppnar mappen /${escapeHtml(folder)} på webben...</div>`);
+          return;
         }
 
         if (target === '..' || target === '~') {
-          window.location.href = '/';
-          return `<div class="text-[#10b981]">Öppnar hemkatalogen / på webben...</div>`;
+          navigateWithCli('/', `<div class="text-[#10b981]">Öppnar hemkatalogen / på webben...</div>`);
+          return;
         }
 
         // 2. Kontrollera om target matchar en fil med actionUrl i nuvarande katalog
@@ -914,8 +1056,8 @@ ${escapeHtml(node.content)}
         if (current.children[rawTarget] && current.children[rawTarget].type === 'file') {
           const f = current.children[rawTarget] as FileNode;
           if (f.actionUrl) {
-            window.location.href = f.actionUrl;
-            return `<div class="text-[#10b981]">Öppnar ${escapeHtml(rawTarget)} (${escapeHtml(f.actionUrl)})...</div>`;
+            navigateWithCli(f.actionUrl, `<div class="text-[#10b981]">Öppnar ${escapeHtml(rawTarget)} (${escapeHtml(f.actionUrl)})...</div>`);
+            return;
           }
         }
 
@@ -925,10 +1067,10 @@ ${escapeHtml(node.content)}
             for (const [fname, node] of Object.entries(dirNode.children)) {
               if (node.type === 'file') {
                 const baseFname = fname.toLowerCase().replace(/\.md$/, '');
-                if (target === baseFname || target === fname.toLowerCase()) {
+                if (target === baseFname || target === fname.toLowerCase() || baseFname.includes(target) || target.includes(baseFname)) {
                   if (node.actionUrl) {
-                    window.location.href = node.actionUrl;
-                    return `<div class="text-[#38bdf8]">Öppnar ${escapeHtml(fname)} (${escapeHtml(node.actionUrl)})...</div>`;
+                    navigateWithCli(node.actionUrl, `<div class="text-[#38bdf8]">Öppnar ${escapeHtml(fname)} (${escapeHtml(node.actionUrl)})...</div>`);
+                    return;
                   }
                 }
               }
@@ -938,16 +1080,16 @@ ${escapeHtml(node.content)}
 
         // 4. Snabbgenvägar till sektioner
         if (target === 'projects' || target === 'projekt') {
-          window.location.href = '/projects';
-          return `<div class="text-[#10b981]">Navigerar till /projects...</div>`;
+          navigateWithCli('/projects', `<div class="text-[#10b981]">Navigerar till /projects...</div>`);
+          return;
         }
         if (target === 'thoughts' || target === 'tankar' || target === 'blog' || target === 'blogg' || target === 'anteckningar') {
-          window.location.href = '/thoughts';
-          return `<div class="text-[#10b981]">Navigerar till /thoughts...</div>`;
+          navigateWithCli('/thoughts', `<div class="text-[#10b981]">Navigerar till /thoughts...</div>`);
+          return;
         }
         if (target === 'files' || target === 'filer' || target === 'downloads') {
-          window.location.href = '/files';
-          return `<div class="text-[#10b981]">Navigerar till /files...</div>`;
+          navigateWithCli('/files', `<div class="text-[#10b981]">Navigerar till /files...</div>`);
+          return;
         }
 
         // 5. Direktladdningar
@@ -972,21 +1114,18 @@ ${escapeHtml(node.content)}
       },
 
       projects: () => {
-        sessionStorage.setItem('navigated_via_cli', 'true');
-        window.location.href = '/projects';
-        return `<div class="text-[#a78bfa]">Öppnar /projects (Portfolio)...</div>`;
+        navigateWithCli('/projects', `<div class="text-[#a78bfa]">Öppnar /projects (Portfolio)...</div>`);
+        return;
       },
 
       thoughts: () => {
-        sessionStorage.setItem('navigated_via_cli', 'true');
-        window.location.href = '/thoughts';
-        return `<div class="text-[#f59e0b]">Öppnar /thoughts (Blogg & Anteckningar)...</div>`;
+        navigateWithCli('/thoughts', `<div class="text-[#f59e0b]">Öppnar /thoughts (Blogg & Anteckningar)...</div>`);
+        return;
       },
 
       files: () => {
-        sessionStorage.setItem('navigated_via_cli', 'true');
-        window.location.href = '/files';
-        return `<div class="text-[#10b981]">Öppnar /files...</div>`;
+        navigateWithCli('/files', `<div class="text-[#10b981]">Öppnar /files...</div>`);
+        return;
       },
 
       fastfetch: () => `
@@ -1043,6 +1182,8 @@ ${escapeHtml(node.content)}
 
       clear: () => {
         history.innerHTML = '';
+        sessionStorage.removeItem('terminal_history_html');
+        sessionStorage.removeItem('terminal_nav_scroll_y');
         return;
       },
 
@@ -1057,12 +1198,20 @@ ${escapeHtml(node.content)}
     commands['neofetch'] = commands['fastfetch'];
     commands['fetch'] = commands['fastfetch'];
 
-    // Smidiga alias för whoami och contact (gulo, whoisgulo, whoamgulo, email, mail etc)
+    // Smidiga alias för whoami
     commands['whoisgulo'] = commands['whoami'];
     commands['whoamgulo'] = commands['whoami'];
     commands['gulo'] = commands['whoami'];
     commands['whois'] = commands['whoami'];
     commands['who'] = commands['whoami'];
+
+    // Smidiga alias för contact (Discord, phone, number, kontakt, socials, mail, email)
+    commands['discord'] = commands['contact'];
+    commands['phone'] = commands['contact'];
+    commands['number'] = commands['contact'];
+    commands['kontakt'] = commands['contact'];
+    commands['socials'] = commands['contact'];
+    commands['social'] = commands['contact'];
     commands['email'] = commands['contact'];
     commands['mail'] = commands['contact'];
 
@@ -1102,7 +1251,7 @@ ${escapeHtml(node.content)}
       }
 
       input.value = '';
-      input.focus();
+      input.focus({ preventScroll: true });
     }
 
     form.addEventListener('submit', (e) => {
@@ -1138,6 +1287,8 @@ ${escapeHtml(node.content)}
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'l') {
         e.preventDefault();
         history.innerHTML = '';
+        sessionStorage.removeItem('terminal_history_html');
+        sessionStorage.removeItem('terminal_nav_scroll_y');
         input.value = '';
         return;
       }
@@ -1168,9 +1319,10 @@ ${escapeHtml(node.content)}
         // If typing first token -> autocomplete command names
         if (tokens.length <= 1) {
           const cmdList = [
-            'help', 'school', 'swim', 'whoami', 'contact', 'ls', 'cd', 'cat', 'pwd', 
-            'grep', 'open', 'projects', 'thoughts', 'files', 'clear', 'date', 'uptime', 
-            'fastfetch', 'neofetch', 'fetch', 'tldr', 'study', 'sleep', 'mc', 'alias', 'exit'
+            'help', 'school', 'swim', 'whoami', 'contact', 'discord', 'phone', 'number', 'kontakt',
+            'ls', 'cd', 'cat', 'pwd', 'grep', 'open', 'projects', 'thoughts', 'files', 'clear', 
+            'date', 'uptime', 'fastfetch', 'neofetch', 'fetch', 'tldr', 'study', 'sleep', 'mc', 
+            'alias', 'whoisgulo', 'gulo', 'exit'
           ];
           const matches = cmdList.filter(c => c.startsWith(lastToken.toLowerCase()));
 
@@ -1254,9 +1406,6 @@ ${escapeHtml(node.content)}
           hint.textContent = matches.join('   ');
           history.appendChild(hint);
         }
-      } else if (e.ctrlKey && e.key.toLowerCase() === 'l') {
-        e.preventDefault();
-        history.innerHTML = '';
       }
     });
 

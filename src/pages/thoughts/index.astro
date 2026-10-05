@@ -46,100 +46,136 @@ const allTags = Array.from(
             Tankar, Guider &amp; Anteckningar
           </h1>
           <p class="text-xs sm:text-sm text-[#8b949e] mt-1 font-mono">
-            En text-first digital trädgård. Uppdelad i djupare tankar, tekniska guider och snabba labbanteckningar.
+            En text-first digital trädgård. Välj en eller flera kategorier direkt på korten nedan för att filtrera.
           </p>
         </div>
 
-        <div class="flex items-center gap-2 text-xs font-mono text-[#8b949e]">
+        <!-- Sortering & Antal -->
+        <div class="flex items-center gap-3 text-xs font-mono">
           <span class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981] font-mono text-xs">
             <span id="thought-count-badge">{sortedThoughts.length}</span> poster synliga
           </span>
+
+          <div class="inline-flex rounded-lg p-0.5 bg-[#0d1117] border border-[#30363d]" id="sort-controls">
+            <button 
+              type="button" 
+              id="btn-sort-newest" 
+              class="sort-btn active px-2.5 py-1 rounded text-[11px] font-semibold bg-[#161b22] text-[#e6edf3] border border-[#30363d] cursor-pointer transition-all"
+              data-order="desc"
+              title="Sortera efter nyast publiceringsdatum först"
+            >
+              Nyast ↓
+            </button>
+            <button 
+              type="button" 
+              id="btn-sort-oldest" 
+              class="sort-btn px-2.5 py-1 rounded text-[11px] text-[#8b949e] hover:text-[#e6edf3] cursor-pointer transition-all"
+              data-order="asc"
+              title="Sortera efter äldst publiceringsdatum först"
+            >
+              Äldst ↑
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Controls Panel: Categories, Sorting, Search & Tags -->
-      <div class="mt-6 pt-5 border-t border-[#30363d]/60 space-y-4">
-        <!-- 1. Kategori-väljare (Huvudfiltrering) -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div class="flex flex-wrap items-center gap-2 text-xs font-mono" id="category-filter-bar">
-            <span class="text-[#8b949e] text-[11px] mr-1 uppercase font-semibold">Kategori:</span>
-            <button 
-              type="button" 
-              class="cat-filter-btn active px-3 py-1.5 rounded bg-[#10b981] text-[#0d1117] font-bold border border-[#10b981] transition-all cursor-pointer flex items-center gap-1.5"
-              data-cat="all"
-            >
-              <span>[Alla]</span>
-              <span class="opacity-75 text-[10px]">({countAll})</span>
-            </button>
-
-            <button 
-              type="button" 
-              class="cat-filter-btn px-3 py-1.5 rounded bg-[#161b22] text-[#f59e0b] border border-[#30363d] hover:border-[#f59e0b] hover:bg-[#f59e0b]/10 transition-all cursor-pointer flex items-center gap-1.5 font-medium"
-              data-cat="tanke"
-            >
-              <span>[Tankar]</span>
-              <span class="text-[#8b949e] text-[10px]">({countTankar})</span>
-            </button>
-
-            <button 
-              type="button" 
-              class="cat-filter-btn px-3 py-1.5 rounded bg-[#161b22] text-[#38bdf8] border border-[#30363d] hover:border-[#38bdf8] hover:bg-[#38bdf8]/10 transition-all cursor-pointer flex items-center gap-1.5 font-medium"
-              data-cat="guide"
-            >
-              <span>[Guider]</span>
-              <span class="text-[#8b949e] text-[10px]">({countGuider})</span>
-            </button>
-
-            <button 
-              type="button" 
-              class="cat-filter-btn px-3 py-1.5 rounded bg-[#161b22] text-[#10b981] border border-[#30363d] hover:border-[#10b981] hover:bg-[#10b981]/10 transition-all cursor-pointer flex items-center gap-1.5 font-medium"
-              data-cat="anteckning"
-            >
-              <span>[Anteckningar]</span>
-              <span class="text-[#8b949e] text-[10px]">({countAnteckningar})</span>
-            </button>
-          </div>
-
-          <!-- Datumsortering (Nyast först vs Äldst först) -->
-          <div class="flex items-center gap-2 text-xs font-mono" id="sort-controls">
-            <span class="text-[#8b949e] text-[11px]">Datum:</span>
-            <div class="inline-flex rounded-lg p-0.5 bg-[#0d1117] border border-[#30363d]">
-              <button 
-                type="button" 
-                id="btn-sort-newest" 
-                class="sort-btn active px-2.5 py-1 rounded text-[11px] font-semibold bg-[#161b22] text-[#e6edf3] border border-[#30363d] cursor-pointer transition-all"
-                data-order="desc"
-                title="Sortera efter nyast publiceringsdatum först"
-              >
-                Nyast ↓
-              </button>
-              <button 
-                type="button" 
-                id="btn-sort-oldest" 
-                class="sort-btn px-2.5 py-1 rounded text-[11px] text-[#8b949e] hover:text-[#e6edf3] cursor-pointer transition-all"
-                data-order="asc"
-                title="Sortera efter äldst publiceringsdatum först"
-              >
-                Äldst ↑
-              </button>
-            </div>
-          </div>
+      <!-- Interactive Multi-Select Category Cards -->
+      <div class="mt-6 pt-5 border-t border-[#30363d]/60 space-y-3">
+        <div class="flex items-center justify-between text-xs font-mono">
+          <span class="text-[#8b949e] text-[11px] uppercase tracking-wider font-semibold">
+            Välj kategorier att visa (klicka på ett eller flera kort; om inget eller alla är valda visas allt):
+          </span>
+          <button 
+            type="button" 
+            id="btn-reset-categories" 
+            class="hidden text-[11px] text-[#38bdf8] hover:text-[#10b981] hover:underline cursor-pointer transition-colors"
+          >
+            [Visa alla kategorier]
+          </button>
         </div>
 
-        <!-- 2. Live Search Input -->
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-xs text-[#8b949e]">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono" id="category-cards-container">
+          <!-- Card 1: TANKE -->
+          <button 
+            type="button" 
+            class="cat-toggle-card text-left p-3.5 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#f59e0b]/80 transition-all cursor-pointer group flex flex-col justify-between gap-2.5 select-none"
+            data-cat="tanke"
+            aria-pressed="false"
+          >
+            <div class="flex items-center justify-between w-full">
+              <span class="text-[#f59e0b] font-bold tracking-wide">[TANKE]</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-[#0d1117] border border-[#30363d] text-[#8b949e] cat-count">
+                {countTankar} st
+              </span>
+            </div>
+            <p class="text-[#8b949e] text-[11px] leading-relaxed group-hover:text-[#e6edf3] transition-colors">
+              Djupare reflektioner, personlig filosofi kring simning, studier och teknik.
+            </p>
+            <div class="flex items-center justify-between text-[10px] text-[#8b949e] pt-1.5 border-t border-[#30363d]/40 w-full">
+              <span class="cat-status-text">Klicka för att filtrera</span>
+              <span class="cat-indicator-dot w-2 h-2 rounded-full border border-[#8b949e]"></span>
+            </div>
+          </button>
+
+          <!-- Card 2: GUIDE -->
+          <button 
+            type="button" 
+            class="cat-toggle-card text-left p-3.5 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#38bdf8]/80 transition-all cursor-pointer group flex flex-col justify-between gap-2.5 select-none"
+            data-cat="guide"
+            aria-pressed="false"
+          >
+            <div class="flex items-center justify-between w-full">
+              <span class="text-[#38bdf8] font-bold tracking-wide">[GUIDE]</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-[#0d1117] border border-[#30363d] text-[#8b949e] cat-count">
+                {countGuider} st
+              </span>
+            </div>
+            <p class="text-[#8b949e] text-[11px] leading-relaxed group-hover:text-[#e6edf3] transition-colors">
+              How-tos, JVM-tuning, dotfiles och terminalkonfigurationer för Linux.
+            </p>
+            <div class="flex items-center justify-between text-[10px] text-[#8b949e] pt-1.5 border-t border-[#30363d]/40 w-full">
+              <span class="cat-status-text">Klicka för att filtrera</span>
+              <span class="cat-indicator-dot w-2 h-2 rounded-full border border-[#8b949e]"></span>
+            </div>
+          </button>
+
+          <!-- Card 3: ANTECKNING -->
+          <button 
+            type="button" 
+            class="cat-toggle-card text-left p-3.5 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#10b981]/80 transition-all cursor-pointer group flex flex-col justify-between gap-2.5 select-none"
+            data-cat="anteckning"
+            aria-pressed="false"
+          >
+            <div class="flex items-center justify-between w-full">
+              <span class="text-[#10b981] font-bold tracking-wide">[ANTECKNING]</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-[#0d1117] border border-[#30363d] text-[#8b949e] cat-count">
+                {countAnteckningar} st
+              </span>
+            </div>
+            <p class="text-[#8b949e] text-[11px] leading-relaxed group-hover:text-[#e6edf3] transition-colors">
+              Snabbt labbkladd från EDIT-huset, Valgrind-flaggor och systemd-units.
+            </p>
+            <div class="flex items-center justify-between text-[10px] text-[#8b949e] pt-1.5 border-t border-[#30363d]/40 w-full">
+              <span class="cat-status-text">Klicka för att filtrera</span>
+              <span class="cat-indicator-dot w-2 h-2 rounded-full border border-[#8b949e]"></span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Live Search Input -->
+        <div class="relative pt-2">
+          <div class="absolute inset-y-0 left-0 pl-3 pt-2 flex items-center pointer-events-none text-xs text-[#8b949e]">
             <span>grep:</span>
           </div>
           <input 
             type="text" 
             id="thought-search-input"
-            placeholder="Sök på rubrik, beskrivning, tagg eller kategori (t.ex. 'simning', 'valgrind', 'tmux', 'jvm')..." 
+            placeholder="Sök i artiklar på rubrik, beskrivning eller tagg (t.ex. 'simning', 'valgrind', 'tmux', 'jvm')..." 
             class="w-full bg-[#161b22] text-[#e6edf3] text-xs pl-16 pr-4 py-2 rounded-lg border border-[#30363d] focus:outline-none focus:border-[#10b981] placeholder-[#8b949e]/60 font-mono transition-colors"
           />
         </div>
 
-        <!-- 3. Tag Filters -->
+        <!-- Tag Filters -->
         <div class="flex flex-wrap items-center gap-1.5 text-xs font-mono" id="blog-tag-bar">
           <span class="text-[#8b949e] text-[11px] mr-1">Tagg:</span>
           <button 
@@ -159,30 +195,6 @@ const allTags = Array.from(
             </button>
           ))}
         </div>
-      </div>
-    </div>
-
-    <!-- Category Explanations Box (Subtle context) -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">
-      <div class="p-3 rounded-lg bg-[#161b22]/70 border border-[#30363d]/60">
-        <span class="text-[#f59e0b] font-bold block mb-1">[TANKE]</span>
-        <p class="text-[#8b949e] text-[11px] leading-relaxed">
-          Djupare reflektioner, personlig filosofi kring simning, studier och teknik.
-        </p>
-      </div>
-
-      <div class="p-3 rounded-lg bg-[#161b22]/70 border border-[#30363d]/60">
-        <span class="text-[#38bdf8] font-bold block mb-1">[GUIDE]</span>
-        <p class="text-[#8b949e] text-[11px] leading-relaxed">
-          How-tos, JVM-tuning, dotfiles och terminalkonfigurationer för Linux.
-        </p>
-      </div>
-
-      <div class="p-3 rounded-lg bg-[#161b22]/70 border border-[#30363d]/60">
-        <span class="text-[#10b981] font-bold block mb-1">[ANTECKNING]</span>
-        <p class="text-[#8b949e] text-[11px] leading-relaxed">
-          Snabbt labbkladd från EDIT-huset, Valgrind-flaggor och systemd-units.
-        </p>
       </div>
     </div>
 
@@ -291,7 +303,8 @@ const allTags = Array.from(
 
 <script>
   function initBlogSystem() {
-    const catBtns = document.querySelectorAll('.cat-filter-btn');
+    const toggleCards = Array.from(document.querySelectorAll<HTMLButtonElement>('.cat-toggle-card'));
+    const btnReset = document.getElementById('btn-reset-categories');
     const tagBtns = document.querySelectorAll('.tag-filter-btn');
     const searchInput = document.getElementById('thought-search-input') as HTMLInputElement | null;
     const listContainer = document.getElementById('thoughts-list');
@@ -301,13 +314,67 @@ const allTags = Array.from(
     const btnSortNewest = document.getElementById('btn-sort-newest');
     const btnSortOldest = document.getElementById('btn-sort-oldest');
 
-    let currentCategory = 'all';
+    // Mängd av aktivt valda kategorier: Set<'tanke' | 'guide' | 'anteckning'>
+    // Regel: 0 valda = visa alla. 3 valda = visa alla. 1 eller 2 valda = visa bara de valda!
+    const selectedCategories = new Set<string>();
+
     let currentTag = 'all';
     let searchQuery = '';
     let currentSort = 'desc'; // 'desc' = nyast först, 'asc' = äldst först
 
+    function updateCardVisuals() {
+      const isFiltered = selectedCategories.size > 0 && selectedCategories.size < 3;
+      if (btnReset) {
+        btnReset.classList.toggle('hidden', !isFiltered);
+      }
+
+      toggleCards.forEach((card) => {
+        const cat = card.getAttribute('data-cat') || '';
+        const isSelected = selectedCategories.has(cat);
+        card.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+
+        const dot = card.querySelector('.cat-indicator-dot');
+        const statusText = card.querySelector('.cat-status-text');
+
+        // Återställ basklasser
+        card.classList.remove(
+          'ring-1', 'ring-[#f59e0b]', 'border-[#f59e0b]', 'bg-[#f59e0b]/10',
+          'ring-[#38bdf8]', 'border-[#38bdf8]', 'bg-[#38bdf8]/10',
+          'ring-[#10b981]', 'border-[#10b981]', 'bg-[#10b981]/10'
+        );
+        card.classList.add('bg-[#161b22]', 'border-[#30363d]');
+
+        if (dot) {
+          dot.classList.remove('bg-[#f59e0b]', 'border-[#f59e0b]', 'bg-[#38bdf8]', 'border-[#38bdf8]', 'bg-[#10b981]', 'border-[#10b981]');
+          dot.classList.add('border-[#8b949e]');
+        }
+        if (statusText) {
+          statusText.classList.remove('text-[#f59e0b]', 'text-[#38bdf8]', 'text-[#10b981]', 'font-semibold');
+          statusText.textContent = 'Klicka för att filtrera';
+        }
+
+        if (isSelected) {
+          card.classList.remove('bg-[#161b22]', 'border-[#30363d]');
+          if (cat === 'tanke') {
+            card.classList.add('ring-1', 'ring-[#f59e0b]', 'border-[#f59e0b]', 'bg-[#f59e0b]/10');
+            if (dot) { dot.classList.remove('border-[#8b949e]'); dot.classList.add('bg-[#f59e0b]', 'border-[#f59e0b]'); }
+            if (statusText) { statusText.classList.add('text-[#f59e0b]', 'font-semibold'); statusText.textContent = 'Aktivt filter ✓'; }
+          } else if (cat === 'guide') {
+            card.classList.add('ring-1', 'ring-[#38bdf8]', 'border-[#38bdf8]', 'bg-[#38bdf8]/10');
+            if (dot) { dot.classList.remove('border-[#8b949e]'); dot.classList.add('bg-[#38bdf8]', 'border-[#38bdf8]'); }
+            if (statusText) { statusText.classList.add('text-[#38bdf8]', 'font-semibold'); statusText.textContent = 'Aktivt filter ✓'; }
+          } else if (cat === 'anteckning') {
+            card.classList.add('ring-1', 'ring-[#10b981]', 'border-[#10b981]', 'bg-[#10b981]/10');
+            if (dot) { dot.classList.remove('border-[#8b949e]'); dot.classList.add('bg-[#10b981]', 'border-[#10b981]'); }
+            if (statusText) { statusText.classList.add('text-[#10b981]', 'font-semibold'); statusText.textContent = 'Aktivt filter ✓'; }
+          }
+        }
+      });
+    }
+
     function applyFilterAndSort() {
-      // 1. Filtrera
+      const isFiltered = selectedCategories.size > 0 && selectedCategories.size < 3;
+
       let visibleCount = 0;
       items.forEach((item) => {
         const cat = item.getAttribute('data-category') || '';
@@ -315,7 +382,8 @@ const allTags = Array.from(
         const title = item.getAttribute('data-title') || '';
         const desc = item.getAttribute('data-desc') || '';
 
-        const catMatches = currentCategory === 'all' || cat === currentCategory;
+        // Kategori-match: om 0 eller 3 är valda visas alla. Om 1 eller 2 valda visas endast de.
+        const catMatches = !isFiltered || selectedCategories.has(cat);
         const tagMatches = currentTag === 'all' || tags.includes(currentTag);
         const searchMatches = 
           !searchQuery || 
@@ -329,7 +397,7 @@ const allTags = Array.from(
         if (isMatch) visibleCount++;
       });
 
-      // 2. Sortera i DOM
+      // Sortera i DOM
       if (listContainer) {
         const sortedItems = [...items].sort((a, b) => {
           const tA = Number(a.getAttribute('data-timestamp') || 0);
@@ -349,26 +417,25 @@ const allTags = Array.from(
       if (countBadge) countBadge.textContent = String(visibleCount);
     }
 
-    // Kategori-knappar
-    catBtns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        currentCategory = btn.getAttribute('data-cat') || 'all';
-
-        catBtns.forEach((b) => {
-          b.classList.remove('bg-[#10b981]', 'text-[#0d1117]', 'font-bold', 'border-[#10b981]');
-          b.classList.add('bg-[#161b22]', 'border-[#30363d]');
-          const cat = b.getAttribute('data-cat');
-          if (cat === 'tanke') b.classList.add('text-[#f59e0b]');
-          else if (cat === 'guide') b.classList.add('text-[#38bdf8]');
-          else if (cat === 'anteckning') b.classList.add('text-[#10b981]');
-          else b.classList.add('text-[#8b949e]');
-        });
-
-        btn.classList.remove('bg-[#161b22]', 'text-[#f59e0b]', 'text-[#38bdf8]', 'text-[#10b981]', 'text-[#8b949e]', 'border-[#30363d]');
-        btn.classList.add('bg-[#10b981]', 'text-[#0d1117]', 'font-bold', 'border-[#10b981]');
-
+    // Klick på interaktiva kategori-kort
+    toggleCards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const cat = card.getAttribute('data-cat') || '';
+        if (selectedCategories.has(cat)) {
+          selectedCategories.delete(cat);
+        } else {
+          selectedCategories.add(cat);
+        }
+        updateCardVisuals();
         applyFilterAndSort();
       });
+    });
+
+    // Återställ till alla kategorier
+    btnReset?.addEventListener('click', () => {
+      selectedCategories.clear();
+      updateCardVisuals();
+      applyFilterAndSort();
     });
 
     // Tagg-knappar
