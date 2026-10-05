@@ -15,3 +15,8 @@ Utvecklad som en del av operativsystem- och datorteknikspåret på Datateknik vi
 - Kontextbyte och registersparande för RISC-V hårdvaruregister.
 - Dynamisk prioritetsberäkning baserad på I/O-bursts mot beräkningsintensiva trådar.
 - Fullständig testsvit med deterministiska scenarios och minneskontroller via Valgrind.
+
+### Relaterade resurser & filer
+- 📄 [CV — Civilingenjör Datateknik](/files#file-cv-datateknik)
+- ⚙️ [Neovim C/Rust utvecklingsmiljö dotfiles](/files#file-dotfiles-neovim)
+

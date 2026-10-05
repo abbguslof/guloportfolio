@@ -15,3 +15,8 @@ Ett självhostat Minecraft-nätverk optimerat för maximal tick-stabilitet (20.0
 - **Proxy:** Velocity med modern forwarding och krypterad paketinspektion.
 - **Backend:** PufferPanel & isolerade Docker-containrar med cgroups för CPU/RAM-kvoter.
 - **Övervakning:** Spark profiler integrerat med Grafana för realtidsanalys av MSPT och garbage collection pauses.
+
+### Nedladdningar & Serverfiler
+- 📦 [Fabric 1.20.4 Performance Modpack](/files#file-fabric-server-pack)
+- 📜 [Automatiserat Backup & Roteringsskript (zstd)](/files#file-mc-backup-script)
+

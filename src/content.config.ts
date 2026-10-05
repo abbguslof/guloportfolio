@@ -38,10 +38,13 @@ const downloads = defineCollection({
     category: z.string(),
     fileUrl: z.string(),
     description: z.string(),
+    usage: z.string().optional(),
     updatedAt: z.string(),
     checksum: z.string().optional(),
     tags: z.array(z.string()).optional(),
     featured: z.boolean().default(false),
+    relatedProjects: z.array(z.string()).default([]),
+    relatedThoughts: z.array(z.string()).default([]),
   }),
 });
 

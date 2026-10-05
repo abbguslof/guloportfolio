@@ -36,3 +36,9 @@ java -Xms12G -Xmx12G -XX:+UseG1GC \
 
 ### Resultat
 Realtidsmätningar via Spark visade att 99.8% av alla ticks låg under 18ms MSPT, även när flera spelare genererade ny terräng samtidigt.
+
+### Tillhörande resurser & nedladdningar
+Vill du köra med dessa förkonfigurerade flaggor och optimerade moddar?
+- 📦 [Fabric 1.20.4 Performance Pack](/files#file-fabric-server-pack) (eller ladda ner direkt: [fabric-1.20.4-optimized.zip](/downloads/fabric-1.20.4-optimized.zip))
+- 📜 [Automatiserat Backup & Roteringsskript](/files#file-mc-backup-script)
+

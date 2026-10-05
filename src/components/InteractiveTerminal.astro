@@ -134,137 +134,97 @@ const { isSubpage = false } = Astro.props;
 
     <!-- Terminal Collapsible Body -->
     <div id="terminal-body" class="p-4 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto transition-all">
-      <!-- High-Density TUI Fastfetch Cockpit (Eliminates all dead space and negative voids) -->
-      <div class="flex flex-col sm:flex-row items-stretch gap-4 pb-4 border-b border-[#30363d]/80">
-        <!-- Chafa Dithered CRT Terminal Identity Card (Fixed snug width, matched height) -->
-        <div class="shrink-0 flex flex-col justify-between w-full sm:w-44 md:w-48 bg-[#0d1117] p-2.5 rounded border border-[#30363d] shadow-sm">
-          <div>
-            <!-- Panel header -->
-            <div class="flex items-center justify-between pb-1.5 mb-2 border-b border-[#30363d] text-[10px] text-[#8b949e]">
-              <span class="text-[#10b981] font-bold">~/.face.six</span>
-              <span class="text-[9px] px-1 py-0.5 rounded bg-[#161b22] border border-[#30363d] text-[#38bdf8]">CHAFA</span>
-            </div>
-
-            <!-- CRT Scanline Portrait -->
-            <div class="relative w-full aspect-square rounded border border-[#30363d] overflow-hidden group shadow-inner bg-[#161b22]">
-              <img 
-                src="/images/avatar.jpg" 
-                alt="gulo — dev & swimmer avatar" 
-                class="w-full h-full object-cover grayscale contrast-125 brightness-95 group-hover:grayscale-0 group-hover:brightness-105 transition-all duration-300"
-              />
-              <!-- CRT phosphor scanline effect -->
-              <div class="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-emerald-500/5 to-transparent opacity-60 mix-blend-overlay"></div>
-            </div>
-          </div>
-
-          <!-- Identity metadata block directly below avatar (Zero empty space) -->
-          <div class="mt-2 pt-2 border-t border-[#30363d] space-y-1 text-[10px] text-[#8b949e]">
-            <div class="flex items-center justify-between">
-              <span>IDENT:</span>
-              <span class="text-[#e6edf3] font-semibold">gulo // 0x47</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <span>HOST:</span>
-              <span class="text-[#38bdf8]">chalmers-d24</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <span>SWIM:</span>
-              <span class="text-[#10b981]">valhalla 50m</span>
-            </div>
-            <!-- Terminal 6-color ANSI palette test bar -->
-            <div class="flex items-center justify-between pt-1 gap-1" title="Terminal 16-color test">
-              <span class="h-2 flex-1 rounded-xs bg-[#f85149]"></span>
-              <span class="h-2 flex-1 rounded-xs bg-[#10b981]"></span>
-              <span class="h-2 flex-1 rounded-xs bg-[#f59e0b]"></span>
-              <span class="h-2 flex-1 rounded-xs bg-[#38bdf8]"></span>
-              <span class="h-2 flex-1 rounded-xs bg-[#a78bfa]"></span>
-              <span class="h-2 flex-1 rounded-xs bg-[#e6edf3]"></span>
-            </div>
+      <!-- Authentic Neofetch / Fastfetch Layout -->
+      <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-5 border-b border-[#30363d]/80">
+        <!-- Chafa Dithered CRT Terminal Avatar (Left column) -->
+        <div class="shrink-0">
+          <div class="relative w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 rounded border border-[#30363d] bg-[#0d1117] overflow-hidden shadow-md group">
+            <img 
+              src="/images/avatar.jpg" 
+              alt="gulo — dev & swimmer avatar" 
+              class="w-full h-full object-cover grayscale contrast-125 brightness-95 group-hover:grayscale-0 group-hover:brightness-105 transition-all duration-300"
+            />
+            <!-- Authentic subtle CRT phosphor scanlines -->
+            <div class="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-emerald-500/5 to-transparent opacity-60 mix-blend-overlay"></div>
           </div>
         </div>
 
-        <!-- Balanced Two-Column Specification Pane (Fills horizontal space cleanly) -->
-        <div class="flex-1 min-w-0 flex flex-col justify-between space-y-2.5">
-          <!-- Top bar: User & Machine -->
-          <div class="pb-1.5 border-b border-[#30363d] flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-2">
-              <span class="text-[#10b981] font-bold text-sm">gulo</span>
-              <span class="text-[#8b949e]">@</span>
-              <span class="text-[#38bdf8] font-bold text-sm">chalmers-station</span>
-              <span class="text-[10px] px-1.5 py-0.2 rounded bg-[#0d1117] border border-[#30363d] text-[#8b949e]">Debian 12</span>
+        <!-- Clean Neofetch / Fastfetch Specs (Right column) -->
+        <div class="flex-1 min-w-0 space-y-1 text-xs sm:text-sm">
+          <!-- Fastfetch Header: user@host -->
+          <div>
+            <span class="text-[#10b981] font-bold">gulo</span><span class="text-[#8b949e]">@</span><span class="text-[#38bdf8] font-bold">chalmers-station</span>
+            <div class="text-[#30363d] select-none tracking-tighter leading-none mt-0.5">
+              ---------------------------------------------------
             </div>
-            <div class="flex items-center gap-2 text-[11px] text-[#8b949e]">
-              <span>Göteborg, Sverige</span>
-              <span>•</span>
-              <span class="text-[#10b981] font-medium flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse"></span>
-                ONLINE
+          </div>
+
+          <!-- Specs list with authentic CLI colored key labels -->
+          <div class="space-y-1 pt-1 text-xs">
+            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
+              <span class="text-[#38bdf8] font-semibold">OS:</span>
+              <span class="text-[#e6edf3]">Debian GNU/Linux 12 (bookworm) x86_64</span>
+            </div>
+
+            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
+              <span class="text-[#38bdf8] font-semibold">Host:</span>
+              <span class="text-[#e6edf3]">chalmers-workstation</span>
+            </div>
+
+            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
+              <span class="text-[#38bdf8] font-semibold">Kernel:</span>
+              <span class="text-[#e6edf3]">Linux 6.12.8-zen1</span>
+            </div>
+
+            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
+              <span class="text-[#38bdf8] font-semibold">Uptime:</span>
+              <span class="text-[#e6edf3]">42 dagar, 8 timmar, 14 min</span>
+            </div>
+
+            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
+              <span class="text-[#38bdf8] font-semibold">Shell:</span>
+              <span class="text-[#e6edf3]">zsh 5.9 / bash 5.2 • kitty</span>
+            </div>
+
+            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
+              <span class="text-[#38bdf8] font-semibold">Editor:</span>
+              <span class="text-[#e6edf3]">Neovim v0.10.2 (Lua dotfiles)</span>
+            </div>
+
+            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
+              <span class="text-[#10b981] font-semibold">Utbildning:</span>
+              <span class="text-[#e6edf3]">Civilingenjör Datateknik @ Chalmers (Åk 2)</span>
+            </div>
+
+            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
+              <span class="text-[#10b981] font-semibold">Simning:</span>
+              <span class="text-[#e6edf3]">Valhallabadet (5-6 pass/v, frisim/fjäril)</span>
+            </div>
+
+            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
+              <span class="text-[#10b981] font-semibold">Homelab:</span>
+              <span class="text-[#e6edf3]">PaperMC SMP-kluster, Docker, Velocity</span>
+            </div>
+
+            <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
+              <span class="text-[#f59e0b] font-semibold">Status:</span>
+              <span class="text-[#10b981] font-medium flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-ping"></span>
+                [● ONLINE] Tentavecka @ Chalmers &amp; serverdrift
               </span>
             </div>
           </div>
 
-          <!-- Two-Column High-Density Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-xs">
-            <!-- Column 1: Profil, Studier & Simning -->
-            <div class="space-y-1.5">
-              <div class="text-[10px] uppercase font-bold text-[#38bdf8] tracking-wider pb-0.5 border-b border-[#30363d]/40">
-                [PROFIL &amp; STUDIER]
-              </div>
-              <div class="grid grid-cols-[90px_1fr] gap-x-1.5 items-baseline">
-                <span class="text-[#8b949e] font-medium">Utbildning:</span>
-                <span class="text-[#e6edf3]">Civilingenjör Datateknik @ Chalmers (Åk 2)</span>
-              </div>
-              <div class="grid grid-cols-[90px_1fr] gap-x-1.5 items-baseline">
-                <span class="text-[#8b949e] font-medium">Fokus:</span>
-                <span class="text-[#e6edf3]">OS, distribuerade system, C/Rust</span>
-              </div>
-              <div class="grid grid-cols-[90px_1fr] gap-x-1.5 items-baseline">
-                <span class="text-[#8b949e] font-medium">Simning:</span>
-                <span class="text-[#e6edf3]">Valhallabadet • 5-6 pass/v (frisim/fjäril)</span>
-              </div>
-              <div class="grid grid-cols-[90px_1fr] gap-x-1.5 items-baseline">
-                <span class="text-[#8b949e] font-medium">Foto:</span>
-                <span class="text-[#e6edf3]">Analog 35mm film &amp; mörkrum</span>
-              </div>
-            </div>
-
-            <!-- Column 2: System, Homelab & Miljö -->
-            <div class="space-y-1.5">
-              <div class="text-[10px] uppercase font-bold text-[#a78bfa] tracking-wider pb-0.5 border-b border-[#30363d]/40">
-                [SYSTEM &amp; HOMELAB]
-              </div>
-              <div class="grid grid-cols-[90px_1fr] gap-x-1.5 items-baseline">
-                <span class="text-[#8b949e] font-medium">Homelab:</span>
-                <span class="text-[#e6edf3]">PaperMC SMP-kluster, Docker, Velocity</span>
-              </div>
-              <div class="grid grid-cols-[90px_1fr] gap-x-1.5 items-baseline">
-                <span class="text-[#8b949e] font-medium">OS/Kernel:</span>
-                <span class="text-[#e6edf3]">Debian 12 / Arch • Linux 6.12-zen</span>
-              </div>
-              <div class="grid grid-cols-[90px_1fr] gap-x-1.5 items-baseline">
-                <span class="text-[#8b949e] font-medium">Verktyg:</span>
-                <span class="text-[#e6edf3]">Neovim (Lua), Kitty, Git, Zsh</span>
-              </div>
-              <div class="grid grid-cols-[90px_1fr] gap-x-1.5 items-baseline">
-                <span class="text-[#8b949e] font-medium">Nätverk:</span>
-                <span class="text-[#e6edf3]">WireGuard VPN, Cloudflare Tunnel</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Bottom Telemetry & Status Bar (Spans full width) -->
-          <div class="pt-2 border-t border-[#30363d]/60 flex flex-wrap items-center justify-between gap-3 text-[11px]">
-            <div class="flex items-center gap-2 text-[#10b981]">
-              <span class="w-2 h-2 rounded-full bg-[#10b981] animate-ping"></span>
-              <span class="font-medium">Status: Tentavecka @ Chalmers, bassängpass &amp; serverdrift</span>
-            </div>
-            <div class="flex items-center gap-3 text-[#8b949e]">
-              <span>UPTIME: <strong class="text-[#e6edf3]">42d 8h</strong></span>
-              <span>•</span>
-              <span>MEM: <strong class="text-[#e6edf3]">3.8G / 16G</strong></span>
-              <span>•</span>
-              <span>LOAD: <strong class="text-[#e6edf3]">0.18</strong></span>
-            </div>
+          <!-- Authentic terminal 8-color palette test bar -->
+          <div class="pt-2 flex items-center gap-1.5" title="Terminal 8-color test palette">
+            <span class="w-4 h-2.5 rounded-xs bg-[#0d1117] border border-[#30363d]"></span>
+            <span class="w-4 h-2.5 rounded-xs bg-[#f85149]"></span>
+            <span class="w-4 h-2.5 rounded-xs bg-[#10b981]"></span>
+            <span class="w-4 h-2.5 rounded-xs bg-[#f59e0b]"></span>
+            <span class="w-4 h-2.5 rounded-xs bg-[#38bdf8]"></span>
+            <span class="w-4 h-2.5 rounded-xs bg-[#a78bfa]"></span>
+            <span class="w-4 h-2.5 rounded-xs bg-[#56d364]"></span>
+            <span class="w-4 h-2.5 rounded-xs bg-[#e6edf3]"></span>
           </div>
         </div>
       </div>
@@ -329,6 +289,7 @@ const { isSubpage = false } = Astro.props;
     function closeWindow() {
       if (isMaximized) unmaximize();
       if (isMinimized) unminimize();
+      sessionStorage.setItem('terminal_open', 'false');
 
       if (isSubpage) {
         termSection.classList.add('hidden');
@@ -340,6 +301,7 @@ const { isSubpage = false } = Astro.props;
 
     // Återställ fönstret
     function restoreWindow() {
+      sessionStorage.setItem('terminal_open', 'true');
       termSection.classList.remove('hidden');
       termWindow.classList.remove('hidden');
       closedCard?.classList.add('hidden');
@@ -388,11 +350,11 @@ const { isSubpage = false } = Astro.props;
 
     // Minimize helper
     function applyMinimize() {
-      if (isMaximized) unmaximize(); // Exit fullscreen before minimizing so page is visible!
+      if (isMaximized) unmaximize(); // Avsluta alltid fullskärm vid minimering så sidan syns!
       isMinimized = true;
       termBody.classList.add('hidden');
       statusPill?.classList.remove('hidden');
-      if (titleText) titleText.textContent = 'bash — gulo@playground: ~ (klicka var som helst för att öppna)';
+      if (titleText) titleText.textContent = `bash — gulo@playground: ${getCwdLabel()} (klicka för att öppna)`;
     }
 
     function toggleMinimize() {
@@ -446,6 +408,16 @@ const { isSubpage = false } = Astro.props;
           restoreWindow();
         } else {
           toggleMinimize();
+        }
+      }
+    });
+
+    // Bevara terminalens öppna status när användaren klickar på interna länkar
+    document.addEventListener('click', (e) => {
+      const anchor = (e.target as HTMLElement)?.closest('a');
+      if (anchor && anchor.href && anchor.origin === window.location.origin && !anchor.target) {
+        if (!termSection.classList.contains('hidden') && !termWindow.classList.contains('hidden')) {
+          sessionStorage.setItem('terminal_open', 'true');
         }
       }
     });
@@ -521,10 +493,43 @@ const { isSubpage = false } = Astro.props;
               type: 'file',
               size: '2.8 KB',
               description: 'Automated World Backup & Prune Script',
-              content: `#!/usr/bin/env bash\n# Automated World Backup Script\ntar --zstd -cf "$BACKUP_FILE" world\nfind "$BACKUP_DIR" -name "world_*.tar.zst" -mtime +14 -delete`,
+              content: `#!/usr/bin/env bash\n# Automated World Backup Script\ntar --zstd -cf "$BACKUP_FILE" world\nfind "$BACKUP_DIR" -name "world_*.tar.zst" -mtime +14 -delete\nLadda ner: open backup-world.sh`,
               actionUrl: '/downloads/backup-world.sh',
+            },
+            'cv-gulo-datateknik.pdf': {
+              type: 'file',
+              size: '142 KB',
+              description: 'CV — Civilingenjör Datateknik (Chalmers)',
+              content: `PDF-dokument: Curriculum Vitae för gulo (Datateknik @ Chalmers).\nLadda ner: open cv-gulo-datateknik.pdf`,
+              actionUrl: '/downloads/cv-gulo-datateknik.pdf',
+            },
+            'nvim-dotfiles.tar.gz': {
+              type: 'file',
+              size: '1.2 MB',
+              description: 'Neovim Lua Dotfiles (Lazy.nvim & LSP)',
+              content: `Arkiv: Neovim dotfiles i Lua med LSP-zero och Treesitter.\nLadda ner: open nvim-dotfiles.tar.gz`,
+              actionUrl: '/downloads/nvim-dotfiles.tar.gz',
             }
           }
+        },
+        // Easter Eggs & Hidden Dotfiles
+        '.gitignore': {
+          type: 'file',
+          size: '348 B',
+          description: 'Git ignore rules',
+          content: `# Saker vi ignorerar på Chalmers & i livet\n/node_modules/\n/target/\n/dist/\n/400m_medley_mjölksyra.log\n/dålig_kod.c\n/tentastress.tmp\n/kaffe_överdos.pid\n/minnesläcka_malloc_utan_free.core\n/morgonträning_kl_0530_i_regn.dump`,
+        },
+        '.bashrc': {
+          type: 'file',
+          size: '460 B',
+          description: 'Bash runtime configuration',
+          content: `# ~/.bashrc - gulo interactive terminal configuration\nexport PS1="\\[\\033[01;32m\\]visitor@playground\\[\\033[00m\\]:\\[\\033[01;34m\\]\\w\\[\\033[00m\\]\\$ "\nexport EDITOR="nvim"\nexport SWIM_POOL="Valhallabadet 50m"\n\nalias swim="echo 'Dyk i! Valhallabadet kl 06:00, 400m insim redo.'"\nalias study="echo 'Kompilerar operativsystem... tentan godkänd!'"\nalias sleep="echo 'Error: 404 Sleep Not Found under tentavecka'"\nalias mc="docker compose -f ~/homelab/docker-compose.yml up -d"`,
+        },
+        '.secret': {
+          type: 'file',
+          size: '190 B',
+          description: 'Top secret flag',
+          content: `🚩 Grattis! Du hittade den dolda filen via ls -la!\nFlag: CTF{chalmers_swimmer_homelab_master_2026}\nTips: Skriv 'swim', 'school' eller 'cat .gitignore' för fler roliga upptäckter!`,
         },
         'about.txt': {
           type: 'file',
@@ -547,7 +552,19 @@ const { isSubpage = false } = Astro.props;
       }
     };
 
+    // Kontextmedvetenhet: Terminalen startar i den katalog som motsvarar aktuell sida!
+    const pathname = window.location.pathname.replace(/\/$/, '') || '/';
     let currentPath: string[] = [];
+    if (pathname.startsWith('/projects')) {
+      currentPath = ['projects'];
+    } else if (pathname.startsWith('/thoughts')) {
+      currentPath = ['thoughts'];
+    } else if (pathname.startsWith('/files')) {
+      currentPath = ['files'];
+    } else {
+      currentPath = [];
+    }
+
     let cmdHistory: string[] = [];
     let historyIndex = -1;
 
@@ -562,6 +579,16 @@ const { isSubpage = false } = Astro.props;
       if (promptCwd) {
         promptCwd.textContent = getCwdLabel();
       }
+    }
+
+    updateTitle();
+
+    // Persistens mellan sidbyten: Om terminalen var öppen tidigare, behåll den öppen!
+    const wasOpen = sessionStorage.getItem('terminal_open');
+    if (wasOpen === 'true') {
+      restoreWindow();
+    } else if (wasOpen === 'false' && !isSubpage) {
+      closeWindow();
     }
 
     function resolveNode(pathArr: string[]): DirNode | FileNode | null {
@@ -652,11 +679,17 @@ const { isSubpage = false } = Astro.props;
 
       ls: (args) => {
         let targetDir = getCurrentDir();
-        if (args[0] && !args[0].startsWith('-')) {
-          const target = args[0].replace(/\/$/, '');
+        const flags = args.filter(a => a.startsWith('-'));
+        const nonFlags = args.filter(a => !a.startsWith('-'));
+
+        const showAll = flags.some(f => f.includes('a'));
+        const isLong = flags.some(f => f.includes('l'));
+
+        if (nonFlags[0]) {
+          const target = nonFlags[0].replace(/\/$/, '');
           const node = target === '~' ? fileSystem : targetDir.children[target];
           if (!node) {
-            return `<div class="text-[#f85149]">ls: kan inte komma åt '${escapeHtml(args[0])}': Ingen sådan fil eller katalog</div>`;
+            return `<div class="text-[#f85149]">ls: kan inte komma åt '${escapeHtml(nonFlags[0])}': Ingen sådan fil eller katalog</div>`;
           }
           if (node.type === 'file') {
             return `<div class="text-[#e6edf3]">${escapeHtml(target)} (${node.size})</div>`;
@@ -664,16 +697,34 @@ const { isSubpage = false } = Astro.props;
           targetDir = node as DirNode;
         }
 
-        const entries = Object.entries(targetDir.children);
+        let entries = Object.entries(targetDir.children);
+        if (!showAll) {
+          entries = entries.filter(([name]) => !name.startsWith('.'));
+        }
+
         if (entries.length === 0) return `<div class="text-[#8b949e]">Katalogen är tom.</div>`;
 
-        const isLong = args.includes('-l') || args.includes('-la');
         if (isLong) {
-          const rows = entries.map(([name, node]) => {
+          let rows = '';
+          if (showAll) {
+            rows += `
+              <div class="grid grid-cols-[100px_70px_1fr] gap-2">
+                <span class="text-[#8b949e]">drwxr-xr-x</span>
+                <span class="text-[#8b949e] text-right">4.0 KB</span>
+                <span class="text-[#38bdf8] font-bold">.</span>
+              </div>
+              <div class="grid grid-cols-[100px_70px_1fr] gap-2">
+                <span class="text-[#8b949e]">drwxr-xr-x</span>
+                <span class="text-[#8b949e] text-right">4.0 KB</span>
+                <span class="text-[#38bdf8] font-bold">..</span>
+              </div>
+            `;
+          }
+          rows += entries.map(([name, node]) => {
             const isDir = node.type === 'dir';
-            const perm = isDir ? 'drwxr-xr-x' : '-rw-r--r--';
+            const perm = isDir ? 'drwxr-xr-x' : (name.startsWith('.') ? '-rw-------' : '-rw-r--r--');
             const size = isDir ? '4.0 KB' : node.size;
-            const color = isDir ? 'text-[#38bdf8] font-bold' : 'text-[#e6edf3]';
+            const color = isDir ? 'text-[#38bdf8] font-bold' : (name.startsWith('.') ? 'text-[#a78bfa]' : 'text-[#e6edf3]');
             return `<div class="grid grid-cols-[100px_70px_1fr] gap-2">
               <span class="text-[#8b949e]">${perm}</span>
               <span class="text-[#8b949e] text-right">${size}</span>
@@ -683,14 +734,22 @@ const { isSubpage = false } = Astro.props;
           return `<div class="font-mono text-xs space-y-1">${rows}</div>`;
         }
 
+        let prefix = '';
+        if (showAll) {
+          prefix = `<span class="text-[#38bdf8] font-bold">.</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-[#38bdf8] font-bold">..</span>&nbsp;&nbsp;&nbsp;&nbsp;`;
+        }
+
         const pills = entries.map(([name, node]) => {
           if (node.type === 'dir') {
             return `<span class="text-[#38bdf8] font-bold">${escapeHtml(name)}/</span>`;
           }
+          if (name.startsWith('.')) {
+            return `<span class="text-[#a78bfa]">${escapeHtml(name)}</span>`;
+          }
           return `<span class="text-[#e6edf3]">${escapeHtml(name)}</span>`;
         }).join('&nbsp;&nbsp;&nbsp;&nbsp;');
 
-        return `<div class="flex flex-wrap gap-x-6 gap-y-1 text-xs sm:text-sm">${pills}</div>`;
+        return `<div class="flex flex-wrap gap-x-6 gap-y-1 text-xs sm:text-sm font-mono">${prefix}${pills}</div>`;
       },
 
       cd: (args) => {
@@ -720,7 +779,7 @@ const { isSubpage = false } = Astro.props;
         }
       },
 
-      pwd: () => `<div class="text-[#8b949e]">/home/visitor${currentPath.length > 0 ? '/' + currentPath.join('/') : ''}</div>`,
+      pwd: () => `<div class="text-[#8b949e]">/home/gulo${currentPath.length > 0 ? '/' + currentPath.join('/') : ''}</div>`,
 
       cat: (args) => {
         if (!args[0]) return `<div class="text-[#f85149]">Användning: cat &lt;filnamn&gt;</div>`;
@@ -773,10 +832,39 @@ ${escapeHtml(node.content)}
       },
 
       open: (args) => {
-        if (!args[0]) return `<div class="text-[#f85149]">Användning: open &lt;artikel/projekt/fil/sektion&gt;</div>`;
-        const target = args[0].toLowerCase().replace(/\.md$/, '').replace(/\.html$/, '');
+        // Behåll alltid terminalen öppen när man navigerar med CLI
+        sessionStorage.setItem('terminal_open', 'true');
 
-        // 1. Projects
+        const rawTarget = args[0] ? args[0].trim() : '.';
+        const target = rawTarget.toLowerCase().replace(/\/$/, '').replace(/\.md$/, '');
+
+        // 1. "open" eller "open ." -> öppnar katalogen användaren befinner sig i!
+        if (target === '.' || target === '') {
+          if (currentPath.length === 0) {
+            window.location.href = '/';
+            return `<div class="text-[#10b981]">Öppnar startsidan /...</div>`;
+          }
+          const folder = currentPath[0];
+          window.location.href = `/${folder}`;
+          return `<div class="text-[#10b981]">Öppnar mappen /${escapeHtml(folder)} på webben...</div>`;
+        }
+
+        if (target === '..' || target === '~') {
+          window.location.href = '/';
+          return `<div class="text-[#10b981]">Öppnar hemkatalogen / på webben...</div>`;
+        }
+
+        // 2. Kontrollera om target matchar en fil med actionUrl i nuvarande katalog
+        const current = getCurrentDir();
+        if (current.children[rawTarget] && current.children[rawTarget].type === 'file') {
+          const f = current.children[rawTarget] as FileNode;
+          if (f.actionUrl) {
+            window.location.href = f.actionUrl;
+            return `<div class="text-[#10b981]">Öppnar ${escapeHtml(rawTarget)} (${escapeHtml(f.actionUrl)})...</div>`;
+          }
+        }
+
+        // 3. Projects
         if (target.includes('mc-cluster') || target === 'cluster') {
           window.location.href = '/projects/mc-cluster';
           return `<div class="text-[#38bdf8]">Navigerar till /projects/mc-cluster...</div>`;
@@ -790,7 +878,7 @@ ${escapeHtml(node.content)}
           return `<div class="text-[#10b981]">Navigerar till /projects...</div>`;
         }
 
-        // 2. Thoughts
+        // 4. Thoughts
         if (target.includes('simning') || target.includes('chalmers-simning')) {
           window.location.href = '/thoughts/chalmers-simning-kod';
           return `<div class="text-[#38bdf8]">Navigerar till /thoughts/chalmers-simning-kod...</div>`;
@@ -804,7 +892,7 @@ ${escapeHtml(node.content)}
           return `<div class="text-[#10b981]">Navigerar till /thoughts...</div>`;
         }
 
-        // 3. Files downloads / section
+        // 5. Files downloads / section
         if (target === 'files' || target === 'filer' || target === 'downloads') {
           window.location.href = '/files';
           return `<div class="text-[#10b981]">Navigerar till /files...</div>`;
@@ -817,24 +905,47 @@ ${escapeHtml(node.content)}
           window.location.href = '/downloads/backup-world.sh';
           return `<div class="text-[#10b981]">Laddar ner backup-world.sh...</div>`;
         }
+        if (target.includes('cv') || target.includes('resume')) {
+          window.location.href = '/downloads/cv-gulo-datateknik.pdf';
+          return `<div class="text-[#10b981]">Laddar ner cv-gulo-datateknik.pdf...</div>`;
+        }
+        if (target.includes('dotfiles') || target.includes('nvim')) {
+          window.location.href = '/downloads/nvim-dotfiles.tar.gz';
+          return `<div class="text-[#10b981]">Laddar ner nvim-dotfiles.tar.gz...</div>`;
+        }
 
         return `<div class="text-[#f85149]">Känner inte igen '${escapeHtml(target)}'. Skriv 'help' eller 'ls'.</div>`;
       },
 
       projects: () => {
+        sessionStorage.setItem('terminal_open', 'true');
         window.location.href = '/projects';
         return `<div class="text-[#a78bfa]">Öppnar /projects (Portfolio)...</div>`;
       },
 
       thoughts: () => {
+        sessionStorage.setItem('terminal_open', 'true');
         window.location.href = '/thoughts';
         return `<div class="text-[#f59e0b]">Öppnar /thoughts (Blogg)...</div>`;
       },
 
       files: () => {
+        sessionStorage.setItem('terminal_open', 'true');
         window.location.href = '/files';
         return `<div class="text-[#10b981]">Öppnar /files...</div>`;
       },
+
+      // Easter egg aliases defined in .bashrc
+      study: () => `<div class="text-[#10b981] font-mono">Kompilerar operativsystem för RISC-V... Tentan godkänd med beröm! 💯</div>`,
+      sleep: () => `<div class="text-[#f85149] font-mono">Error 404: Sleep Not Found under tentavecka på Chalmers. Fyller på kaffekoppen... ☕</div>`,
+      mc: () => `<div class="text-[#10b981] font-mono">Docker SMP-kluster startat på port 25565. 20.0 TPS garanterat. 🟩</div>`,
+      alias: () => `
+<div class="text-xs space-y-1 font-mono text-[#8b949e]">
+  <div><span class="text-[#38bdf8]">alias swim</span>='echo "Dyk i! Valhallabadet kl 06:00, 400m insim redo."'</div>
+  <div><span class="text-[#38bdf8]">alias study</span>='echo "Kompilerar operativsystem... tentan godkänd!"'</div>
+  <div><span class="text-[#38bdf8]">alias sleep</span>='echo "Error: 404 Sleep Not Found under tentavecka"'</div>
+  <div><span class="text-[#38bdf8]">alias mc</span>='docker compose -f ~/homelab/docker-compose.yml up -d'</div>
+</div>`,
 
       clear: () => {
         history.innerHTML = '';
@@ -923,27 +1034,55 @@ ${escapeHtml(node.content)}
 
         // If typing first token -> autocomplete command names
         if (tokens.length <= 1) {
-          const cmdList = ['help', 'school', 'swim', 'whoami', 'ls', 'cd', 'cat', 'pwd', 'grep', 'open', 'projects', 'thoughts', 'files', 'clear', 'date', 'uptime', 'exit'];
+          const cmdList = ['help', 'school', 'swim', 'whoami', 'contact', 'ls', 'cd', 'cat', 'pwd', 'grep', 'open', 'projects', 'thoughts', 'files', 'clear', 'date', 'uptime', 'study', 'sleep', 'mc', 'alias', 'exit'];
           const matches = cmdList.filter(c => c.startsWith(lastToken.toLowerCase()));
 
           if (matches.length === 1) {
             input.value = matches[0] + ' ';
           } else if (matches.length > 1) {
             const hint = document.createElement('div');
-            hint.className = 'text-xs text-[#38bdf8] pl-3 my-1';
+            hint.className = 'text-xs text-[#38bdf8] pl-3 my-1 font-mono';
             hint.textContent = matches.join('   ');
             history.appendChild(hint);
           }
           return;
         }
 
-        // If typing second token -> autocomplete filesystem nodes or open targets
+        // If typing second token or later -> autocomplete filesystem nodes, flags or open targets
+        const mainCmd = tokens[0].toLowerCase();
         const currentDir = getCurrentDir();
-        const availableItems = Object.entries(currentDir.children).map(([name, node]) => {
-          return node.type === 'dir' ? `${name}/` : name;
-        });
+        let availableItems: string[] = [];
 
-        if (currentPath.length > 0) availableItems.push('..');
+        if (mainCmd === 'ls' && lastToken.startsWith('-')) {
+          availableItems = ['-a', '-l', '-la', '-al'];
+        } else if (mainCmd === 'cd') {
+          availableItems = Object.entries(currentDir.children)
+            .filter(([_, node]) => node.type === 'dir')
+            .map(([name]) => `${name}/`);
+          if (currentPath.length > 0) availableItems.push('..');
+        } else {
+          // Standard file & dir listing
+          availableItems = Object.entries(currentDir.children)
+            .filter(([name]) => {
+              if (lastToken.startsWith('.')) return true; // visa dolda om användaren startat med '.'
+              return !name.startsWith('.');
+            })
+            .map(([name, node]) => node.type === 'dir' ? `${name}/` : name);
+
+          if (lastToken.startsWith('.') && currentPath.length > 0) {
+            availableItems.push('..');
+          }
+
+          // If command is 'open', also offer standard section destinations
+          if (mainCmd === 'open') {
+            const openTargets = ['projects', 'thoughts', 'files'];
+            openTargets.forEach(t => {
+              if (!availableItems.includes(t) && !availableItems.includes(`${t}/`)) {
+                availableItems.push(t);
+              }
+            });
+          }
+        }
 
         const matches = availableItems.filter(item => item.toLowerCase().startsWith(lastToken.toLowerCase()));
 
@@ -952,7 +1091,7 @@ ${escapeHtml(node.content)}
           input.value = tokens.join(' ');
         } else if (matches.length > 1) {
           const hint = document.createElement('div');
-          hint.className = 'text-xs text-[#38bdf8] pl-3 my-1';
+          hint.className = 'text-xs text-[#38bdf8] pl-3 my-1 font-mono';
           hint.textContent = matches.join('   ');
           history.appendChild(hint);
         }

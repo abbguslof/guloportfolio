@@ -8,5 +8,8 @@
   "updatedAt": "2026-03-20",
   "checksum": "sha256:8f4c2e91b6",
   "tags": ["Fabric", "Server", "Optimization"],
-  "featured": true
+  "featured": true,
+  "usage": "unzip fabric-1.20.4-optimized.zip -d /opt/minecraft/server/mods/",
+  "relatedProjects": ["mc-cluster"],
+  "relatedThoughts": ["mc-jvm-flags"]
 }

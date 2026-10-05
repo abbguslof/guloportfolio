@@ -20,3 +20,8 @@ Hjärnan fortsätter att bearbeta problem i bakgrunden så fort man ger den utry
 
 ### Rutiner och uthållighet
 Att kombinera ett krävande program som Datateknik med hård simträning och egna servrar låter ibland som en ekvation som inte går ihop. Men för mig är det tvärtom: disciplinen från bassängen gör att timmarna framför tangentbordet blir mycket mer fokuserade.
+
+### Resurser & Filer
+- 📄 [Ladda ner mitt CV (Datateknik @ Chalmers)](/files#file-cv-datateknik)
+- ⚙️ [Neovim konfigurering & dotfiles](/files#file-dotfiles-neovim)
+

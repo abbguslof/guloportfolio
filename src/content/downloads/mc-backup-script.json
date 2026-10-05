@@ -8,5 +8,8 @@
   "updatedAt": "2026-03-01",
   "checksum": "sha256:3a1b89ef04",
   "tags": ["Linux", "Bash", "Sysadmin"],
-  "featured": true
+  "featured": true,
+  "usage": "chmod +x backup-world.sh && ./backup-world.sh --retention=7d",
+  "relatedProjects": ["mc-cluster"],
+  "relatedThoughts": []
 }

@@ -124,8 +124,17 @@ const { downloads, totalCount = downloads.length } = Astro.props;
                 </div>
               </div>
 
-              <!-- Direct Download Trigger -->
-              <div class="shrink-0 self-start sm:self-center">
+              <!-- Action buttons -->
+              <div class="flex items-center gap-2 shrink-0 self-start sm:self-center">
+                {item.id && (
+                  <a 
+                    href={`/files#file-${item.id}`}
+                    class="inline-flex items-center px-2.5 py-1.5 rounded bg-[#161b22] border border-[#30363d] text-xs font-mono text-[#8b949e] hover:text-[#e6edf3] hover:border-[#8b949e] transition-all cursor-pointer"
+                    title={`Läs mer om ${item.name} och se kommandon`}
+                  >
+                    <span>[Info]</span>
+                  </a>
+                )}
                 <a 
                   href={item.fileUrl}
                   download={item.filename}
