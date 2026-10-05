@@ -1,5 +1,10 @@
 ---
-// Header.astro - Silky Smooth Floating Cockpit Navigation with Continuous Edge Gliding
+// Header.astro - Full-width Floating Cockpit Navigation with Active Page Indicators
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isProjects = currentPath.startsWith('/projects');
+const isThoughts = currentPath.startsWith('/thoughts');
+const isFiles = currentPath.startsWith('/files');
+const isHome = currentPath === '/';
 ---
 
 <!-- Placeholder div in normal document flow to guarantee 0px layout shift -->
@@ -15,7 +20,11 @@
       <!-- Brand / Logo (Far left to maximize center reading area) -->
       <div id="header-brand" class="flex items-center gap-2.5 sm:gap-3 shrink-0">
         <a href="/" class="group flex items-center gap-2 text-sm font-semibold tracking-tight transition-colors">
-          <span class="px-2 py-0.5 rounded bg-[#161b22] border border-[#30363d] font-mono text-xs font-bold text-[#10b981] group-hover:border-[#10b981] transition-colors">
+          <span class={`px-2 py-0.5 rounded font-mono text-xs font-bold transition-all ${
+            isHome 
+              ? 'bg-[#161b22] border border-[#10b981] text-[#10b981] ring-1 ring-[#10b981]/50 shadow-[0_0_8px_rgba(16,185,129,0.25)]' 
+              : 'bg-[#161b22] border border-[#30363d] text-[#10b981] group-hover:border-[#10b981]'
+          }`}>
             GULO
           </span>
           <span class="text-xs font-mono text-[#8b949e] group-hover:text-[#e6edf3] transition-colors hidden min-[360px]:inline">
@@ -40,13 +49,40 @@
           <span>&gt;_</span>
           <span data-i18n="nav_terminal">terminal</span>
         </button>
-        <a href="/projects" class="px-2 sm:px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#a78bfa] transition-all" data-i18n="nav_projects">
+        <a 
+          href="/projects" 
+          class={`nav-link px-2 sm:px-2.5 py-1 rounded border transition-all ${
+            isProjects 
+              ? 'border-[#a78bfa] text-[#e6edf3] bg-[#a78bfa]/15 ring-1 ring-[#a78bfa]/60 shadow-[0_0_10px_rgba(167,139,250,0.25)] font-semibold' 
+              : 'bg-[#161b22] border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#a78bfa]'
+          }`}
+          data-i18n="nav_projects"
+          data-nav="projects"
+        >
           projects
         </a>
-        <a href="/thoughts" class="px-2 sm:px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#f59e0b] transition-all" data-i18n="nav_thoughts">
+        <a 
+          href="/thoughts" 
+          class={`nav-link px-2 sm:px-2.5 py-1 rounded border transition-all ${
+            isThoughts 
+              ? 'border-[#f59e0b] text-[#e6edf3] bg-[#f59e0b]/15 ring-1 ring-[#f59e0b]/60 shadow-[0_0_10px_rgba(245,158,11,0.25)] font-semibold' 
+              : 'bg-[#161b22] border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#f59e0b]'
+          }`}
+          data-i18n="nav_thoughts"
+          data-nav="thoughts"
+        >
           blog / thoughts
         </a>
-        <a href="/files" class="px-2 sm:px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#38bdf8] transition-all" data-i18n="nav_files">
+        <a 
+          href="/files" 
+          class={`nav-link px-2 sm:px-2.5 py-1 rounded border transition-all ${
+            isFiles 
+              ? 'border-[#38bdf8] text-[#e6edf3] bg-[#38bdf8]/15 ring-1 ring-[#38bdf8]/60 shadow-[0_0_10px_rgba(56,189,248,0.25)] font-semibold' 
+              : 'bg-[#161b22] border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#38bdf8]'
+          }`}
+          data-i18n="nav_files"
+          data-nav="files"
+        >
           files
         </a>
         <a 
@@ -144,6 +180,55 @@
 
   // Initial check
   onScroll();
+
+  // Active navigation highlight sync
+  function syncActiveNav() {
+    const pathname = window.location.pathname.replace(/\/$/, '') || '/';
+    const linkProjects = document.querySelector<HTMLAnchorElement>('[data-nav="projects"]');
+    const linkThoughts = document.querySelector<HTMLAnchorElement>('[data-nav="thoughts"]');
+    const linkFiles = document.querySelector<HTMLAnchorElement>('[data-nav="files"]');
+
+    if (linkProjects) {
+      const active = pathname.startsWith('/projects');
+      linkProjects.classList.toggle('border-[#a78bfa]', active);
+      linkProjects.classList.toggle('text-[#e6edf3]', active);
+      linkProjects.classList.toggle('bg-[#a78bfa]/15', active);
+      linkProjects.classList.toggle('ring-1', active);
+      linkProjects.classList.toggle('ring-[#a78bfa]/60', active);
+      linkProjects.classList.toggle('font-semibold', active);
+      if (!active) {
+        linkProjects.classList.add('bg-[#161b22]', 'border-[#30363d]', 'text-[#8b949e]');
+      }
+    }
+
+    if (linkThoughts) {
+      const active = pathname.startsWith('/thoughts');
+      linkThoughts.classList.toggle('border-[#f59e0b]', active);
+      linkThoughts.classList.toggle('text-[#e6edf3]', active);
+      linkThoughts.classList.toggle('bg-[#f59e0b]/15', active);
+      linkThoughts.classList.toggle('ring-1', active);
+      linkThoughts.classList.toggle('ring-[#f59e0b]/60', active);
+      linkThoughts.classList.toggle('font-semibold', active);
+      if (!active) {
+        linkThoughts.classList.add('bg-[#161b22]', 'border-[#30363d]', 'text-[#8b949e]');
+      }
+    }
+
+    if (linkFiles) {
+      const active = pathname.startsWith('/files');
+      linkFiles.classList.toggle('border-[#38bdf8]', active);
+      linkFiles.classList.toggle('text-[#e6edf3]', active);
+      linkFiles.classList.toggle('bg-[#38bdf8]/15', active);
+      linkFiles.classList.toggle('ring-1', active);
+      linkFiles.classList.toggle('ring-[#38bdf8]/60', active);
+      linkFiles.classList.toggle('font-semibold', active);
+      if (!active) {
+        linkFiles.classList.add('bg-[#161b22]', 'border-[#30363d]', 'text-[#8b949e]');
+      }
+    }
+  }
+
+  syncActiveNav();
 
   // Terminal button - toggles terminal open or closed
   document.getElementById('header-terminal-toggle')?.addEventListener('click', () => {
