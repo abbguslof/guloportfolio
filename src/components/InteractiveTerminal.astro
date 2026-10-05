@@ -334,12 +334,13 @@ const dynamicFileSystem = {
         </div>
       </div>
 
-      <!-- Terminal Output History -->
-      <div id="terminal-history" class="pt-3 space-y-2.5" aria-live="polite">
-        <div class="text-[#8b949e] text-xs">
-          Terminal redo. Skriv <code class="text-[#10b981] font-bold">help</code> för kommandolista (<code class="text-[#38bdf8]">school</code>, <code class="text-[#38bdf8]">swim</code>, <code class="text-[#38bdf8]">ls</code>, <code class="text-[#38bdf8]">cd</code>, <code class="text-[#38bdf8]">cat</code>, <code class="text-[#38bdf8]">open</code>). Tryck <code class="text-[#10b981]">Tab</code> för att auto-komplettera.
-        </div>
+      <!-- Terminal Ready Banner (Bevaras alltid vid 'clear') -->
+      <div id="terminal-ready-banner" class="pt-3 text-[#8b949e] text-xs select-none">
+        Terminal redo. Skriv <code class="text-[#10b981] font-bold">help</code> för kommandolista (<code class="text-[#38bdf8]">school</code>, <code class="text-[#38bdf8]">swim</code>, <code class="text-[#38bdf8]">ls</code>, <code class="text-[#38bdf8]">cd</code>, <code class="text-[#38bdf8]">cat</code>, <code class="text-[#38bdf8]">open</code>). Tryck <code class="text-[#10b981]">Tab</code> för att auto-komplettera.
       </div>
+
+      <!-- Terminal Output History -->
+      <div id="terminal-history" class="pt-2 space-y-2.5" aria-live="polite"></div>
 
       <!-- Active Interactive Prompt Row -->
       <form id="terminal-form" class="mt-3 flex items-center gap-2 pt-2 border-t border-[#30363d]/40">
@@ -721,6 +722,16 @@ const dynamicFileSystem = {
   <div><span class="text-[#8b949e]">Intressen:</span> Självhostade servrar, Linux-tuning, Minecraft, analog fotografi (35mm) och dotfiles.</div>
 </div>`,
 
+      contact: () => `
+<div class="text-[#e6edf3] space-y-1.5 text-xs font-mono p-3 rounded bg-[#0d1117] border border-[#30363d]">
+  <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">📫 KONTAKT &amp; LÄNKAR // GULO</div>
+  <div><span class="text-[#38bdf8] font-semibold">GitHub:</span> <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="text-[#e6edf3] hover:underline hover:text-[#10b981]">github.com/gulo ↗</a></div>
+  <div><span class="text-[#38bdf8] font-semibold">Email:</span> <a href="mailto:gulo@example.com" class="text-[#e6edf3] hover:underline hover:text-[#10b981]">gulo@example.com ↗</a></div>
+  <div><span class="text-[#38bdf8] font-semibold">Discord:</span> <span class="text-[#e6edf3]">gulo#0001 (eller pinga på Chalmers Discord-servern)</span></div>
+  <div><span class="text-[#38bdf8] font-semibold">Chalmers:</span> <span class="text-[#e6edf3]">EDIT-huset, Maskingränd / Johanneberg</span></div>
+  <div class="text-[#8b949e] text-[11px] pt-1">Hör gärna av dig om homelab, simning, Rust eller projektidéer!</div>
+</div>`,
+
       ls: (args) => {
         let targetDir = getCurrentDir();
         const flags = args.filter(a => a.startsWith('-'));
@@ -1046,6 +1057,15 @@ ${escapeHtml(node.content)}
     commands['neofetch'] = commands['fastfetch'];
     commands['fetch'] = commands['fastfetch'];
 
+    // Smidiga alias för whoami och contact (gulo, whoisgulo, whoamgulo, email, mail etc)
+    commands['whoisgulo'] = commands['whoami'];
+    commands['whoamgulo'] = commands['whoami'];
+    commands['gulo'] = commands['whoami'];
+    commands['whois'] = commands['whoami'];
+    commands['who'] = commands['whoami'];
+    commands['email'] = commands['contact'];
+    commands['mail'] = commands['contact'];
+
     function execute(rawCmd: string) {
       const cleanCmd = rawCmd.trim();
       if (!cleanCmd) return;
@@ -1111,6 +1131,14 @@ ${escapeHtml(node.content)}
         input.value = '';
         historyIndex = cmdHistory.length;
         history.scrollTop = history.scrollHeight;
+        return;
+      }
+
+      // Ctrl+L för att rensa historik som i bash (Terminal redo-raden bevaras ovanför)
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'l') {
+        e.preventDefault();
+        history.innerHTML = '';
+        input.value = '';
         return;
       }
 
@@ -1187,7 +1215,7 @@ ${escapeHtml(node.content)}
             availableItems.push('..');
           }
 
-          // If command is 'open', also offer standard section destinations
+          // If command is 'open', also offer standard section destinations and all dynamic slugs
           if (mainCmd === 'open') {
             const openTargets = ['projects', 'thoughts', 'files'];
             openTargets.forEach(t => {
@@ -1195,6 +1223,18 @@ ${escapeHtml(node.content)}
                 availableItems.push(t);
               }
             });
+
+            // Inkludera alla dynamiska slugs från projekt, tankar och filer för Tab-komplettering
+            for (const [dirName, dirNode] of Object.entries(fileSystem.children)) {
+              if (dirNode.type === 'dir') {
+                for (const fname of Object.keys(dirNode.children)) {
+                  const baseFname = fname.replace(/\.md$/, '');
+                  if (!availableItems.includes(baseFname)) {
+                    availableItems.push(baseFname);
+                  }
+                }
+              }
+            }
           }
         }
 
