@@ -230,11 +230,22 @@
 
     function resizeStdCanvas() {
       if (!stdCanvas || !stdCtx) return;
-      stdDpr = Math.min(window.devicePixelRatio || 1, 2);
-      stdWidth = window.innerWidth;
-      stdHeight = window.innerHeight;
-      stdCanvas.width = Math.round(stdWidth * stdDpr);
-      stdCanvas.height = Math.round(stdHeight * stdDpr);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const targetW = Math.round(width * dpr);
+      const targetH = Math.round(height * dpr);
+
+      // Prevent redundant canvas reallocation on small mobile viewport oscillations
+      if (stdCanvas.width === targetW && stdCanvas.height === targetH) {
+        return;
+      }
+
+      stdDpr = dpr;
+      stdWidth = width;
+      stdHeight = height;
+      stdCanvas.width = targetW;
+      stdCanvas.height = targetH;
       stdCtx.setTransform(stdDpr, 0, 0, stdDpr, 0, 0);
 
       if (currentMode === 'standard') {
@@ -345,6 +356,7 @@
       const isVisible = switcher.style.display !== 'none';
       const shouldShow = typeof force === 'boolean' ? force : !isVisible;
       switcher.style.display = shouldShow ? 'flex' : 'none';
+      localStorage.setItem('site_bg_switcher_open', shouldShow ? 'true' : 'false');
     }
 
     // Button click listeners
@@ -386,6 +398,20 @@
     // Window resize
     window.addEventListener('resize', resizeStdCanvas, { passive: true });
 
+    // Page visibility listener: pause 60fps loop when tab is backgrounded
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (stdRafId) {
+          cancelAnimationFrame(stdRafId);
+          stdRafId = null;
+        }
+      } else {
+        if (currentMode === 'standard' && !motionQuery.matches && !stdRafId) {
+          stdRafId = requestAnimationFrame(stdLoop);
+        }
+      }
+    });
+
     // prefers-reduced-motion listener
     motionQuery.addEventListener('change', () => {
       applyEffect(currentMode);
@@ -394,6 +420,10 @@
     // Initial setup
     resizeStdCanvas();
     setMode(currentMode);
+
+    if (localStorage.getItem('site_bg_switcher_open') === 'true') {
+      toggleSwitcher(true);
+    }
   })();
 </script>
 

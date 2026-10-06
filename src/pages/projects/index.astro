@@ -128,7 +128,7 @@ const sortedProjects = projects.sort((a, b) => a.data.order - b.data.order);
       ))}
     </div>
 
-    <div id="no-projects-msg" class="py-12 text-center text-xs font-mono text-[#8b949e] hidden">
+    <div id="no-projects-msg" class="py-12 text-center text-xs font-mono text-[#8b949e] hidden" data-i18n="projects_no_match">
       No projects found matching the query.
     </div>
 
@@ -199,6 +199,10 @@ const sortedProjects = projects.sort((a, b) => a.data.order - b.data.order);
 
     searchInput?.addEventListener('input', () => {
       searchQuery = (searchInput.value || '').trim().toLowerCase();
+      filterProjects();
+    });
+
+    window.addEventListener('lang-change', () => {
       filterProjects();
     });
   }

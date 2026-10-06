@@ -1,5 +1,5 @@
 ---
-// Footer.astro - TUI System Diagnostics & Social Network Matrix
+// Footer.astro - TUI System Diagnostics, Real-time Telemetry & Matrix Links
 ---
 
 <footer class="mt-16 pt-8 pb-12 border-t border-[#30363d] text-xs font-mono text-[#8b949e]">
@@ -8,20 +8,22 @@
     <div class="p-4 rounded-lg bg-[#161b22] border border-[#30363d] space-y-3">
       <div class="flex items-center justify-between pb-2 border-b border-[#30363d]/60 text-[11px]">
         <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse"></span>
+          <span id="footer-sys-dot" class="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse"></span>
           <span class="text-[#e6edf3] font-semibold" data-i18n="footer_diagnostics">SYSTEM DIAGNOSTICS &amp; TELEMETRY</span>
         </div>
-        <span class="text-[#10b981]" data-i18n="footer_nominal">ALL_SYSTEMS_NOMINAL</span>
+        <span id="footer-sys-status" class="text-[#10b981] font-semibold" data-i18n="footer_nominal">ALL_SYSTEMS_NOMINAL</span>
       </div>
 
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px]">
         <div>
           <span class="block text-[#8b949e]" data-i18n="footer_location_label">LOCATION:</span>
-          <span class="text-[#e6edf3]" data-i18n="footer_location_val">Gothenburg, SE (Chalmers)</span>
+          <span class="text-[#e6edf3]">
+            <span data-i18n="footer_location_val">Gothenburg, SE</span> • <span id="footer-clock" class="text-[#38bdf8]">--:--:--</span>
+          </span>
         </div>
         <div>
           <span class="block text-[#8b949e]" data-i18n="footer_ping_label">NETWORK PING:</span>
-          <span class="text-[#38bdf8]" data-i18n="footer_ping_val">~12ms (SUNET fiber)</span>
+          <span id="footer-ping-val" class="text-[#38bdf8]">~12ms (SUNET fiber)</span>
         </div>
         <div>
           <span class="block text-[#8b949e]" data-i18n="footer_engine_label">ENGINE:</span>
@@ -29,7 +31,7 @@
         </div>
         <div>
           <span class="block text-[#8b949e]" data-i18n="footer_uptime_label">HOST UPTIME:</span>
-          <span class="text-[#10b981]" data-i18n="footer_uptime_val">99.98% / 42 days, 8 hrs</span>
+          <span id="footer-uptime-val" class="text-[#10b981]">99.98% / calculating...</span>
         </div>
       </div>
     </div>
@@ -88,3 +90,119 @@
     </div>
   </div>
 </footer>
+
+<script>
+  function initFooterTelemetry() {
+    const sysDot = document.getElementById('footer-sys-dot');
+    const sysStatus = document.getElementById('footer-sys-status');
+    const clockEl = document.getElementById('footer-clock');
+    const pingEl = document.getElementById('footer-ping-val');
+    const uptimeEl = document.getElementById('footer-uptime-val');
+
+    // 1. Ticking Local Gothenburg Clock (Europe/Stockholm)
+    const timeFormatter = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/Stockholm',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+
+    function updateClock() {
+      if (clockEl) {
+        clockEl.textContent = `${timeFormatter.format(new Date())} CET`;
+      }
+    }
+
+    // 2. Dynamic Live Host Uptime calculated from deployment station epoch
+    // Station launch epoch: 2026-01-01T00:00:00Z
+    const STATION_EPOCH = new Date('2026-01-01T00:00:00Z').getTime();
+
+    function updateUptime() {
+      if (!uptimeEl) return;
+      const now = Date.now();
+      const diffMs = Math.max(0, now - STATION_EPOCH);
+
+      const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diffMs / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diffMs / (1000 * 60)) % 60);
+      const seconds = Math.floor((diffMs / 1000) % 60);
+
+      uptimeEl.textContent = `99.98% / ${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    // 3. Real RTT Network Ping measurement
+    function measureInitialPing() {
+      const navEntries = performance.getEntriesByType && performance.getEntriesByType('navigation');
+      if (navEntries && navEntries[0]) {
+        const nav = navEntries[0] as PerformanceNavigationTiming;
+        const rtt = Math.round(nav.responseEnd - nav.requestStart);
+        if (rtt > 0 && rtt < 1000 && pingEl) {
+          pingEl.textContent = `${rtt}ms (RTT SUNET fiber)`;
+        }
+      }
+    }
+
+    // Update ping from Header probe events
+    window.addEventListener('network-ping', ((e: CustomEvent) => {
+      if (!pingEl) return;
+      const { latency, isOnline } = e.detail || {};
+      if (isOnline && typeof latency === 'number') {
+        pingEl.textContent = `${latency}ms (RTT SUNET fiber)`;
+      } else if (!isOnline) {
+        pingEl.textContent = 'DISCONNECTED';
+      }
+    }) as EventListener);
+
+    // Update telemetry state when connection drops or recovers
+    window.addEventListener('connection-state-change', ((e: CustomEvent) => {
+      const isOnline = e.detail?.isOnline;
+      if (!sysDot || !sysStatus) return;
+
+      if (isOnline) {
+        sysDot.className = 'w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse';
+        sysStatus.className = 'text-[#10b981] font-semibold';
+        sysStatus.textContent = 'ALL_SYSTEMS_NOMINAL';
+      } else {
+        sysDot.className = 'w-2.5 h-2.5 rounded-full bg-[#f85149]';
+        sysStatus.className = 'text-[#f85149] font-semibold';
+        sysStatus.textContent = 'SYS_OFFLINE_DEGRADED';
+      }
+    }) as EventListener);
+
+    // Initial sync
+    updateClock();
+    updateUptime();
+    measureInitialPing();
+
+    // Loop ticker with tab-switch pause to save CPU
+    let tickerInterval: number | null = window.setInterval(() => {
+      updateClock();
+      updateUptime();
+    }, 1000);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        updateClock();
+        updateUptime();
+        if (tickerInterval === null) {
+          tickerInterval = window.setInterval(() => {
+            updateClock();
+            updateUptime();
+          }, 1000);
+        }
+      } else {
+        if (tickerInterval !== null) {
+          clearInterval(tickerInterval);
+          tickerInterval = null;
+        }
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFooterTelemetry);
+  } else {
+    initFooterTelemetry();
+  }
+</script>

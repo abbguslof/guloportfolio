@@ -1,13 +1,16 @@
 ---
 import { getCollection } from 'astro:content';
+import { getActiveStatus } from '../data/status';
 import fs from 'node:fs';
 import path from 'node:path';
 
 interface Props {
   isSubpage?: boolean;
+  is404?: boolean;
 }
 
-const { isSubpage = false } = Astro.props;
+const { isSubpage = false, is404 = false } = Astro.props;
+const currentActiveStatus = getActiveStatus();
 
 // 1. Läs statiska terminalfiler uppdelade i en/ och sv/ mappar
 const terminalDir = path.join(process.cwd(), 'src/data/terminal');
@@ -197,6 +200,7 @@ const dynamicFileSystemSv = {
   id="terminal-section" 
   class={`w-full ${isSubpage ? 'hidden mb-8' : 'mb-10'}`} 
   data-is-subpage={isSubpage ? 'true' : 'false'}
+  data-is-404={is404 ? 'true' : 'false'}
   aria-label="Interactive TUI Terminal"
 >
   <!-- Embedded dynamic filesystem data for EN and SV -->
@@ -205,8 +209,64 @@ const dynamicFileSystemSv = {
   <script id="terminal-fastfetch-en" type="application/json" set:html={JSON.stringify(fastfetchDataEn)} />
   <script id="terminal-fastfetch-sv" type="application/json" set:html={JSON.stringify(fastfetchDataSv)} />
 
-  <!-- Static Human-Readable "About Me" Card (Only on homepage when terminal is closed via ✕, or by default on mobile phones) -->
-  {!isSubpage && (
+  <!-- 404 Fallback Closed Card vs Homepage About Me Card -->
+  {is404 ? (
+    <div 
+      id="terminal-closed-card" 
+      class="hidden mb-6 p-6 rounded-lg bg-[#161b22] border border-[#f85149]/60 shadow-xl font-mono space-y-4"
+    >
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-[#30363d] gap-3">
+        <div class="flex items-center gap-3">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#f85149] animate-pulse"></span>
+          <h2 class="text-sm font-bold tracking-wider uppercase text-[#e6edf3]" data-i18n="not_found_status">
+            HTTP 404 // COMMAND_NOT_FOUND
+          </h2>
+        </div>
+        <button 
+          type="button" 
+          id="btn-reopen-terminal" 
+          class="text-xs px-3 py-1.5 rounded bg-[#0d1117] border border-[#30363d] text-[#10b981] hover:border-[#10b981] hover:bg-[#10b981]/10 transition-all cursor-pointer flex items-center gap-2 self-start sm:self-auto"
+        >
+          <span>&gt;_</span>
+          <span data-i18n="term_reopen_btn">Open terminal again</span>
+        </button>
+      </div>
+
+      <div class="p-4 rounded bg-[#0d1117] border border-[#30363d] space-y-2">
+        <div class="flex items-center gap-2 text-[#e6edf3] font-bold text-xs">
+          <span class="text-[#f59e0b]">⚠</span>
+          <span data-i18n="not_found_title">Route Not Found in Playground</span>
+        </div>
+        <p class="text-[#8b949e] text-xs leading-relaxed" data-i18n="not_found_desc">
+          The requested path does not exist on this station. It might have been moved, renamed, or never compiled.
+        </p>
+      </div>
+
+      <div class="pt-2">
+        <div class="text-[11px] text-[#8b949e] mb-2 uppercase tracking-wider font-semibold">
+          SUGGESTED DISCOVERY VECTORS:
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <a href="/" class="p-3 rounded bg-[#0d1117] border border-[#30363d] hover:border-[#10b981] text-[#10b981] hover:text-[#e6edf3] transition-all flex items-center justify-between group">
+            <span data-i18n="not_found_back_cockpit">[← Back to Cockpit]</span>
+            <span class="text-[#8b949e] group-hover:text-[#10b981]">~</span>
+          </a>
+          <a href="/projects" class="p-3 rounded bg-[#0d1117] border border-[#30363d] hover:border-[#a78bfa] text-[#a78bfa] hover:text-[#e6edf3] transition-all flex items-center justify-between group">
+            <span data-i18n="not_found_browse_projects">[Explore Projects →]</span>
+            <span class="text-[#8b949e] group-hover:text-[#a78bfa]">~/projects</span>
+          </a>
+          <a href="/thoughts" class="p-3 rounded bg-[#0d1117] border border-[#30363d] hover:border-[#f59e0b] text-[#f59e0b] hover:text-[#e6edf3] transition-all flex items-center justify-between group">
+            <span data-i18n="not_found_read_thoughts">[Read Blog &amp; Notes →]</span>
+            <span class="text-[#8b949e] group-hover:text-[#f59e0b]">~/thoughts</span>
+          </a>
+          <a href="/files" class="p-3 rounded bg-[#0d1117] border border-[#30363d] hover:border-[#38bdf8] text-[#38bdf8] hover:text-[#e6edf3] transition-all flex items-center justify-between group">
+            <span data-i18n="not_found_download_files">[Download Archives →]</span>
+            <span class="text-[#8b949e] group-hover:text-[#38bdf8]">~/files</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  ) : !isSubpage ? (
     <>
       <script is:inline>
         (function() {
@@ -280,12 +340,12 @@ const dynamicFileSystemSv = {
       <!-- Subtle read-more indicator below closed card -->
       <div class="mt-5 pt-3 border-t border-[#30363d]/40 flex items-center justify-center gap-2 text-xs font-mono text-[#8b949e]">
         <span class="inline-block animate-bounce text-[#10b981]">↓</span>
-        <span data-i18n="term_more_below">scrolla för projekt &amp; anteckningar</span>
+        <span data-i18n="term_more_below">scroll for projects &amp; articles</span>
         <span class="inline-block animate-bounce text-[#10b981]">↓</span>
       </div>
     </div>
     </>
-  )}
+  ) : null}
 
   <!-- Terminal Window Container -->
   <div 
@@ -335,7 +395,7 @@ const dynamicFileSystemSv = {
 
       <!-- Window Title & Path -->
       <div class="text-xs text-[#8b949e] font-mono tracking-wide flex items-center gap-2">
-        <span id="window-title-text" class="text-[#e6edf3]">bash — gulo@playground: ~</span>
+        <span id="window-title-text" class="text-[#e6edf3]">{is404 ? 'bash — 404: route_not_found' : 'bash — gulo@playground: ~'}</span>
         <span id="window-status-pill" class="text-[10px] text-[#f59e0b] bg-[#0d1117] px-2 py-0.5 rounded border border-[#30363d] hidden" data-i18n="term_minimized_pill">
           MINIMIZED (click to open)
         </span>
@@ -461,7 +521,7 @@ const dynamicFileSystemSv = {
 
           <!-- Main hint message -->
           <span class="text-[#8b949e] group-hover:text-[#e6edf3] transition-colors" data-i18n="term_cat_hint_text">
-            Klicka <span class="text-[#f85149] font-bold">[✕]</span> för bio i bakgrunden
+            Click <span class="text-[#f85149] font-bold">[✕]</span> for background bio
           </span>
 
           <!-- Subtle grey dismiss hint requested by user -->
@@ -501,11 +561,21 @@ const dynamicFileSystemSv = {
         }
 
         var isSub = sec.getAttribute('data-is-subpage') === 'true';
+        var is404 = sec.getAttribute('data-is-404') === 'true';
         var isDesk = window.innerWidth >= 1024;
         var viaCli = sessionStorage.getItem('navigated_via_cli') === 'true';
         var closedByUser = sessionStorage.getItem('terminal_closed_by_user') === 'true';
 
-        if (viaCli) {
+        if (is404) {
+          sec.classList.remove('hidden');
+          if (closedByUser) {
+            if (win) win.classList.add('hidden');
+            if (card) card.classList.remove('hidden');
+          } else {
+            if (win) win.classList.remove('hidden');
+            if (card) card.classList.add('hidden');
+          }
+        } else if (viaCli) {
           sec.classList.remove('hidden');
           if (win) win.classList.remove('hidden');
           if (card) card.classList.add('hidden');
@@ -530,6 +600,10 @@ const dynamicFileSystemSv = {
           if (win) win.classList.remove('hidden');
           if (card) card.classList.add('hidden');
         } else if (!isSub && isDesk && closedByUser) {
+          sec.classList.remove('hidden');
+          if (win) win.classList.add('hidden');
+          if (card) card.classList.remove('hidden');
+        } else if (!isSub) {
           sec.classList.remove('hidden');
           if (win) win.classList.add('hidden');
           if (card) card.classList.remove('hidden');
@@ -1013,14 +1087,24 @@ const dynamicFileSystemSv = {
       return currentPath.length === 0 ? '~' : `~/${currentPath.join('/')}`;
     }
 
+    const is404 = termSection.getAttribute('data-is-404') === 'true';
+
     function updateTitle() {
       const lang = getSiteLang();
       const maxLabel = lang === 'sv' ? ' [MAXIMERAD FULLSKÄRM]' : ' [MAXIMIZED FULLSCREEN]';
       const minLabel = lang === 'sv' ? ' (klicka för att öppna)' : ' (click to open)';
-      if (titleText && !isMinimized) {
-        titleText.textContent = `bash — gulo@playground: ${getCwdLabel()}${isMaximized ? maxLabel : ''}`;
-      } else if (titleText && isMinimized) {
-        titleText.textContent = `bash — gulo@playground: ${getCwdLabel()}${minLabel}`;
+      if (is404) {
+        if (titleText && !isMinimized) {
+          titleText.textContent = `bash — 404: route_not_found${isMaximized ? maxLabel : ''}`;
+        } else if (titleText && isMinimized) {
+          titleText.textContent = `bash — 404: route_not_found${minLabel}`;
+        }
+      } else {
+        if (titleText && !isMinimized) {
+          titleText.textContent = `bash — gulo@playground: ${getCwdLabel()}${isMaximized ? maxLabel : ''}`;
+        } else if (titleText && isMinimized) {
+          titleText.textContent = `bash — gulo@playground: ${getCwdLabel()}${minLabel}`;
+        }
       }
       if (promptCwd) {
         promptCwd.textContent = getCwdLabel();
@@ -1033,6 +1117,57 @@ const dynamicFileSystemSv = {
     }
 
     updateTitle();
+
+    // In 404 mode, seed the terminal history with the diagnostic block if empty
+    if (is404 && (!history.hasChildNodes() || history.children.length === 0)) {
+      const isSv = getSiteLang() === 'sv';
+      const requestedPath = window.location.pathname;
+      const errorCard = document.createElement('div');
+      errorCard.className = 'space-y-3 pt-2';
+      errorCard.innerHTML = `
+        <div class="text-[#10b981] flex items-center gap-2">
+          <span>visitor@playground</span><span class="text-[#8b949e]">:</span><span class="text-[#38bdf8]">~</span><span class="text-[#e6edf3]">$</span>
+          <span class="text-[#e6edf3]">open ${escapeHtml(requestedPath)}</span>
+        </div>
+        <div class="p-4 rounded bg-[#0d1117] border border-[#f85149]/60 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[#f85149] font-bold text-xs">HTTP 404 // COMMAND_NOT_FOUND</span>
+            <span class="text-[10px] text-[#f59e0b] px-1.5 py-0.5 rounded border border-[#f59e0b]/40">ERR_NOT_FOUND</span>
+          </div>
+          <div class="text-[#e6edf3]">
+            <span class="text-[#f85149]">open:</span> ${isSv ? 'Kunde inte hitta eller öppna mål: ' : 'Cannot locate or open target: '}<code class="text-[#f85149] font-bold">${escapeHtml(requestedPath)}</code>
+          </div>
+          <p class="text-[#8b949e] text-xs leading-relaxed">
+            ${isSv ? 'Sökvägen existerar inte på denna station. Den kan ha flyttats, döpts om eller aldrig kompilerats.' : 'The requested path does not exist on this station. It might have been moved, renamed, or never compiled.'}
+          </p>
+          <div class="pt-2 border-t border-[#30363d]/50 space-y-1.5">
+            <div class="text-[10px] text-[#8b949e] uppercase tracking-wider font-semibold">
+              ${isSv ? 'FÖRESLAGNA DISCOVERY-VEKTORER (KLICKA ELLER SKRIV):' : 'SUGGESTED DISCOVERY VECTORS (CLICK OR TYPE):'}
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <a href="/" class="p-2.5 rounded bg-[#161b22] border border-[#30363d] hover:border-[#10b981] text-[#10b981] transition-all flex items-center justify-between">
+                <span>${isSv ? '[← Tillbaka till Cockpit]' : '[← Back to Cockpit]'}</span>
+                <span class="text-[#8b949e]">~</span>
+              </a>
+              <a href="/projects" class="p-2.5 rounded bg-[#161b22] border border-[#30363d] hover:border-[#a78bfa] text-[#a78bfa] transition-all flex items-center justify-between">
+                <span>${isSv ? '[Utforska projekt →]' : '[Explore Projects →]'}</span>
+                <span class="text-[#8b949e]">~/projects</span>
+              </a>
+              <a href="/thoughts" class="p-2.5 rounded bg-[#161b22] border border-[#30363d] hover:border-[#f59e0b] text-[#f59e0b] transition-all flex items-center justify-between">
+                <span>${isSv ? '[Läs blogg &amp; tankar →]' : '[Read Blog &amp; Notes →]'}</span>
+                <span class="text-[#8b949e]">~/thoughts</span>
+              </a>
+              <a href="/files" class="p-2.5 rounded bg-[#161b22] border border-[#30363d] hover:border-[#38bdf8] text-[#38bdf8] transition-all flex items-center justify-between">
+                <span>${isSv ? '[Ladda ned arkiv →]' : '[Download Archives →]'}</span>
+                <span class="text-[#8b949e]">~/files</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+      history.appendChild(errorCard);
+      setTimeout(() => input.focus({ preventScroll: true }), 60);
+    }
 
     // Normalisera sökvägar för att förhindra falska dupliceringar
     function normalizePath(p: string): string {
@@ -1177,6 +1312,14 @@ const dynamicFileSystemSv = {
       const savedWindowY = sessionStorage.getItem('terminal_nav_scroll_y');
       if (savedWindowY !== null) {
         window.scrollTo({ top: Number(savedWindowY), behavior: 'instant' });
+      }
+    } else if (is404) {
+      if (closedByUser) {
+        termSection.classList.remove('hidden');
+        termWindow.classList.add('hidden');
+        closedCard?.classList.remove('hidden');
+      } else {
+        restoreWindow(true);
       }
     } else if (!isSubpage && isDesktop && !closedByUser) {
       restoreWindow(true);
@@ -1343,6 +1486,14 @@ const dynamicFileSystemSv = {
           if (input) input.focus();
         }
       }
+    });
+
+    // Clicking terminal empty space focuses the prompt input
+    termBody.addEventListener('click', (e) => {
+      const sel = window.getSelection();
+      if (sel && sel.toString().length > 0) return;
+      if ((e.target as HTMLElement).closest('a, button, input, textarea, select')) return;
+      input.focus({ preventScroll: true });
     });
 
     // ==========================================

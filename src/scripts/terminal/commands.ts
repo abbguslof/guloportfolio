@@ -7,6 +7,7 @@ import {
   getSecretOutput, 
   getOsOpinionOutput,
   getStatusOutput,
+  getScheduleOutput,
   getFastfetchOutput,
   getBioOutput,
   getCvOutput,
@@ -34,6 +35,11 @@ export function getCommands(): Record<string, CommandFunction> {
 
     // 1b. STATUS & LIVE SYSOPS
     status: (_args, ctx) => getStatusOutput(ctx.lang),
+    schedule: (_args, ctx) => getScheduleOutput(ctx.lang),
+    tentor: (_args, ctx) => getScheduleOutput(ctx.lang),
+    tentavecka: (_args, ctx) => getScheduleOutput(ctx.lang),
+    exams: (_args, ctx) => getScheduleOutput(ctx.lang),
+    finals: (_args, ctx) => getScheduleOutput(ctx.lang),
 
     // 1c. BIO & EXECUTIVE PROFILE
     bio: (args, ctx) => {
@@ -373,7 +379,35 @@ ${ctx.escapeHtml(node.content)}
         return;
       }
 
-      return `<div class="text-[#f85149]">${ctx.lang === 'sv' ? `Känner inte igen '${ctx.escapeHtml(rawTarget)}'. Skriv 'help' eller 'ls'.` : `Unrecognized target '${ctx.escapeHtml(rawTarget)}'. Type 'help' or 'ls'.`}</div>`;
+      const isSv = ctx.lang === 'sv';
+      return `
+<div class="space-y-2.5 pt-1 text-xs font-mono">
+  <div class="p-3.5 rounded bg-[#0d1117] border border-[#f85149]/60 space-y-2">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-[#f85149] font-bold">HTTP 404 // COMMAND_NOT_FOUND</span>
+      </div>
+      <span class="text-[10px] text-[#f59e0b] px-1.5 py-0.5 rounded border border-[#f59e0b]/40">ERR_NOT_FOUND</span>
+    </div>
+    <div class="text-[#e6edf3]">
+      <span class="text-[#f85149]">open:</span> ${isSv ? `Kunde inte hitta eller öppna mål: ` : `Cannot locate or open target: `}<code class="text-[#f85149] font-bold">${ctx.escapeHtml(rawTarget)}</code>
+    </div>
+    <p class="text-[#8b949e] text-[11px] leading-relaxed">
+      ${isSv ? 'Sökvägen existerar inte på stationen. Den kan ha flyttats, döpts om eller aldrig kompilerats.' : 'The requested path does not exist on this station. It might have been moved, renamed, or never compiled.'}
+    </p>
+    <div class="pt-2 border-t border-[#30363d]/50">
+      <div class="text-[10px] text-[#8b949e] mb-1.5 uppercase tracking-wider font-semibold">
+        ${isSv ? 'FÖRESLAGNA DISCOVERY-VEKTORER:' : 'SUGGESTED DISCOVERY VECTORS:'}
+      </div>
+      <div class="flex flex-wrap gap-2 text-xs">
+        <a href="/" class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] hover:border-[#10b981] text-[#10b981] transition-all">[cd ~ / home]</a>
+        <a href="/projects" class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] hover:border-[#a78bfa] text-[#a78bfa] transition-all">[cd ~/projects]</a>
+        <a href="/thoughts" class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] hover:border-[#f59e0b] text-[#f59e0b] transition-all">[cd ~/thoughts]</a>
+        <a href="/files" class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] hover:border-[#38bdf8] text-[#38bdf8] transition-all">[cd ~/files]</a>
+      </div>
+    </div>
+  </div>
+</div>`;
     },
 
     // 9b. HOME / COCKPIT NAVIGATION

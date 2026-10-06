@@ -33,6 +33,21 @@ html {
   color: #e6edf3;
   font-family: var(--font-mono);
   scroll-behavior: smooth;
+  overflow-x: clip;
+}
+
+body {
+  overflow-x: clip;
+}
+
+/* Prevent iOS Safari auto-zoom on input focus for mobile screens */
+@media (max-width: 640px) {
+  input[type="text"],
+  input[type="search"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
 }
 
 /* Custom terminal scrollbar */

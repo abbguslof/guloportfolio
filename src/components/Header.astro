@@ -14,9 +14,9 @@ const isHome = currentPath === '/';
 <header id="site-header" class="fixed top-0 left-0 right-0 w-full z-50 pointer-events-none transition-[background-color,border-color,box-shadow] duration-250 ease-out">
   <div 
     id="header-surface" 
-    class="pointer-events-auto w-full max-w-[1400px] mx-auto px-4 sm:px-8 py-3.5 transition-[padding-top,padding-bottom] duration-250 ease-out"
+    class="pointer-events-auto w-full max-w-[1400px] mx-auto px-3 sm:px-8 py-3 sm:py-3.5 transition-[padding-top,padding-bottom] duration-250 ease-out"
   >
-    <div class="w-full flex items-center justify-between gap-3 sm:gap-6">
+    <div class="w-full flex items-center justify-between gap-2 sm:gap-6">
       <!-- Brand / Logo (Far left to maximize center reading area) -->
       <div id="header-brand" class="flex items-center gap-2 sm:gap-3 shrink-0">
         <a href="/" class="group flex items-center gap-1.5 sm:gap-2 text-sm font-semibold tracking-tight transition-colors">
@@ -32,9 +32,13 @@ const isHome = currentPath === '/';
           </span>
         </a>
 
-        <span class="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#161b22] border border-[#30363d] text-[#10b981]">
-          <span class="w-1.5 h-1.5 mr-1 rounded-full bg-[#10b981] animate-pulse"></span>
-          ONLINE
+        <span 
+          id="header-online-status"
+          class="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#161b22] border border-[#30363d] text-[#10b981] transition-all"
+          title="Station Connected // Online"
+        >
+          <span id="header-online-dot" class="w-1.5 h-1.5 mr-1 rounded-full bg-[#10b981] animate-pulse"></span>
+          <span id="header-online-text" data-i18n="header_status_online">ONLINE</span>
         </span>
       </div>
 
@@ -236,4 +240,83 @@ const isHome = currentPath === '/';
   document.getElementById('btn-lang-sv')?.addEventListener('click', () => {
     setSiteLang('sv');
   });
+
+  // Live Event-Driven Online/Offline Status Indicator
+  const onlineBadge = document.getElementById('header-online-status');
+  const onlineDot = document.getElementById('header-online-dot');
+  const onlineText = document.getElementById('header-online-text');
+  let currentOnlineState: boolean | null = null;
+
+  function updateOnlineUI(isOnline: boolean) {
+    if (currentOnlineState === isOnline) return;
+    currentOnlineState = isOnline;
+
+    if (!onlineBadge || !onlineDot || !onlineText) return;
+
+    if (isOnline) {
+      onlineBadge.className = 'hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#161b22] border border-[#30363d] text-[#10b981] transition-all';
+      onlineDot.className = 'w-1.5 h-1.5 mr-1 rounded-full bg-[#10b981] animate-pulse';
+      onlineText.textContent = 'ONLINE';
+      onlineBadge.title = 'Station Connected // All Systems Operational';
+    } else {
+      onlineBadge.className = 'hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#161b22] border border-[#f85149]/60 text-[#f85149] transition-all';
+      onlineDot.className = 'w-1.5 h-1.5 mr-1 rounded-full bg-[#f85149]';
+      onlineText.textContent = 'OFFLINE';
+      onlineBadge.title = 'Station Offline // Operating on Local Cache';
+    }
+
+    window.dispatchEvent(new CustomEvent('connection-state-change', { detail: { isOnline } }));
+  }
+
+  // Lightweight probe to verify true WAN connectivity and measure RTT ping
+  async function checkConnectivity() {
+    if (!navigator.onLine) {
+      updateOnlineUI(false);
+      return;
+    }
+
+    const t0 = performance.now();
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const res = await fetch('/favicon.svg', {
+        method: 'HEAD',
+        cache: 'no-store',
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (res.ok || res.status === 304) {
+        const latency = Math.max(1, Math.round(performance.now() - t0));
+        updateOnlineUI(true);
+        window.dispatchEvent(new CustomEvent('network-ping', { detail: { latency, isOnline: true } }));
+      } else {
+        updateOnlineUI(false);
+        window.dispatchEvent(new CustomEvent('network-ping', { detail: { latency: null, isOnline: false } }));
+      }
+    } catch {
+      updateOnlineUI(false);
+      window.dispatchEvent(new CustomEvent('network-ping', { detail: { latency: null, isOnline: false } }));
+    }
+  }
+
+  window.addEventListener('online', () => {
+    updateOnlineUI(true);
+    checkConnectivity();
+  });
+
+  window.addEventListener('offline', () => {
+    updateOnlineUI(false);
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      checkConnectivity();
+    }
+  });
+
+  // Initial check & quiet periodic 60s probe (zero server load)
+  updateOnlineUI(navigator.onLine);
+  setTimeout(checkConnectivity, 300);
+  setInterval(checkConnectivity, 60000);
 </script>

@@ -90,7 +90,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
                     ? 'active bg-[#10b981] text-[#0d1117] font-semibold border-[#10b981]' 
                     : 'bg-[#161b22] text-[#8b949e] border-[#30363d] hover:text-[#e6edf3]'
                 }`}
-                data-cat={cat.toLowerCase()}
+                data-cat={i === 0 ? 'all' : cat.toLowerCase()}
               >
                 {i === 0 ? <span data-i18n="files_filter_all">[{cat === 'Alla' ? 'All' : cat}]</span> : `[${cat}]`}
               </button>
@@ -154,9 +154,9 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
 
                 <!-- Metadata Row -->
                 <div class="flex flex-wrap items-center gap-3 pt-1 text-[11px] text-[#8b949e]">
-                  <span>Storlek: <strong class="text-[#e6edf3]">{item.size}</strong></span>
+                  <span><span data-i18n="files_size_label">Size:</span> <strong class="text-[#e6edf3]">{item.size}</strong></span>
                   <span>•</span>
-                  <span>Uppdaterad: <strong class="text-[#e6edf3]">{item.updatedAt}</strong></span>
+                  <span><span data-i18n="files_updated_label">Updated:</span> <strong class="text-[#e6edf3]">{item.updatedAt}</strong></span>
                   {item.tags && item.tags.length > 0 && (
                     <>
                       <span>•</span>
@@ -178,10 +178,9 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
                   href={item.fileUrl}
                   download={item.filename}
                   class="file-download-btn inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded bg-[#0d1117] border border-[#30363d] text-xs font-mono font-medium text-[#10b981] hover:bg-[#10b981] hover:text-[#0d1117] hover:border-[#10b981] transition-all cursor-pointer min-w-[110px]"
-                  title={`Ladda ner ${item.filename}`}
+                  title={`Download ${item.filename}`}
                 >
-                  <span>[Ladda ner</span>
-                  <span class="text-[11px]">↓]</span>
+                  <span data-i18n="files_download_btn_text">[Download ↓]</span>
                 </a>
                 
                 <button 
@@ -189,7 +188,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
                   class="file-expand-toggle inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded bg-[#161b22] border border-[#30363d] text-xs text-[#8b949e] hover:text-[#e6edf3] hover:border-[#8b949e] transition-all cursor-pointer min-w-[110px]"
                   aria-expanded="false"
                 >
-                  <span class="toggle-text">[Mer info ▼]</span>
+                  <span class="toggle-text" data-i18n="files_info_expand">[More info ▼]</span>
                 </button>
               </div>
             </div>
@@ -200,8 +199,8 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
               {item.usage && (
                 <div class="space-y-1.5">
                   <div class="text-[11px] text-[#38bdf8] font-semibold flex items-center justify-between">
-                    <span>Snabbguide / Hur den körs:</span>
-                    <span class="text-[10px] text-[#8b949e]">Terminalkommando</span>
+                    <span data-i18n="files_quick_guide_title">Quick Guide / How to run:</span>
+                    <span class="text-[10px] text-[#8b949e]" data-i18n="files_terminal_cmd">Terminal command</span>
                   </div>
                   <div class="p-2.5 rounded bg-[#0d1117] border border-[#30363d] flex items-center justify-between gap-3 overflow-x-auto">
                     <code class="text-[#10b981] text-xs whitespace-nowrap">{item.usage}</code>
@@ -209,9 +208,9 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
                       type="button" 
                       class="copy-cmd-btn shrink-0 px-2 py-0.5 rounded bg-[#161b22] border border-[#30363d] text-[10px] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#10b981] transition-colors cursor-pointer"
                       data-cmd={item.usage}
-                      title="Kopiera kommando"
+                      title="Copy command"
                     >
-                      <span>kopiera</span>
+                      <span data-i18n="files_copy_cmd">copy</span>
                       <span class="cmd-copy-check text-[#10b981] hidden ml-1">✓</span>
                     </button>
                   </div>
@@ -221,8 +220,8 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
               <!-- Referenced in Projects & Thoughts -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
                 <div>
-                  <span class="text-[11px] text-[#a78bfa] font-semibold block mb-1">
-                    Refererad i projekt:
+                  <span class="text-[11px] text-[#a78bfa] font-semibold block mb-1" data-i18n="files_ref_projects">
+                    Referenced in projects:
                   </span>
                   {itemRelatedProjects.length > 0 ? (
                     <ul class="space-y-1 text-xs">
@@ -240,13 +239,13 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
                       ))}
                     </ul>
                   ) : (
-                    <span class="text-[#8b949e] text-[11px]">Fristående resurs.</span>
+                    <span class="text-[#8b949e] text-[11px]" data-i18n="files_standalone">Standalone resource.</span>
                   )}
                 </div>
 
                 <div>
-                  <span class="text-[11px] text-[#f59e0b] font-semibold block mb-1">
-                    Refererad i anteckningar / blogg:
+                  <span class="text-[11px] text-[#f59e0b] font-semibold block mb-1" data-i18n="files_ref_thoughts">
+                    Referenced in notes / blog:
                   </span>
                   {itemRelatedThoughts.length > 0 ? (
                     <ul class="space-y-1 text-xs">
@@ -264,7 +263,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
                       ))}
                     </ul>
                   ) : (
-                    <span class="text-[#8b949e] text-[11px]">Inga länkade artiklar ännu.</span>
+                    <span class="text-[#8b949e] text-[11px]" data-i18n="files_no_linked_thoughts">No linked articles yet.</span>
                   )}
                 </div>
               </div>
@@ -273,7 +272,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
               {item.checksum && (
                 <div class="pt-2 border-t border-[#30363d]/40 flex flex-wrap items-center justify-between gap-2 text-[11px]">
                   <div class="flex items-center gap-2">
-                    <span class="text-[#8b949e]">Integritetskontroll (SHA-256):</span>
+                    <span class="text-[#8b949e]" data-i18n="files_checksum_label">Integrity check (SHA-256):</span>
                     <code class="text-[#e6edf3] px-1.5 py-0.5 rounded bg-[#0d1117] border border-[#30363d]">
                       {item.checksum}
                     </code>
@@ -283,7 +282,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
                     class="sha-copy-btn px-2 py-0.5 rounded bg-[#161b22] border border-[#30363d] text-[10px] text-[#8b949e] hover:text-[#10b981] hover:border-[#10b981] transition-colors cursor-pointer"
                     data-sha={item.checksum}
                   >
-                    <span>Kopiera hash</span>
+                    <span data-i18n="files_copy_hash">Copy hash</span>
                     <span class="copy-status ml-1 text-[#10b981] hidden">✓</span>
                   </button>
                 </div>
@@ -293,8 +292,8 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
         );
       })}
 
-      <div id="no-files-msg" class="py-12 text-center text-xs text-[#8b949e] hidden">
-        Inga filer matchar din sökning eller det valda filtret.
+      <div id="no-files-msg" class="py-12 text-center text-xs text-[#8b949e] hidden" data-i18n="files_no_match">
+        No files match your search or filter.
       </div>
     </div>
 
@@ -324,6 +323,17 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
     let currentCat = 'all';
     let searchQuery = '';
 
+    function parseSizeToBytes(str: string): number {
+      const match = str.trim().match(/^([\d.]+)\s*([a-zA-Z]+)?$/);
+      if (!match) return 0;
+      const num = parseFloat(match[1]);
+      const unit = (match[2] || '').toUpperCase();
+      if (unit.startsWith('G')) return num * 1024 * 1024 * 1024;
+      if (unit.startsWith('M')) return num * 1024 * 1024;
+      if (unit.startsWith('K')) return num * 1024;
+      return num;
+    }
+
     function filterAndSort() {
       let visible = cards.filter((card) => {
         const cat = card.getAttribute('data-category') || '';
@@ -332,7 +342,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
         const desc = card.getAttribute('data-desc') || '';
         const tags = card.getAttribute('data-tags') || '';
 
-        const catMatches = currentCat === 'all' || cat === currentCat;
+        const catMatches = currentCat === 'all' || currentCat === 'alla' || cat === currentCat;
         const searchMatches = 
           !searchQuery || 
           name.includes(searchQuery) || 
@@ -355,7 +365,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
           return (b.getAttribute('data-date') || '').localeCompare(a.getAttribute('data-date') || '');
         }
         if (sortMode === 'size') {
-          return parseFloat(b.getAttribute('data-size') || '0') - parseFloat(a.getAttribute('data-size') || '0');
+          return parseSizeToBytes(b.getAttribute('data-size') || '') - parseSizeToBytes(a.getAttribute('data-size') || '');
         }
         return 0;
       });
@@ -402,9 +412,30 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
       drawer.classList.toggle('hidden', !isHidden);
       btn?.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
       if (textSpan) {
-        textSpan.textContent = isHidden ? '[Dölj info ▲]' : '[Mer info ▼]';
+        const isSv = (document.documentElement.lang || '').startsWith('sv');
+        if (isHidden) {
+          textSpan.textContent = isSv ? '[Dölj info ▲]' : '[Hide info ▲]';
+        } else {
+          textSpan.textContent = isSv ? '[Mer info ▼]' : '[More info ▼]';
+        }
       }
     }
+
+    // Synchronize language change on existing drawer toggle buttons
+    window.addEventListener('lang-change', () => {
+      filterAndSort();
+      const isSv = (document.documentElement.lang || '').startsWith('sv');
+      document.querySelectorAll('.file-card').forEach((card) => {
+        const drawer = card.querySelector('.file-drawer');
+        const textSpan = card.querySelector('.toggle-text');
+        if (drawer && textSpan) {
+          const isOpen = !drawer.classList.contains('hidden');
+          textSpan.textContent = isOpen 
+            ? (isSv ? '[Dölj info ▲]' : '[Hide info ▲]') 
+            : (isSv ? '[Mer info ▼]' : '[More info ▼]');
+        }
+      });
+    });
 
     // Expand / collapse info drawer when clicking toggle button or anywhere on card header
     document.querySelectorAll('.file-expand-toggle').forEach((btn) => {

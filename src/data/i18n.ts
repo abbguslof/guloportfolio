@@ -7,6 +7,8 @@ export const translations = {
     // Brand & Status
     brand_sub: 'chalmers.d // playground',
     brand_online: 'ONLINE',
+    header_status_online: 'ONLINE',
+    header_status_offline: 'OFFLINE',
     
     // Header navigation
     nav_terminal: 'terminal',
@@ -48,6 +50,9 @@ export const translations = {
     projects_cat_other: 'Other',
     projects_downloads_title: 'DOWNLOADABLE RESOURCES LINKED TO THIS PROJECT:',
     projects_download_pack: '[Download pack ↓]',
+    projects_source_code: 'Source code',
+    projects_live_demo: 'Live demo',
+    projects_no_match: 'No projects found matching the query.',
     
     // Thoughts page & rows
     thoughts_breadcrumb_home: '[~/home]',
@@ -106,9 +111,25 @@ export const translations = {
     files_sort_size_asc: 'Size (Smallest first)',
     files_sort_category: 'Category',
     files_download_btn: 'Download',
+    files_download_btn_text: '[Download ↓]',
     files_copy_btn: 'Copy',
     files_guide_btn: 'Quick Guide',
     files_direct_link: 'Direct download',
+    files_size_label: 'Size:',
+    files_updated_label: 'Updated:',
+    files_info_expand: '[More info ▼]',
+    files_info_collapse: '[Hide info ▲]',
+    files_quick_guide_title: 'Quick Guide / How to run:',
+    files_terminal_cmd: 'Terminal command',
+    files_copy_cmd: 'copy',
+    files_copied_cmd: 'copied',
+    files_ref_projects: 'Referenced in projects:',
+    files_standalone: 'Standalone resource.',
+    files_ref_thoughts: 'Referenced in notes / blog:',
+    files_no_linked_thoughts: 'No linked articles yet.',
+    files_checksum_label: 'Integrity check (SHA-256):',
+    files_copy_hash: 'Copy hash',
+    files_no_match: 'No files match your search or filter.',
     
     // Footer
     footer_diagnostics: 'SYSTEM DIAGNOSTICS & TELEMETRY',
@@ -126,6 +147,15 @@ export const translations = {
     footer_link_blog: '[blog]',
     footer_link_files: '[files]',
     
+    // 404 Page
+    not_found_status: 'HTTP 404 // COMMAND_NOT_FOUND',
+    not_found_title: 'Route Not Found in Playground',
+    not_found_desc: 'The requested path does not exist on this station. It might have been moved, renamed, or never compiled.',
+    not_found_back_cockpit: '[← Back to Cockpit]',
+    not_found_browse_projects: '[Explore Projects →]',
+    not_found_read_thoughts: '[Read Blog & Notes →]',
+    not_found_download_files: '[Download Archives →]',
+
     // Terminal
     term_input_placeholder: "type 'help', 'school', 'swim', 'cat whoami.md'...",
     term_closed_title: 'Who is gulo? // About me & background',
@@ -158,6 +188,8 @@ export const translations = {
     // Brand & Status
     brand_sub: 'chalmers.d // playground',
     brand_online: 'ONLINE',
+    header_status_online: 'ONLINE',
+    header_status_offline: 'OFFLINE',
     
     // Header navigation
     nav_terminal: 'terminal',
@@ -199,6 +231,9 @@ export const translations = {
     projects_cat_other: 'Övrigt',
     projects_downloads_title: 'NEDLADDNINGSBARA RESURSER KOPPLADE TILL DETTA PROJEKT:',
     projects_download_pack: '[Ladda ner pack ↓]',
+    projects_source_code: 'Källkod',
+    projects_live_demo: 'Live demo',
+    projects_no_match: 'Inga projekt matchar din sökning eller det valda filtret.',
     
     // Thoughts page & rows
     thoughts_breadcrumb_home: '[~/startsidan]',
@@ -257,9 +292,25 @@ export const translations = {
     files_sort_size_asc: 'Storlek (Minst först)',
     files_sort_category: 'Kategori',
     files_download_btn: 'Ladda ner',
+    files_download_btn_text: '[Ladda ner ↓]',
     files_copy_btn: 'Kopiera',
     files_guide_btn: 'Snabbguide',
     files_direct_link: 'Direktlänk',
+    files_size_label: 'Storlek:',
+    files_updated_label: 'Uppdaterad:',
+    files_info_expand: '[Mer info ▼]',
+    files_info_collapse: '[Dölj info ▲]',
+    files_quick_guide_title: 'Snabbguide / Hur den körs:',
+    files_terminal_cmd: 'Terminalkommando',
+    files_copy_cmd: 'kopiera',
+    files_copied_cmd: 'kopierat',
+    files_ref_projects: 'Refererad i projekt:',
+    files_standalone: 'Fristående resurs.',
+    files_ref_thoughts: 'Refererad i anteckningar / blogg:',
+    files_no_linked_thoughts: 'Inga länkade artiklar ännu.',
+    files_checksum_label: 'Integritetskontroll (SHA-256):',
+    files_copy_hash: 'Kopiera hash',
+    files_no_match: 'Inga filer matchar din sökning eller det valda filtret.',
     
     // Footer
     footer_diagnostics: 'SYSTEMDIAGNOSTIK & TELEMETRI',
@@ -277,6 +328,15 @@ export const translations = {
     footer_link_blog: '[blogg]',
     footer_link_files: '[filer]',
     
+    // 404 Page
+    not_found_status: 'HTTP 404 // KOMMANDO_HITTADES_INTE',
+    not_found_title: 'Sökvägen hittades inte',
+    not_found_desc: 'Den efterfrågade adressen finns inte på denna station. Den kan ha flyttats, bytt namn eller aldrig kompilerats.',
+    not_found_back_cockpit: '[← Tillbaka till cockpiten]',
+    not_found_browse_projects: '[Utforska projekt →]',
+    not_found_read_thoughts: '[Läs blogg & anteckningar →]',
+    not_found_download_files: '[Ladda ner från arkivet →]',
+
     // Terminal
     term_input_placeholder: "skriv 'help', 'school', 'swim', 'cat whoami.md'...",
     term_closed_title: 'Vem är gulo? // Om mig & bakgrund',

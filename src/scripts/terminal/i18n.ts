@@ -1,6 +1,7 @@
 // src/scripts/terminal/i18n.ts - Centralized Internationalization & Terminal Texts
 import type { LangCode } from './types';
-import { currentStatus } from '../../data/status';
+import { getActiveStatus, type ActiveStatusResult } from '../../data/status';
+import { getUpcomingEvents, getCurrentEvent } from '../../data/schedule';
 import fastfetchSv from '../../data/terminal/sv/fastfetch.json';
 import fastfetchEn from '../../data/terminal/en/fastfetch.json';
 
@@ -26,6 +27,7 @@ export function getStandardHelpHtml(lang: LangCode): string {
       <div class="text-[#38bdf8] font-bold mb-1">Information &amp; Studier:</div>
       <div><span class="text-[#10b981] font-semibold">bio / about</span> : Komplett profil, CV &amp; översikt</div>
       <div><span class="text-[#10b981] font-semibold">status</span> : Live-status, homelab &amp; tillgänglighet</div>
+      <div><span class="text-[#10b981] font-semibold">schedule / tentor</span> : Chalmers tentaveckor &amp; planering</div>
       <div><span class="text-[#10b981] font-semibold">school / chalmers</span> : Chalmers-studier &amp; kurser</div>
       <div><span class="text-[#10b981] font-semibold">swim</span> : Simningspass &amp; träningstider</div>
       <div><span class="text-[#10b981] font-semibold">whoami</span> : Information om mig &amp; bakgrund</div>
@@ -70,6 +72,7 @@ export function getStandardHelpHtml(lang: LangCode): string {
       <div class="text-[#38bdf8] font-bold mb-1">Information &amp; Academics:</div>
       <div><span class="text-[#10b981] font-semibold">bio / about</span> : Complete profile, CV &amp; overview</div>
       <div><span class="text-[#10b981] font-semibold">status</span> : Live status, homelab &amp; availability</div>
+      <div><span class="text-[#10b981] font-semibold">schedule / exams</span> : Chalmers finals &amp; exam calendar</div>
       <div><span class="text-[#10b981] font-semibold">school / chalmers</span> : Chalmers coursework &amp; focus</div>
       <div><span class="text-[#10b981] font-semibold">swim</span> : Swim routines &amp; training stats</div>
       <div><span class="text-[#10b981] font-semibold">whoami</span> : Background &amp; profile overview</div>
@@ -393,50 +396,117 @@ export function getOsOpinionOutput(lang: LangCode): string {
 }
 
 /**
- * Status command output: clean telemetry card from src/data/status.ts (no awkward code path footer)
+ * Status command output: clean telemetry card dynamically pulling from active schedule & presets
  */
 export function getStatusOutput(lang: LangCode): string {
   const isSv = lang === 'sv';
-  return `
-<div class="p-3 rounded bg-[#0d1117] border border-[#38bdf8]/50 text-xs font-mono space-y-2 max-w-2xl">
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-[#30363d] pb-1.5 gap-1">
-    <div class="flex items-center gap-2">
-      <span class="w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
-      <span class="text-[#38bdf8] font-bold">STATUS // ${currentStatus.user}@${currentStatus.host}</span>
+  const status = getActiveStatus();
+  const eventBanner = status.activeEvent ? `
+    <div class="p-2 rounded bg-[#f59e0b]/10 border border-[#f59e0b]/40 text-[#f59e0b] flex items-center justify-between text-[11px]">
+      <span class="font-bold flex items-center gap-1.5">
+        <span>⚠</span>
+        <span>${isSv ? 'SCHEMALAGT EVENT AKTIVT:' : 'SCHEDULED EVENT ACTIVE:'} ${status.activeEvent.name[lang]}</span>
+      </span>
+      <span class="text-[#8b949e]">${status.activeEvent.startDate} → ${status.activeEvent.endDate}</span>
     </div>
-    <span class="text-[10px] text-[#8b949e]">${isSv ? 'Senast uppdaterad:' : 'Last updated:'} ${currentStatus.lastUpdated}</span>
+  ` : '';
+
+  return `
+<div class="p-3.5 rounded bg-[#0d1117] border border-[#38bdf8]/50 text-xs font-mono space-y-2.5 max-w-2xl">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-[#30363d] pb-2 gap-1.5">
+    <div class="flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full ${status.activeEvent ? 'bg-[#f59e0b]' : 'bg-[#10b981]'} animate-pulse"></span>
+      <span class="text-[#38bdf8] font-bold">STATUS // ${status.user}@${status.host}</span>
+      <span class="text-[10px] px-1.5 py-0.2 rounded border ${status.activeEvent ? 'border-[#f59e0b] text-[#f59e0b]' : 'border-[#10b981] text-[#10b981]'}">
+        ${status.badge[lang]}
+      </span>
+    </div>
+    <span class="text-[10px] text-[#8b949e]">${isSv ? 'Senast uppdaterad:' : 'Last updated:'} ${status.lastUpdated}</span>
   </div>
+
+  ${eventBanner}
 
   <div class="space-y-1.5 pt-0.5 text-[#e6edf3]">
     <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-x-2">
       <span class="text-[#8b949e]">${isSv ? 'Plats:' : 'Location:'}</span>
-      <span class="text-[#38bdf8]">${currentStatus.location[lang]}</span>
+      <span class="text-[#38bdf8]">${status.location[lang]}</span>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-x-2">
       <span class="text-[#8b949e]">${isSv ? 'Aktivitet:' : 'Activity:'}</span>
-      <span>${currentStatus.activity[lang]}</span>
+      <span>${status.activity[lang]}</span>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-x-2">
       <span class="text-[#8b949e]">${isSv ? 'Fokus:' : 'Focus:'}</span>
-      <span class="text-[#10b981] font-medium">${currentStatus.focus[lang]}</span>
+      <span class="text-[#10b981] font-medium">${status.focus[lang]}</span>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-x-2">
       <span class="text-[#8b949e]">${isSv ? 'Stämning:' : 'Mood:'}</span>
-      <span>${currentStatus.mood[lang]}</span>
+      <span>${status.mood[lang]}</span>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-x-2">
       <span class="text-[#8b949e]">${isSv ? 'Homelab:' : 'Homelab:'}</span>
-      <span class="text-[#f59e0b]">${currentStatus.homelab[lang]}</span>
+      <span class="text-[#f59e0b]">${status.homelab[lang]}</span>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-x-2">
-      <span class="text-[#8b949e]">${isSv ? 'Status:' : 'Status:'}</span>
-      <span class="text-[#a78bfa]">${currentStatus.availability[lang]}</span>
+      <span class="text-[#8b949e]">${isSv ? 'Tillgänglig:' : 'Available:'}</span>
+      <span class="text-[#a78bfa]">${status.availability[lang]}</span>
     </div>
   </div>
 
-  <div class="text-[10px] text-[#8b949e] border-t border-[#30363d]/40 pt-1 flex items-center justify-between">
-    <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span><span>${isSv ? 'chalmers-station // aktiv nod' : 'chalmers-station // active node'}</span></span>
-    <span class="text-[#10b981] font-bold">[ONLINE]</span>
+  <div class="text-[10px] text-[#8b949e] border-t border-[#30363d]/40 pt-1.5 flex flex-wrap items-center justify-between gap-2">
+    <span class="flex items-center gap-1.5">
+      <span class="w-1.5 h-1.5 rounded-full ${status.activeEvent ? 'bg-[#f59e0b]' : 'bg-[#10b981]'}"></span>
+      <span>${isSv ? `Läge: ${status.isAutoScheduled ? 'Auto-kalender aktiv' : 'Manuell profil'}` : `Mode: ${status.isAutoScheduled ? 'Auto-schedule active' : 'Manual profile'}`} (${status.mode})</span>
+    </span>
+    <span class="text-[#38bdf8]">${isSv ? "Kör 'schedule' för tentaveckor" : "Type 'schedule' for finals calendar"}</span>
+  </div>
+</div>`;
+}
+
+/**
+ * Schedule command output: lists upcoming exam weeks and athletic training camps
+ */
+export function getScheduleOutput(lang: LangCode): string {
+  const isSv = lang === 'sv';
+  const upcoming = getUpcomingEvents(5);
+  const current = getCurrentEvent();
+
+  const eventsHtml = upcoming.map((ev) => {
+    const isOngoing = current?.id === ev.id;
+    const border = isOngoing ? 'border-[#f59e0b] bg-[#f59e0b]/5' : 'border-[#30363d] bg-[#0d1117]';
+    const tagColor = ev.statusPreset === 'exam' ? 'text-[#f59e0b]' : ev.statusPreset === 'camp' ? 'text-[#38bdf8]' : 'text-[#10b981]';
+
+    return `
+      <div class="p-2.5 rounded border ${border} space-y-1 font-mono text-xs">
+        <div class="flex flex-wrap items-center justify-between gap-1">
+          <div class="flex items-center gap-2">
+            <span class="${tagColor} font-bold">[${ev.badge[lang]}]</span>
+            <span class="text-[#e6edf3] font-semibold">${ev.name[lang]}</span>
+          </div>
+          <span class="text-[11px] text-[#8b949e]">${ev.startDate} → ${ev.endDate}${isOngoing ? ` <span class="text-[#f59e0b] font-bold">(${isSv ? 'PÅGÅR NU' : 'NOW ACTIVE'})</span>` : ''}</span>
+        </div>
+        <p class="text-[11px] text-[#8b949e]">${ev.description[lang]}</p>
+      </div>
+    `;
+  }).join('');
+
+  return `
+<div class="p-3.5 rounded bg-[#0d1117] border border-[#a78bfa]/50 text-xs font-mono space-y-3 max-w-2xl">
+  <div class="flex items-center justify-between border-b border-[#30363d] pb-2">
+    <div class="flex items-center gap-2">
+      <span class="text-sm">📅</span>
+      <span class="text-[#a78bfa] font-bold">${isSv ? 'CHALMERS & AKTIVITETSSCHEMA // TENTAVECKOR & LÄGER' : 'CHALMERS & ACTIVITY SCHEDULE // EXAMS & CAMPS'}</span>
+    </div>
+    <span class="text-[10px] text-[#8b949e]">${isSv ? 'Källa: src/data/schedule.ts' : 'Source: src/data/schedule.ts'}</span>
+  </div>
+
+  <div class="space-y-2">
+    ${eventsHtml}
+  </div>
+
+  <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/40 pt-2 flex items-center justify-between">
+    <span>💡 ${isSv ? 'Kommandot \'status\' slår om automatiskt under dessa datum.' : '\'status\' automatically reflects these dates.'}</span>
+    <span class="text-[#10b981] font-bold">[AUTO-SYNC]</span>
   </div>
 </div>`;
 }
