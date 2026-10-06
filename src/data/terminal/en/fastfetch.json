@@ -51,7 +51,7 @@
     },
     {
       "key": "Status",
-      "value": "[● ONLINE] Exam week & server ops",
+      "value": "[ONLINE] Exam week & server ops",
       "color": "amber",
       "online": true
     }

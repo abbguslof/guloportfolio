@@ -51,7 +51,7 @@
     },
     {
       "key": "Status",
-      "value": "[● ONLINE] Tentavecka & serverdrift",
+      "value": "[ONLINE] Tentavecka & serverdrift",
       "color": "amber",
       "online": true
     }

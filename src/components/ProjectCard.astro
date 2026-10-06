@@ -15,7 +15,7 @@ const { title, description, status, category, tech, repoUrl, liveUrl, slug } = A
 
 // Status styling mapping
 const statusMap: Record<string, { label: string; textClass: string }> = {
-  ACTIVE: { label: '[● ACTIVE]', textClass: 'text-[#10b981]' },
+  ACTIVE: { label: '[ACTIVE]', textClass: 'text-[#10b981]' },
   COMPLETED: { label: '[✓ COMPLETED]', textClass: 'text-[#38bdf8]' },
   WIP: { label: '[⚡ WIP]', textClass: 'text-[#f59e0b]' },
   MAINTAINED: { label: '[⟳ MAINTAINED]', textClass: 'text-[#a78bfa]' },
@@ -27,8 +27,8 @@ const projectUrl = `/projects/${slug}`;
 const catKey = `projects_cat_${category.toLowerCase()}`;
 ---
 
-<div class="group relative flex flex-col justify-between p-5 rounded-lg bg-[#161b22] border border-[#30363d] hover:bg-[#1f242c] hover:border-[#38bdf8]/70 hover:shadow-lg transition-all">
-  <div>
+<div class="project-card group relative flex flex-col justify-between h-full p-5 rounded-lg bg-[#161b22] border border-[#30363d] hover:bg-[#1f242c] hover:border-[#38bdf8]/70 hover:shadow-lg transition-all">
+  <div class="flex flex-col flex-1">
     <!-- Top Metadata: Category & Status -->
     <div class="flex items-center justify-between gap-2 mb-3">
       <span 
@@ -43,7 +43,7 @@ const catKey = `projects_cat_${category.toLowerCase()}`;
     </div>
 
     <!-- Title (Primary Click target -> Goes to /projects/[slug]) -->
-    <h3 class="text-base font-semibold text-[#e6edf3] group-hover:text-[#38bdf8] transition-colors mb-2">
+    <h3 class="text-base font-semibold text-[#e6edf3] group-hover:text-[#38bdf8] transition-colors mb-2 line-clamp-2">
       <a href={projectUrl} class="focus:outline-none flex items-center justify-between">
         <span class="absolute inset-0" aria-hidden="true"></span>
         <span>{title}</span>
@@ -51,13 +51,13 @@ const catKey = `projects_cat_${category.toLowerCase()}`;
       </a>
     </h3>
 
-    <!-- Description -->
-    <p class="text-xs sm:text-sm text-[#8b949e] leading-relaxed mb-4">
+    <!-- Description (Uniform 3-line max with ellipsis truncation) -->
+    <p class="text-xs sm:text-sm text-[#8b949e] leading-relaxed mb-4 line-clamp-3 overflow-hidden flex-1">
       {description}
     </p>
   </div>
 
-  <div class="relative z-10">
+  <div class="relative z-10 mt-auto">
     <!-- Tech stack pills -->
     <div class="flex flex-wrap gap-1.5 pt-3 border-t border-[#30363d]/60 mb-4">
       {tech.map((item) => (

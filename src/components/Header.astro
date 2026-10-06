@@ -23,7 +23,7 @@ const isHome = currentPath === '/';
           <span class={`px-2 py-0.5 rounded font-mono text-xs font-bold transition-all ${
             isHome 
               ? 'bg-[#161b22] border border-[#10b981] text-[#10b981]' 
-              : 'bg-[#161b22] border border-[#30363d] text-[#10b981] group-hover:border-[#10b981]'
+              : 'bg-[#161b22] border border-[#30363d] text-[#10b981]'
           }`} id="header-brand-badge">
             GULO
           </span>
@@ -146,6 +146,15 @@ const isHome = currentPath === '/';
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
   }
+
+  /* Reliable disconnect styling for GULO badge */
+  #header-brand-badge.is-offline {
+    color: #f85149 !important;
+    border-color: #f85149 !important;
+  }
+  #header-brand-badge.is-online {
+    color: #10b981 !important;
+  }
 </style>
 
 <script>
@@ -190,8 +199,20 @@ const isHome = currentPath === '/';
 
     if (brandBadge) {
       const isHome = pathname === '/';
-      brandBadge.classList.toggle('border-[#10b981]', isHome);
-      brandBadge.classList.toggle('border-[#30363d]', !isHome);
+      const isOnline = typeof (window as any).__siteIsOnline === 'boolean'
+        ? (window as any).__siteIsOnline
+        : navigator.onLine;
+      if (isOnline) {
+        brandBadge.classList.remove('is-offline', 'is-offline-border', 'is-offline-text');
+        brandBadge.classList.add('is-online', 'is-online-text');
+        brandBadge.style.setProperty('color', '#10b981', 'important');
+        brandBadge.style.setProperty('border-color', isHome ? '#10b981' : '#30363d', 'important');
+      } else {
+        brandBadge.classList.remove('is-online', 'is-online-text');
+        brandBadge.classList.add('is-offline', 'is-offline-border', 'is-offline-text');
+        brandBadge.style.setProperty('color', '#f85149', 'important');
+        brandBadge.style.setProperty('border-color', '#f85149', 'important');
+      }
     }
 
     if (linkProjects) {
@@ -245,78 +266,134 @@ const isHome = currentPath === '/';
   const onlineBadge = document.getElementById('header-online-status');
   const onlineDot = document.getElementById('header-online-dot');
   const onlineText = document.getElementById('header-online-text');
-  let currentOnlineState: boolean | null = null;
 
   function updateOnlineUI(isOnline: boolean) {
-    if (currentOnlineState === isOnline) return;
-    currentOnlineState = isOnline;
+    (window as any).__siteIsOnline = isOnline;
+
+    const brandBadge = document.getElementById('header-brand-badge');
+    if (brandBadge) {
+      const pathname = window.location.pathname.replace(/\/$/, '') || '/';
+      const isHome = pathname === '/';
+      if (isOnline) {
+        brandBadge.classList.remove('is-offline', 'is-offline-border', 'is-offline-text');
+        brandBadge.classList.add('is-online', 'is-online-text');
+        brandBadge.style.setProperty('color', '#10b981', 'important');
+        brandBadge.style.setProperty('border-color', isHome ? '#10b981' : '#30363d', 'important');
+      } else {
+        brandBadge.classList.remove('is-online', 'is-online-text');
+        brandBadge.classList.add('is-offline', 'is-offline-border', 'is-offline-text');
+        brandBadge.style.setProperty('color', '#f85149', 'important');
+        brandBadge.style.setProperty('border-color', '#f85149', 'important');
+      }
+    }
 
     if (!onlineBadge || !onlineDot || !onlineText) return;
 
     if (isOnline) {
-      onlineBadge.className = 'hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#161b22] border border-[#30363d] text-[#10b981] transition-all';
-      onlineDot.className = 'w-1.5 h-1.5 mr-1 rounded-full bg-[#10b981] animate-pulse';
+      onlineBadge.className = 'hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#161b22] border border-[#30363d] text-[#10b981] transition-all is-online-text';
+      onlineBadge.style.color = '#10b981';
+      onlineBadge.style.borderColor = '#30363d';
+      onlineDot.className = 'w-1.5 h-1.5 mr-1 rounded-full bg-[#10b981] animate-pulse is-online-bg';
+      onlineDot.style.backgroundColor = '#10b981';
       onlineText.textContent = 'ONLINE';
       onlineBadge.title = 'Station Connected // All Systems Operational';
     } else {
-      onlineBadge.className = 'hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#161b22] border border-[#f85149]/60 text-[#f85149] transition-all';
-      onlineDot.className = 'w-1.5 h-1.5 mr-1 rounded-full bg-[#f85149]';
+      onlineBadge.className = 'hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#161b22] border border-[#f85149]/60 text-[#f85149] transition-all is-offline-text is-offline-border';
+      onlineBadge.style.color = '#f85149';
+      onlineBadge.style.borderColor = '#f85149';
+      onlineDot.className = 'w-1.5 h-1.5 mr-1 rounded-full bg-[#f85149] is-offline-bg';
+      onlineDot.style.backgroundColor = '#f85149';
       onlineText.textContent = 'OFFLINE';
-      onlineBadge.title = 'Station Offline // Operating on Local Cache';
+      onlineBadge.title = 'Station Offline // Disconnected from Network';
     }
 
     window.dispatchEvent(new CustomEvent('connection-state-change', { detail: { isOnline } }));
   }
 
   // Lightweight probe to verify true WAN connectivity and measure RTT ping
+  let isProbing = false;
   async function checkConnectivity() {
+    if (isProbing) return;
     if (!navigator.onLine) {
       updateOnlineUI(false);
+      window.dispatchEvent(new CustomEvent('network-ping', { detail: { latency: null, isOnline: false } }));
       return;
     }
 
+    isProbing = true;
     const t0 = performance.now();
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
-      const res = await fetch('/favicon.svg', {
-        method: 'HEAD',
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+
+      // Probe external 204 endpoint with mode: 'no-cors' for true WAN verification
+      // Transmits 0 bytes and immediately fails if WAN/Internet is disconnected
+      await fetch('https://www.google.com/generate_204', {
+        method: 'GET',
+        mode: 'no-cors',
         cache: 'no-store',
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
 
-      if (res.ok || res.status === 304) {
-        const latency = Math.max(1, Math.round(performance.now() - t0));
-        updateOnlineUI(true);
-        window.dispatchEvent(new CustomEvent('network-ping', { detail: { latency, isOnline: true } }));
-      } else {
-        updateOnlineUI(false);
-        window.dispatchEvent(new CustomEvent('network-ping', { detail: { latency: null, isOnline: false } }));
-      }
+      const latency = Math.max(1, Math.round(performance.now() - t0));
+      updateOnlineUI(true);
+      window.dispatchEvent(new CustomEvent('network-ping', { detail: { latency, isOnline: true } }));
     } catch {
+      // WAN unreachable or timed out
       updateOnlineUI(false);
       window.dispatchEvent(new CustomEvent('network-ping', { detail: { latency: null, isOnline: false } }));
+    } finally {
+      isProbing = false;
     }
   }
 
   window.addEventListener('online', () => {
-    updateOnlineUI(true);
     checkConnectivity();
   });
 
   window.addEventListener('offline', () => {
     updateOnlineUI(false);
+    window.dispatchEvent(new CustomEvent('network-ping', { detail: { latency: null, isOnline: false } }));
   });
+
+  window.addEventListener('connection-state-change', ((e: CustomEvent) => {
+    if (typeof e.detail?.isOnline === 'boolean' && e.detail.isOnline !== (window as any).__siteIsOnline) {
+      updateOnlineUI(e.detail.isOnline);
+    }
+  }) as EventListener);
+
+  // Fast check whenever window regains focus (e.g. user toggled Wi-Fi in OS menu)
+  window.addEventListener('focus', () => {
+    checkConnectivity();
+  });
+
+  // Battery- & bandwidth-friendly connectivity verification:
+  // Zero network requests when the tab is hidden or device is offline.
+  let probeTimer: number | null = null;
+
+  function scheduleProbe() {
+    if (probeTimer !== null) clearInterval(probeTimer);
+    if (document.visibilityState === 'visible') {
+      probeTimer = window.setInterval(checkConnectivity, 8000);
+    }
+  }
 
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
       checkConnectivity();
+      scheduleProbe();
+    } else {
+      if (probeTimer !== null) {
+        clearInterval(probeTimer);
+        probeTimer = null;
+      }
     }
   });
 
-  // Initial check & quiet periodic 60s probe (zero server load)
+  // Initial setup: initial UI state from navigator.onLine, probe immediately
+  (window as any).__siteIsOnline = navigator.onLine;
   updateOnlineUI(navigator.onLine);
-  setTimeout(checkConnectivity, 300);
-  setInterval(checkConnectivity, 60000);
+  setTimeout(checkConnectivity, 100);
+  scheduleProbe();
 </script>

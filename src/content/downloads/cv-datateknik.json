@@ -8,8 +8,17 @@
   "usage": "curl -O https://gulo.dev/downloads/cv-gulo-datateknik.pdf",
   "updatedAt": "2026-04-01",
   "checksum": "sha256:d41d8cd98f",
-  "tags": ["CV", "Chalmers", "Karriär", "PDF"],
+  "tags": [
+    "CV",
+    "Chalmers",
+    "Karriär",
+    "PDF"
+  ],
   "featured": true,
-  "relatedProjects": ["chalmers-sys-sched"],
-  "relatedThoughts": ["chalmers-simning-kod"]
+  "relatedProjects": [
+    "chalmers-sys-sched"
+  ],
+  "relatedThoughts": [
+    "chalmers-simning-kod"
+  ]
 }

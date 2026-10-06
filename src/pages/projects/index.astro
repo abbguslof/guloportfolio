@@ -105,10 +105,10 @@ const sortedProjects = projects.sort((a, b) => a.data.order - b.data.order);
     </div>
 
     <!-- Portfolio Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="projects-grid">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch" id="projects-grid">
       {sortedProjects.map((project) => (
         <div 
-          class="project-item" 
+          class="project-item h-full flex flex-col" 
           data-cat={project.data.category.toLowerCase()}
           data-title={project.data.title.toLowerCase()}
           data-desc={project.data.description.toLowerCase()}

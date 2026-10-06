@@ -1,34 +1,239 @@
-# Personal Playground & TUI Cockpit
+# 🚀 GULO // Personal Cockpit & TUI Digital Garden
 
-Digital garden, visitkort, portfolio och fildelningshub för personliga projekt, studier vid Chalmers Datateknik, simning, homelab och systemadministration.
+```text
+  ____ _   _ _     ___  
+ / ___| | | | |   / _ \ 
+| |  _| | | | |  | | | |
+| |_| | |_| | |__| |_| |
+ \____|\___/|_____\___/ 
+ CHALMERS // D-24 // TUI WORKSTATION & DIGITAL PLAYGROUND
+```
 
-## ⚡ Snabbstart
+[![Framework](https://img.shields.io/badge/Astro-7.x%20(SSG)-FF5D01?style=flat-square&logo=astro&logoColor=white)](https://astro.build)
+[![Language](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Styling](https://img.shields.io/badge/TailwindCSS-v4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Typography](https://img.shields.io/badge/Font-JetBrains%20Mono-000000?style=flat-square&logo=jetbrains&logoColor=white)](https://www.jetbrains.com/lp/mono/)
+[![License](https://img.shields.io/badge/License-MIT-2ea043?style=flat-square)](LICENSE)
+
+A personal digital garden, portfolio showcase, technical blog, and file distribution hub disguised as an interactive Unix/Linux TUI workstation. Built with **Astro 7 (Static Site Generation)**, **TypeScript**, and **Tailwind CSS v4** for maximum performance, battery efficiency, and zero layout shift.
+
+---
+
+## ⚡ Quick Start
 
 ```bash
-# Installera beroenden
+# 1. Clone the repository
+git clone https://github.com/your-username/guloportfolio.git
+cd guloportfolio
+
+# 2. Install dependencies
 npm install
 
-# Starta utvecklingsservern lokalt (http://localhost:4321)
+# 3. Start the local development server (http://localhost:4321)
 npm run dev
 
-# Bygg produktionsversionen
+# 4. Build the production bundle (static output in dist/)
 npm run build
 
-# Förhandsgranska produktionsbygget
+# 5. Preview the production build locally
 npm run preview
 ```
 
-## 📂 Lägga till innehåll
+---
 
-Allt innehåll hanteras via **Astro Content Layer** i `src/content.config.ts`:
+## 🖥️ Core Architecture & Features
 
-- **Tankar & Blogginlägg:** Skapa en `.md`-fil i `src/content/thoughts/` med `title`, `pubDate` och `tags`.
-- **Projekt:** Skapa en `.md`-fil i `src/content/projects/` med `title`, `status`, `category` och `tech`.
-- **Filer & Nedladdningar:** Lägg filen i `public/downloads/` och skapa en JSON-beskrivning i `src/content/downloads/`.
+### 1. Interactive TUI Terminal (`src/components/InteractiveTerminal.astro`)
+- **Built-in Bash Interpreter**: Interactive command engine supporting 35+ Unix-like commands including `help`, `bio`, `status`, `schedule`, `school`, `swim`, `whoami`, `contact`, `ls`, `cd`, `cat`, `nvim`, `git`, `calc`, `uptime`, `fastfetch` / `neofetch`, `clear`, and `exit`.
+- **Dynamic Virtual Filesystem**: Reads contents from `src/data/terminal/{en,sv}/` at compile time and allows navigating and viewing simulated files directly in the browser.
+- **Sub-Interpreters**: Built-in mini Vim (`nvim` text viewer), Git commit inspector (`git log`, `git status`), and scientific calculator (`calc 2^10 + 42`).
+- **Window Management**: Fully functional macOS-style window controls (Close, Minimize, Maximize/Fullscreen with `Esc` shortcut), persistent state across navigation, and tab auto-completion.
+- **Graceful Fallback Card**: When the terminal is closed or on mobile devices (<1024px), it smoothly collapses into a structured *"Who is gulo? // About me & background"* biography card with a one-click reopening button.
 
-## 🛠 Tech Stack
+### 2. Live Telemetry & Offline Detection (`src/data/telemetry.ts`)
+- **Dynamic Host Uptime**: Live ticking uptime calculated from a configurable station launch epoch (`SITE_LAUNCH_DATE`).
+- **Zero-Bandwidth RTT Ping**: Measures real round-trip network latency from browser navigation timing with zero extra HTTP overhead.
+- **Reactive Offline State**: Lightweight WAN probe (`/generate_204`) combined with native browser events (`online` / `offline`). When disconnected:
+  - Header brand badge (`GULO`) and status pill turn solid red (`#f85149`).
+  - Terminal fastfetch and `status` command show red `[OFFLINE]` indicators.
+  - Footer uptime counter and Gothenburg clock freeze their counters and turn red.
+  - All tickers automatically pause when browser tabs are inactive (`visibilitychange`) to save CPU and battery.
 
-- **Framework:** Astro 7 (Static Site Generation / SSG)
-- **Styling:** Tailwind CSS v4 + `@tailwindcss/typography`
-- **Typsnitt:** JetBrains Mono (`@fontsource/jetbrains-mono`)
-- **Syntax Highlighting:** Shiki (`github-dark`)
+### 3. Automated Exam & Finals Scheduler (`src/data/schedule.ts`)
+- Configurable calendar for university exam periods (tentaveckor) and athletic training camps.
+- The site's status badge, fastfetch specs, and `status` command dynamically detect current dates and switch modes automatically (e.g. from regular training to active exam week).
+
+### 4. Bilingual Localization (`src/data/i18n.ts` & `src/scripts/i18n-client.ts`)
+- First-class English (`EN`) and Swedish (`SV`) support.
+- Zero-refresh client-side language switching that instantly updates headers, navigation, cards, footer, and the active terminal session.
+- Remembers user language preference via `localStorage`.
+
+### 5. Ambient Canvas & Glassmorphic Design System (`src/styles/global.css`)
+- **Unified 6px Frosted Blur**: Subtle `backdrop-filter: blur(6px)` applied uniformly across all windows, cards, and panels.
+- **Ambient Visual Effects**: Switch between background modes (`matrix`, `glow`, `minimal`) on the fly.
+- **Typography & Aesthetics**: Powered by JetBrains Mono with curated dark mode tones (`#0d1117`, `#161b22`, `#30363d`) and high-contrast TUI accent colors (`#10b981`, `#38bdf8`, `#f59e0b`, `#a78bfa`, `#f85149`).
+
+### 6. Astro Content Collections (`src/content.config.ts`)
+- Type-safe schemas with Zod validation for:
+  - **`projects`**: Markdown showcases with status badges (`ACTIVE`, `WIP`, `COMPLETED`), tech stack tags, and repository/live demo links.
+  - **`thoughts`**: Digital garden notes, guides, and thoughts with estimated reading time, tag filtering, and instant search.
+  - **`downloads`**: Curated developer files, dotfiles, scripts, and CV with file size, terminal installation commands, and SHA-256 integrity checksums.
+
+---
+
+## 📁 Repository Structure
+
+```text
+guloportfolio/
+├── public/                       # Static public assets
+│   ├── downloads/                # Downloadable files (.pdf, .zip, .sh, .tar.gz)
+│   ├── favicon.svg               # Site icon
+│   └── vendor/                   # Ambient shader & runtime assets
+├── src/
+│   ├── components/               # Astro UI components
+│   │   ├── AmbientBackground.astro # Dynamic background canvas
+│   │   ├── Footer.astro          # Diagnostics grid, Gothenburg clock, uptime & links
+│   │   ├── Header.astro          # Cockpit navigation, online status, language toggle
+│   │   ├── InteractiveTerminal.astro # Full TUI terminal window & engine
+│   │   ├── ProjectCard.astro     # Standardized portfolio card
+│   │   └── ThoughtRow.astro      # Blog list item component
+│   ├── content/                  # Astro Content Layer collections
+│   │   ├── downloads/            # Metadata JSON files for downloads
+│   │   ├── projects/             # Portfolio project writeups (.md)
+│   │   └── thoughts/             # Blog posts, guides and research notes (.md)
+│   ├── content.config.ts         # Zod schemas for content collections
+│   ├── data/                     # Configuration & Telemetry
+│   │   ├── i18n.ts               # Bilingual translations dictionary (EN/SV)
+│   │   ├── schedule.ts           # University exam & athletic event scheduler
+│   │   ├── status.ts             # Availability presets & status badges
+│   │   ├── telemetry.ts          # Launch epoch & live uptime math
+│   │   └── terminal/             # Virtual terminal filesystem
+│   │       ├── en/               # English files (.bashrc, fastfetch.json, whoami.md...)
+│   │       └── sv/               # Swedish files (.bashrc, fastfetch.json, whoami.md...)
+│   ├── layouts/
+│   │   └── Layout.astro          # Base HTML layout with SEO metadata & fonts
+│   ├── pages/                    # File-based routing
+│   │   ├── 404.astro             # Custom 404 cockpit with terminal command hints
+│   │   ├── files/index.astro     # Download hub with category filter & search
+│   │   ├── index.astro           # Homepage: Terminal hero, projects & latest posts
+│   │   ├── projects/             # Portfolio showcase & [slug] project details
+│   │   └── thoughts/             # Digital garden blog & [slug] reader view
+│   ├── scripts/                  # Client-side scripts & terminal engine
+│   │   ├── i18n-client.ts        # Client language manager & event dispatcher
+│   │   └── terminal/             # Bash parser, calculator, git, nvim & i18n
+│   └── styles/
+│       └── global.css            # Tailored design system, frosted blur & code blocks
+├── AGENTS.md                     # Development workflows and coding rules
+├── astro.config.mjs              # Astro configuration
+├── package.json                  # Dependencies and scripts
+└── tsconfig.json                 # TypeScript strict configuration
+```
+
+---
+
+## ⚙️ Customization Guide
+
+### 1. Setting Your Launch Date & Uptime
+Open [`src/data/telemetry.ts`](file:///Users/glof-mac/projects/guloportfolio/src/data/telemetry.ts) and edit the `SITE_LAUNCH_DATE` constant:
+
+```typescript
+// Format: ISO-8601 (YYYY-MM-DDTHH:mm:ssZ)
+export const SITE_LAUNCH_DATE = '2026-01-01T00:00:00Z';
+```
+
+### 2. Configuring Exam Weeks & Schedule Events
+Open [`src/data/schedule.ts`](file:///Users/glof-mac/projects/guloportfolio/src/data/schedule.ts) to define upcoming university exam weeks or activities:
+
+```typescript
+export const SCHEDULED_EVENTS: ScheduleEvent[] = [
+  {
+    id: 'exam-lp3-2026',
+    name: { en: 'Finals Week LP3', sv: 'Tentavecka LP3' },
+    startDate: '2026-03-09',
+    endDate: '2026-03-14',
+    statusPreset: 'exam',
+    badge: { en: 'EXAM WEEK', sv: 'TENTAVECKA' },
+    description: { 
+      en: 'Exams in EDA433 and TDA384. Homelab maintenance paused.', 
+      sv: 'Tentor i EDA433 och TDA384. Serverdrift pausad.' 
+    },
+  },
+];
+```
+
+### 3. Personalizing Fastfetch & Whoami
+- **Specs & Badge**: Modify [`src/data/terminal/en/fastfetch.json`](file:///Users/glof-mac/projects/guloportfolio/src/data/terminal/en/fastfetch.json) and [`src/data/terminal/sv/fastfetch.json`](file:///Users/glof-mac/projects/guloportfolio/src/data/terminal/sv/fastfetch.json).
+- **Bio in Terminal**: Edit [`src/data/terminal/en/whoami.md`](file:///Users/glof-mac/projects/guloportfolio/src/data/terminal/en/whoami.md) and [`src/data/terminal/sv/whoami.md`](file:///Users/glof-mac/projects/guloportfolio/src/data/terminal/sv/whoami.md).
+
+> **Note**: Avoid adding random documentation files directly inside `src/data/terminal/{en,sv}/`, as every file in those folders is mounted into the terminal's virtual filesystem.
+
+### 4. Adding Projects
+Create a markdown file in `src/content/projects/<slug>.md`:
+
+```markdown
+---
+title: "Distributed SMP Cluster"
+description: "Bare-metal Debian 12 server cluster running containerized instances."
+status: "ACTIVE"       # ACTIVE | MAINTAINED | COMPLETED | WIP | ARCHIVED
+category: "Homelab"    # School | Homelab | Minecraft | Web | Other
+tech: ["Docker", "Linux", "WireGuard", "Zfs"]
+repoUrl: "https://github.com/your-username/cluster"
+liveUrl: "https://mc.example.com"
+order: 1
+featured: true
+---
+
+Your markdown writeup here...
+```
+
+### 5. Writing Blog Posts / Thoughts
+Create a markdown file in `src/content/thoughts/<slug>.md`:
+
+```markdown
+---
+title: "Valgrind & Manual Memory Management in C"
+description: "Tracking down memory leaks and illegal reads using Valgrind and GDB."
+pubDate: 2026-03-01
+category: "guide"      # tanke | guide | anteckning
+tags: ["c", "linux", "valgrind"]
+featured: true
+---
+
+Your article content here...
+```
+
+### 6. Adding Downloadable Files
+1. Place the physical file in `public/downloads/<filename>`.
+2. Create a metadata entry in `src/content/downloads/<filename>.json`:
+
+```json
+{
+  "name": "Neovim Lua Configuration",
+  "filename": "nvim-dotfiles.tar.gz",
+  "size": "42 KB",
+  "category": "Config",
+  "fileUrl": "/downloads/nvim-dotfiles.tar.gz",
+  "description": "Clean modular Neovim setup in Lua with Lazy.nvim.",
+  "usage": "tar -xzf nvim-dotfiles.tar.gz -C ~/.config/nvim",
+  "updatedAt": "2026-03",
+  "checksum": "sha256:4f8a...c91e",
+  "tags": ["neovim", "lua", "dotfiles"]
+}
+```
+
+---
+
+## 🚢 Deployment
+
+The project is configured for static site generation (`output: "static"`). The generated output in `dist/` can be deployed instantly to any static host:
+
+- **Cloudflare Pages**: Framework preset `Astro`, build command `npm run build`, output directory `dist`.
+- **Vercel**: Framework preset `Astro`, build command `npm run build`, output directory `dist`.
+- **Netlify**: Build command `npm run build`, publish directory `dist`.
+- **GitHub Pages**: Use the official Astro GitHub Actions workflow to deploy the `dist/` directory.
+
+---
+
+## 📜 License
+
+Built with curiosity and playground spirit. Code released under the [MIT License](LICENSE).

@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import { getActiveStatus } from '../data/status';
+import { calculateUptime } from '../data/telemetry';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -11,6 +12,7 @@ interface Props {
 
 const { isSubpage = false, is404 = false } = Astro.props;
 const currentActiveStatus = getActiveStatus();
+const stationUptime = calculateUptime();
 
 // 1. Läs statiska terminalfiler uppdelade i en/ och sv/ mappar
 const terminalDir = path.join(process.cwd(), 'src/data/terminal');
@@ -57,7 +59,7 @@ let fastfetchDataEn: any = {
     { key: 'Education', value: 'M.Sc. Computer Science & Eng @ Chalmers (Year 2)', color: 'emerald' },
     { key: 'Swimming', value: 'Valhallabadet (5-6 sessions/wk, freestyle/fly)', color: 'emerald' },
     { key: 'Homelab', value: 'PaperMC SMP cluster, Docker, Velocity', color: 'emerald' },
-    { key: 'Status', value: '[● ONLINE] Exam week & server ops', color: 'amber', online: true }
+    { key: 'Status', value: '[ONLINE] Exam week & server ops', color: 'amber', online: true }
   ]
 };
 
@@ -82,7 +84,7 @@ let fastfetchDataSv: any = {
     { key: 'Utbildning', value: 'Civilingenjör Datateknik @ Chalmers (Åk 2)', color: 'emerald' },
     { key: 'Simning', value: 'Valhallabadet (5-6 pass/v, frisim/fjäril)', color: 'emerald' },
     { key: 'Homelab', value: 'PaperMC SMP-kluster, Docker, Velocity', color: 'emerald' },
-    { key: 'Status', value: '[● ONLINE] Tentavecka & serverdrift', color: 'amber', online: true }
+    { key: 'Status', value: '[ONLINE] Tentavecka & serverdrift', color: 'amber', online: true }
   ]
 };
 
@@ -90,6 +92,23 @@ if (staticFilesSv['fastfetch.json']) {
   try {
     fastfetchDataSv = JSON.parse(staticFilesSv['fastfetch.json'].content);
   } catch (e) {}
+}
+
+// Inject live calculated uptime and current active status into fastfetch specs
+if (Array.isArray(fastfetchDataEn?.specs)) {
+  fastfetchDataEn.specs = fastfetchDataEn.specs.map((item: any) => {
+    if (item.key === 'Uptime') return { ...item, value: stationUptime.formattedEn };
+    if (item.key === 'Status') return { ...item, value: currentActiveStatus.badge.en.replace(/\[●\s*/g, '['), color: currentActiveStatus.activeEvent ? 'amber' : 'emerald' };
+    return item;
+  });
+}
+
+if (Array.isArray(fastfetchDataSv?.specs)) {
+  fastfetchDataSv.specs = fastfetchDataSv.specs.map((item: any) => {
+    if (item.key === 'Uptime' || item.key === 'Drifttid') return { ...item, value: stationUptime.formattedSv };
+    if (item.key === 'Status') return { ...item, value: currentActiveStatus.badge.sv.replace(/\[●\s*/g, '['), color: currentActiveStatus.activeEvent ? 'amber' : 'emerald' };
+    return item;
+  });
 }
 
 // 2. Läs dynamiska projekt (sammanfattning för terminal cat)
@@ -287,7 +306,7 @@ const dynamicFileSystemSv = {
       >
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 mb-4 border-b border-[#30363d] gap-3">
         <div class="flex items-center gap-3">
-          <span class="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse"></span>
+          <span id="closed-card-dot" class="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse"></span>
           <h2 class="text-sm font-mono font-bold tracking-wider uppercase text-[#e6edf3]" id="closed-card-title" data-i18n="term_closed_title">
             Who is gulo? // About me &amp; background
           </h2>
@@ -355,7 +374,7 @@ const dynamicFileSystemSv = {
     <!-- Window Title Bar with Interactive Controls -->
     <div 
       id="terminal-titlebar"
-      class="flex items-center justify-between px-4 py-2.5 bg-[#0d1117] border-b border-[#30363d] select-none cursor-pointer shrink-0"
+      class="flex items-center justify-between px-4 py-2.5 bg-[#161b22] border-b border-[#30363d] select-none cursor-pointer shrink-0"
       title="Click titlebar to expand if minimized, or double click for fullscreen"
       data-i18n-title="term_titlebar_hint"
     >
@@ -415,7 +434,7 @@ const dynamicFileSystemSv = {
       <!-- Fastfetch Layout -->
       <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-5 border-b border-[#30363d]/80">
         <!-- Fastfetch ASCII Emblem (Left column) -->
-        <div class="shrink-0 select-none font-mono text-[11px] sm:text-xs leading-[1.2] p-3 rounded bg-[#0d1117] border border-[#30363d]/80 flex flex-col justify-center items-center text-center">
+        <div class="shrink-0 select-none font-mono text-[11px] sm:text-xs leading-[1.2] p-3 rounded bg-[#161b22] border border-[#30363d]/80 flex flex-col justify-center items-center text-center">
           <pre class="leading-tight text-center font-mono">
 <span class="text-[#38bdf8]">     /\_____/\     </span>
 <span class="text-[#38bdf8]">    /</span>  <span class="text-[#e6edf3] font-bold">o</span>   <span class="text-[#e6edf3] font-bold">o</span>  <span class="text-[#38bdf8]">\    </span>
@@ -618,6 +637,7 @@ const dynamicFileSystemSv = {
 <script>
   import { getCommands } from '../scripts/terminal/commands';
   import { getSiteLang } from '../scripts/terminal/i18n';
+  import { isSiteOnline, setSiteOnline } from '../data/telemetry';
   import type { CommandContext, DirNode, FileNode, LangCode } from '../scripts/terminal/types';
 
   function initTerminalEngine() {
@@ -686,8 +706,8 @@ const dynamicFileSystemSv = {
     let activeLang: 'en' | 'sv' = getSiteLang();
     let fileSystem: DirNode = loadFileSystem(activeLang);
 
-    // Fastfetch DOM updater when language toggles
-    function updateFastfetchDOM(lang: 'en' | 'sv') {
+    // Fastfetch DOM updater when language toggles or online state changes
+    function updateFastfetchDOM(lang: 'en' | 'sv', isOnlineParam?: boolean) {
       const scriptEl = document.getElementById(`terminal-fastfetch-${lang}`);
       if (!scriptEl || !scriptEl.textContent) return;
       try {
@@ -703,16 +723,52 @@ const dynamicFileSystemSv = {
         if (userEl) userEl.textContent = data.user || 'gulo';
         if (hostEl) hostEl.textContent = data.host || 'chalmers-station';
 
+        const isOnline = typeof isOnlineParam === 'boolean' 
+          ? isOnlineParam 
+          : isSiteOnline();
+
         if (specsEl && Array.isArray(data.specs)) {
           specsEl.innerHTML = data.specs.map((item: any) => {
-            const colorClass = item.color === 'emerald' ? 'text-[#10b981]' : item.color === 'amber' ? 'text-[#f59e0b]' : 'text-[#38bdf8]';
-            const onlineHtml = item.online
-              ? `<span class="text-[#10b981] font-medium flex items-center gap-1.5 spec-val-label"><span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-ping"></span>${escapeHtml(item.value)}</span>`
-              : `<span class="text-[#e6edf3] spec-val-label">${escapeHtml(item.value)}</span>`;
+            let itemKey = item.key;
+            let itemVal = item.value;
+            let itemColor = item.color;
+            let isOnlineItem = item.online;
+
+            const isStatusRow = (itemKey || '').toLowerCase() === 'status';
+
+            if (isStatusRow) {
+              if (!isOnline) {
+                itemVal = lang === 'sv' ? '[OFFLINE] Ej ansluten till nätverk' : '[OFFLINE] Disconnected from network';
+                isOnlineItem = false;
+              } else {
+                itemVal = (itemVal || '').replace(/\[●\s*/g, '[');
+                isOnlineItem = true;
+              }
+            }
+
+            let keyStyle = '';
+            let valStyle = '';
+
+            if (isStatusRow && !isOnline) {
+              keyStyle = 'color: #f85149 !important;';
+              valStyle = 'color: #f85149 !important;';
+            } else if (itemColor === 'emerald') {
+              keyStyle = 'color: #10b981;';
+            } else if (itemColor === 'amber') {
+              keyStyle = 'color: #f59e0b;';
+            } else {
+              keyStyle = 'color: #38bdf8;';
+            }
+
+            const onlineHtml = isOnlineItem
+              ? `<span class="text-[#10b981] font-medium flex items-center gap-1.5 spec-val-label"><span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-ping"></span>${escapeHtml(itemVal)}</span>`
+              : (isStatusRow
+                ? `<span class="font-medium flex items-center gap-1.5 spec-val-label" style="${valStyle}"><span class="w-1.5 h-1.5 rounded-full bg-[#f85149]" style="background-color: #f85149 !important;"></span>${escapeHtml(itemVal)}</span>`
+                : `<span class="text-[#e6edf3] spec-val-label">${escapeHtml(itemVal)}</span>`);
 
             return `
               <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2 fastfetch-spec-row">
-                <span class="${colorClass} font-semibold spec-key-label">${escapeHtml(item.key)}:</span>
+                <span class="font-semibold spec-key-label" style="${keyStyle}">${escapeHtml(itemKey)}:</span>
                 ${onlineHtml}
               </div>
             `;
@@ -721,13 +777,46 @@ const dynamicFileSystemSv = {
       } catch (e) {}
     }
 
-    // Uppdatera fastfetch DOM och placeholder initialt om vi är i SV läge
-    if (activeLang === 'sv') {
-      updateFastfetchDOM('sv');
-      if (input) {
-        input.placeholder = "skriv 'help', 'school', 'swim', 'cat whoami.md'...";
+    const closedCardDot = document.getElementById('closed-card-dot');
+    function updateClosedCardDot(isOnline: boolean) {
+      if (!closedCardDot) return;
+      if (isOnline) {
+        closedCardDot.className = 'w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse is-online-bg';
+        closedCardDot.style.setProperty('background-color', '#10b981', 'important');
+        closedCardDot.style.setProperty('animation', '');
+      } else {
+        closedCardDot.className = 'w-2.5 h-2.5 rounded-full bg-[#f85149] is-offline-bg';
+        closedCardDot.style.setProperty('background-color', '#f85149', 'important');
+        closedCardDot.style.setProperty('animation', 'none', 'important');
       }
     }
+
+    // Uppdatera fastfetch DOM, closed card dot och placeholder initialt oavsett språk
+    const initialIsOnline = isSiteOnline();
+    updateFastfetchDOM(activeLang, initialIsOnline);
+    updateClosedCardDot(initialIsOnline);
+    if (input) {
+      input.placeholder = activeLang === 'sv'
+        ? "skriv 'help', 'school', 'swim', 'cat whoami.md'..."
+        : "type 'help', 'school', 'swim', 'cat whoami.md'...";
+    }
+
+    // Reagera på anslutningsstatusändring i terminalen omedelbart
+    window.addEventListener('connection-state-change', ((e: CustomEvent) => {
+      const isOnline = typeof e.detail?.isOnline === 'boolean' ? e.detail.isOnline : isSiteOnline();
+      updateFastfetchDOM(activeLang, isOnline);
+      updateClosedCardDot(isOnline);
+    }) as EventListener);
+
+    window.addEventListener('offline', () => {
+      updateFastfetchDOM(activeLang, false);
+      updateClosedCardDot(false);
+    });
+
+    window.addEventListener('online', () => {
+      updateFastfetchDOM(activeLang, true);
+      updateClosedCardDot(true);
+    });
 
     // Reagera på språkväxling direkt i terminalen!
     window.addEventListener('lang-change', (e: any) => {
@@ -823,6 +912,7 @@ const dynamicFileSystemSv = {
           minimizedCatHint?.classList.remove('cat-enter', 'cat-exit');
           minimizedCatHint?.classList.add('hidden');
           closedCard?.classList.remove('hidden');
+          updateClosedCardDot(isSiteOnline());
           isClosing = false;
         }, 160);
       }
@@ -1788,6 +1878,15 @@ const dynamicFileSystemSv = {
 </script>
 
 <style>
+  /* Indicator dot on closed card when offline/online */
+  #closed-card-dot.is-offline {
+    background-color: #f85149 !important;
+    animation: none !important;
+  }
+  #closed-card-dot.is-online {
+    background-color: #10b981 !important;
+  }
+
   /* Native App Window Launch Animation */
   @keyframes termWindowOpen {
     0% {

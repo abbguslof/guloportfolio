@@ -17,6 +17,10 @@ export async function getStaticPaths() {
 const { project } = Astro.props;
 const { Content } = await render(project);
 
+// Linked downloads from collection
+const allDownloads = await getCollection('downloads');
+const linkedDownloads = allDownloads.filter((d) => (d.data.relatedProjects || []).includes(project.id));
+
 // Status styling
 const statusColors: Record<string, string> = {
   ACTIVE: 'text-[#10b981] border-[#10b981]/40',
@@ -116,24 +120,28 @@ const statusColors: Record<string, string> = {
     </article>
 
     <!-- Attached Downloads if applicable -->
-    {project.data.category === 'Minecraft' && (
-      <div class="mt-12 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-        <div class="text-xs font-mono font-bold text-[#10b981] mb-2" data-i18n="projects_downloads_title">
-          DOWNLOADABLE RESOURCES LINKED TO THIS PROJECT:
+    {linkedDownloads.length > 0 && (
+      <div class="mt-12 p-4 rounded-lg bg-[#161b22] border border-[#30363d] font-mono">
+        <div class="text-xs font-bold text-[#10b981] mb-2 flex items-center gap-2" data-i18n="projects_downloads_title">
+          <span>↓</span>
+          <span>DOWNLOADABLE RESOURCES LINKED TO THIS PROJECT:</span>
         </div>
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-          <div>
-            <span class="font-semibold text-[#e6edf3]">Fabric Performance Pack 1.20.4</span>
-            <span class="text-[#8b949e] ml-2">(4.8 MB zip)</span>
-          </div>
-          <a 
-            href="/downloads/fabric-1.20.4-optimized.zip" 
-            download="fabric-1.20.4-optimized.zip"
-            class="px-3 py-1 rounded bg-[#0d1117] border border-[#30363d] text-[#10b981] hover:border-[#10b981] transition-all text-xs text-center"
-            data-i18n="projects_download_pack"
-          >
-            [Download pack ↓]
-          </a>
+        <div class="space-y-2 pt-2 border-t border-[#30363d]/60">
+          {linkedDownloads.map((dl) => (
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs pt-1">
+              <div>
+                <span class="font-semibold text-[#e6edf3]">{dl.data.name}</span>
+                <span class="text-[#8b949e] ml-2">({dl.data.size})</span>
+              </div>
+              <a 
+                href={dl.data.fileUrl} 
+                download={dl.data.filename}
+                class="px-3 py-1 rounded bg-[#0d1117] border border-[#30363d] text-[#10b981] hover:border-[#10b981] transition-all text-xs text-center"
+              >
+                [Download {dl.data.filename} ↓]
+              </a>
+            </div>
+          ))}
         </div>
       </div>
     )}

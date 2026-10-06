@@ -8,8 +8,17 @@
   "usage": "tar -xvf nvim-dotfiles.tar.gz -C ~/.config/nvim/",
   "updatedAt": "2026-03-15",
   "checksum": "sha256:5e884898da",
-  "tags": ["Neovim", "Lua", "Dotfiles", "Linux"],
+  "tags": [
+    "Neovim",
+    "Lua",
+    "Dotfiles",
+    "Linux"
+  ],
   "featured": false,
-  "relatedProjects": ["chalmers-sys-sched"],
-  "relatedThoughts": ["chalmers-simning-kod"]
+  "relatedProjects": [
+    "chalmers-sys-sched"
+  ],
+  "relatedThoughts": [
+    "chalmers-simning-kod"
+  ]
 }

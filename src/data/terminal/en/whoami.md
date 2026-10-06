@@ -4,4 +4,4 @@
 - Homelab: PaperMC SMP cluster on Debian 12, Velocity, Docker & isolated subnets.
 - Interests: Linux kernel tuning, analog photography (35mm film), Neovim dotfiles in Lua.
 ---
-Status: [● ONLINE] Exam week & server ops in Gothenburg
+Status: [ONLINE] Exam week & server ops in Gothenburg

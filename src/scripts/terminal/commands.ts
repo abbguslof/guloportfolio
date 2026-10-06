@@ -17,6 +17,7 @@ import { handleGitCommand } from './git';
 import { evaluateMathExpression } from './calc';
 import { handleGameCommand } from './game';
 import { handleNvimCommand } from './nvim';
+import { calculateUptime, isSiteOnline } from '../../data/telemetry';
 
 export type CommandFunction = (args: string[], ctx: CommandContext) => string | void;
 
@@ -475,9 +476,15 @@ ${ctx.escapeHtml(node.content)}
       ctx.clearHistory();
     },
 
-    date: (_args, ctx) => `<div class="text-[#8b949e] font-mono">${new Date().toLocaleString(ctx.lang === 'sv' ? 'sv-SE' : 'en-GB')} (Europe/Stockholm)</div>`,
-    
-    uptime: (_args, ctx) => `<div class="text-[#10b981] font-mono">Uptime: ${ctx.lang === 'sv' ? '42 dagar, 8 timmar' : '42 days, 8 hours'}, load: 0.18, 0.22, 0.35</div>`,
+    uptime: (_args, ctx) => {
+      const up = calculateUptime();
+      const uptimeStr = ctx.lang === 'sv' ? up.formattedSv : up.formattedEn;
+      const isOnline = isSiteOnline();
+      if (!isOnline) {
+        return `<div class="text-[#f85149] font-mono">system uptime: <span class="text-[#e6edf3] font-semibold">${uptimeStr}</span> (chalmers-station) <span class="text-[#f85149] font-bold">[OFFLINE]</span></div>`;
+      }
+      return `<div class="text-[#10b981] font-mono">system uptime: <span class="text-[#e6edf3] font-semibold">${uptimeStr}</span> (chalmers-station)</div>`;
+    },
 
     exit: (_args, ctx) => {
       ctx.exitTerminal();

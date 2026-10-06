@@ -42,6 +42,7 @@ body {
 
 /* Prevent iOS Safari auto-zoom on input focus for mobile screens */
 @media (max-width: 640px) {
+
   input[type="text"],
   input[type="search"],
   select,
@@ -77,18 +78,24 @@ body {
 
 /* Cockpit Subtle Translucency & Delicate Shadow across all pages */
 .bg-\[\#161b22\] {
-  background-color: rgba(22, 27, 34, 0.72) !important;
+  background-color: rgba(22, 27, 34, 0.91) !important;
 }
 
-/* Apply backdrop blur strictly to structural panels and cards, NOT to input fields or inline badges */
+/* Apply unified subtle backdrop blur to all structural panels, windows and cards */
 .file-card,
 .cat-toggle-card,
+.thought-card,
+.thought-container,
+.project-card,
+.tui-window,
+.tui-card,
 #terminal-window,
 #terminal-closed-card,
-#site-header,
-footer>div>div.rounded-lg {
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+div.rounded-lg.bg-\[\#161b22\],
+article.rounded-lg.bg-\[\#161b22\],
+footer > div > div.rounded-lg {
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 /* Explicitly ensure inputs and search containers never suffer from backdrop-filter compositor blur */
@@ -106,10 +113,16 @@ input.bg-\[\#161b22\] {
 /* Super subtle depth shadow for terminal, cards & information blocks */
 .file-card,
 .cat-toggle-card,
+.thought-card,
+.thought-container,
+.project-card,
+.tui-window,
+.tui-card,
 #terminal-window,
 #terminal-closed-card,
-.rounded-lg.border,
-footer>div>div.rounded-lg {
+div.rounded-lg.bg-\[\#161b22\],
+article.rounded-lg.bg-\[\#161b22\],
+footer > div > div.rounded-lg {
   box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.38), 0 0 0 1px rgba(255, 255, 255, 0.02);
 }
 
@@ -181,4 +194,25 @@ pre.astro-code code {
 .prose pre:hover .code-copy-btn,
 pre.astro-code:hover .code-copy-btn {
   opacity: 1;
+}
+
+/* Explicit Offline/Online UI state classes */
+.is-offline-text {
+  color: #f85149 !important;
+}
+
+.is-offline-border {
+  border-color: #f85149 !important;
+}
+
+.is-offline-bg {
+  background-color: #f85149 !important;
+}
+
+.is-online-text {
+  color: #10b981 !important;
+}
+
+.is-online-border {
+  border-color: #10b981 !important;
 }

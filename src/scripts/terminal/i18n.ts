@@ -2,6 +2,7 @@
 import type { LangCode } from './types';
 import { getActiveStatus, type ActiveStatusResult } from '../../data/status';
 import { getUpcomingEvents, getCurrentEvent } from '../../data/schedule';
+import { calculateUptime, isSiteOnline } from '../../data/telemetry';
 import fastfetchSv from '../../data/terminal/sv/fastfetch.json';
 import fastfetchEn from '../../data/terminal/en/fastfetch.json';
 
@@ -401,6 +402,8 @@ export function getOsOpinionOutput(lang: LangCode): string {
 export function getStatusOutput(lang: LangCode): string {
   const isSv = lang === 'sv';
   const status = getActiveStatus();
+  const uptime = calculateUptime();
+  const isOnline = isSiteOnline();
   const eventBanner = status.activeEvent ? `
     <div class="p-2 rounded bg-[#f59e0b]/10 border border-[#f59e0b]/40 text-[#f59e0b] flex items-center justify-between text-[11px]">
       <span class="font-bold flex items-center gap-1.5">
@@ -411,15 +414,17 @@ export function getStatusOutput(lang: LangCode): string {
     </div>
   ` : '';
 
+  const statusBadge = !isOnline
+    ? `<span class="text-[10px] px-1.5 py-0.2 rounded border border-[#f85149] text-[#f85149]" style="color: #f85149 !important; border-color: #f85149 !important;">[OFFLINE]</span>`
+    : `<span class="text-[10px] px-1.5 py-0.2 rounded border ${status.activeEvent ? 'border-[#f59e0b] text-[#f59e0b]' : 'border-[#10b981] text-[#10b981]'}">${status.badge[lang].replace(/\[●\s*/g, '[')}</span>`;
+
   return `
 <div class="p-3.5 rounded bg-[#0d1117] border border-[#38bdf8]/50 text-xs font-mono space-y-2.5 max-w-2xl">
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-[#30363d] pb-2 gap-1.5">
     <div class="flex items-center gap-2">
-      <span class="w-2 h-2 rounded-full ${status.activeEvent ? 'bg-[#f59e0b]' : 'bg-[#10b981]'} animate-pulse"></span>
+      <span class="w-2 h-2 rounded-full ${!isOnline ? 'bg-[#f85149]' : (status.activeEvent ? 'bg-[#f59e0b] animate-pulse' : 'bg-[#10b981] animate-pulse')}" style="${!isOnline ? 'background-color: #f85149 !important;' : ''}"></span>
       <span class="text-[#38bdf8] font-bold">STATUS // ${status.user}@${status.host}</span>
-      <span class="text-[10px] px-1.5 py-0.2 rounded border ${status.activeEvent ? 'border-[#f59e0b] text-[#f59e0b]' : 'border-[#10b981] text-[#10b981]'}">
-        ${status.badge[lang]}
-      </span>
+      ${statusBadge}
     </div>
     <span class="text-[10px] text-[#8b949e]">${isSv ? 'Senast uppdaterad:' : 'Last updated:'} ${status.lastUpdated}</span>
   </div>
@@ -427,6 +432,14 @@ export function getStatusOutput(lang: LangCode): string {
   ${eventBanner}
 
   <div class="space-y-1.5 pt-0.5 text-[#e6edf3]">
+    <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-x-2">
+      <span class="text-[#8b949e]">${isSv ? 'Drifttid:' : 'Host Uptime:'}</span>
+      <span class="${isOnline ? 'text-[#10b981]' : 'text-[#f85149]'} font-semibold" style="${!isOnline ? 'color: #f85149 !important;' : ''}">${isSv ? uptime.formattedSv : uptime.formattedEn}${!isOnline ? ` <span class="text-[#8b949e] text-[10px]">(${isSv ? 'fryst under offline' : 'frozen while offline'})</span>` : ''}</span>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-x-2">
+      <span class="text-[#8b949e]">${isSv ? 'Nätverk:' : 'Network:'}</span>
+      <span class="${isOnline ? 'text-[#38bdf8]' : 'text-[#f85149] font-bold'}" style="${!isOnline ? 'color: #f85149 !important;' : ''}">${isOnline ? (isSv ? 'Ansluten // Aktiv telemetri' : 'Connected // Live telemetry') : (isSv ? '[OFFLINE] Ej ansluten till nätverk' : '[OFFLINE] Disconnected from network')}</span>
+    </div>
     <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-x-2">
       <span class="text-[#8b949e]">${isSv ? 'Plats:' : 'Location:'}</span>
       <span class="text-[#38bdf8]">${status.location[lang]}</span>
@@ -455,7 +468,7 @@ export function getStatusOutput(lang: LangCode): string {
 
   <div class="text-[10px] text-[#8b949e] border-t border-[#30363d]/40 pt-1.5 flex flex-wrap items-center justify-between gap-2">
     <span class="flex items-center gap-1.5">
-      <span class="w-1.5 h-1.5 rounded-full ${status.activeEvent ? 'bg-[#f59e0b]' : 'bg-[#10b981]'}"></span>
+      <span class="w-1.5 h-1.5 rounded-full ${!isOnline ? 'bg-[#f85149]' : status.activeEvent ? 'bg-[#f59e0b]' : 'bg-[#10b981]'}"></span>
       <span>${isSv ? `Läge: ${status.isAutoScheduled ? 'Auto-kalender aktiv' : 'Manuell profil'}` : `Mode: ${status.isAutoScheduled ? 'Auto-schedule active' : 'Manual profile'}`} (${status.mode})</span>
     </span>
     <span class="text-[#38bdf8]">${isSv ? "Kör 'schedule' för tentaveckor" : "Type 'schedule' for finals calendar"}</span>
@@ -516,20 +529,60 @@ export function getScheduleOutput(lang: LangCode): string {
  */
 export function getFastfetchOutput(lang: LangCode): string {
   const data = lang === 'sv' ? fastfetchSv : fastfetchEn;
+  const uptime = calculateUptime();
+  const status = getActiveStatus();
+  const isOnline = isSiteOnline();
+
   const specsRows = data.specs.map((item: any) => {
-    const colorClass = item.color === 'emerald' ? 'text-[#10b981]' : item.color === 'amber' ? 'text-[#f59e0b]' : 'text-[#38bdf8]';
-    const valHtml = item.online
-      ? `<span class="text-[#10b981] font-medium flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-ping"></span>${item.value}</span>`
-      : `<span class="text-[#e6edf3]">${item.value}</span>`;
+    let key = item.key;
+    let val = item.value;
+    let color = item.color;
+    let isOnlineItem = item.online;
+
+    if (key === 'Uptime' || key === 'Drifttid') {
+      val = lang === 'sv' ? uptime.formattedSv : uptime.formattedEn;
+    }
+    const isStatusRow = (key || '').toLowerCase() === 'status';
+
+    if (isStatusRow) {
+      if (!isOnline) {
+        val = lang === 'sv' ? '[OFFLINE] Ej ansluten till nätverk' : '[OFFLINE] Disconnected from network';
+        isOnlineItem = false;
+      } else {
+        val = (status.badge[lang] || val).replace(/\[●\s*/g, '[');
+        color = status.activeEvent ? 'amber' : 'emerald';
+        isOnlineItem = true;
+      }
+    }
+
+    let keyStyle = '';
+    let valStyle = '';
+
+    if (isStatusRow && !isOnline) {
+      keyStyle = 'color: #f85149 !important;';
+      valStyle = 'color: #f85149 !important;';
+    } else if (color === 'emerald') {
+      keyStyle = 'color: #10b981;';
+    } else if (color === 'amber') {
+      keyStyle = 'color: #f59e0b;';
+    } else {
+      keyStyle = 'color: #38bdf8;';
+    }
+
+    const valHtml = isOnlineItem
+      ? `<span class="text-[#10b981] font-medium flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-ping"></span>${val}</span>`
+      : (isStatusRow
+        ? `<span class="font-medium flex items-center gap-1.5" style="${valStyle}"><span class="w-1.5 h-1.5 rounded-full bg-[#f85149]" style="background-color: #f85149 !important;"></span>${val}</span>`
+        : `<span class="text-[#e6edf3]">${val}</span>`);
     return `
       <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
-        <span class="${colorClass} font-semibold">${item.key}:</span>
+        <span class="font-semibold" style="${keyStyle}">${key}:</span>
         ${valHtml}
       </div>`;
   }).join('');
 
   return `
-<div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 p-3 rounded bg-[#0d1117] border border-[#30363d]/80 text-xs font-mono">
+<div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 p-3 rounded bg-[#161b22] border border-[#30363d]/80 text-xs font-mono">
   <!-- Fastfetch ASCII Emblem -->
   <div class="shrink-0 select-none text-[11px] sm:text-xs leading-[1.2] p-2.5 rounded bg-[#161b22] border border-[#30363d]/80 flex flex-col justify-center items-center text-center">
     <pre class="leading-tight text-center font-mono">

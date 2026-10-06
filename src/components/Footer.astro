@@ -1,5 +1,7 @@
 ---
 // Footer.astro - TUI System Diagnostics, Real-time Telemetry & Matrix Links
+import { SITE_LAUNCH_DATE, calculateUptime } from '../data/telemetry';
+const initialUptime = calculateUptime();
 ---
 
 <footer class="mt-16 pt-8 pb-12 border-t border-[#30363d] text-xs font-mono text-[#8b949e]">
@@ -15,23 +17,23 @@
       </div>
 
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px]">
-        <div>
+        <div class="min-w-0">
           <span class="block text-[#8b949e]" data-i18n="footer_location_label">LOCATION:</span>
-          <span class="text-[#e6edf3]">
+          <span class="text-[#e6edf3] block truncate" title="Gothenburg, SE CET">
             <span data-i18n="footer_location_val">Gothenburg, SE</span> • <span id="footer-clock" class="text-[#38bdf8]">--:--:--</span>
           </span>
         </div>
-        <div>
+        <div class="min-w-0">
           <span class="block text-[#8b949e]" data-i18n="footer_ping_label">NETWORK PING:</span>
-          <span id="footer-ping-val" class="text-[#38bdf8]">~12ms (SUNET fiber)</span>
+          <span id="footer-ping-val" class="text-[#38bdf8] block truncate">~12ms</span>
         </div>
-        <div>
+        <div class="min-w-0">
           <span class="block text-[#8b949e]" data-i18n="footer_engine_label">ENGINE:</span>
-          <span class="text-[#a78bfa]" data-i18n="footer_engine_val">Astro 7 (SSG) + TUI</span>
+          <span class="text-[#a78bfa] block truncate" data-i18n="footer_engine_val"><a href="https://astro.build" target="_blank" rel="noopener noreferrer" class="hover:underline hover:text-[#e6edf3]">Astro</a> 7 (SSG) + TUI</span>
         </div>
-        <div>
+        <div class="min-w-0">
           <span class="block text-[#8b949e]" data-i18n="footer_uptime_label">HOST UPTIME:</span>
-          <span id="footer-uptime-val" class="text-[#10b981]">99.98% / calculating...</span>
+          <span id="footer-uptime-val" class="text-[#10b981] font-semibold block truncate" data-launch-epoch={SITE_LAUNCH_DATE}>{initialUptime.short}</span>
         </div>
       </div>
     </div>
@@ -91,6 +93,15 @@
   </div>
 </footer>
 
+<style>
+  #footer-uptime-val.is-offline {
+    color: #f85149 !important;
+  }
+  #footer-uptime-val.is-online {
+    color: #10b981 !important;
+  }
+</style>
+
 <script>
   function initFooterTelemetry() {
     const sysDot = document.getElementById('footer-sys-dot');
@@ -115,30 +126,37 @@
     }
 
     // 2. Dynamic Live Host Uptime calculated from deployment station epoch
-    // Station launch epoch: 2026-01-01T00:00:00Z
-    const STATION_EPOCH = new Date('2026-01-01T00:00:00Z').getTime();
+    const launchStr = uptimeEl?.getAttribute('data-launch-epoch') || '2026-01-01T00:00:00Z';
+    const STATION_EPOCH = new Date(launchStr).getTime();
+    let isStationOnline = typeof (window as any)?.__siteIsOnline === 'boolean' 
+      ? (window as any).__siteIsOnline 
+      : navigator.onLine;
+    let offlineDowntimeMs = 0;
+    let wentOfflineTimestamp: number | null = isStationOnline ? null : Date.now();
 
     function updateUptime() {
       if (!uptimeEl) return;
       const now = Date.now();
-      const diffMs = Math.max(0, now - STATION_EPOCH);
+      const effectiveNow = (wentOfflineTimestamp !== null ? wentOfflineTimestamp : now) - offlineDowntimeMs;
+      const diffMs = Math.max(0, effectiveNow - STATION_EPOCH);
 
       const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
       const hours = Math.floor((diffMs / (1000 * 60 * 60)) % 24);
       const minutes = Math.floor((diffMs / (1000 * 60)) % 60);
       const seconds = Math.floor((diffMs / 1000) % 60);
 
-      uptimeEl.textContent = `99.98% / ${days}d ${hours}h ${minutes}m ${seconds}s`;
+      uptimeEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+      uptimeEl.style.setProperty('color', isStationOnline ? '#10b981' : '#f85149', 'important');
     }
 
-    // 3. Real RTT Network Ping measurement
+    // 3. Real RTT Network Ping measurement (zero additional network requests)
     function measureInitialPing() {
       const navEntries = performance.getEntriesByType && performance.getEntriesByType('navigation');
       if (navEntries && navEntries[0]) {
         const nav = navEntries[0] as PerformanceNavigationTiming;
         const rtt = Math.round(nav.responseEnd - nav.requestStart);
         if (rtt > 0 && rtt < 1000 && pingEl) {
-          pingEl.textContent = `${rtt}ms (RTT SUNET fiber)`;
+          pingEl.textContent = `${rtt}ms`;
         }
       }
     }
@@ -148,25 +166,98 @@
       if (!pingEl) return;
       const { latency, isOnline } = e.detail || {};
       if (isOnline && typeof latency === 'number') {
-        pingEl.textContent = `${latency}ms (RTT SUNET fiber)`;
+        pingEl.textContent = `${latency}ms`;
+        pingEl.className = 'text-[#38bdf8] block truncate';
       } else if (!isOnline) {
         pingEl.textContent = 'DISCONNECTED';
+        pingEl.className = 'text-[#f85149] font-semibold block truncate';
       }
     }) as EventListener);
 
-    // Update telemetry state when connection drops or recovers
-    window.addEventListener('connection-state-change', ((e: CustomEvent) => {
-      const isOnline = e.detail?.isOnline;
-      if (!sysDot || !sysStatus) return;
+    function applyOnlineStatusUI(online: boolean) {
+      if (sysDot) {
+        sysDot.className = online 
+          ? 'w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse is-online-bg'
+          : 'w-2.5 h-2.5 rounded-full bg-[#f85149] is-offline-bg';
+        sysDot.style.backgroundColor = online ? '#10b981' : '#f85149';
+      }
+      if (sysStatus) {
+        sysStatus.className = online 
+          ? 'text-[#10b981] font-semibold is-online-text'
+          : 'text-[#f85149] font-semibold is-offline-text';
+        sysStatus.textContent = online 
+          ? 'ALL_SYSTEMS_NOMINAL' 
+          : 'SYS_OFFLINE_DEGRADED';
+        sysStatus.style.color = online ? '#10b981' : '#f85149';
+      }
+      if (clockEl) {
+        clockEl.className = online 
+          ? 'text-[#38bdf8]' 
+          : 'text-[#f85149] font-semibold is-offline-text';
+        clockEl.style.color = online ? '#38bdf8' : '#f85149';
+      }
+      if (uptimeEl) {
+        if (online) {
+          uptimeEl.classList.remove('is-offline', 'is-offline-text');
+          uptimeEl.classList.add('is-online', 'is-online-text');
+          uptimeEl.style.setProperty('color', '#10b981', 'important');
+        } else {
+          uptimeEl.classList.remove('is-online', 'is-online-text');
+          uptimeEl.classList.add('is-offline', 'is-offline-text');
+          uptimeEl.style.setProperty('color', '#f85149', 'important');
+        }
+      }
+      if (pingEl && !online) {
+        pingEl.className = 'text-[#f85149] font-semibold block truncate is-offline-text';
+        pingEl.style.color = '#f85149';
+        pingEl.textContent = 'DISCONNECTED';
+      } else if (pingEl && online) {
+        pingEl.style.color = '#38bdf8';
+      }
+    }
 
-      if (isOnline) {
-        sysDot.className = 'w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse';
-        sysStatus.className = 'text-[#10b981] font-semibold';
-        sysStatus.textContent = 'ALL_SYSTEMS_NOMINAL';
+    // Direct browser offline/online event listeners
+    window.addEventListener('offline', () => {
+      if (isStationOnline) {
+        wentOfflineTimestamp = Date.now();
+      }
+      isStationOnline = false;
+      applyOnlineStatusUI(false);
+      updateUptime();
+    });
+
+    window.addEventListener('online', () => {
+      if (wentOfflineTimestamp !== null) {
+        offlineDowntimeMs += (Date.now() - wentOfflineTimestamp);
+        wentOfflineTimestamp = null;
+      }
+      isStationOnline = true;
+      applyOnlineStatusUI(true);
+      updateClock();
+      updateUptime();
+    });
+
+    // Update telemetry state and freeze/resume time tickers when connection drops or recovers
+    window.addEventListener('connection-state-change', ((e: CustomEvent) => {
+      const nowOnline = e.detail?.isOnline ?? true;
+      if (isStationOnline !== nowOnline) {
+        if (!nowOnline) {
+          wentOfflineTimestamp = Date.now();
+        } else {
+          if (wentOfflineTimestamp !== null) {
+            offlineDowntimeMs += (Date.now() - wentOfflineTimestamp);
+            wentOfflineTimestamp = null;
+          }
+        }
+      }
+      isStationOnline = nowOnline;
+      applyOnlineStatusUI(isStationOnline);
+
+      if (isStationOnline) {
+        updateClock();
+        updateUptime();
       } else {
-        sysDot.className = 'w-2.5 h-2.5 rounded-full bg-[#f85149]';
-        sysStatus.className = 'text-[#f85149] font-semibold';
-        sysStatus.textContent = 'SYS_OFFLINE_DEGRADED';
+        updateUptime();
       }
     }) as EventListener);
 
@@ -174,22 +265,27 @@
     updateClock();
     updateUptime();
     measureInitialPing();
+    applyOnlineStatusUI(isStationOnline);
 
-    // Loop ticker with tab-switch pause to save CPU
-    let tickerInterval: number | null = window.setInterval(() => {
-      updateClock();
-      updateUptime();
-    }, 1000);
+    // Loop ticker with tab-switch pause to save battery and CPU.
+    // Both clock and uptime freeze and turn red when offline
+    function tick() {
+      if (isStationOnline) {
+        updateClock();
+        updateUptime();
+      }
+    }
+
+    let tickerInterval: number | null = window.setInterval(tick, 1000);
 
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
         updateClock();
-        updateUptime();
+        if (isStationOnline) {
+          updateUptime();
+        }
         if (tickerInterval === null) {
-          tickerInterval = window.setInterval(() => {
-            updateClock();
-            updateUptime();
-          }, 1000);
+          tickerInterval = window.setInterval(tick, 1000);
         }
       } else {
         if (tickerInterval !== null) {

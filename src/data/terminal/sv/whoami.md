@@ -4,4 +4,4 @@
 - Homelab: PaperMC SMP-kluster på Debian 12, Velocity, Docker & isolerade nätverk.
 - Intressen: Linux-tuning, analog fotografi (35mm film), Neovim dotfiles i Lua.
 ---
-Status: [● ONLINE] Tentavecka & serverdrift i Göteborg
+Status: [ONLINE] Tentavecka & serverdrift i Göteborg

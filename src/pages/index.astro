@@ -95,7 +95,7 @@ const latestThoughts = sortedThoughts.slice(0, 5);
       </div>
 
       <!-- Articles list container with rich rows -->
-      <div class="rounded-lg bg-[#161b22] border border-[#30363d] p-3 divide-y divide-[#30363d]/40">
+      <div class="thought-container rounded-lg bg-[#161b22] border border-[#30363d] p-3 divide-y divide-[#30363d]/40">
         {latestThoughts.map((post) => (
           <ThoughtRow 
             title={post.data.title}

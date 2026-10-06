@@ -47,8 +47,8 @@ export const statusPresets: Record<PresetKey, StatusProfile> = {
   regular: {
     name: 'Regular Semester / Normal läsperiod',
     badge: {
-      sv: '[● ONLINE] Läsperiod & Simning',
-      en: '[● ONLINE] Semester & Swimming',
+      sv: '[ONLINE] Läsperiod & Simning',
+      en: '[ONLINE] Semester & Swimming',
     },
     activity: {
       sv: 'Civilingenjör Datateknik (åk 2) på Chalmers. Tränar 5-6 simpass i veckan.',
