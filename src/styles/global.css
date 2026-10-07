@@ -216,3 +216,42 @@ pre.astro-code:hover .code-copy-btn {
 .is-online-border {
   border-color: #10b981 !important;
 }
+
+/* ============================================================================
+   LANGUAGE-REACTIVE VISIBILITY (EN / SV)
+   Allows instant 0ms switching without DOM rewrites or layout shift
+   ============================================================================ */
+html[data-lang="en"] .lang-sv-only,
+html:not([data-lang="sv"]) .lang-sv-only {
+  display: none !important;
+}
+
+html[data-lang="sv"] .lang-en-only {
+  display: none !important;
+}
+
+/* ============================================================================
+   ACCESSIBILITY & KEYBOARD NAVIGATION (Tab / Shift+Tab / Focus-Visible)
+   ============================================================================ */
+:focus-visible {
+  outline: 2px solid #10b981 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.45) !important;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #10b981 !important;
+  outline-offset: 2px !important;
+}
+
+/* Smooth cockpit illumination when focusing inside cards */
+.project-card:has(a:focus-visible),
+.file-card:has(.file-card-header:focus-visible),
+.thought-card:has(a:focus-visible) {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.35) !important;
+}

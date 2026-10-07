@@ -44,10 +44,12 @@ npm run preview
 ## 🖥️ Core Architecture & Features
 
 ### 1. Interactive TUI Terminal (`src/components/InteractiveTerminal.astro`)
-- **Built-in Bash Interpreter**: Interactive command engine supporting 35+ Unix-like commands including `help`, `bio`, `status`, `schedule`, `school`, `swim`, `whoami`, `contact`, `ls`, `cd`, `cat`, `nvim`, `git`, `calc`, `uptime`, `fastfetch` / `neofetch`, `clear`, and `exit`.
+- **Built-in Bash Interpreter**: Interactive command engine supporting 40+ Unix-like commands including `help` (`help -e`), `bio`, `status`, `schedule`, `school`, `swim`, `whoami`, `contact`, `ls`, `cd`, `cat`, `nvim`, `git`, `calc`, `uptime`, `fastfetch` / `neofetch`, `lang`, `reset`, `clear`, and `exit`.
 - **Dynamic Virtual Filesystem**: Reads contents from `src/data/terminal/{en,sv}/` at compile time and allows navigating and viewing simulated files directly in the browser.
+- **Language Switcher & Aliases**: Switch site language in the terminal via `lang se`, `lang en`, or direct aliases (`swedish`, `svenska`, `se`, `sv`, `swe`, `english`, `engelska`, `en`, `eng`). Already-selected languages are politely recognized without unnecessary re-renders.
+- **Factory Reset Command (`reset`)**: Restores user preferences to initial factory defaults — resetting language to English, ambient background to standard, unhiding dismissed notices, clearing command history, and resetting the working directory.
 - **Sub-Interpreters**: Built-in mini Vim (`nvim` text viewer), Git commit inspector (`git log`, `git status`), and scientific calculator (`calc 2^10 + 42`).
-- **Window Management**: Fully functional macOS-style window controls (Close, Minimize, Maximize/Fullscreen with `Esc` shortcut), persistent state across navigation, and tab auto-completion.
+- **Window Management & Shortcuts**: Functional macOS-style window controls (Close, Minimize, Maximize/Fullscreen with `Esc` shortcut), persistent state across navigation, tab auto-completion, and `Esc` to unfocus the terminal.
 - **Graceful Fallback Card**: When the terminal is closed or on mobile devices (<1024px), it smoothly collapses into a structured *"Who is gulo? // About me & background"* biography card with a one-click reopening button.
 
 ### 2. Live Telemetry & Offline Detection (`src/data/telemetry.ts`)
@@ -66,17 +68,27 @@ npm run preview
 ### 4. Bilingual Localization (`src/data/i18n.ts` & `src/scripts/i18n-client.ts`)
 - First-class English (`EN`) and Swedish (`SV`) support.
 - Zero-refresh client-side language switching that instantly updates headers, navigation, cards, footer, and the active terminal session.
+- Technical thoughts, guides, and notes are authored in English with a compact inline notification bar for Swedish users, while projects, downloads, and UI are fully bilingual.
 - Remembers user language preference via `localStorage`.
 
-### 5. Ambient Canvas & Glassmorphic Design System (`src/styles/global.css`)
+### 5. Keyboard Navigation & Accessibility (`src/scripts/keyboard-nav.ts`)
+- **Full Keyboard Traversal**: Navigate smoothly using `Tab`, `Shift+Tab`, `Enter`, `Space`, `Esc`, and arrow keys (`←`, `→`, `↑`, `↓`) on all platforms (including macOS Safari and Chrome without needing system-level Full Keyboard Access).
+- **Cockpit Focus System**: High-contrast emerald `:focus-visible` outlines (`#10b981`) with soft cockpit glow across buttons, links, inputs, and interactive cards.
+- **Smart Terminal & Input Controls**:
+  - `Esc` deselects/blurs the terminal input or active search bar.
+  - When the terminal is not focused, `Tab` allows tabbing into the terminal and continuing through page content.
+  - Inside the terminal, `Tab` executes command and path auto-completion.
+  - `Arrow keys` cycle between category filter buttons (`projects`, `files`, `thoughts`), header navigation links, and article/project cards.
+
+### 6. Ambient Canvas & Glassmorphic Design System (`src/styles/global.css`)
 - **Unified 6px Frosted Blur**: Subtle `backdrop-filter: blur(6px)` applied uniformly across all windows, cards, and panels.
-- **Ambient Visual Effects**: Switch between background modes (`matrix`, `glow`, `minimal`) on the fly.
+- **Ambient Visual Effects**: Switch between background modes (`standard`, `topo`, `dither`, `ascii`, `dots`, `pixel`, `shimmer`, `off`) on the fly.
 - **Typography & Aesthetics**: Powered by JetBrains Mono with curated dark mode tones (`#0d1117`, `#161b22`, `#30363d`) and high-contrast TUI accent colors (`#10b981`, `#38bdf8`, `#f59e0b`, `#a78bfa`, `#f85149`).
 
-### 6. Astro Content Collections (`src/content.config.ts`)
+### 7. Astro Content Collections (`src/content.config.ts`)
 - Type-safe schemas with Zod validation for:
-  - **`projects`**: Markdown showcases with status badges (`ACTIVE`, `WIP`, `COMPLETED`), tech stack tags, and repository/live demo links.
-  - **`thoughts`**: Digital garden notes, guides, and thoughts with estimated reading time, tag filtering, and instant search.
+  - **`projects`**: Bilingual Markdown showcases (`src/content/projects/{en,sv}/`) with status badges (`ACTIVE`, `WIP`, `COMPLETED`), tech stack tags, and repository/live demo links.
+  - **`thoughts`**: Digital garden notes, guides, and thoughts with word count, category badges, tag filtering, and instant search.
   - **`downloads`**: Curated developer files, dotfiles, scripts, and CV with file size, terminal installation commands, and SHA-256 integrity checksums.
 
 ---
@@ -99,7 +111,9 @@ guloportfolio/
 │   │   └── ThoughtRow.astro      # Blog list item component
 │   ├── content/                  # Astro Content Layer collections
 │   │   ├── downloads/            # Metadata JSON files for downloads
-│   │   ├── projects/             # Portfolio project writeups (.md)
+│   │   ├── projects/             # Bilingual portfolio writeups (.md)
+│   │   │   ├── en/               # English project descriptions
+│   │   │   └── sv/               # Swedish project descriptions
 │   │   └── thoughts/             # Blog posts, guides and research notes (.md)
 │   ├── content.config.ts         # Zod schemas for content collections
 │   ├── data/                     # Configuration & Telemetry
@@ -120,7 +134,11 @@ guloportfolio/
 │   │   └── thoughts/             # Digital garden blog & [slug] reader view
 │   ├── scripts/                  # Client-side scripts & terminal engine
 │   │   ├── i18n-client.ts        # Client language manager & event dispatcher
+│   │   ├── keyboard-nav.ts       # Global keyboard traversal (Tab, Shift+Tab, Esc, Arrows)
 │   │   └── terminal/             # Bash parser, calculator, git, nvim & i18n
+│   ├── utils/
+│   │   ├── projects.ts           # Bilingual project grouping & aggregation
+│   │   └── readingTime.ts        # Article reading time estimation
 │   └── styles/
 │       └── global.css            # Tailored design system, frosted blur & code blocks
 ├── AGENTS.md                     # Development workflows and coding rules

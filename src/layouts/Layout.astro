@@ -4,13 +4,26 @@ import AmbientBackground from '../components/AmbientBackground.astro';
 
 interface Props {
   title?: string;
+  titleEn?: string;
+  titleSv?: string;
   description?: string;
+  descriptionEn?: string;
+  descriptionSv?: string;
 }
 
 const {
   title = "gulo // digital garden & playground",
+  titleEn,
+  titleSv,
   description = "Personal cockpit, portfolio and file archive. Chalmers Datateknik, swimming, homelab and systems programming.",
+  descriptionEn,
+  descriptionSv,
 } = Astro.props;
+
+const finalTitleEn = titleEn || title;
+const finalTitleSv = titleSv || titleEn || title;
+const finalDescEn = descriptionEn || description;
+const finalDescSv = descriptionSv || descriptionEn || description;
 ---
 
 <!doctype html>
@@ -21,24 +34,41 @@ const {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
 
-    <!-- SEO & Metadata -->
-    <title>{title}</title>
-    <meta name="description" content={description} />
+    <!-- SEO & Metadata with Instant Pre-Hydration Bilingual Sync -->
+    <title data-title-en={finalTitleEn} data-title-sv={finalTitleSv}>{finalTitleEn}</title>
+    <meta name="description" content={finalDescEn} data-desc-en={finalDescEn} data-desc-sv={finalDescSv} />
     <meta name="theme-color" content="#0d1117" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
+    <meta property="og:title" content={finalTitleEn} />
+    <meta property="og:description" content={finalDescEn} />
     <meta property="og:type" content="website" />
 
-    <!-- Pre-hydration language detection (defaults to 'en') -->
+    <!-- Pre-hydration language detection & metadata synchronization (defaults to 'en') -->
     <script is:inline>
       (function() {
         var lang = localStorage.getItem('site_lang') || 'en';
         document.documentElement.lang = lang;
         document.documentElement.setAttribute('data-lang', lang);
+        var titleEl = document.querySelector('title');
+        if (titleEl) {
+          var t = titleEl.getAttribute('data-title-' + lang);
+          if (t) document.title = t;
+        }
+        var descEl = document.querySelector('meta[name="description"]');
+        if (descEl) {
+          var d = descEl.getAttribute('data-desc-' + lang);
+          if (d) descEl.setAttribute('content', d);
+        }
       })();
     </script>
   </head>
   <body class="min-h-screen bg-[#0d1117] text-[#e6edf3] font-mono selection:bg-[#2ea043] selection:text-[#0d1117] antialiased">
+    <!-- Accessible skip link for keyboard navigation -->
+    <a 
+      href="#main-content" 
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-3 focus:py-1.5 focus:rounded focus:bg-[#10b981] focus:text-[#0d1117] focus:font-bold focus:shadow-lg focus:outline-none text-xs"
+    >
+      Skip to content
+    </a>
     <!-- Living, ultra-subtle cockpit ambient background -->
     <AmbientBackground />
 
@@ -46,9 +76,12 @@ const {
       <slot />
     </div>
 
-    <!-- Client-side i18n & code block utilities -->
+    <!-- Client-side i18n, keyboard navigation & code block utilities -->
     <script>
       import '../scripts/i18n-client';
+      import { initKeyboardNav } from '../scripts/keyboard-nav';
+
+      initKeyboardNav();
 
       function setupCodeCopyButtons() {
         document.querySelectorAll('pre').forEach((pre) => {

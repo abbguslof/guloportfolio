@@ -16,7 +16,17 @@ const downloads = rawDownloads.map((d) => ({
 const projects = await getCollection('projects');
 const thoughts = await getCollection('thoughts');
 
-const projectMap = new Map(projects.map((p) => [p.id, { title: p.data.title, slug: p.id }]));
+const projectMap = new Map();
+for (const p of projects) {
+  const slug = p.id.replace(/^(en|sv)\//, '');
+  const isSv = p.id.startsWith('sv/');
+  if (!projectMap.has(slug)) {
+    projectMap.set(slug, { slug, titleEn: p.data.title, titleSv: p.data.title });
+  }
+  const entry = projectMap.get(slug);
+  if (isSv) entry.titleSv = p.data.title;
+  else entry.titleEn = p.data.title;
+}
 const thoughtMap = new Map(thoughts.map((t) => [t.id, { title: t.data.title, slug: t.id }]));
 
 // Samla alla unika kategorier
@@ -24,15 +34,17 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
 ---
 
 <Layout 
-  title="File Sharing & Resources // gulo" 
-  description="Downloadable scripts, resume, Minecraft server packages, dotfiles, and configurations with usage guides."
+  titleEn="File Sharing & Resources // gulo" 
+  titleSv="Fildelning & Resurser // gulo"
+  descriptionEn="Downloadable scripts, resume, Minecraft server packages, dotfiles, and configurations with usage guides."
+  descriptionSv="Nedladdningsbara skript, CV, Minecraft-serverpaket, dotfiles och konfigurationer med användarguider."
 >
   <Header />
 
   <!-- Global terminal container on subpages (starts hidden, opens via header) -->
   <InteractiveTerminal isSubpage={true} />
 
-  <main class="w-full py-4 space-y-8 font-mono">
+  <main id="main-content" class="w-full py-4 space-y-8 font-mono">
     <!-- Breadcrumb & Top Header -->
     <div class="border-b border-[#30363d] pb-6">
       <div class="flex items-center gap-2 text-xs text-[#8b949e] mb-3">
@@ -135,8 +147,14 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
             data-size={item.size}
             id={`file-${item.id}`}
           >
-            <!-- Card Main Row (Clickable for instant details) -->
-            <div class="file-card-header p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 cursor-pointer hover:bg-[#1c2128]/50 transition-colors">
+            <!-- Card Main Row (Clickable for instant details, accessible via Tab/Enter) -->
+            <div 
+              class="file-card-header p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 cursor-pointer hover:bg-[#1c2128]/50 transition-colors"
+              tabindex="0"
+              role="button"
+              aria-expanded="false"
+              aria-label={`Details for ${item.name}`}
+            >
               <div class="space-y-2 flex-1 min-w-0">
                 <div class="flex items-center flex-wrap gap-2">
                   <span class="text-[11px] font-bold text-[#10b981] px-1.5 py-0.5 rounded bg-[#0d1117] border border-[#10b981]/40">
@@ -232,7 +250,8 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
                             class="text-[#e6edf3] hover:text-[#38bdf8] hover:underline flex items-center gap-1.5"
                           >
                             <span class="text-[#a78bfa]">#</span>
-                            <span>{p?.title}</span>
+                            <span class="lang-en-only">{p?.titleEn}</span>
+                            <span class="lang-sv-only">{p?.titleSv}</span>
                             <span class="text-[10px] text-[#8b949e]">→</span>
                           </a>
                         </li>
@@ -405,12 +424,14 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
       if (!card) return;
       const drawer = card.querySelector('.file-drawer');
       const btn = card.querySelector('.file-expand-toggle');
+      const header = card.querySelector('.file-card-header');
       const textSpan = card.querySelector('.toggle-text');
       if (!drawer) return;
 
       const isHidden = drawer.classList.contains('hidden');
       drawer.classList.toggle('hidden', !isHidden);
       btn?.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+      header?.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
       if (textSpan) {
         const isSv = (document.documentElement.lang || '').startsWith('sv');
         if (isHidden) {
@@ -447,13 +468,26 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
     });
 
     document.querySelectorAll('.file-card-header').forEach((header) => {
-      header.addEventListener('click', (e) => {
+      const handleToggle = (e: Event) => {
         const target = e.target as HTMLElement;
         if (target.closest('.file-download-btn') || target.closest('a') || target.closest('button')) {
           return;
         }
         const card = header.closest<HTMLElement>('.file-card');
         toggleDrawer(card);
+      };
+
+      header.addEventListener('click', handleToggle);
+      header.addEventListener('keydown', (e) => {
+        const ke = e as KeyboardEvent;
+        if (ke.key === 'Enter' || ke.key === ' ') {
+          const target = ke.target as HTMLElement;
+          if (target.closest('.file-download-btn') || target.closest('a') || target.closest('button')) {
+            return;
+          }
+          ke.preventDefault();
+          handleToggle(e);
+        }
       });
     });
 
