@@ -11,6 +11,7 @@ export const translations = {
     header_status_offline: 'OFFLINE',
     
     // Header navigation
+    nav_skip_content: 'Skip to content',
     nav_terminal: 'terminal',
     nav_projects: 'projects',
     nav_thoughts: 'blog / thoughts',
@@ -197,6 +198,7 @@ export const translations = {
     header_status_offline: 'OFFLINE',
     
     // Header navigation
+    nav_skip_content: 'Hoppa till innehåll',
     nav_terminal: 'terminal',
     nav_projects: 'projekt',
     nav_thoughts: 'blogg / tankar',

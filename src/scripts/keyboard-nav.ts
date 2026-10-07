@@ -5,6 +5,14 @@ export function initKeyboardNav(): void {
   if ((window as any).__keyboard_nav_initialized) return;
   (window as any).__keyboard_nav_initialized = true;
 
+  // Track element blurred via Escape so subsequent Tab resumes from its position
+  let lastBlurredElement: HTMLElement | null = null;
+
+  document.addEventListener('pointerdown', () => {
+    lastBlurredElement = null;
+    (window as any).__lastBlurredElement = null;
+  });
+
   // Helper to query all currently visible, interactive elements on the page in DOM order
   function getVisibleFocusables(): HTMLElement[] {
     const selector = [
@@ -27,6 +35,7 @@ export function initKeyboardNav(): void {
       // Exclude hidden elements or elements marked tabindex="-1"
       if (el.getAttribute('tabindex') === '-1') return false;
       if (el.closest('.hidden')) return false;
+      if (el.classList.contains('sr-only') && el.id !== 'skip-link') return false;
       if (el.offsetParent === null && el.tagName !== 'BODY') return false;
 
       const style = window.getComputedStyle(el);
@@ -36,6 +45,71 @@ export function initKeyboardNav(): void {
       return true;
     });
   }
+
+  // Find the first meaningful content element below the header/terminal
+  function getFirstContentElement(): HTMLElement | null {
+    const isHomePage = window.location.pathname === '/' || window.location.pathname === '';
+    if (isHomePage) {
+      const projectsSection = document.getElementById('projects');
+      if (projectsSection) {
+        const candidate = projectsSection.querySelector<HTMLElement>(
+          'a[href], button:not([disabled]):not([tabindex="-1"]), input:not([disabled]):not([type="hidden"]):not([tabindex="-1"])'
+        );
+        if (candidate) return candidate;
+      }
+    }
+
+    const main = document.getElementById('main-content');
+    if (main) {
+      const candidates = Array.from(main.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"], .cat-toggle-card, .proj-filter-btn, .file-cat-btn, .file-card-header'
+      )).filter((el) => {
+        if (el.getAttribute('tabindex') === '-1') return false;
+        if (el.closest('#terminal-window')) return false;
+        if (el.closest('.hidden')) return false;
+        if (el.classList.contains('sr-only')) return false;
+        if (el.offsetParent === null) return false;
+        const style = window.getComputedStyle(el);
+        if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
+        return true;
+      });
+
+      if (candidates.length > 0) return candidates[0];
+    }
+
+    return null;
+  }
+
+  // Setup Skip to content link to jump directly to first interactive content
+  function setupSkipLink(): void {
+    const skipLink = document.getElementById('skip-link') || document.querySelector<HTMLAnchorElement>('a[href="#main-content"]');
+    if (!skipLink) return;
+
+    function handleSkipActivation(e: Event) {
+      e.preventDefault();
+      const firstContent = getFirstContentElement();
+      if (firstContent) {
+        firstContent.focus();
+        firstContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        const main = document.getElementById('main-content');
+        if (main) {
+          main.setAttribute('tabindex', '-1');
+          main.focus();
+          main.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }
+
+    skipLink.addEventListener('click', handleSkipActivation);
+    skipLink.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        handleSkipActivation(e);
+      }
+    });
+  }
+
+  setupSkipLink();
 
   document.addEventListener('keydown', (e: KeyboardEvent) => {
     const active = document.activeElement as HTMLElement | null;
@@ -52,6 +126,8 @@ export function initKeyboardNav(): void {
           active.tagName === 'TEXTAREA'
         ) {
           e.preventDefault();
+          lastBlurredElement = active;
+          (window as any).__lastBlurredElement = active;
           active.blur();
           return;
         }
@@ -84,27 +160,18 @@ export function initKeyboardNav(): void {
       (active.id.includes('search') || active.getAttribute('type') === 'text');
 
     if (isSearchInput && active) {
-      if (e.key === 'Tab' || e.key === 'ArrowDown') {
-        if (!e.shiftKey) {
-          e.preventDefault();
-          const focusables = getVisibleFocusables();
-          const idx = focusables.indexOf(active);
-          if (idx !== -1 && idx < focusables.length - 1) {
-            focusables[idx + 1].focus();
-            return;
-          }
-        } else if (e.key === 'Tab' && e.shiftKey) {
-          e.preventDefault();
-          const focusables = getVisibleFocusables();
-          const idx = focusables.indexOf(active);
-          if (idx > 0) {
-            focusables[idx - 1].focus();
-            return;
-          }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const focusables = getVisibleFocusables();
+        const idx = focusables.indexOf(active);
+        if (idx !== -1 && idx < focusables.length - 1) {
+          focusables[idx + 1].focus();
+          return;
         }
       }
-      // Allow regular typing and left/right cursor movement in search input
-      if (e.key !== 'Enter') {
+      // Allow regular typing, text selection and cursor movement in search input.
+      // Tab, Shift+Tab, and Escape fall through to global navigation.
+      if (e.key !== 'Tab' && e.key !== 'Escape' && e.key !== 'Enter') {
         return;
       }
     }
@@ -131,7 +198,17 @@ export function initKeyboardNav(): void {
       const focusables = getVisibleFocusables();
       if (focusables.length === 0) return;
 
-      const currentIndex = active ? focusables.indexOf(active) : -1;
+      let referenceElement = active;
+      if (!referenceElement || referenceElement === document.body) {
+        const candidate = lastBlurredElement || (window as any).__lastBlurredElement;
+        if (candidate && document.contains(candidate)) {
+          referenceElement = candidate;
+        }
+      }
+      lastBlurredElement = null;
+      (window as any).__lastBlurredElement = null;
+
+      const currentIndex = referenceElement ? focusables.indexOf(referenceElement) : -1;
 
       e.preventDefault();
 

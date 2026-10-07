@@ -21,7 +21,7 @@ const sortedProjects = await getGroupedProjects();
   <!-- Global terminal on subpages (opens on header button click) -->
   <InteractiveTerminal isSubpage={true} />
 
-  <main id="main-content" class="w-full py-4 space-y-10">
+  <main id="main-content" tabindex="-1" class="w-full py-4 space-y-10 outline-none">
     <!-- Breadcrumb & Top Header -->
     <div class="border-b border-[#30363d] pb-6">
       <div class="flex items-center gap-2 text-xs font-mono text-[#8b949e] mb-3">

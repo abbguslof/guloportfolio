@@ -18,15 +18,18 @@ const tagsData = tags.map((t) => t.toLowerCase()).join(',');
 let catBadgeClass = 'text-[#f59e0b] border-[#f59e0b]/40 bg-[#f59e0b]/10';
 let catBadgeKey = 'thoughts_cat_tanke_badge';
 let catDefaultText = '[THOUGHT]';
+let catHoverText = 'group-hover:text-[#f59e0b]';
 
 if (category === 'guide') {
   catBadgeClass = 'text-[#38bdf8] border-[#38bdf8]/40 bg-[#38bdf8]/10';
   catBadgeKey = 'thoughts_cat_guide_badge';
   catDefaultText = '[GUIDE]';
+  catHoverText = 'group-hover:text-[#38bdf8]';
 } else if (category === 'anteckning') {
   catBadgeClass = 'text-[#10b981] border-[#10b981]/40 bg-[#10b981]/10';
   catBadgeKey = 'thoughts_cat_anteckning_badge';
   catDefaultText = '[NOTE]';
+  catHoverText = 'group-hover:text-[#10b981]';
 }
 ---
 
@@ -52,12 +55,12 @@ if (category === 'guide') {
     <!-- Tags & Arrow -->
     <div class="flex items-center gap-1.5 flex-wrap">
       {tags.slice(0, 3).map((tag) => (
-        <span class="text-[10px] font-mono text-[#8b949e] group-hover:text-[#38bdf8] px-1.5 py-0.5 rounded bg-[#0d1117] border border-[#30363d] transition-colors">
+        <span class={`text-[10px] font-mono text-[#8b949e] ${catHoverText} px-1.5 py-0.5 rounded bg-[#0d1117] border border-[#30363d] transition-colors`}>
           #{tag}
         </span>
       ))}
       <span 
-        class="text-xs text-[#8b949e] group-hover:text-[#10b981] group-hover:translate-x-0.5 transition-transform ml-1 font-mono"
+        class={`text-xs text-[#8b949e] ${catHoverText} group-hover:translate-x-0.5 transition-all ml-1 font-mono`}
         data-i18n="thoughts_read_more"
       >
         read →
@@ -66,7 +69,7 @@ if (category === 'guide') {
   </div>
 
   <!-- Title -->
-  <div class="text-sm sm:text-base font-semibold text-[#e6edf3] group-hover:text-[#10b981] transition-colors">
+  <div class={`text-sm sm:text-base font-semibold text-[#e6edf3] ${catHoverText} transition-colors`}>
     <span>{title}</span>
   </div>
 

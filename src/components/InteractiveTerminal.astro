@@ -409,6 +409,7 @@ const dynamicFileSystemSv = {
         <button 
           type="button" 
           id="btn-win-close" 
+          tabindex="-1"
           class="w-3.5 h-3.5 rounded-full bg-[#f85149] hover:brightness-125 transition-all flex items-center justify-center text-[9px] font-bold text-[#0d1117] group cursor-pointer" 
           title="Close terminal"
           data-i18n-title="term_btn_close_title"
@@ -419,6 +420,7 @@ const dynamicFileSystemSv = {
         <button 
           type="button" 
           id="btn-win-minimize" 
+          tabindex="-1"
           class="w-3.5 h-3.5 rounded-full bg-[#f59e0b] hover:brightness-125 transition-all flex items-center justify-center text-[9px] font-bold text-[#0d1117] group cursor-pointer" 
           title="Minimize window"
           data-i18n-title="term_btn_min_title"
@@ -429,6 +431,7 @@ const dynamicFileSystemSv = {
         <button 
           type="button" 
           id="btn-win-maximize" 
+          tabindex="-1"
           class="w-3.5 h-3.5 rounded-full bg-[#2ea043] hover:brightness-125 transition-all flex items-center justify-center text-[9px] font-bold text-[#0d1117] group cursor-pointer" 
           title="Maximize to fullscreen (press Esc to close)"
           data-i18n-title="term_btn_max_title"
@@ -546,7 +549,7 @@ const dynamicFileSystemSv = {
           placeholder="type 'help', 'school', 'swim', 'cat whoami.md'..."
           data-i18n-placeholder="term_input_placeholder"
         />
-        <button type="submit" class="sr-only">Run command</button>
+        <button type="submit" class="sr-only" tabindex="-1">Run command</button>
       </form>
     </div>
   </div>
@@ -1621,6 +1624,7 @@ const dynamicFileSystemSv = {
     input.addEventListener('keydown', (e) => {
       // Escape av-markerar terminalen (blur) så man kan tabba vidare till resten av sidan
       if (e.key === 'Escape') {
+        (window as any).__lastBlurredElement = input;
         input.blur();
         return;
       }
@@ -1694,8 +1698,8 @@ const dynamicFileSystemSv = {
             'ls', 'cd', 'cat', 'nvim', 'vim', 'vi', 'pwd', 'grep', 'open', 
             'projects', 'project', 'thoughts', 'thought', 'blog', 'note', 'notes', 'guide', 'guides', 'files', 'clear', 
             'date', 'uptime', 'fastfetch', 'neofetch', 'fetch', 'uname', 'hostname', 'history',
-            'secret', 'git', 'calc', 'guess', './helloworld.sh', 'helloworld.sh', 'hello', 'tjena', 'hej', 'hejsan', 'halloj',
-            'bg', 'matrix', 'alias', 'whoisgulo', 'gulo', 'exit', 'wget', 'dl', 'download', 'linux', 'windows',
+            'git', 'calc', 'guess', './helloworld.sh', 'helloworld.sh', 'hello', 'tjena', 'hej', 'hejsan', 'halloj',
+            'bg', 'exit', 'wget', 'dl', 'download',
             'reset', 'factory-reset', 'defaults'
           ];
           const matches = cmdList.filter(c => c.startsWith(lastToken.toLowerCase()));

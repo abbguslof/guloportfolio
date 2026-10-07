@@ -44,7 +44,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
   <!-- Global terminal container on subpages (starts hidden, opens via header) -->
   <InteractiveTerminal isSubpage={true} />
 
-  <main id="main-content" class="w-full py-4 space-y-8 font-mono">
+  <main id="main-content" tabindex="-1" class="w-full py-4 space-y-8 font-mono outline-none">
     <!-- Breadcrumb & Top Header -->
     <div class="border-b border-[#30363d] pb-6">
       <div class="flex items-center gap-2 text-xs text-[#8b949e] mb-3">

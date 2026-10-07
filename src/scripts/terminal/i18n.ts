@@ -200,7 +200,6 @@ export function getExtendedHelpHtml(lang: LangCode): string {
           <div><code class="text-[#10b981]">stats</code>, <code class="text-[#10b981]">btop</code> : System-, tränings- och nätverksmonitor</div>
           <div><code class="text-[#10b981]">uptime</code>, <code class="text-[#10b981]">uname -a</code>, <code class="text-[#10b981]">hostname</code> : Driftinfo</div>
           <div><code class="text-[#10b981]">bg &lt;stil&gt;</code> : Ändra bakgrund (standard, topo, dither, ascii, dots, pixel, shimmer, off)</div>
-          <div><code class="text-[#10b981]">matrix</code>, <code class="text-[#10b981]">secret</code> : Matrix-effekt &amp; hemliga easter eggs</div>
         </div>
       </div>
     </div>
@@ -296,7 +295,6 @@ export function getExtendedHelpHtml(lang: LangCode): string {
           <div><code class="text-[#10b981]">stats</code>, <code class="text-[#10b981]">btop</code> : TUI monitor for system, training &amp; network</div>
           <div><code class="text-[#10b981]">uptime</code>, <code class="text-[#10b981]">uname -a</code>, <code class="text-[#10b981]">hostname</code> : Telemetry &amp; host stats</div>
           <div><code class="text-[#10b981]">bg &lt;style&gt;</code> : Set background (standard, topo, dither, ascii, dots, pixel, shimmer, off)</div>
-          <div><code class="text-[#10b981]">matrix</code>, <code class="text-[#10b981]">secret</code> : ASCII rain matrix mode &amp; easter eggs</div>
         </div>
       </div>
     </div>
