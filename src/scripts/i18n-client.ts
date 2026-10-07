@@ -56,11 +56,27 @@ export function applySiteLang(lang: Lang): void {
 
   if (btnEn && btnSv) {
     if (lang === 'en') {
-      btnEn.className = 'lang-btn px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#10b981] bg-[#0d1117] border border-[#10b981]/40 shadow-sm';
-      btnSv.className = 'lang-btn px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]';
+      btnEn.className = 'lang-btn px-1.5 sm:px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#10b981] bg-[#0d1117] border border-[#10b981]/40 shadow-sm';
+      btnSv.className = 'lang-btn px-1.5 sm:px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]';
     } else {
-      btnSv.className = 'lang-btn px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#10b981] bg-[#0d1117] border border-[#10b981]/40 shadow-sm';
-      btnEn.className = 'lang-btn px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]';
+      btnSv.className = 'lang-btn px-1.5 sm:px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#10b981] bg-[#0d1117] border border-[#10b981]/40 shadow-sm';
+      btnEn.className = 'lang-btn px-1.5 sm:px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]';
+    }
+  }
+
+  // 5. Update document title and meta description
+  const titleEl = document.querySelector('title');
+  if (titleEl) {
+    const localizedTitle = titleEl.getAttribute(`data-title-${lang}`);
+    if (localizedTitle) {
+      document.title = localizedTitle;
+    }
+  }
+  const descEl = document.querySelector('meta[name="description"]');
+  if (descEl) {
+    const localizedDesc = descEl.getAttribute(`data-desc-${lang}`);
+    if (localizedDesc) {
+      descEl.setAttribute('content', localizedDesc);
     }
   }
 }
@@ -76,4 +92,9 @@ if (typeof window !== 'undefined') {
   } else {
     applySiteLang(current);
   }
+
+  document.addEventListener('astro:page-load', () => {
+    applySiteLang(getSiteLang());
+  });
 }
+

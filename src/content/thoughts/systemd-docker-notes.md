@@ -1,13 +1,13 @@
 ---
-title: "Docker Compose som systemd service unit"
-description: "Minnesanteckning för Debian 12: unit-mall med WantedBy och ExecStart för att containers startar rent efter reboot."
+title: "Running Docker Compose as a systemd Service Unit"
+description: "Cheat-sheet for Debian 12: unit template with WantedBy and ExecStart ensuring container stacks start and stop cleanly across reboots."
 pubDate: 2026-02-18
 category: "anteckning"
 tags: ["Docker", "Linux", "Debian", "Homelab"]
 draft: false
 ---
 
-Minnesanteckning för homelab-servern. Istället för att lita enbart på Docker daemons restart-policy skapar jag en dedicerad systemd unit per Compose-stack.
+Reference note for the homelab server. Rather than relying solely on the Docker daemon's internal restart policies, I manage production Compose stacks via dedicated systemd unit files.
 
 ### Unit file: `/etc/systemd/system/docker-compose-app.service`
 ```ini
@@ -28,10 +28,10 @@ TimeoutStartSec=0
 WantedBy=multi-user.target
 ```
 
-### Aktivera
+### Activation
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable --now docker-compose-app
 ```
 
-Enkelt och garanterar att nätverk och volymer stängs av kontrollerat vid server-reboots.
+Clean and deterministic. Ensures volumes, attached networks, and background containers gracefully unmount during host shutdown and reboot cycles.

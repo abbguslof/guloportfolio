@@ -5,7 +5,6 @@ import Header from '../../components/Header.astro';
 import InteractiveTerminal from '../../components/InteractiveTerminal.astro';
 import Footer from '../../components/Footer.astro';
 import { getCollection, render } from 'astro:content';
-
 export async function getStaticPaths() {
   const thoughts = await getCollection('thoughts');
   return thoughts.map((post) => ({
@@ -18,6 +17,7 @@ const { post } = Astro.props;
 const { Content } = await render(post);
 
 const formattedDate = post.data.pubDate.toISOString().slice(0, 10);
+const wordCount = (post.body || '').trim().split(/\s+/).filter(Boolean).length;
 const category = post.data.category || 'tanke';
 
 // Dynamically retrieve downloads linked to this post
@@ -28,14 +28,17 @@ const linkedDownloads = allDownloads.filter((d) =>
 );
 
 let catBadgeClass = 'text-[#f59e0b] border-[#f59e0b]/40 bg-[#f59e0b]/10';
+let catBorderClass = 'border-[#f59e0b]';
 let catBadgeKey = 'thoughts_cat_tanke_badge';
 let catLabel = '[THOUGHT]';
 if (category === 'guide') {
   catBadgeClass = 'text-[#38bdf8] border-[#38bdf8]/40 bg-[#38bdf8]/10';
+  catBorderClass = 'border-[#38bdf8]';
   catBadgeKey = 'thoughts_cat_guide_badge';
   catLabel = '[GUIDE]';
 } else if (category === 'anteckning') {
   catBadgeClass = 'text-[#10b981] border-[#10b981]/40 bg-[#10b981]/10';
+  catBorderClass = 'border-[#10b981]';
   catBadgeKey = 'thoughts_cat_anteckning_badge';
   catLabel = '[NOTE]';
 }
@@ -50,7 +53,7 @@ if (category === 'guide') {
   <!-- Global terminal on subpages (opens on header button click) -->
   <InteractiveTerminal isSubpage={true} />
 
-  <main class="w-full py-4 space-y-8">
+  <main id="main-content" class="w-full py-4 space-y-8">
     <!-- Back button -->
     <div class="mb-8 flex items-center justify-between">
       <a 
@@ -74,15 +77,16 @@ if (category === 'guide') {
 
     <!-- Article Header -->
     <header class="pb-6 mb-8 border-b border-[#30363d]">
-      <div class="flex items-center gap-3 text-xs font-mono text-[#8b949e] mb-3">
+      <div class="flex items-center gap-2.5 text-xs font-mono text-[#8b949e] mb-3 flex-wrap">
         <span class={`text-[11px] font-bold px-2 py-0.5 rounded border ${catBadgeClass}`} data-i18n={catBadgeKey}>
           {catLabel}
         </span>
         <time datetime={formattedDate}>{formattedDate}</time>
         <span>•</span>
-        <span>gulo</span>
-        <span>•</span>
-        <span>Göteborg</span>
+        <span>
+          <span class="lang-en-only">{wordCount} words</span>
+          <span class="lang-sv-only">{wordCount} ord</span>
+        </span>
       </div>
 
       <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-[#e6edf3] tracking-tight leading-snug">
@@ -90,11 +94,38 @@ if (category === 'guide') {
       </h1>
 
       {post.data.description && (
-        <p class="text-sm text-[#8b949e] mt-3 leading-relaxed border-l-2 border-[#10b981] pl-3">
+        <p class={`text-sm text-[#8b949e] mt-3 leading-relaxed border-l-2 ${catBorderClass} pl-3`}>
           {post.data.description}
         </p>
       )}
     </header>
+
+    <!-- Compact Language notice: Only displayed for Swedish users viewing English thoughts -->
+    <aside 
+      id="thought-lang-notice"
+      class="lang-sv-only mb-6 px-3 py-1.5 rounded bg-[#161b22] border border-[#f59e0b]/30 text-xs font-mono text-[#8b949e] flex items-center justify-between gap-3 shadow-sm transition-all"
+      role="note"
+      aria-label="Språknotis"
+    >
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="text-[10px] font-bold text-[#f59e0b] px-1.5 py-0.5 rounded bg-[#f59e0b]/10 border border-[#f59e0b]/30 shrink-0">
+          EN
+        </span>
+        <span class="text-[11px] text-[#8b949e] truncate" data-i18n="thoughts_lang_notice_compact">
+          Tankar, guider och anteckningar publiceras bara på engelska.
+        </span>
+      </div>
+
+      <button 
+        type="button" 
+        id="btn-dismiss-thought-notice"
+        class="text-[#8b949e] hover:text-[#e6edf3] px-1 rounded hover:bg-[#30363d]/50 transition-colors cursor-pointer text-xs shrink-0 select-none leading-none"
+        title="Dölj notisen"
+        aria-label="Dölj notis"
+      >
+        ✕
+      </button>
+    </aside>
 
     <!-- Article Body with Markdown Rendering -->
     <article class="prose prose-invert max-w-none text-[#e6edf3] text-sm leading-relaxed 
@@ -158,3 +189,26 @@ if (category === 'guide') {
 
   <Footer />
 </Layout>
+
+<script>
+  function setupThoughtPage() {
+    const notice = document.getElementById('thought-lang-notice');
+    const dismissBtn = document.getElementById('btn-dismiss-thought-notice');
+
+    if (sessionStorage.getItem('dismissed_thought_lang_notice') === 'true') {
+      notice?.classList.add('hidden');
+    }
+
+    dismissBtn?.addEventListener('click', () => {
+      notice?.classList.add('hidden');
+      sessionStorage.setItem('dismissed_thought_lang_notice', 'true');
+    });
+
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupThoughtPage);
+  } else {
+    setupThoughtPage();
+  }
+</script>

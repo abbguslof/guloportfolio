@@ -92,6 +92,11 @@ export const translations = {
     thoughts_downloads_title: 'DOWNLOADABLE RESOURCES LINKED TO THIS POST:',
     thoughts_download_pack: '[Download pack ↓]',
     thoughts_download_script: '[Download script ↓]',
+    thoughts_lang_notice_badge: '[LANGUAGE // EN ONLY]',
+    thoughts_lang_notice_title: 'This post is published in English',
+    thoughts_lang_notice_desc: 'Thoughts, guides, and notes are published purely in English. Projects and other sections are available in both English and Swedish.',
+    thoughts_lang_notice_compact: 'Thoughts, guides, and notes are published in English only.',
+    thoughts_archive_lang_note: '(Articles and notes are published in English)',
     
     // Files page
     files_breadcrumb_home: '[~/home]',
@@ -273,6 +278,11 @@ export const translations = {
     thoughts_downloads_title: 'NEDLADDNINGSBARA RESURSER KOPPLADE TILL DETTA INLÄGG:',
     thoughts_download_pack: '[Ladda ner pack ↓]',
     thoughts_download_script: '[Ladda ner skript ↓]',
+    thoughts_lang_notice_badge: '[SPRÅKNOTIS // EN]',
+    thoughts_lang_notice_title: 'Detta inlägg är författat på engelska',
+    thoughts_lang_notice_desc: 'Tankar, guider och anteckningar skrivs och publiceras enbart på engelska. Projekt och övriga delar av stationen finns på både svenska och engelska.',
+    thoughts_lang_notice_compact: 'Tankar, guider och anteckningar publiceras bara på engelska.',
+    thoughts_archive_lang_note: '(Inläggen i arkivet publiceras enbart på engelska)',
     
     // Files page
     files_breadcrumb_home: '[~/startsidan]',

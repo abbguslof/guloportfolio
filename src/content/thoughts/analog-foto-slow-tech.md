@@ -1,21 +1,21 @@
 ---
-title: "Varför 35mm film tvingar mig att tänka innan jag trycker"
-description: "Tankar om analog fotografi, tålamod och varför begränsningen av 36 rutor gör en till en mer metodisk systemutvecklare."
+title: "Why 35mm Film Forces Me to Think Before Pressing the Shutter"
+description: "Thoughts on analog photography, patience, and why the physical constraint of 36 frames makes you a more deliberate systems engineer."
 pubDate: 2025-11-12
 category: "tanke"
-tags: ["Foto", "Livet", "Kreativt"]
+tags: ["Photography", "Life", "Creative"]
 draft: false
 ---
 
-I en digital vardag där man kan kompilera om kod på en millisekund och ta tiotusen bilder med telefonen utan att blinka är analog fotografi en märklig oas.
+In a digital day-to-day where code recompiles in a millisecond and you can take ten thousand pictures on your phone without blinking, analog photography is a strange oasis.
 
-Med en manuell 35mm kamera (Olympus OM-1) har man exakt 36 exponeringar på en rulle. Det finns ingen skärm på baksidan för att kontrollera histogrammet. Ingen autofokus som kompenserar för slarv.
+With a fully manual 35mm camera (an Olympus OM-1), you have exactly 36 frames on a roll. There is no LCD screen on the back to check a histogram. No autofocus to compensate for carelessness.
 
-### Värdet av begränsningar
-När varje bild kostar pengar att framkalla och varje ruta räknas stannar man upp. Man tittar på ljuset, mäter exponeringen och väntar på rätt ögonblick.
+### The Value of Constraints
+When every photograph costs money to develop and every frame counts, you pause. You study the light, meter the exposure, and wait for the right moment.
 
-Jag har märkt att samma tänkande smyger sig in i min programmering:
-- Istället för att slänga in tjugo `printf`-satser och gissa var buggen ligger, stannar jag upp och läser igenom koden rad för rad.
-- Istället för att installera fem externa bibliotek för ett enkelt problem, bygger jag en ren och avgränsad lösning med det som redan finns.
+I've noticed that this exact mindset subtly creeps into my programming workflow:
+- Instead of spraying twenty random `printf` statements and guessing where a bug lives, I pause, pull up the debugger, and trace the logic line by line.
+- Instead of pulling in five external libraries to solve a trivial problem, I build a lean, well-bounded solution using what already exists in standard toolchains.
 
-Begränsningar tvingar fram medvetenhet. Oavsett om det handlar om korn på en negativfilm eller minnesallokeringar i en mikrokontroller.
+Constraints enforce mindfulness. Whether dealing with grain on negative film or byte allocations in a memory-constrained microcontroller.

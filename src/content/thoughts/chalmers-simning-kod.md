@@ -1,28 +1,27 @@
 ---
-title: "Från 50m bassängen till tentaveckan på Chalmers"
-description: "Om rytm, mental återhämtning och varför simträning är det bästa botemedlet mot fastkörda algoritmer."
+title: "From the 50m Pool to Exam Week at Chalmers"
+description: "On rhythm, mental recovery, and why competitive swim training is the ultimate antidote to stalled algorithms."
 pubDate: 2026-03-28
 category: "tanke"
-tags: ["Chalmers", "Livet", "Simning", "Datateknik"]
+tags: ["Chalmers", "Life", "Swimming", "Computer Engineering"]
 draft: false
 ---
 
-Det finns en märklig parallell mellan att simma 4000 meter i Valhallabadet och att felsöka ett komplext minnesläckage i C.
+There is a striking parallel between swimming 4,000 meters at Valhallabadet and debugging a thorny memory corruption issue in C.
 
-Båda kräver ett konstant lugn och en förmåga att hålla fokus utan att forcera. När man simmar har man varken mobilskärmar eller Discord-notiser. Det är bara ljudet av vattnet, kaklet i botten och andetagen i takt.
+Both demand sustained composure and the discipline to maintain tempo without forcing the outcome. When swimming, there are no phone screens or Discord notifications. Just the ambient churn of water, lane tiles scrolling beneath, and rhythmic strokes.
 
-### Det omedvetna tänkandet
-Ofta har jag suttit i timmar i EDIT-huset på Chalmers och försökt förstå varför en pekare blir korrupt i ett schemaläggningsprogram. Man stirrar på terminalen, provar GDB och bygger om koden för femtioelfte gången.
+### Diffuse-Mode Thinking
+Often I'll spend hours in the EDIT building at Chalmers trying to pinpoint why a pointer corrupts during context switching. You stare at terminal buffers, step through GDB backtraces, and recompile for the fiftieth time.
 
-Sedan går man och kör ett simpass. Efter 20 minuter, ungefär när man simmar 100m frisim i ett jämnt tempo, dyker lösningen plötsligt upp i huvudet:
-> *"Jag nollställde aldrig referensräknaren innan noden återanvändes i den länkade listan."*
+Then you head to afternoon swim practice. Twenty minutes in, midway through a steady 100m freestyle set, the root cause suddenly clicks:
+> *"I never cleared the reference count before recycling the node from the slab allocator pool."*
 
-Hjärnan fortsätter att bearbeta problem i bakgrunden så fort man ger den utrymme att andas.
+The brain continues processing deep technical problems in the background as soon as you step away and give it room to breathe.
 
-### Rutiner och uthållighet
-Att kombinera ett krävande program som Datateknik med hård simträning och egna servrar låter ibland som en ekvation som inte går ihop. Men för mig är det tvärtom: disciplinen från bassängen gör att timmarna framför tangentbordet blir mycket mer fokuserade.
+### Routine & Stamina
+Balancing an intensive Computer Science & Engineering degree with rigorous swim training and self-hosted infrastructure might sound difficult to reconcile. For me, it is the opposite: the physical discipline from the pool makes hours in front of the terminal vastly sharper and more intentional.
 
-### Resurser & Filer
-- 📄 [Ladda ner mitt CV (Datateknik @ Chalmers)](/files#file-cv-datateknik)
-- ⚙️ [Neovim konfigurering & dotfiles](/files#file-dotfiles-neovim)
-
+### Resources & Files
+- 📄 [Download my Resume (Computer Science @ Chalmers)](/files#file-cv-datateknik)
+- ⚙️ [Neovim Configuration & Dotfiles](/files#file-dotfiles-neovim)

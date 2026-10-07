@@ -1,18 +1,18 @@
 ---
-title: "Optimerade JVM-flaggor för PaperMC 1.20"
-description: "Hur jag konfigurerade Aikar's flags och G1GC för stabil 20 TPS under hög serverbelastning."
+title: "Tuning JVM Flags for PaperMC 1.20"
+description: "How I fine-tuned Aikar's flags and G1GC parameters for rock-solid 20.0 TPS under sustained community server load."
 pubDate: 2026-03-15
 category: "guide"
 tags: ["Minecraft", "Linux", "Sysadmin"]
 draft: false
 ---
 
-När man driftar en community-server för Minecraft är den största fienden sällan ren CPU-cykelbrist, utan ojämna Garbage Collection-pauser (GC pauses). 
+When managing a community Minecraft server, the primary adversary is rarely raw CPU core starvation—it is unpredictable Garbage Collection (GC) pauses.
 
-Standardinställningarna för OpenJDK 21 fungerar bra för allmänna webbservrar, men i Minecraft leder en paus på mer än 50ms direkt till en tappad tick och märkbart lagg för spelarna.
+Default OpenJDK 21 settings are optimized for general-purpose web services, but in a tick-rate-sensitive game loop (50ms budget per tick), any stop-the-world pause exceeding 50ms instantly causes dropped ticks and perceptible stutter for players.
 
-### Aikar's Flags med finjustering
-Genom att sätta `InitiatingHeapOccupancyPercent` och styra regionstorleken för G1GC minimerade vi pauser från 120ms ner till under 15ms:
+### Fine-Tuning Aikar's Flags
+By lowering `InitiatingHeapOccupancyPercent` and tightly constraining G1GC nursery sizing, we reduced stop-the-world pauses from ~120ms spikes down to under 15ms:
 
 ```bash
 java -Xms12G -Xmx12G -XX:+UseG1GC \
@@ -35,11 +35,10 @@ java -Xms12G -Xmx12G -XX:+UseG1GC \
   -jar paper.jar --nogui
 ```
 
-### Resultat
-Realtidsmätningar via Spark visade att 99.8% av alla ticks låg under 18ms MSPT, även när flera spelare genererade ny terräng samtidigt.
+### Production Results
+Real-time profiling via Spark confirmed that 99.8% of all ticks remained comfortably below 18ms MSPT (Milliseconds Per Tick), even when concurrent players triggered chunk generation across multiple worlds.
 
-### Tillhörande resurser & nedladdningar
-Vill du köra med dessa förkonfigurerade flaggor och optimerade moddar?
-- 📦 [Fabric 1.20.4 Performance Pack](/files#file-fabric-server-pack) (eller ladda ner direkt: [fabric-1.20.4-optimized.zip](/downloads/fabric-1.20.4-optimized.zip))
-- 📜 [Automatiserat Backup & Roteringsskript](/files#file-mc-backup-script)
-
+### Linked Resources & Downloads
+Looking to deploy with these pre-configured flags and optimized mods?
+- 📦 [Fabric 1.20.4 Performance Pack](/files#file-fabric-server-pack) (direct download: [fabric-1.20.4-optimized.zip](/downloads/fabric-1.20.4-optimized.zip))
+- 📜 [Automated Backup & Prune Script (zstd)](/files#file-mc-backup-script)

@@ -1,15 +1,15 @@
 ---
-title: "Pekare & minnesläckor i C — snabbanteckning från EDIT-labbet"
-description: "Snabb referens för Valgrind-flaggor, spårning av dubbel-frees och validering av cirkulära pekarkedjor i schemaläggaren."
+title: "Pointers & Memory Leaks in C — Quick Notes from the EDIT Lab"
+description: "Quick reference for Valgrind flags, tracking down double-frees, and cleanly freeing circular pointer chains in the scheduler lab."
 pubDate: 2026-04-02
 category: "anteckning"
 tags: ["C", "Chalmers", "GDB", "Valgrind"]
 draft: false
 ---
 
-Snabbt kladd från gårdagens labb i Operativsystemskursen (EDIT-huset). Skriver ner det här så jag slipper googla felaktiga stackoverflow-trådar nästa gång pekare spökar.
+Quick scratchpad notes from yesterday's operating systems lab session in the EDIT building at Chalmers. Writing this down so I don't have to wade through misleading StackOverflow threads next time pointer arithmetic causes grief.
 
-### Valgrind-kommando som fångar allt
+### Valgrind Command That Catches Everything
 ```bash
 valgrind --leak-check=full \
          --show-leak-kinds=all \
@@ -19,21 +19,21 @@ valgrind --leak-check=full \
          ./scheduler_sim
 ```
 
-### Den subtila fällan: Cirkulära referenser
-När vi implementerade round-robin kön med en dubbellänkad cirkulär lista glömde vi att bryta ringen innan `free_queue()` itererade över noderna:
+### The Subtle Trap: Circular Pointer Chains
+When implementing the round-robin run-queue with a doubly-linked circular ring, we initially forgot to break the cycle before `free_queue()` iterated over the nodes:
 
 ```c
-// FEL: Fastnar i oändlig loop eller triggar double-free
+// WRONG: Enters an infinite loop or triggers double-free
 void bad_free(Node* head) {
     Node* curr = head;
     while (curr != NULL) {
         Node* next = curr->next;
         free(curr);
-        curr = next; // Når head igen!
+        curr = next; // Loops back to head!
     }
 }
 
-// RÄTT: Bryt cirkeln explicit först
+// RIGHT: Explicitly break the circle first
 void safe_free(Node* head) {
     if (!head) return;
     Node* curr = head->next;
@@ -46,5 +46,5 @@ void safe_free(Node* head) {
 }
 ```
 
-### Tumregel
-Sätt alltid avallokerade pekare till `NULL` direkt efter `free()`. Sparar 2 timmars felsökning vid dolda race conditions.
+### Rule of Thumb
+Always assign deallocated pointers to `NULL` immediately after `free()`. Saves two hours of debugging hidden use-after-free conditions and race conditions in concurrent queue consumers.

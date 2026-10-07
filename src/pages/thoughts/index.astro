@@ -24,15 +24,17 @@ const allTags = Array.from(
 ---
 
 <Layout 
-  title="Thoughts, Guides & Notes // gulo" 
-  description="Personal notes from Chalmers Computer Science & Engineering, competitive swimming, Minecraft homelab, and C/Linux system programming."
+  titleEn="Thoughts, Guides & Notes // gulo" 
+  titleSv="Tankar, Guider & Anteckningar // gulo"
+  descriptionEn="Personal notes from Chalmers Computer Science & Engineering, competitive swimming, Minecraft homelab, and C/Linux system programming."
+  descriptionSv="Anteckningar från Chalmers Datateknik, tävlingssimning, Minecraft-homelab och systemprogrammering i C/Linux."
 >
   <Header />
 
   <!-- Global terminal on subpages (opens on header button click) -->
   <InteractiveTerminal isSubpage={true} />
 
-  <main class="w-full py-4 space-y-8">
+  <main id="main-content" class="w-full py-4 space-y-8">
     <!-- Breadcrumb & Top Header -->
     <div class="border-b border-[#30363d] pb-6">
       <div class="flex items-center gap-2 text-xs font-mono text-[#8b949e] mb-3">
@@ -48,6 +50,9 @@ const allTags = Array.from(
           </h1>
           <p class="text-xs sm:text-sm text-[#8b949e] mt-1 font-mono" data-i18n="thoughts_subtitle">
             A text-first digital garden. Click one or more cards below to filter categories.
+          </p>
+          <p class="lang-sv-only text-[11px] text-[#f59e0b] mt-1 font-mono flex items-center gap-1.5" data-i18n="thoughts_archive_lang_note">
+            (Inläggen i arkivet publiceras enbart på engelska)
           </p>
         </div>
 

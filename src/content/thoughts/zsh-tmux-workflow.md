@@ -1,19 +1,19 @@
 ---
-title: "Guide: Terminalflöde med tmux, zoxide och fzf"
-description: "En genomgång av min tmux-konfiguration och hur fzf-bindings gör att jag byter kontext och mappar utan att röra musen."
+title: "Guide: Terminal Workflow with tmux, zoxide & fzf"
+description: "A breakdown of my tmux workflow and how fzf keybindings let me switch project contexts and directories without ever touching the mouse."
 pubDate: 2026-01-20
 category: "guide"
 tags: ["Linux", "Terminal", "tmux", "fzf"]
 draft: false
 ---
 
-Efter att ha lagt orimligt många timmar på att konfigurera Linux och Hyprland är det här den enskilda setupen som sparar mest tid i vardagen på Chalmers.
+After spending countless hours configuring Linux and Hyprland, this single setup consistently saves the most time during everyday engineering work at Chalmers.
 
-### Varför inte bara flikar i terminalemulatorn?
-Flikar i Alacritty eller Kitty är knutna till GUI-fönstret. Kraschar terminalen eller om man stänger locket dör processerna. Med `tmux` lever sessionerna kvar i bakgrunden, oavsett om man kopplar upp sig via SSH från en labbsal eller sitter hemma vid skrivbordet.
+### Why Not Just Terminal Emulator Tabs?
+Tabs in Alacritty or Kitty are fundamentally tied to the lifecycle of the graphical window. If your window manager restarts or you close your laptop lid, running processes terminate. With `tmux`, persistent sessions survive in the background—whether SSH'ing into a campus lab server or working locally from your desk.
 
-### Sessionizer-skriptet (`tmux-sessionizer`)
-Kopplat till `Ctrl+f` i shell och tmux:
+### The Sessionizer Script (`tmux-sessionizer`)
+Bound to `Ctrl+f` in both shell and tmux:
 
 ```bash
 #!/usr/bin/env bash
@@ -42,5 +42,5 @@ fi
 tmux switch-client -t $selected_name
 ```
 
-### Resultat
-Ett knapptryck, tre bokstäver i fuzzy-findern, och hela arbetsytan för rätt kurs eller server öppnas med rätt rotkatalog och Neovim-buffertar redo.
+### The Result
+One keystroke, three characters into the fuzzy finder, and your entire workspace for the right course or server pops open with its project root directory and Neovim buffers intact.
