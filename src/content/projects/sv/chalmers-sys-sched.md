@@ -19,4 +19,3 @@ Utvecklad som en del av operativsystem- och datorteknikspåret på Datateknik vi
 ### Relaterade resurser & filer
 - 📄 [CV — Civilingenjör Datateknik](/files#file-cv-datateknik)
 - ⚙️ [Neovim C/Rust utvecklingsmiljö dotfiles](/files#file-dotfiles-neovim)
-

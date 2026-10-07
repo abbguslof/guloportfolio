@@ -17,5 +17,7 @@
   "relatedProjects": [
     "mc-cluster"
   ],
-  "relatedThoughts": []
+  "relatedThoughts": [
+    "mc-jvm-flags"
+  ]
 }

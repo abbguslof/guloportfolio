@@ -5,22 +5,23 @@ import Header from '../../components/Header.astro';
 import InteractiveTerminal from '../../components/InteractiveTerminal.astro';
 import Footer from '../../components/Footer.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
-import { getCollection } from 'astro:content';
+import { getGroupedProjects } from '../../utils/projects';
 
-const projects = await getCollection('projects');
-const sortedProjects = projects.sort((a, b) => a.data.order - b.data.order);
+const sortedProjects = await getGroupedProjects();
 ---
 
 <Layout 
-  title="Projects & Portfolio // gulo" 
-  description="Portfolio of systems programming, Chalmers Datateknik coursework, Minecraft infrastructure, and homelab setups."
+  titleEn="Projects & Portfolio // gulo" 
+  titleSv="Projekt & Portfolio // gulo"
+  descriptionEn="Portfolio of systems programming, Chalmers Datateknik coursework, Minecraft infrastructure, and homelab setups."
+  descriptionSv="Portfolio med systemprogrammering, laborationer från Chalmers, Minecraft-infrastruktur och homelab."
 >
   <Header />
 
   <!-- Global terminal on subpages (opens on header button click) -->
   <InteractiveTerminal isSubpage={true} />
 
-  <main class="w-full py-4 space-y-10">
+  <main id="main-content" class="w-full py-4 space-y-10">
     <!-- Breadcrumb & Top Header -->
     <div class="border-b border-[#30363d] pb-6">
       <div class="flex items-center gap-2 text-xs font-mono text-[#8b949e] mb-3">
@@ -109,20 +110,24 @@ const sortedProjects = projects.sort((a, b) => a.data.order - b.data.order);
       {sortedProjects.map((project) => (
         <div 
           class="project-item h-full flex flex-col" 
-          data-cat={project.data.category.toLowerCase()}
-          data-title={project.data.title.toLowerCase()}
-          data-desc={project.data.description.toLowerCase()}
-          data-tech={(project.data.tech || []).join(' ').toLowerCase()}
+          data-cat={project.en.data.category.toLowerCase()}
+          data-title-en={project.en.data.title.toLowerCase()}
+          data-title-sv={project.sv.data.title.toLowerCase()}
+          data-desc-en={project.en.data.description.toLowerCase()}
+          data-desc-sv={project.sv.data.description.toLowerCase()}
+          data-tech={(project.en.data.tech || []).join(' ').toLowerCase()}
         >
           <ProjectCard 
-            title={project.data.title}
-            description={project.data.description}
-            status={project.data.status}
-            category={project.data.category}
-            tech={project.data.tech}
-            repoUrl={project.data.repoUrl}
-            liveUrl={project.data.liveUrl}
-            slug={project.id}
+            titleEn={project.en.data.title}
+            titleSv={project.sv.data.title}
+            descEn={project.en.data.description}
+            descSv={project.sv.data.description}
+            status={project.en.data.status}
+            category={project.en.data.category}
+            tech={project.en.data.tech}
+            repoUrl={project.en.data.repoUrl}
+            liveUrl={project.en.data.liveUrl}
+            slug={project.slug}
           />
         </div>
       ))}
@@ -160,15 +165,22 @@ const sortedProjects = projects.sort((a, b) => a.data.order - b.data.order);
       let visibleCount = 0;
       items.forEach((item) => {
         const cat = item.getAttribute('data-cat') || '';
-        const title = item.getAttribute('data-title') || '';
-        const desc = item.getAttribute('data-desc') || '';
+        const titleEn = item.getAttribute('data-title-en') || '';
+        const titleSv = item.getAttribute('data-title-sv') || '';
+        const descEn = item.getAttribute('data-desc-en') || '';
+        const descSv = item.getAttribute('data-desc-sv') || '';
         const tech = item.getAttribute('data-tech') || '';
 
-        const catMatches = currentCat === 'all' || cat === currentCat;
+        const catMatches = 
+          currentCat === 'all' || 
+          cat === currentCat || 
+          (currentCat === 'homelab' && (cat === 'homelab' || tech.includes('linux') || titleEn.includes('homelab')));
         const searchMatches = 
           !searchQuery || 
-          title.includes(searchQuery) || 
-          desc.includes(searchQuery) || 
+          titleEn.includes(searchQuery) || 
+          titleSv.includes(searchQuery) || 
+          descEn.includes(searchQuery) || 
+          descSv.includes(searchQuery) || 
           tech.includes(searchQuery) ||
           cat.includes(searchQuery);
 

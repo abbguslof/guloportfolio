@@ -5,21 +5,23 @@ import Header from '../../components/Header.astro';
 import InteractiveTerminal from '../../components/InteractiveTerminal.astro';
 import Footer from '../../components/Footer.astro';
 import { getCollection, render } from 'astro:content';
+import { getGroupedProjects } from '../../utils/projects';
 
 export async function getStaticPaths() {
-  const projects = await getCollection('projects');
-  return projects.map((project) => ({
-    params: { slug: project.id },
-    props: { project },
+  const grouped = await getGroupedProjects();
+  return grouped.map((item) => ({
+    params: { slug: item.slug },
+    props: { projectEn: item.en, projectSv: item.sv, slug: item.slug },
   }));
 }
 
-const { project } = Astro.props;
-const { Content } = await render(project);
+const { projectEn, projectSv, slug } = Astro.props;
+const { Content: ContentEn } = await render(projectEn);
+const { Content: ContentSv } = projectSv ? await render(projectSv) : { Content: null };
 
-// Linked downloads from collection
+// Linked downloads from collection (matched by clean slug e.g. mc-cluster)
 const allDownloads = await getCollection('downloads');
-const linkedDownloads = allDownloads.filter((d) => (d.data.relatedProjects || []).includes(project.id));
+const linkedDownloads = allDownloads.filter((d) => (d.data.relatedProjects || []).includes(slug));
 
 // Status styling
 const statusColors: Record<string, string> = {
@@ -32,15 +34,17 @@ const statusColors: Record<string, string> = {
 ---
 
 <Layout 
-  title={`${project.data.title} // gulo`}
-  description={project.data.description}
+  titleEn={`${projectEn.data.title} // gulo`}
+  titleSv={`${projectSv ? projectSv.data.title : projectEn.data.title} // gulo`}
+  descriptionEn={projectEn.data.description}
+  descriptionSv={projectSv ? projectSv.data.description : projectEn.data.description}
 >
   <Header />
 
   <!-- Global terminal on subpages (opens on header button click) -->
   <InteractiveTerminal isSubpage={true} />
 
-  <main class="w-full py-4 space-y-8">
+  <main id="main-content" class="w-full py-4 space-y-8">
     <!-- Back button -->
     <div class="mb-8">
       <a 
@@ -56,27 +60,29 @@ const statusColors: Record<string, string> = {
       <div class="flex items-center gap-2 mb-3">
         <span 
           class="text-xs font-mono uppercase px-2 py-0.5 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e]"
-          data-i18n={`projects_cat_${project.data.category.toLowerCase()}`}
+          data-i18n={`projects_cat_${projectEn.data.category.toLowerCase()}`}
         >
-          {project.data.category}
+          {projectEn.data.category}
         </span>
-        <span class={`text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#161b22] border ${statusColors[project.data.status] || 'text-[#10b981]'}`}>
-          [{project.data.status}]
+        <span class={`text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#161b22] border ${statusColors[projectEn.data.status] || 'text-[#10b981]'}`}>
+          [{projectEn.data.status}]
         </span>
       </div>
 
       <h1 class="text-2xl sm:text-3xl font-bold text-[#e6edf3] tracking-tight mb-3">
-        {project.data.title}
+        <span class="lang-en-only">{projectEn.data.title}</span>
+        <span class="lang-sv-only">{projectSv.data.title}</span>
       </h1>
 
       <p class="text-sm text-[#8b949e] leading-relaxed border-l-2 border-[#38bdf8] pl-3 mb-6">
-        {project.data.description}
+        <span class="lang-en-only">{projectEn.data.description}</span>
+        <span class="lang-sv-only">{projectSv.data.description}</span>
       </p>
 
       <!-- Tech tags & Links -->
       <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
         <div class="flex flex-wrap gap-1.5">
-          {project.data.tech.map((t) => (
+          {projectEn.data.tech.map((t) => (
             <span class="text-xs font-mono text-[#8b949e] bg-[#161b22] px-2 py-0.5 rounded border border-[#30363d]">
               #{t}
             </span>
@@ -84,9 +90,9 @@ const statusColors: Record<string, string> = {
         </div>
 
         <div class="flex items-center gap-3 text-xs font-mono">
-          {project.data.repoUrl && (
+          {projectEn.data.repoUrl && (
             <a 
-              href={project.data.repoUrl}
+              href={projectEn.data.repoUrl}
               target="_blank"
               rel="noopener noreferrer"
               class="px-3 py-1.5 rounded bg-[#161b22] border border-[#30363d] text-[#38bdf8] hover:border-[#38bdf8] hover:text-[#e6edf3] transition-all flex items-center gap-1.5"
@@ -95,9 +101,9 @@ const statusColors: Record<string, string> = {
               <span class="text-[10px]">↗</span>
             </a>
           )}
-          {project.data.liveUrl && (
+          {projectEn.data.liveUrl && (
             <a 
-              href={project.data.liveUrl}
+              href={projectEn.data.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
               class="px-3 py-1.5 rounded bg-[#161b22] border border-[#30363d] text-[#10b981] hover:border-[#10b981] hover:text-[#e6edf3] transition-all flex items-center gap-1.5"
@@ -115,16 +121,23 @@ const statusColors: Record<string, string> = {
       prose-headings:text-[#e6edf3] prose-headings:font-bold prose-headings:font-mono
       prose-h2:text-lg prose-h2:border-b prose-h2:border-[#30363d] prose-h2:pb-2 prose-h2:mt-8
       prose-h3:text-base prose-h3:text-[#38bdf8]
-      prose-p:text-[#c9d1d9] prose-p:leading-relaxed">
-      <Content />
+      prose-p:text-[#c9d1d9] prose-p:leading-relaxed
+      prose-blockquote:border-l-[#10b981] prose-blockquote:text-[#8b949e] prose-blockquote:italic
+      prose-a:text-[#38bdf8] prose-a:underline hover:prose-a:text-[#10b981]">
+      <div class="lang-en-only">
+        {ContentEn && <ContentEn />}
+      </div>
+      <div class="lang-sv-only">
+        {ContentSv ? <ContentSv /> : (ContentEn && <ContentEn />)}
+      </div>
     </article>
 
     <!-- Attached Downloads if applicable -->
     {linkedDownloads.length > 0 && (
       <div class="mt-12 p-4 rounded-lg bg-[#161b22] border border-[#30363d] font-mono">
-        <div class="text-xs font-bold text-[#10b981] mb-2 flex items-center gap-2" data-i18n="projects_downloads_title">
+        <div class="text-xs font-bold text-[#10b981] mb-2 flex items-center gap-2">
           <span>↓</span>
-          <span>DOWNLOADABLE RESOURCES LINKED TO THIS PROJECT:</span>
+          <span data-i18n="projects_downloads_title">DOWNLOADABLE RESOURCES LINKED TO THIS PROJECT:</span>
         </div>
         <div class="space-y-2 pt-2 border-t border-[#30363d]/60">
           {linkedDownloads.map((dl) => (
@@ -156,9 +169,10 @@ const statusColors: Record<string, string> = {
           <span data-i18n="projects_back_home">[Back to the cockpit]</span>
         </a>
       </div>
-      <span class="text-[#8b949e]">slug: {project.id}</span>
+      <span class="text-[#8b949e]">slug: {slug}</span>
     </div>
   </main>
 
   <Footer />
 </Layout>
+

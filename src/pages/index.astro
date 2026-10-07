@@ -7,12 +7,12 @@ import ProjectCard from '../components/ProjectCard.astro';
 import ThoughtRow from '../components/ThoughtRow.astro';
 import Footer from '../components/Footer.astro';
 import { getCollection } from 'astro:content';
+import { getGroupedProjects } from '../utils/projects';
 
 // Hämta projekt
-const projects = await getCollection('projects');
-const sortedProjects = projects.sort((a, b) => a.data.order - b.data.order);
+const sortedProjects = await getGroupedProjects();
 // Utvalda projekt för startsidan
-const featuredProjects = sortedProjects.filter((p) => p.data.featured);
+const featuredProjects = sortedProjects.filter((p) => p.en.data.featured);
 const displayProjects = featuredProjects.length > 0 ? featuredProjects : sortedProjects.slice(0, 2);
 
 // Hämta tankar & anteckningar (sorterade efter nyast först, max 5 för startsidan)
@@ -24,13 +24,15 @@ const latestThoughts = sortedThoughts.slice(0, 5);
 ---
 
 <Layout 
-  title="gulo // digital garden & playground" 
-  description="Personal cockpit, portfolio and file archive. Chalmers Datateknik, swimming, Minecraft homelab and systems programming."
+  titleEn="gulo // digital garden & playground" 
+  titleSv="gulo // digital trädgård & playground"
+  descriptionEn="Personal cockpit, portfolio and file archive. Chalmers Datateknik, swimming, Minecraft homelab and systems programming."
+  descriptionSv="Personlig cockpit, portfolio och filarkiv. Chalmers Datateknik, simning, Minecraft-homelab och systemprogrammering."
 >
   <!-- Header -->
   <Header />
 
-  <main class="w-full space-y-16">
+  <main id="main-content" class="w-full space-y-16">
     <!-- 1. Hero: Interactive Terminal (Med Chafa-porträtt, fungerande fönsterknappar & Bash) -->
     <InteractiveTerminal isSubpage={false} />
 
@@ -59,14 +61,16 @@ const latestThoughts = sortedThoughts.slice(0, 5);
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         {displayProjects.map((project) => (
           <ProjectCard 
-            title={project.data.title}
-            description={project.data.description}
-            status={project.data.status}
-            category={project.data.category}
-            tech={project.data.tech}
-            repoUrl={project.data.repoUrl}
-            liveUrl={project.data.liveUrl}
-            slug={project.id}
+            titleEn={project.en.data.title}
+            titleSv={project.sv.data.title}
+            descEn={project.en.data.description}
+            descSv={project.sv.data.description}
+            status={project.en.data.status}
+            category={project.en.data.category}
+            tech={project.en.data.tech}
+            repoUrl={project.en.data.repoUrl}
+            liveUrl={project.en.data.liveUrl}
+            slug={project.slug}
           />
         ))}
       </div>
@@ -77,9 +81,12 @@ const latestThoughts = sortedThoughts.slice(0, 5);
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-5 border-b border-[#30363d] gap-2">
         <div class="flex items-center gap-2">
           <span class="text-[#f59e0b] font-bold">#</span>
-          <h2 id="thoughts-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]" data-i18n="home_hero_thoughts_title">
+          <h2 id="thoughts-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3] flex items-center gap-2" data-i18n="home_hero_thoughts_title">
             Latest Thoughts, Guides &amp; Notes
           </h2>
+          <span class="lang-sv-only text-[10px] font-mono text-[#f59e0b] bg-[#f59e0b]/10 border border-[#f59e0b]/30 px-1.5 py-0.5 rounded" title="Innehållet skrivs enbart på engelska">
+            EN
+          </span>
         </div>
 
         <div class="flex items-center gap-3 text-xs font-mono">

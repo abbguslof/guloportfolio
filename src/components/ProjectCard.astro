@@ -1,8 +1,12 @@
 ---
 // ProjectCard.astro - Thumbnail-free TUI Project Card with dynamic bilingual tags & links
 interface Props {
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
+  titleEn?: string;
+  titleSv?: string;
+  descEn?: string;
+  descSv?: string;
   status: 'ACTIVE' | 'MAINTAINED' | 'COMPLETED' | 'WIP' | 'ARCHIVED';
   category: 'School' | 'Homelab' | 'Minecraft' | 'Web' | 'Other';
   tech: string[];
@@ -11,7 +15,25 @@ interface Props {
   slug: string;
 }
 
-const { title, description, status, category, tech, repoUrl, liveUrl, slug } = Astro.props;
+const { 
+  title, 
+  description, 
+  titleEn, 
+  titleSv, 
+  descEn, 
+  descSv, 
+  status, 
+  category, 
+  tech, 
+  repoUrl, 
+  liveUrl, 
+  slug 
+} = Astro.props;
+
+const tEn = titleEn || title || '';
+const tSv = titleSv || title || tEn;
+const dEn = descEn || description || '';
+const dSv = descSv || description || dEn;
 
 // Status styling mapping
 const statusMap: Record<string, { label: string; textClass: string }> = {
@@ -44,16 +66,18 @@ const catKey = `projects_cat_${category.toLowerCase()}`;
 
     <!-- Title (Primary Click target -> Goes to /projects/[slug]) -->
     <h3 class="text-base font-semibold text-[#e6edf3] group-hover:text-[#38bdf8] transition-colors mb-2 line-clamp-2">
-      <a href={projectUrl} class="focus:outline-none flex items-center justify-between">
-        <span class="absolute inset-0" aria-hidden="true"></span>
-        <span>{title}</span>
+      <a href={projectUrl} class="focus-visible:outline-none flex items-center justify-between">
+        <span class="absolute inset-0 rounded-lg pointer-events-none" aria-hidden="true"></span>
+        <span class="lang-en-only">{tEn}</span>
+        <span class="lang-sv-only">{tSv}</span>
         <span class="text-xs text-[#8b949e] group-hover:text-[#38bdf8] group-hover:translate-x-0.5 transition-all">→</span>
       </a>
     </h3>
 
     <!-- Description (Uniform 3-line max with ellipsis truncation) -->
     <p class="text-xs sm:text-sm text-[#8b949e] leading-relaxed mb-4 line-clamp-3 overflow-hidden flex-1">
-      {description}
+      <span class="lang-en-only">{dEn}</span>
+      <span class="lang-sv-only">{dSv}</span>
     </p>
   </div>
 

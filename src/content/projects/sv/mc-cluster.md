@@ -19,4 +19,3 @@ Ett självhostat Minecraft-nätverk optimerat för maximal tick-stabilitet (20.0
 ### Nedladdningar & Serverfiler
 - 📦 [Fabric 1.20.4 Performance Modpack](/files#file-fabric-server-pack)
 - 📜 [Automatiserat Backup & Roteringsskript (zstd)](/files#file-mc-backup-script)
-
