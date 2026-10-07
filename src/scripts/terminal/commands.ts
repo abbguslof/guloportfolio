@@ -18,6 +18,7 @@ import { evaluateMathExpression } from './calc';
 import { handleGameCommand } from './game';
 import { handleNvimCommand } from './nvim';
 import { calculateUptime, isSiteOnline } from '../../data/telemetry';
+import { setSiteLang } from '../i18n-client';
 
 export type CommandFunction = (args: string[], ctx: CommandContext) => string | void;
 
@@ -59,6 +60,68 @@ export function getCommands(): Record<string, CommandFunction> {
 
     // 1e. STATS & BTOP
     stats: (_args, ctx) => getStatsMonitorOutput(ctx.lang),
+
+    // 1f. LANGUAGE SWITCHER
+    lang: (args, ctx) => {
+      const target = (args[0] || '').toLowerCase().trim();
+      const current = ctx.lang;
+
+      const swedishAliases = ['sv', 'se', 'swe', 'swedish', 'svenska'];
+      const englishAliases = ['en', 'eng', 'english', 'engelska'];
+
+      if (swedishAliases.includes(target)) {
+        if (current === 'sv') {
+          return '<div class="text-[#8b949e] font-mono text-xs">Webbplatsen är redan inställd på <span class="text-[#10b981] font-bold">svenska (SV)</span>.</div>';
+        }
+        setSiteLang('sv');
+        return '<div class="text-[#10b981] font-mono text-xs">Språk ändrat till <span class="font-bold">svenska (SV)</span>. Hela cockpiten & webbplatsen är uppdaterad.</div>';
+      }
+
+      if (englishAliases.includes(target)) {
+        if (current === 'en') {
+          return '<div class="text-[#8b949e] font-mono text-xs">Site language is already set to <span class="text-[#10b981] font-bold">English (EN)</span>.</div>';
+        }
+        setSiteLang('en');
+        return '<div class="text-[#10b981] font-mono text-xs">Language switched to <span class="font-bold">English (EN)</span>. Entire cockpit & site updated.</div>';
+      }
+
+      if (target) {
+        return current === 'sv'
+          ? `<div class="text-[#f85149] font-mono text-xs">Okänt språk: '${ctx.escapeHtml(target)}'. Välj <code class="text-[#38bdf8]">lang en</code> eller <code class="text-[#38bdf8]">lang se</code> (eller alias: sv, swe, eng, english, swedish).</div>`
+          : `<div class="text-[#f85149] font-mono text-xs">Unknown language: '${ctx.escapeHtml(target)}'. Choose <code class="text-[#38bdf8]">lang en</code> or <code class="text-[#38bdf8]">lang se</code> (or aliases: sv, swe, eng, english, swedish).</div>`;
+      }
+
+      // No argument provided -> describe current language and how to change
+      return current === 'sv'
+        ? `<div class="text-xs font-mono space-y-1 p-2 rounded bg-[#0d1117] border border-[#30363d]/80">
+            <div>Aktuellt språk: <span class="text-[#10b981] font-bold">Svenska (SV)</span></div>
+            <div class="text-[#8b949e]">Byt språk med: <code class="text-[#38bdf8]">lang en</code> eller <code class="text-[#38bdf8]">lang se</code></div>
+            <div class="text-[#8b949e] text-[11px] pt-1 border-t border-[#30363d]/40">
+              Tillgängliga alias för engelska: <code class="text-[#10b981]">en</code>, <code class="text-[#10b981]">eng</code>, <code class="text-[#10b981]">english</code>, <code class="text-[#10b981]">engelska</code><br/>
+              Tillgängliga alias för svenska: <code class="text-[#10b981]">sv</code>, <code class="text-[#10b981]">se</code>, <code class="text-[#10b981]">swe</code>, <code class="text-[#10b981]">swedish</code>, <code class="text-[#10b981]">svenska</code>
+            </div>
+           </div>`
+        : `<div class="text-xs font-mono space-y-1 p-2 rounded bg-[#0d1117] border border-[#30363d]/80">
+            <div>Current language: <span class="text-[#10b981] font-bold">English (EN)</span></div>
+            <div class="text-[#8b949e]">Switch language with: <code class="text-[#38bdf8]">lang se</code> or <code class="text-[#38bdf8]">lang en</code></div>
+            <div class="text-[#8b949e] text-[11px] pt-1 border-t border-[#30363d]/40">
+              English aliases: <code class="text-[#10b981]">en</code>, <code class="text-[#10b981]">eng</code>, <code class="text-[#10b981]">english</code>, <code class="text-[#10b981]">engelska</code><br/>
+              Swedish aliases: <code class="text-[#10b981]">sv</code>, <code class="text-[#10b981]">se</code>, <code class="text-[#10b981]">swe</code>, <code class="text-[#10b981]">swedish</code>, <code class="text-[#10b981]">svenska</code>
+            </div>
+           </div>`;
+    },
+    language: (args, ctx) => commands.lang(args, ctx),
+    sprak: (args, ctx) => commands.lang(args, ctx),
+    språk: (args, ctx) => commands.lang(args, ctx),
+    se: (_args, ctx) => commands.lang(['se'], ctx),
+    sv: (_args, ctx) => commands.lang(['sv'], ctx),
+    swe: (_args, ctx) => commands.lang(['swe'], ctx),
+    swedish: (_args, ctx) => commands.lang(['swedish'], ctx),
+    svenska: (_args, ctx) => commands.lang(['svenska'], ctx),
+    en: (_args, ctx) => commands.lang(['en'], ctx),
+    eng: (_args, ctx) => commands.lang(['eng'], ctx),
+    english: (_args, ctx) => commands.lang(['english'], ctx),
+    engelska: (_args, ctx) => commands.lang(['engelska'], ctx),
 
     // 2. INFORMATION CARDS
     school: (_args, ctx) => {
@@ -475,6 +538,71 @@ ${ctx.escapeHtml(node.content)}
     clear: (_args, ctx) => {
       ctx.clearHistory();
     },
+
+    reset: (_args, ctx) => {
+      // 1. Language to English (default)
+      setSiteLang('en');
+      localStorage.setItem('site_lang', 'en');
+
+      // 2. Ambient background to standard
+      window.dispatchEvent(new CustomEvent('set-bg-mode', { detail: 'standard' }));
+      localStorage.removeItem('site_bg_mode');
+      localStorage.removeItem('site_bg_switcher_open');
+
+      // 3. Clear all dismissed notices and stored session preferences
+      sessionStorage.removeItem('dismissed_thought_lang_notice');
+      sessionStorage.removeItem('terminal_cat_hint_dismissed');
+      sessionStorage.removeItem('terminal_closed_by_user');
+      sessionStorage.removeItem('terminal_cmd_history');
+      sessionStorage.removeItem('terminal_history_html');
+      sessionStorage.removeItem('terminal_nav_scroll_y');
+      localStorage.removeItem('terminal_cmd_history');
+
+      // Unhide thought notice on current page if present
+      const notice = document.getElementById('thought-lang-notice');
+      if (notice) notice.classList.remove('hidden');
+
+      // 4. Reset cwd to ~
+      ctx.setCurrentPath([]);
+
+      // 5. Purge command history & clear terminal output
+      ctx.clearHistory();
+
+      return `
+<div class="space-y-2 font-mono text-xs p-3.5 rounded bg-[#0d1117] border border-[#10b981]/50 text-[#e6edf3]">
+  <div class="text-[#10b981] font-bold flex items-center gap-2 text-sm border-b border-[#30363d]/60 pb-1.5">
+    <span>✓</span> <span>SYSTEM RESET // FACTORY DEFAULTS RESTORED</span>
+  </div>
+  <div class="text-[#8b949e] text-xs space-y-1">
+    <div class="flex items-center gap-2">
+      <span class="text-[#10b981]">●</span> <span>Language reset:</span>
+      <span class="text-[#e6edf3] font-semibold">English (EN)</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-[#38bdf8]">●</span> <span>Ambient background:</span>
+      <span class="text-[#e6edf3] font-semibold">standard (dark cockpit)</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-[#f59e0b]">●</span> <span>Dismissed notices:</span>
+      <span class="text-[#e6edf3] font-semibold">Restored &amp; unhidden</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-[#a78bfa]">●</span> <span>Terminal history &amp; buffer:</span>
+      <span class="text-[#e6edf3] font-semibold">Purged</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-[#8b949e]">●</span> <span>Working directory:</span>
+      <span class="text-[#e6edf3] font-semibold">~</span>
+    </div>
+  </div>
+  <div class="text-[11px] text-[#8b949e] pt-1.5 border-t border-[#30363d]/40">
+    All user preferences, session flags, and console state have been reset to initial cockpit defaults.
+  </div>
+</div>`;
+    },
+    'factory-reset': (args, ctx) => commands.reset(args, ctx),
+    defaults: (args, ctx) => commands.reset(args, ctx),
+    default: (args, ctx) => commands.reset(args, ctx),
 
     uptime: (_args, ctx) => {
       const up = calculateUptime();

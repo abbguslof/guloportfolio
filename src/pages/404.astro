@@ -7,12 +7,14 @@ import Footer from '../components/Footer.astro';
 ---
 
 <Layout 
-  title="404: Command Not Found // gulo" 
-  description="The requested route does not exist on this station. Return to the cockpit or explore projects, thoughts and files."
+  titleEn="404: Command Not Found // gulo" 
+  titleSv="404: Kommandot hittades inte // gulo"
+  descriptionEn="The requested route does not exist on this station. Return to the cockpit or explore projects, thoughts and files."
+  descriptionSv="Den efterfrågade adressen finns inte på denna station. Återvänd till cockpiten eller utforska projekt, tankar och filer."
 >
   <Header />
 
-  <main class="w-full py-4 space-y-6 font-mono">
+  <main id="main-content" class="w-full py-4 space-y-6 font-mono">
     <!-- Breadcrumb -->
     <div class="border-b border-[#30363d] pb-4">
       <div class="flex items-center gap-2 text-xs text-[#8b949e]">

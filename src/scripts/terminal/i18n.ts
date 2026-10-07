@@ -40,6 +40,7 @@ export function getStandardHelpHtml(lang: LangCode): string {
       <div><span class="text-[#10b981] font-semibold">projects / homelab</span> : Öppna portföljsidan</div>
       <div><span class="text-[#10b981] font-semibold">thoughts / blog</span> : Öppna blogg/anteckningar</div>
       <div><span class="text-[#10b981] font-semibold">files</span> : Öppna filarkivet</div>
+      <div><span class="text-[#10b981] font-semibold">lang [sv|en]</span> : Byt språk direkt (svenska/engelska)</div>
       <div><span class="text-[#10b981] font-semibold">theme / bg &lt;stil&gt;</span> : Växla visuell bakgrundseffekt</div>
     </div>
   </div>
@@ -85,6 +86,7 @@ export function getStandardHelpHtml(lang: LangCode): string {
       <div><span class="text-[#10b981] font-semibold">projects / homelab</span> : Portfolio showcase</div>
       <div><span class="text-[#10b981] font-semibold">thoughts / blog</span> : Blog &amp; research notes</div>
       <div><span class="text-[#10b981] font-semibold">files</span> : Downloads &amp; dotfiles</div>
+      <div><span class="text-[#10b981] font-semibold">lang [en|sv]</span> : Switch language (English/Swedish)</div>
       <div><span class="text-[#10b981] font-semibold">theme / bg &lt;style&gt;</span> : Switch ambient visual effect</div>
     </div>
   </div>
@@ -116,179 +118,193 @@ export function getStandardHelpHtml(lang: LangCode): string {
 export function getExtendedHelpHtml(lang: LangCode): string {
   if (lang === 'sv') {
     return `
-<div class="text-[#e6edf3] space-y-3 font-mono">
+<div class="text-[#e6edf3] space-y-3.5 font-mono">
   <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1 flex items-center justify-between">
-    <span>BASH KOMMANDOTOLK // FULLSTÄNDIG UTÖKAD KOMMANDOLISTA</span>
-    <span class="text-[10px] text-[#38bdf8] font-normal">--extended / -e</span>
+    <span>BASH KOMMANDOTOLK // FULLSTÄNDIG UTÖKAD KOMMANDOGUIDE</span>
+    <span class="text-[10px] text-[#38bdf8] font-normal">help --extended / -e</span>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-    <!-- Kolumn 1: Info & Webb -->
+    <!-- Kolumn 1: Profil, Webb, Språk, Fönster -->
     <div class="space-y-3">
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">📄 Information &amp; Profil:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">📄 Information, Profil &amp; Studier:</div>
         <div class="space-y-0.5 text-[#8b949e]">
-          <div><code class="text-[#10b981]">bio</code>, <code class="text-[#10b981]">about</code> : Biografi &amp; executive översikt</div>
-          <div><code class="text-[#10b981]">cv</code>, <code class="text-[#10b981]">resume</code> : Utbildning, kompetenser &amp; meriter</div>
-          <div><code class="text-[#10b981]">stats</code>, <code class="text-[#10b981]">btop</code> : System- &amp; träningsmonitor (TUI)</div>
-          <div><code class="text-[#10b981]">status</code> : Aktuell status, homelab &amp; tillgänglighet</div>
-          <div><code class="text-[#10b981]">whoami</code> : Profil, bakgrund &amp; intressen</div>
-          <div><code class="text-[#10b981]">school</code>, <code class="text-[#10b981]">chalmers</code> : Civilingenjör Datateknik</div>
-          <div><code class="text-[#10b981]">swim</code> : Tävlingssimning &amp; träningsschema</div>
-          <div><code class="text-[#10b981]">contact</code> : E-post, GitHub &amp; länkar</div>
+          <div><code class="text-[#10b981]">bio</code>, <code class="text-[#10b981]">about</code>, <code class="text-[#10b981]">tldr</code> : Biografi, personlig bakgrund &amp; översikt</div>
+          <div><code class="text-[#10b981]">cv</code>, <code class="text-[#10b981]">resume</code>, <code class="text-[#10b981]">recruit</code> : Utbildning, tekniska färdigheter &amp; meriter</div>
+          <div><code class="text-[#10b981]">status</code> : Live-status för homelab, studier &amp; tillgänglighet</div>
+          <div><code class="text-[#10b981]">schedule</code>, <code class="text-[#10b981]">tentor</code> : Chalmers tentaveckor &amp; träningsläger</div>
+          <div><code class="text-[#10b981]">school</code>, <code class="text-[#10b981]">chalmers</code> : Civilingenjör Datateknik @ Chalmers (D-24)</div>
+          <div><code class="text-[#10b981]">swim</code> : Tävlingssimning i Valhallabadet &amp; passrutiner</div>
+          <div><code class="text-[#10b981]">whoami</code>, <code class="text-[#10b981]">contact</code> : Vem jag är, GitHub, e-post &amp; sociala medier</div>
         </div>
       </div>
 
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">🌐 Webb &amp; Navigering:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">🌐 Webb, Navigering &amp; Språkväxling:</div>
         <div class="space-y-0.5 text-[#8b949e]">
-          <div><code class="text-[#10b981]">home</code>, <code class="text-[#10b981]">hem</code> : Gå tillbaka till cockpiten (/)</div>
-          <div><code class="text-[#10b981]">projects</code>, <code class="text-[#10b981]">homelab</code> : Projekt &amp; servrar</div>
-          <div><code class="text-[#10b981]">thoughts</code>, <code class="text-[#10b981]">blog</code> : Tankar &amp; anteckningar</div>
-          <div><code class="text-[#10b981]">files</code> : Filarkiv &amp; nedladdningar</div>
-          <div><code class="text-[#10b981]">open &lt;mål&gt;</code> : Öppna projekt, post eller sida</div>
+          <div><code class="text-[#10b981]">home</code>, <code class="text-[#10b981]">hem</code> : Återvänd till cockpiten / startsidan (/)</div>
+          <div><code class="text-[#10b981]">projects</code>, <code class="text-[#10b981]">homelab</code> : Portfölj med projekt, labbar &amp; servrar</div>
+          <div><code class="text-[#10b981]">thoughts</code>, <code class="text-[#10b981]">blog</code> : Tankar, guider &amp; tekniska anteckningar</div>
+          <div><code class="text-[#10b981]">files</code> : Filarkiv, skript, CV &amp; dotfiles</div>
+          <div><code class="text-[#10b981]">open &lt;mål&gt;</code> : Öppna projekt, artikel eller länk direkt</div>
+          <div><code class="text-[#10b981]">lang [sv|en|se]</code> : Växla hela webbplatsens språk</div>
+          <div class="text-[11px] text-[#38bdf8] pl-2">Svenska alias: <code class="text-[#e6edf3]">se</code>, <code class="text-[#e6edf3]">sv</code>, <code class="text-[#e6edf3]">swe</code>, <code class="text-[#e6edf3]">swedish</code>, <code class="text-[#e6edf3]">svenska</code></div>
+          <div class="text-[11px] text-[#38bdf8] pl-2">Engelska alias: <code class="text-[#e6edf3]">en</code>, <code class="text-[#e6edf3]">eng</code>, <code class="text-[#e6edf3]">english</code>, <code class="text-[#e6edf3]">engelska</code></div>
         </div>
       </div>
 
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">🎨 Bakgrunder &amp; Cockpit:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">⌨️ Tangentbord &amp; Terminalkontroller:</div>
         <div class="space-y-0.5 text-[#8b949e]">
-          <div><code class="text-[#10b981]">bg</code> : Växla / öppna HUD-rutan för bakgrunder</div>
-          <div><code class="text-[#10b981]">bg &lt;stil&gt;</code> : Byt stil (standard, topo, dither, ascii, dots, pixel, shimmer, off)</div>
+          <div><code class="text-[#10b981]">Tab</code> : Autokomplettera kommandon, argument &amp; filnamn</div>
+          <div><code class="text-[#10b981]">↑ / ↓ (Pilar)</code> : Bläddra bland tidigare körda kommandon</div>
+          <div><code class="text-[#10b981]">history</code> : Visa de senaste 25 kommandona</div>
+          <div><code class="text-[#10b981]">clear</code>, <code class="text-[#10b981]">cls</code> : Rensa terminalskärmen</div>
+          <div><code class="text-[#10b981]">reset</code> : Återställ alla inställningar, språk (EN), historik &amp; notiser till standard</div>
+          <div><code class="text-[#10b981]">exit</code>, <code class="text-[#10b981]">close</code> : Stäng terminalfönstret (eller klicka på [✕])</div>
+          <div><code class="text-[#10b981]">Esc</code> : Avsluta fullskärmsläge</div>
         </div>
       </div>
     </div>
 
-    <!-- Kolumn 2: Utvecklarverktyg, Git & Nöje -->
+    <!-- Kolumn 2: Filsystem, Verktyg, Git, Grafik -->
     <div class="space-y-3">
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">🐙 Git Versionshantering:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">📁 Filsystem &amp; Editor:</div>
         <div class="space-y-0.5 text-[#8b949e]">
-          <div><code class="text-[#10b981]">git status</code> : Arbetskopia &amp; ändrade filer</div>
-          <div><code class="text-[#10b981]">git log [--oneline]</code> : Senaste commits</div>
-          <div><code class="text-[#10b981]">git branch</code> : Aktiva grenar</div>
-          <div><code class="text-[#10b981]">git diff</code> : Visa färgkodad diff</div>
-          <div><code class="text-[#10b981]">git remote -v</code> : Upstream GitHub-adress</div>
-          <div><code class="text-[#10b981]">git push</code> : Simulera git push till origin</div>
+          <div><code class="text-[#10b981]">ls [-la] [mapp]</code> : Lista filer, storlek och rättigheter</div>
+          <div><code class="text-[#10b981]">cd &lt;katalog&gt;</code> : Navigera (<code class="text-[#e6edf3]">cd projects</code>, <code class="text-[#e6edf3]">cd ..</code>, <code class="text-[#e6edf3]">cd ~</code>)</div>
+          <div><code class="text-[#10b981]">cat &lt;fil&gt;</code> : Skriv ut innehållet i en fil i terminalen</div>
+          <div><code class="text-[#10b981]">nvim [fil]</code>, <code class="text-[#10b981]">vim</code> : Neovim TUI buffer-visare med radnummer</div>
+          <div><code class="text-[#10b981]">pwd</code> : Skriv ut den aktuella sökvägen</div>
+          <div><code class="text-[#10b981]">wget &lt;fil&gt;</code> : Ladda ned faktiska resurser från files/ (alias: dl, download)</div>
         </div>
       </div>
 
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">🧮 Interaktivitet, Skript &amp; Spel:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">🧮 Miniräknare, Skript &amp; Spel:</div>
         <div class="space-y-0.5 text-[#8b949e]">
-          <div><code class="text-[#10b981]">nvim [fil]</code>, <code class="text-[#10b981]">vim</code> : Neovim texteditor</div>
-          <div><code class="text-[#10b981]">calc &lt;uttryck&gt;</code> : Matematisk miniräknare (t.ex. <span class="text-[#e6edf3]">calc 2²</span> eller <span class="text-[#e6edf3]">calc 2**2</span>)</div>
-          <div><code class="text-[#10b981]">guess [&lt;tal&gt;]</code> : Spela gissningsspelet (1-100)</div>
-          <div><code class="text-[#10b981]">./helloworld.sh</code> : Kör skalskriptet i hemkatalogen</div>
-          <div><code class="text-[#10b981]">hello / hej / tjena</code> : Hälsningsfras</div>
-          <div><code class="text-[#10b981]">fastfetch / neofetch</code> : Skriv ut systemdiagnostik</div>
+          <div><code class="text-[#10b981]">calc &lt;uttryck&gt;</code> : Matematik (stödjer <code class="text-[#e6edf3]">2^8</code>, <code class="text-[#e6edf3]">2²</code>, <code class="text-[#e6edf3]">sqrt(256)</code>, <code class="text-[#e6edf3]">sin(pi/2)</code>)</div>
+          <div><code class="text-[#10b981]">guess [&lt;tal&gt;]</code> : Interaktivt gissningsspel (1-100) med poängräkning</div>
+          <div><code class="text-[#10b981]">./helloworld.sh</code> : Kör det virtuella välkomstskriptet</div>
+          <div><code class="text-[#10b981]">hello / hej / tjena</code> : Hälsningsfraser</div>
         </div>
       </div>
 
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">📁 Filsystem &amp; Bash:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">🐙 Git, Diagnostik &amp; Bakgrundseffekter:</div>
         <div class="space-y-0.5 text-[#8b949e]">
-          <div><code class="text-[#10b981]">ls -la</code> : Lista alla filer (inkl. dolda filer)</div>
-          <div><code class="text-[#10b981]">cd &lt;katalog&gt;</code>, <code class="text-[#10b981]">pwd</code>, <code class="text-[#10b981]">cat &lt;fil&gt;</code></div>
-          <div><code class="text-[#10b981]">wget &lt;fil&gt;</code> : Ladda ned från files/ (alias: dl, download)</div>
-          <div><code class="text-[#10b981]">uptime</code>, <code class="text-[#10b981]">date</code>, <code class="text-[#10b981]">uname</code>, <code class="text-[#10b981]">history</code></div>
+          <div><code class="text-[#10b981]">git [status|log|branch|diff|remote|push]</code> : Simulerad Git</div>
+          <div><code class="text-[#10b981]">fastfetch</code>, <code class="text-[#10b981]">neofetch</code> : Specar, uptime &amp; Chafa ASCII-logo</div>
+          <div><code class="text-[#10b981]">stats</code>, <code class="text-[#10b981]">btop</code> : System-, tränings- och nätverksmonitor</div>
+          <div><code class="text-[#10b981]">uptime</code>, <code class="text-[#10b981]">uname -a</code>, <code class="text-[#10b981]">hostname</code> : Driftinfo</div>
+          <div><code class="text-[#10b981]">bg &lt;stil&gt;</code> : Ändra bakgrund (standard, topo, dither, ascii, dots, pixel, shimmer, off)</div>
+          <div><code class="text-[#10b981]">matrix</code>, <code class="text-[#10b981]">secret</code> : Matrix-effekt &amp; hemliga easter eggs</div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/60 pt-2 flex items-center justify-between">
-    <span>Skriv <code class="text-[#10b981]">help</code> för den korta listan.</span>
-    <span>Tryck <code class="text-[#10b981]">Tab</code> för autokomplettering.</span>
+  <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/60 pt-2 flex flex-wrap items-center justify-between gap-2">
+    <span>💡 Skriv <code class="text-[#10b981]">help</code> för kompakt lista.</span>
+    <span>💡 Tryck <code class="text-[#10b981]">Tab</code> för autokomplettering av alla kommandon och filer.</span>
   </div>
 </div>`;
   }
 
   return `
-<div class="text-[#e6edf3] space-y-3 font-mono">
+<div class="text-[#e6edf3] space-y-3.5 font-mono">
   <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1 flex items-center justify-between">
-    <span>BASH INTERPRETER // FULL EXTENDED COMMAND SUITE</span>
-    <span class="text-[10px] text-[#38bdf8] font-normal">--extended / -e</span>
+    <span>BASH INTERPRETER // COMPREHENSIVE COMMAND GUIDE</span>
+    <span class="text-[10px] text-[#38bdf8] font-normal">help --extended / -e</span>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-    <!-- Col 1: Info & Web -->
+    <!-- Col 1: Bio, Web, Language, Window Controls -->
     <div class="space-y-3">
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">📄 Information &amp; Bio:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">📄 Information, Bio &amp; Academics:</div>
         <div class="space-y-0.5 text-[#8b949e]">
-          <div><code class="text-[#10b981]">bio</code>, <code class="text-[#10b981]">about</code> : Biography &amp; executive summary</div>
-          <div><code class="text-[#10b981]">cv</code>, <code class="text-[#10b981]">resume</code> : Academics, skills &amp; experience</div>
-          <div><code class="text-[#10b981]">stats</code>, <code class="text-[#10b981]">btop</code> : System &amp; athletic metrics (TUI)</div>
-          <div><code class="text-[#10b981]">status</code> : Current focus, homelab &amp; availability</div>
-          <div><code class="text-[#10b981]">whoami</code> : Profile, background &amp; passions</div>
-          <div><code class="text-[#10b981]">school</code>, <code class="text-[#10b981]">chalmers</code> : Chalmers Computer Science degree</div>
-          <div><code class="text-[#10b981]">swim</code> : Competitive swimming routines &amp; stats</div>
-          <div><code class="text-[#10b981]">contact</code> : Email, GitHub &amp; social links</div>
+          <div><code class="text-[#10b981]">bio</code>, <code class="text-[#10b981]">about</code>, <code class="text-[#10b981]">tldr</code> : Biography, background &amp; executive overview</div>
+          <div><code class="text-[#10b981]">cv</code>, <code class="text-[#10b981]">resume</code>, <code class="text-[#10b981]">recruit</code> : Education, technical skillsets &amp; experience</div>
+          <div><code class="text-[#10b981]">status</code> : Live homelab status, academic focus &amp; availability</div>
+          <div><code class="text-[#10b981]">schedule</code>, <code class="text-[#10b981]">exams</code> : Chalmers exam calendar &amp; training camps</div>
+          <div><code class="text-[#10b981]">school</code>, <code class="text-[#10b981]">chalmers</code> : Chalmers Computer Science degree (D-24)</div>
+          <div><code class="text-[#10b981]">swim</code> : Competitive swim routines &amp; Valhallabadet sets</div>
+          <div><code class="text-[#10b981]">whoami</code>, <code class="text-[#10b981]">contact</code> : Identity, GitHub, email &amp; social profiles</div>
         </div>
       </div>
 
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">🌐 Web &amp; Navigation:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">🌐 Web, Navigation &amp; Language Switcher:</div>
         <div class="space-y-0.5 text-[#8b949e]">
-          <div><code class="text-[#10b981]">home</code>, <code class="text-[#10b981]">hem</code> : Return to the cockpit (/)</div>
-          <div><code class="text-[#10b981]">projects</code>, <code class="text-[#10b981]">homelab</code> : Portfolio showcase</div>
-          <div><code class="text-[#10b981]">thoughts</code>, <code class="text-[#10b981]">blog</code> : Articles, notes &amp; deep dives</div>
-          <div><code class="text-[#10b981]">files</code> : Downloads, configs &amp; dotfiles</div>
-          <div><code class="text-[#10b981]">open &lt;target&gt;</code> : Open project, post or page</div>
+          <div><code class="text-[#10b981]">home</code>, <code class="text-[#10b981]">hem</code> : Return to the cockpit / homepage (/)</div>
+          <div><code class="text-[#10b981]">projects</code>, <code class="text-[#10b981]">homelab</code> : Showcase of coursework, homelab &amp; code</div>
+          <div><code class="text-[#10b981]">thoughts</code>, <code class="text-[#10b981]">blog</code> : Digital garden notes, guides &amp; articles</div>
+          <div><code class="text-[#10b981]">files</code> : Downloadable packages, resume, dotfiles &amp; scripts</div>
+          <div><code class="text-[#10b981]">open &lt;target&gt;</code> : Open any project, post or route in the browser</div>
+          <div><code class="text-[#10b981]">lang [en|se|sv]</code> : Switch entire site &amp; terminal language</div>
+          <div class="text-[11px] text-[#38bdf8] pl-2">English aliases: <code class="text-[#e6edf3]">en</code>, <code class="text-[#e6edf3]">eng</code>, <code class="text-[#e6edf3]">english</code>, <code class="text-[#e6edf3]">engelska</code></div>
+          <div class="text-[11px] text-[#38bdf8] pl-2">Swedish aliases: <code class="text-[#e6edf3]">se</code>, <code class="text-[#e6edf3]">sv</code>, <code class="text-[#e6edf3]">swe</code>, <code class="text-[#e6edf3]">swedish</code>, <code class="text-[#e6edf3]">svenska</code></div>
         </div>
       </div>
 
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">🎨 Visual Themes &amp; Effects:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">⌨️ Keyboard &amp; Window Controls:</div>
         <div class="space-y-0.5 text-[#8b949e]">
-          <div><code class="text-[#10b981]">bg</code> : Toggle HUD switcher widget</div>
-          <div><code class="text-[#10b981]">bg &lt;style&gt;</code> : Set effect (standard, topo, dither, ascii, dots, pixel, shimmer, off)</div>
+          <div><code class="text-[#10b981]">Tab</code> : Autocomplete commands, arguments &amp; filenames</div>
+          <div><code class="text-[#10b981]">↑ / ↓ (Arrows)</code> : Cycle through command history</div>
+          <div><code class="text-[#10b981]">history</code> : View previous 25 executed commands</div>
+          <div><code class="text-[#10b981]">clear</code>, <code class="text-[#10b981]">cls</code> : Clear terminal output window</div>
+          <div><code class="text-[#10b981]">reset</code> : Restore all preferences, language (EN), history &amp; notices to defaults</div>
+          <div><code class="text-[#10b981]">exit</code>, <code class="text-[#10b981]">close</code> : Close terminal window (or click [✕])</div>
+          <div><code class="text-[#10b981]">Esc</code> : Exit fullscreen mode</div>
         </div>
       </div>
     </div>
 
-    <!-- Col 2: Dev Tools, Git & Fun -->
+    <!-- Col 2: Filesystem, Tools, Git, Diagnostics -->
     <div class="space-y-3">
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">🐙 Git Version Control:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">📁 Filesystem &amp; Editor:</div>
         <div class="space-y-0.5 text-[#8b949e]">
-          <div><code class="text-[#10b981]">git status</code> : Working tree &amp; modified files</div>
-          <div><code class="text-[#10b981]">git log [--oneline]</code> : Recent commit history</div>
-          <div><code class="text-[#10b981]">git branch</code> : List branches</div>
-          <div><code class="text-[#10b981]">git diff</code> : View colorized code diff</div>
-          <div><code class="text-[#10b981]">git remote -v</code> : Remote upstream URLs</div>
-          <div><code class="text-[#10b981]">git push</code> : Simulate upstream push</div>
+          <div><code class="text-[#10b981]">ls [-la] [dir]</code> : List files, file sizes and permissions</div>
+          <div><code class="text-[#10b981]">cd &lt;dir&gt;</code> : Navigate directories (<code class="text-[#e6edf3]">cd projects</code>, <code class="text-[#e6edf3]">cd ..</code>, <code class="text-[#e6edf3]">cd ~</code>)</div>
+          <div><code class="text-[#10b981]">cat &lt;file&gt;</code> : Print document contents to the shell</div>
+          <div><code class="text-[#10b981]">nvim [file]</code>, <code class="text-[#10b981]">vim</code> : Neovim TUI buffer view with line numbers</div>
+          <div><code class="text-[#10b981]">pwd</code> : Print working directory</div>
+          <div><code class="text-[#10b981]">wget &lt;file&gt;</code> : Download actual archive file to disk (alias: dl, download)</div>
         </div>
       </div>
 
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">🧮 Interactive, Scripting &amp; Fun:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">🧮 Calculator, Scripting &amp; Minigames:</div>
         <div class="space-y-0.5 text-[#8b949e]">
-          <div><code class="text-[#10b981]">nvim [file]</code>, <code class="text-[#10b981]">vim</code> : Neovim text editor</div>
-          <div><code class="text-[#10b981]">calc &lt;expr&gt;</code> : Math evaluator (e.g. <span class="text-[#e6edf3]">calc 2²</span> or <span class="text-[#e6edf3]">calc 2**2</span>)</div>
-          <div><code class="text-[#10b981]">guess [&lt;num&gt;]</code> : Number guessing minigame (1-100)</div>
-          <div><code class="text-[#10b981]">./helloworld.sh</code> : Execute the shell script in ~</div>
-          <div><code class="text-[#10b981]">hello / hi / hey</code> : Friendly greeting</div>
-          <div><code class="text-[#10b981]">fastfetch / neofetch</code> : Print system diagnostic banner</div>
+          <div><code class="text-[#10b981]">calc &lt;expr&gt;</code> : Math evaluator (supports <code class="text-[#e6edf3]">2^8</code>, <code class="text-[#e6edf3]">2²</code>, <code class="text-[#e6edf3]">sqrt(256)</code>, <code class="text-[#e6edf3]">sin(pi/2)</code>)</div>
+          <div><code class="text-[#10b981]">guess [&lt;num&gt;]</code> : Interactive number guessing game (1-100) with score tracking</div>
+          <div><code class="text-[#10b981]">./helloworld.sh</code> : Execute the virtual shell script</div>
+          <div><code class="text-[#10b981]">hello / hi / hey</code> : Friendly greetings</div>
         </div>
       </div>
 
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">📁 Filesystem &amp; Bash:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">🐙 Git, Diagnostics &amp; Ambient Visuals:</div>
         <div class="space-y-0.5 text-[#8b949e]">
-          <div><code class="text-[#10b981]">ls -la</code> : List all files (including dotfiles)</div>
-          <div><code class="text-[#10b981]">cd &lt;dir&gt;</code>, <code class="text-[#10b981]">pwd</code>, <code class="text-[#10b981]">cat &lt;file&gt;</code></div>
-          <div><code class="text-[#10b981]">wget &lt;file&gt;</code> : Download from files/ (alias: dl, download)</div>
-          <div><code class="text-[#10b981]">uptime</code>, <code class="text-[#10b981]">date</code>, <code class="text-[#10b981]">uname</code>, <code class="text-[#10b981]">history</code></div>
+          <div><code class="text-[#10b981]">git [status|log|branch|diff|remote|push]</code> : Simulated Git toolkit</div>
+          <div><code class="text-[#10b981]">fastfetch</code>, <code class="text-[#10b981]">neofetch</code> : Machine specs, uptime &amp; Chafa ASCII portrait</div>
+          <div><code class="text-[#10b981]">stats</code>, <code class="text-[#10b981]">btop</code> : TUI monitor for system, training &amp; network</div>
+          <div><code class="text-[#10b981]">uptime</code>, <code class="text-[#10b981]">uname -a</code>, <code class="text-[#10b981]">hostname</code> : Telemetry &amp; host stats</div>
+          <div><code class="text-[#10b981]">bg &lt;style&gt;</code> : Set background (standard, topo, dither, ascii, dots, pixel, shimmer, off)</div>
+          <div><code class="text-[#10b981]">matrix</code>, <code class="text-[#10b981]">secret</code> : ASCII rain matrix mode &amp; easter eggs</div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/60 pt-2 flex items-center justify-between">
-    <span>Type <code class="text-[#10b981]">help</code> for the compact list.</span>
-    <span>Press <code class="text-[#10b981]">Tab</code> for autocomplete.</span>
+  <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/60 pt-2 flex flex-wrap items-center justify-between gap-2">
+    <span>💡 Type <code class="text-[#10b981]">help</code> for the compact list.</span>
+    <span>💡 Press <code class="text-[#10b981]">Tab</code> to autocomplete all commands, flags and filenames.</span>
   </div>
 </div>`;
 }

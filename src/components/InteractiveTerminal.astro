@@ -111,18 +111,44 @@ if (Array.isArray(fastfetchDataSv?.specs)) {
   });
 }
 
-// 2. Läs dynamiska projekt (sammanfattning för terminal cat)
+// 2. Läs dynamiska projekt (sammanfattning för terminal cat, separat EN och SV)
 const rawProjects = await getCollection('projects');
-const projectNodes: Record<string, any> = {};
+const projectMap = new Map<string, { en?: any; sv?: any }>();
 for (const p of rawProjects) {
-  const preview = `# ${p.data.title}\nStatus: [${p.data.status}] | Category: ${p.data.category}\nTech: ${(p.data.tech || []).join(', ')}\n\n${p.data.description}\n\nView on web: open ${p.id}`;
-  projectNodes[`${p.id}.md`] = {
-    type: 'file',
-    size: '1.4 KB',
-    description: p.data.description,
-    content: preview,
-    actionUrl: `/projects/${p.id}`,
-  };
+  const slug = p.id.replace(/^(en|sv)\//, '');
+  const isSv = p.id.startsWith('sv/');
+  if (!projectMap.has(slug)) projectMap.set(slug, {});
+  const entry = projectMap.get(slug)!;
+  if (isSv) entry.sv = p;
+  else entry.en = p;
+}
+
+const projectNodesEn: Record<string, any> = {};
+const projectNodesSv: Record<string, any> = {};
+
+for (const [slug, pair] of projectMap.entries()) {
+  const pEn = pair.en || pair.sv;
+  const pSv = pair.sv || pair.en;
+
+  if (pEn) {
+    projectNodesEn[`${slug}.md`] = {
+      type: 'file',
+      size: '1.4 KB',
+      description: pEn.data.description,
+      content: `# ${pEn.data.title}\nStatus: [${pEn.data.status}] | Category: ${pEn.data.category}\nTech: ${(pEn.data.tech || []).join(', ')}\n\n${pEn.data.description}\n\nView on web: open ${slug}`,
+      actionUrl: `/projects/${slug}`,
+    };
+  }
+
+  if (pSv) {
+    projectNodesSv[`${slug}.md`] = {
+      type: 'file',
+      size: '1.4 KB',
+      description: pSv.data.description,
+      content: `# ${pSv.data.title}\nStatus: [${pSv.data.status}] | Kategori: ${pSv.data.category}\nTeknologier: ${(pSv.data.tech || []).join(', ')}\n\n${pSv.data.description}\n\nÖppna på webben: open ${slug}`,
+      actionUrl: `/projects/${slug}`,
+    };
+  }
 }
 
 // 3. Läs dynamiska tankar & blogginlägg
@@ -161,7 +187,7 @@ const dynamicFileSystemEn = {
   children: {
     projects: {
       type: 'dir',
-      children: projectNodes,
+      children: projectNodesEn,
     },
     thoughts: {
       type: 'dir',
@@ -190,7 +216,7 @@ const dynamicFileSystemSv = {
   children: {
     projects: {
       type: 'dir',
-      children: projectNodes,
+      children: projectNodesSv,
     },
     thoughts: {
       type: 'dir',
@@ -1507,7 +1533,10 @@ const dynamicFileSystemSv = {
         escapeHtml,
         clearHistory: () => {
           history.innerHTML = '';
+          cmdHistory = [];
+          historyIndex = -1;
           sessionStorage.removeItem('terminal_history_html');
+          sessionStorage.removeItem('terminal_cmd_history');
           sessionStorage.removeItem('terminal_nav_scroll_y');
         },
         exitTerminal: () => {
@@ -1590,6 +1619,12 @@ const dynamicFileSystemSv = {
     // 3. ROBUST TAB COMPLETION, CTRL+C & SHORTCUTS
     // ==========================================
     input.addEventListener('keydown', (e) => {
+      // Escape av-markerar terminalen (blur) så man kan tabba vidare till resten av sidan
+      if (e.key === 'Escape') {
+        input.blur();
+        return;
+      }
+
       // Ctrl+C för att avbryta kommando
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
         const sel = window.getSelection()?.toString();
@@ -1651,15 +1686,17 @@ const dynamicFileSystemSv = {
         // Tab på första ordet -> komplettera kommando
         if (tokens.length <= 1) {
           const cmdList = [
-            'help', 'status', 'school', 'swim', 'whoami', 'contact', 'discord', 'kontakt',
+            'help', 'status', 'schedule', 'tentor', 'school', 'swim', 'whoami', 'contact', 'discord', 'kontakt',
             'home', 'hem', 'main', 'cockpit', 'root',
             'bio', 'about', 'tldr', 'info', 'profil', 'profile',
             'cv', 'resume', 'recruit', 'stats', 'btop', 'htop',
+            'lang', 'language', 'sprak', 'språk', 'se', 'sv', 'swe', 'swedish', 'svenska', 'en', 'eng', 'english', 'engelska',
             'ls', 'cd', 'cat', 'nvim', 'vim', 'vi', 'pwd', 'grep', 'open', 
             'projects', 'project', 'thoughts', 'thought', 'blog', 'note', 'notes', 'guide', 'guides', 'files', 'clear', 
             'date', 'uptime', 'fastfetch', 'neofetch', 'fetch', 'uname', 'hostname', 'history',
             'secret', 'git', 'calc', 'guess', './helloworld.sh', 'helloworld.sh', 'hello', 'tjena', 'hej', 'hejsan', 'halloj',
-            'bg', 'matrix', 'alias', 'whoisgulo', 'gulo', 'exit', 'wget', 'dl', 'download', 'linux', 'windows'
+            'bg', 'matrix', 'alias', 'whoisgulo', 'gulo', 'exit', 'wget', 'dl', 'download', 'linux', 'windows',
+            'reset', 'factory-reset', 'defaults'
           ];
           const matches = cmdList.filter(c => c.startsWith(lastToken.toLowerCase()));
 
@@ -1678,9 +1715,19 @@ const dynamicFileSystemSv = {
           return;
         }
 
-        // Tab på argument -> komplettera sökvägar / filer / bakgrundsstilar / git / guess / wget / bio
+        // Tab på argument -> komplettera sökvägar / filer / bakgrundsstilar / git / guess / wget / bio / lang
         const mainCmd = tokens[0].toLowerCase();
         let availableItems: string[] = [];
+
+        if ((mainCmd === 'lang' || mainCmd === 'language' || mainCmd === 'sprak' || mainCmd === 'språk') && tokens.length === 2) {
+          availableItems = ['en', 'se', 'sv', 'eng', 'swe', 'english', 'swedish', 'engelska', 'svenska'];
+          const matches = availableItems.filter(item => item.toLowerCase().startsWith(lastToken.toLowerCase()));
+          if (matches.length === 1) {
+            tokens[tokens.length - 1] = matches[0];
+            input.value = tokens.join(' ');
+          }
+          return;
+        }
 
         if (mainCmd === 'bio' && tokens.length === 2) {
           availableItems = ['cv', 'resume', 'stats', 'btop'];

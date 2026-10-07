@@ -34,7 +34,7 @@ export const scheduleEvents: ScheduleEvent[] = [
   {
     id: 'lp1-tentor-2026',
     name: {
-      sv: 'Tentavecka Läspeiod 1 (Chalmers)',
+      sv: 'Tentavecka Läsperiod 1 (Chalmers)',
       en: 'Study Period 1 Finals / Exam Week (Chalmers)',
     },
     startDate: '2026-10-19',
