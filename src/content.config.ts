@@ -41,9 +41,9 @@ const optionalStringArray = z.preprocess((val) => {
 const thoughts = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/thoughts' }),
   schema: z.object({
-    title: z.string(),
+    title: z.string().default('Untitled Note'),
     description: optionalString,
-    pubDate: z.coerce.date(),
+    pubDate: z.coerce.date().default(() => new Date()),
     updatedDate: z.coerce.date().optional(),
     category: z.enum(['tanke', 'thought', 'guide', 'anteckning', 'note', 'idea', 'idé']).default('tanke'),
     tags: optionalStringArray,
