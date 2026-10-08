@@ -191,8 +191,8 @@ if (category === 'guide') {
     )}
 
     <!-- Bottom return navigation -->
-    <div class="mt-12 pt-6 border-t border-[#30363d] flex items-center justify-between text-xs font-mono">
-      <div class="flex items-center gap-4">
+    <div class="mt-12 pt-6 border-t border-[#30363d] flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 text-xs font-mono">
+      <div class="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4">
         <a 
           href="/thoughts" 
           class="text-[#8b949e] hover:text-[#10b981] transition-colors"
@@ -206,7 +206,7 @@ if (category === 'guide') {
           <span data-i18n="thoughts_back_home">[Back to the cockpit]</span>
         </a>
       </div>
-      <span class="text-[#8b949e]">
+      <span class="text-[#8b949e] hidden sm:inline">
         slug: {post.id}
       </span>
     </div>

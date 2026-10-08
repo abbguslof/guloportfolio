@@ -1,10 +1,10 @@
 // src/scripts/terminal/commands.ts - Modular Command Dispatcher & Engine
 import type { CommandContext, FileNode, DirNode } from './types';
-import { 
-  getStandardHelpHtml, 
-  getExtendedHelpHtml, 
-  getGreetingResponse, 
-  getSecretOutput, 
+import {
+  getStandardHelpHtml,
+  getExtendedHelpHtml,
+  getGreetingResponse,
+  getSecretOutput,
   getOsOpinionOutput,
   getStatusOutput,
   getScheduleOutput,
@@ -26,7 +26,7 @@ export function getCommands(): Record<string, CommandFunction> {
   const commands: Record<string, CommandFunction> = {
     // 1. HELP & DISCOVERY
     help: (args, ctx) => {
-      const isExtended = args.some(a => 
+      const isExtended = args.some(a =>
         a === '--extended' || a === '-e' || a === '--all' || a === '-a' || a === 'max' || a === 'all' || a === 'full'
       );
       if (isExtended) {
@@ -66,7 +66,7 @@ export function getCommands(): Record<string, CommandFunction> {
 ██║   ██║██║   ██║╚════██║   ██║   ██╔══██║╚██╗ ██╔╝
 ╚██████╔╝╚██████╔╝███████║   ██║   ██║  ██║ ╚████╔╝ 
   </pre>
-  <div class="text-[#e6edf3] font-semibold text-xs sm:text-sm">Gustav Löfstedt // <span class="text-[#38bdf8]">gulo</span></div>
+  <div class="text-[#e6edf3] font-semibold text-xs sm:text-sm">Gustav Löfqvist // <span class="text-[#38bdf8]">gulo</span></div>
   <div class="text-[#8b949e] text-xs">${isSv ? 'Civilingenjör Datateknik @ Chalmers Tekniska Högskola (Åk 2).' : 'Second-year M.Sc. Computer Science &amp; Engineering @ Chalmers University of Technology.'}</div>
   <div class="text-[#8b949e] text-xs">${isSv ? 'Systemutveckling (C, Rust, Linux), tävlingssimning och homelab.' : 'Systems programming (C, Rust, Linux), competitive swimming, and homelab enthusiast.'}</div>
 </div>`;
@@ -263,8 +263,8 @@ export function getCommands(): Record<string, CommandFunction> {
         const target = nonFlags[0].replace(/\/$/, '');
         const node = target === '~' ? ctx.fileSystem : targetDir.children[target];
         if (!node) {
-          const err = ctx.lang === 'sv' 
-            ? `kan inte komma åt '${ctx.escapeHtml(nonFlags[0])}': Ingen sådan fil eller katalog` 
+          const err = ctx.lang === 'sv'
+            ? `kan inte komma åt '${ctx.escapeHtml(nonFlags[0])}': Ingen sådan fil eller katalog`
             : `cannot access '${ctx.escapeHtml(nonFlags[0])}': No such file or directory`;
           return `<div class="text-[#f85149]">ls: ${err}</div>`;
         }
@@ -528,7 +528,7 @@ ${ctx.escapeHtml(node.content)}
       }
 
       if (countOnly) {
-        return `<div class="font-mono text-xs space-y-0.5">${Object.entries(fileCounts).map(([f, c]) => 
+        return `<div class="font-mono text-xs space-y-0.5">${Object.entries(fileCounts).map(([f, c]) =>
           `<div><span class="text-[#38bdf8]">${ctx.escapeHtml(f)}</span>: <span class="text-[#10b981] font-bold">${c}</span></div>`
         ).join('')}</div>`;
       }
@@ -850,7 +850,7 @@ ${ctx.escapeHtml(node.content)}
       if (cmds.length === 0) {
         const saved = sessionStorage.getItem('terminal_cmd_history');
         if (saved) {
-          try { cmds = JSON.parse(saved); } catch {}
+          try { cmds = JSON.parse(saved); } catch { }
         }
       }
       if (cmds.length === 0) {
@@ -858,7 +858,7 @@ ${ctx.escapeHtml(node.content)}
           ? `<div class="text-[#8b949e] font-mono text-xs">Inga tidigare kommandon i historiken.</div>`
           : `<div class="text-[#8b949e] font-mono text-xs">No previous commands in history.</div>`;
       }
-      const lines = cmds.slice(-25).map((c, i) => 
+      const lines = cmds.slice(-25).map((c, i) =>
         `<div class="text-[#8b949e]"><span class="text-[#38bdf8] inline-block w-6 text-right mr-2">${i + 1}</span>${ctx.escapeHtml(c)}</div>`
       ).join('');
       return `<div class="font-mono text-xs space-y-0.5">${lines}</div>`;
@@ -935,7 +935,7 @@ ${ctx.escapeHtml(node.content)}
           targetNode = filesDir.children[filename];
           matchedName = filename;
         } else {
-          const matchKey = Object.keys(filesDir.children).find(k => 
+          const matchKey = Object.keys(filesDir.children).find(k =>
             k.toLowerCase() === filename.toLowerCase() || k.toLowerCase().includes(filename.toLowerCase())
           );
           if (matchKey) {
@@ -954,7 +954,7 @@ ${ctx.escapeHtml(node.content)}
             matchedName = filename;
           }
         } else {
-          const matchKey = Object.keys(thoughtsDir.children).find(k => 
+          const matchKey = Object.keys(thoughtsDir.children).find(k =>
             k.endsWith('.pdf') && (k.toLowerCase() === filename.toLowerCase() || k.toLowerCase().startsWith(filename.toLowerCase()) || k.toLowerCase().includes(filename.toLowerCase()))
           );
           if (matchKey) {
@@ -973,7 +973,7 @@ ${ctx.escapeHtml(node.content)}
             matchedName = filename;
           }
         } else {
-          const matchKey = Object.keys(projectsDir.children).find(k => 
+          const matchKey = Object.keys(projectsDir.children).find(k =>
             k.endsWith('.pdf') && (k.toLowerCase() === filename.toLowerCase() || k.toLowerCase().startsWith(filename.toLowerCase()) || k.toLowerCase().includes(filename.toLowerCase()))
           );
           if (matchKey) {
