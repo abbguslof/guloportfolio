@@ -27,39 +27,39 @@
 <aside 
   id="bg-style-switcher" 
   style="display: none;"
-  class="fixed bottom-3 right-3 sm:bottom-4 sm:right-4 z-40 items-center gap-1 p-1 rounded-lg bg-[#161b22]/95 border border-[#30363d] backdrop-blur-md text-[11px] font-mono shadow-xl select-none transition-all duration-300"
+  class="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] right-2 sm:right-4 z-40 max-w-[calc(100vw-1rem)] flex-wrap justify-end sm:justify-start items-center gap-1 p-1 rounded-lg bg-[#161b22]/95 border border-[#30363d] backdrop-blur-md text-[11px] font-mono shadow-xl select-none transition-all duration-300"
   aria-label="Background style picker"
 >
   <span class="text-[#8b949e] pl-1.5 pr-1 hidden lg:inline text-[10px] font-bold uppercase tracking-wider">BG:</span>
-  <button type="button" data-bg="standard" class="bg-mode-btn px-2 py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]" title="Ursprunglig mjuk topo (Standard)">
+  <button type="button" data-bg="standard" class="bg-mode-btn px-2 py-1 sm:py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]" title="Ursprunglig mjuk topo (Standard)">
     Standard
   </button>
-  <button type="button" data-bg="topo" class="bg-mode-btn px-2 py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]" title="WebGL Topo Lines">
+  <button type="button" data-bg="topo" class="bg-mode-btn px-2 py-1 sm:py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]" title="WebGL Topo Lines">
     Topo
   </button>
-  <button type="button" data-bg="dither" class="bg-mode-btn px-2 py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]">
+  <button type="button" data-bg="dither" class="bg-mode-btn px-2 py-1 sm:py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]">
     Dither
   </button>
-  <button type="button" data-bg="ascii" class="bg-mode-btn px-2 py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]">
+  <button type="button" data-bg="ascii" class="bg-mode-btn px-2 py-1 sm:py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]">
     ASCII
   </button>
-  <button type="button" data-bg="dots" class="bg-mode-btn px-2 py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]">
+  <button type="button" data-bg="dots" class="bg-mode-btn px-2 py-1 sm:py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]">
     Dots
   </button>
-  <button type="button" data-bg="blocky" class="bg-mode-btn px-2 py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]">
+  <button type="button" data-bg="blocky" class="bg-mode-btn px-2 py-1 sm:py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]">
     Pixel
   </button>
-  <button type="button" data-bg="shimmer" class="bg-mode-btn px-2 py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]">
+  <button type="button" data-bg="shimmer" class="bg-mode-btn px-2 py-1 sm:py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]">
     Shimmer
   </button>
-  <button type="button" data-bg="off" class="bg-mode-btn px-1.5 py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#f85149]" title="Turn background off">
+  <button type="button" data-bg="off" class="bg-mode-btn px-1.5 py-1 sm:py-0.5 rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#f85149]" title="Turn background off">
     Off
   </button>
   <!-- Dismiss / Close button -->
   <button 
     type="button" 
     id="bg-close-btn" 
-    class="text-[#8b949e] hover:text-[#f85149] px-1.5 py-0.5 rounded transition-colors ml-0.5 cursor-pointer font-bold text-xs" 
+    class="text-[#8b949e] hover:text-[#f85149] px-2 py-1 sm:py-0.5 rounded transition-colors ml-0.5 cursor-pointer font-bold text-xs" 
     title="Stäng (skriv 'bg' i terminalen för att öppna igen)"
     aria-label="Close background picker"
   >

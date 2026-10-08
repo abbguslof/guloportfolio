@@ -49,7 +49,7 @@ const projectUrl = `/projects/${slug}`;
 const catKey = `projects_cat_${category.toLowerCase()}`;
 ---
 
-<div class="project-card group relative flex flex-col justify-between h-full p-5 rounded-lg bg-[#161b22] border border-[#30363d] hover:bg-[#1f242c] hover:border-[#38bdf8]/70 hover:shadow-lg transition-all">
+<div class="project-card group relative flex flex-col justify-between h-full p-4 sm:p-5 rounded-lg bg-[#161b22] border border-[#30363d] hover:bg-[#1f242c] hover:border-[#38bdf8]/70 hover:shadow-lg transition-all">
   <div class="flex flex-col flex-1">
     <!-- Top Metadata: Category & Status -->
     <div class="flex items-center justify-between gap-2 mb-3">
@@ -65,7 +65,7 @@ const catKey = `projects_cat_${category.toLowerCase()}`;
     </div>
 
     <!-- Title (Primary Click target -> Goes to /projects/[slug]) -->
-    <h3 class="text-base font-semibold text-[#e6edf3] group-hover:text-[#38bdf8] transition-colors mb-2 line-clamp-2">
+    <h3 class="text-sm sm:text-base font-semibold text-[#e6edf3] group-hover:text-[#38bdf8] transition-colors mb-2 line-clamp-2">
       <a href={projectUrl} class="focus-visible:outline-none flex items-center justify-between">
         <span class="absolute inset-0 rounded-lg pointer-events-none" aria-hidden="true"></span>
         <span class="lang-en-only">{tEn}</span>
@@ -83,7 +83,7 @@ const catKey = `projects_cat_${category.toLowerCase()}`;
 
   <div class="relative z-10 mt-auto">
     <!-- Tech stack pills -->
-    <div class="flex flex-wrap gap-1.5 pt-3 border-t border-[#30363d]/60 mb-4">
+    <div class="flex flex-wrap gap-1.5 pt-3 border-t border-[#30363d]/60 mb-3.5">
       {tech.map((item) => (
         <span class="text-[11px] font-mono text-[#8b949e] bg-[#0d1117] px-2 py-0.5 rounded border border-[#30363d]/80">
           #{item}
@@ -92,10 +92,10 @@ const catKey = `projects_cat_${category.toLowerCase()}`;
     </div>
 
     <!-- Secondary external action links -->
-    <div class="flex items-center justify-between text-xs font-mono">
+    <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
       <a 
         href={projectUrl} 
-        class="text-xs text-[#38bdf8] hover:underline z-20 flex items-center gap-1"
+        class="text-xs text-[#38bdf8] hover:underline z-20 flex items-center gap-1 py-1"
         data-i18n="projects_read_more"
       >
         [Read more about project →]
@@ -106,7 +106,7 @@ const catKey = `projects_cat_${category.toLowerCase()}`;
           href={repoUrl} 
           target="_blank" 
           rel="noopener noreferrer" 
-          class="text-[#8b949e] hover:text-[#e6edf3] flex items-center gap-1 transition-colors z-20"
+          class="text-[#8b949e] hover:text-[#e6edf3] flex items-center gap-1 transition-colors z-20 py-1"
           title="View GitHub repository"
           data-i18n-title="projects_github_title"
         >

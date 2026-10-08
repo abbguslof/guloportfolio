@@ -26,6 +26,10 @@
 
 :root {
   color-scheme: dark;
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
 }
 
 html {
@@ -34,17 +38,31 @@ html {
   font-family: var(--font-mono);
   scroll-behavior: smooth;
   overflow-x: clip;
+  max-width: 100vw;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   overflow-x: clip;
+  max-width: 100vw;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Hide scrollbar for clean horizontal mobile filter/nav bars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Prevent iOS Safari auto-zoom on input focus for mobile screens */
 @media (max-width: 640px) {
-
   input[type="text"],
   input[type="search"],
+  input[type="email"],
   select,
   textarea {
     font-size: 16px !important;
@@ -264,16 +282,29 @@ select:focus-visible,
   -webkit-overflow-scrolling: touch;
 }
 
-/* Ensure mobile interactive touch targets are comfortable */
+/* Ensure mobile interactive touch targets are comfortable and responsive */
 @media (max-width: 640px) {
   .lang-btn {
-    min-height: 28px;
+    min-height: 32px;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
   }
   .nav-link {
-    min-height: 28px;
+    min-height: 34px;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+  }
+  /* Active tap feedback on touchscreen devices */
+  button:active,
+  a:active,
+  .file-card:active,
+  .thought-item:active,
+  .project-card:active {
+    opacity: 0.92;
+    transform: scale(0.99);
   }
 }

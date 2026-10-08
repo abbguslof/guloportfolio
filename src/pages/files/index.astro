@@ -53,9 +53,9 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
         <span class="text-[#e6edf3]" data-i18n="files_breadcrumb_current">files</span>
       </div>
 
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 class="text-2xl sm:text-3xl font-bold text-[#e6edf3] tracking-tight" data-i18n="files_title">
+          <h1 class="text-xl sm:text-3xl font-bold text-[#e6edf3] tracking-tight" data-i18n="files_title">
             File Sharing &amp; Resources
           </h1>
           <p class="text-xs sm:text-sm text-[#8b949e] mt-1" data-i18n="files_subtitle">
@@ -63,7 +63,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
           </p>
         </div>
 
-        <div class="flex items-center gap-3 text-xs text-[#8b949e]">
+        <div class="flex items-center gap-3 text-xs text-[#8b949e] self-start sm:self-auto">
           <span class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981]">
             <span id="file-count-badge">{downloads.length}</span> <span data-i18n="files_count_suffix">files available</span>
           </span>
@@ -71,10 +71,10 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
       </div>
 
       <!-- Search & Filters Bar -->
-      <div class="mt-6 pt-4 border-t border-[#30363d]/60 space-y-4">
+      <div class="mt-5 sm:mt-6 pt-4 border-t border-[#30363d]/60 space-y-3.5 sm:space-y-4">
         <!-- Live Search Bar -->
         <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none gap-2 text-xs font-mono text-[#8b949e]">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none gap-1.5 text-xs font-mono text-[#8b949e]">
             <svg class="w-4 h-4 text-[#10b981] flex-shrink-0" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
               <path d="M10.68 11.74a6 6 0 0 1-7.922-8.982 6 6 0 0 1 8.982 7.922l3.04 3.04a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215ZM11.5 7a4.5 4.5 0 1 0-9 0 4.5 4.5 0 0 0 9 0Z"></path>
             </svg>
@@ -84,20 +84,20 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
             type="text" 
             id="file-search-input"
             data-i18n-placeholder="files_search_placeholder"
-            placeholder="Search filename, description, category, or tag (e.g. 'cv', 'bash', 'minecraft')..." 
-            class="w-full bg-[#161b22] text-[#e6edf3] text-xs pl-20 pr-4 py-2 rounded-lg border border-[#30363d] focus:outline-none focus:border-[#10b981] placeholder-[#8b949e]/60 font-mono transition-colors"
+            placeholder="Search filename, description, category, or tag..." 
+            class="w-full bg-[#161b22] text-[#e6edf3] text-xs pl-16 sm:pl-20 pr-4 py-2 min-h-[38px] sm:min-h-auto rounded-lg border border-[#30363d] focus:outline-none focus:border-[#10b981] placeholder-[#8b949e]/60 font-mono transition-colors"
           />
         </div>
 
         <!-- Controls: Category Filter & Sorting -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 text-xs">
           <!-- Categories -->
-          <div class="flex flex-wrap items-center gap-2" id="file-categories">
+          <div class="flex flex-wrap items-center gap-1.5 sm:gap-2" id="file-categories">
             <span class="text-[#8b949e] text-[11px] mr-1" data-i18n="files_filter_category">Category:</span>
             {categories.map((cat, i) => (
               <button 
                 type="button" 
-                class={`file-cat-btn px-2.5 py-1 rounded border transition-all cursor-pointer ${
+                class={`file-cat-btn px-3 py-1.5 sm:py-1 min-h-[34px] sm:min-h-auto rounded border transition-all cursor-pointer flex items-center ${
                   i === 0 
                     ? 'active bg-[#10b981] text-[#0d1117] font-semibold border-[#10b981]' 
                     : 'bg-[#161b22] text-[#8b949e] border-[#30363d] hover:text-[#e6edf3]'
@@ -110,11 +110,11 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
           </div>
 
           <!-- Sorting -->
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 self-start sm:self-auto">
             <span class="text-[#8b949e] text-[11px]" data-i18n="files_sort_label">Sort:</span>
             <select 
               id="file-sort-select" 
-              class="bg-[#161b22] text-[#e6edf3] text-xs px-2.5 py-1 rounded border border-[#30363d] focus:outline-none focus:border-[#10b981] cursor-pointer font-mono"
+              class="bg-[#161b22] text-[#e6edf3] text-xs px-3 py-1.5 sm:py-1 min-h-[34px] sm:min-h-auto rounded border border-[#30363d] focus:outline-none focus:border-[#10b981] cursor-pointer font-mono"
             >
               <option value="newest" data-i18n="files_sort_newest">Recently updated</option>
               <option value="name" data-i18n="files_sort_name_asc">Name (A-Z)</option>
@@ -149,7 +149,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
           >
             <!-- Card Main Row (Clickable for instant details, accessible via Tab/Enter) -->
             <div 
-              class="file-card-header p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 cursor-pointer hover:bg-[#1c2128]/50 transition-colors"
+              class="file-card-header p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 cursor-pointer hover:bg-[#1c2128]/50 transition-colors"
               tabindex="0"
               role="button"
               aria-expanded="false"
@@ -171,7 +171,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
                 </p>
 
                 <!-- Metadata Row -->
-                <div class="flex flex-wrap items-center gap-3 pt-1 text-[11px] text-[#8b949e]">
+                <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 pt-1 text-[11px] text-[#8b949e]">
                   <span><span data-i18n="files_size_label">Size:</span> <strong class="text-[#e6edf3]">{item.size}</strong></span>
                   <span>•</span>
                   <span><span data-i18n="files_updated_label">Updated:</span> <strong class="text-[#e6edf3]">{item.updatedAt}</strong></span>
@@ -190,12 +190,12 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
                 </div>
               </div>
 
-              <!-- Action buttons -->
-              <div class="flex items-center sm:flex-col gap-2 shrink-0 self-start sm:self-center">
+              <!-- Action buttons: side-by-side on mobile, stacked on desktop -->
+              <div class="flex items-center sm:flex-col gap-2 w-full sm:w-auto shrink-0 mt-1 sm:mt-0">
                 <a 
                   href={item.fileUrl}
                   download={item.filename}
-                  class="file-download-btn inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded bg-[#0d1117] border border-[#30363d] text-xs font-mono font-medium text-[#10b981] hover:bg-[#10b981] hover:text-[#0d1117] hover:border-[#10b981] transition-all cursor-pointer min-w-[110px]"
+                  class="file-download-btn flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 rounded bg-[#0d1117] border border-[#30363d] text-xs font-mono font-medium text-[#10b981] hover:bg-[#10b981] hover:text-[#0d1117] hover:border-[#10b981] active:scale-95 transition-all cursor-pointer min-h-[38px] sm:min-h-auto sm:min-w-[110px]"
                   title={`Download ${item.filename}`}
                 >
                   <span data-i18n="files_download_btn_text">[Download ↓]</span>
@@ -203,7 +203,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
                 
                 <button 
                   type="button" 
-                  class="file-expand-toggle inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded bg-[#161b22] border border-[#30363d] text-xs text-[#8b949e] hover:text-[#e6edf3] hover:border-[#8b949e] transition-all cursor-pointer min-w-[110px]"
+                  class="file-expand-toggle flex-1 sm:flex-none inline-flex items-center justify-center gap-1 px-3 py-2 sm:py-1.5 rounded bg-[#161b22] border border-[#30363d] text-xs text-[#8b949e] hover:text-[#e6edf3] hover:border-[#8b949e] active:scale-95 transition-all cursor-pointer min-h-[38px] sm:min-h-auto sm:min-w-[110px]"
                   aria-expanded="false"
                 >
                   <span class="toggle-text" data-i18n="files_info_expand">[More info ▼]</span>
@@ -212,7 +212,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
             </div>
 
             <!-- Expandable Information Drawer -->
-            <div class="file-drawer hidden px-4 sm:px-5 pb-5 pt-3 border-t border-[#30363d]/60 bg-[#0d1117]/60 space-y-4 text-xs">
+            <div class="file-drawer hidden px-3.5 sm:px-5 pb-5 pt-3 border-t border-[#30363d]/60 bg-[#0d1117]/60 space-y-4 text-xs">
               <!-- Usage command / guide -->
               {item.usage && (
                 <div class="space-y-1.5">
@@ -220,11 +220,11 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
                     <span data-i18n="files_quick_guide_title">Quick Guide / How to run:</span>
                     <span class="text-[10px] text-[#8b949e]" data-i18n="files_terminal_cmd">Terminal command</span>
                   </div>
-                  <div class="p-2.5 rounded bg-[#0d1117] border border-[#30363d] flex items-center justify-between gap-3 overflow-x-auto">
-                    <code class="text-[#10b981] text-xs whitespace-nowrap">{item.usage}</code>
+                  <div class="p-2.5 rounded bg-[#0d1117] border border-[#30363d] flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
+                    <code class="text-[#10b981] text-xs break-all sm:break-normal overflow-x-auto">{item.usage}</code>
                     <button 
                       type="button" 
-                      class="copy-cmd-btn shrink-0 px-2 py-0.5 rounded bg-[#161b22] border border-[#30363d] text-[10px] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#10b981] transition-colors cursor-pointer"
+                      class="copy-cmd-btn self-start sm:self-auto shrink-0 px-2.5 py-1 min-h-[30px] sm:min-h-auto rounded bg-[#161b22] border border-[#30363d] text-[11px] sm:text-[10px] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#10b981] active:scale-95 transition-colors cursor-pointer"
                       data-cmd={item.usage}
                       title="Copy command"
                     >

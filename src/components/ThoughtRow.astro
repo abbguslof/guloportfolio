@@ -40,19 +40,19 @@ if (category === 'guide') {
 
 <a 
   href={`/thoughts/${slug}`}
-  class="thought-item group block p-4 -mx-2 rounded-lg hover:bg-[#0d1117] border-b border-[#30363d]/40 last:border-b-0 transition-all space-y-2 cursor-pointer"
+  class="thought-item group block p-3 sm:p-4 -mx-1 sm:-mx-2 rounded-lg hover:bg-[#0d1117] active:bg-[#0d1117] border-b border-[#30363d]/40 last:border-b-0 transition-all space-y-2 cursor-pointer"
   data-tags={tagsData}
   data-category={category}
 >
-  <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-    <div class="flex items-center gap-2.5">
+  <div class="flex flex-wrap items-center justify-between gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-mono">
+    <div class="flex items-center gap-2">
       <span 
-        class={`text-[10px] font-bold px-2 py-0.5 rounded border ${catBadgeClass}`}
+        class={`text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded border ${catBadgeClass}`}
         data-i18n={catBadgeKey}
       >
         {catDefaultText}
       </span>
-      <time datetime={formattedDate} class="text-xs text-[#8b949e]">
+      <time datetime={formattedDate} class="text-[11px] sm:text-xs text-[#8b949e]">
         {formattedDate}
       </time>
     </div>
@@ -65,7 +65,7 @@ if (category === 'guide') {
         </span>
       ))}
       <span 
-        class={`text-xs text-[#8b949e] ${catHoverText} group-hover:translate-x-0.5 transition-all ml-1 font-mono`}
+        class={`text-[11px] sm:text-xs text-[#8b949e] ${catHoverText} group-hover:translate-x-0.5 transition-all ml-1 font-mono`}
         data-i18n="thoughts_read_more"
       >
         read →

@@ -46,19 +46,19 @@ const statusColors: Record<string, string> = {
 
   <main id="main-content" tabindex="-1" class="w-full py-4 space-y-8 outline-none">
     <!-- Back button -->
-    <div class="mb-8">
+    <div class="mb-5 sm:mb-8">
       <a 
         href="/projects" 
-        class="inline-flex items-center gap-1.5 text-xs font-mono text-[#8b949e] hover:text-[#10b981] transition-colors px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d]"
+        class="inline-flex items-center gap-1.5 text-xs font-mono text-[#8b949e] hover:text-[#10b981] transition-colors px-3 py-1.5 min-h-[34px] sm:min-h-auto rounded bg-[#161b22] border border-[#30363d]"
       >
         <span data-i18n="projects_back_btn">← [~/projects]</span>
       </a>
     </div>
 
     <!-- Project Header -->
-    <header class="pb-6 mb-8 border-b border-[#30363d]">
+    <header class="pb-5 sm:pb-6 mb-6 sm:mb-8 border-b border-[#30363d]">
       <div class="flex items-center justify-between gap-3 mb-3 flex-wrap">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
           <span 
             class="text-xs font-mono uppercase px-2 py-0.5 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e]"
             data-i18n={`projects_cat_${projectEn.data.category.toLowerCase()}`}
@@ -76,7 +76,7 @@ const statusColors: Record<string, string> = {
             download={projectEn.data.pdfName || projectSv?.data?.pdfName || `${slug}.pdf`}
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center gap-1.5 text-xs font-mono font-semibold px-2.5 py-1 rounded bg-[#161b22] border border-[#10b981]/50 text-[#10b981] hover:bg-[#10b981]/15 hover:border-[#10b981] transition-all ml-auto shadow-sm group"
+            class="inline-flex items-center gap-1.5 text-xs font-mono font-semibold px-2.5 py-1.5 min-h-[32px] rounded bg-[#161b22] border border-[#10b981]/50 text-[#10b981] hover:bg-[#10b981]/15 hover:border-[#10b981] transition-all ml-auto shadow-sm group"
             title={projectEn.data.pdfName || projectSv?.data?.pdfName || 'Download Project PDF'}
           >
             <span class="text-xs group-hover:translate-y-0.5 transition-transform">↓</span>
@@ -89,34 +89,34 @@ const statusColors: Record<string, string> = {
         )}
       </div>
 
-      <h1 class="text-2xl sm:text-3xl font-bold text-[#e6edf3] tracking-tight mb-3">
+      <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-[#e6edf3] tracking-tight mb-3 break-words">
         <span class="lang-en-only">{projectEn.data.title}</span>
         <span class="lang-sv-only">{projectSv.data.title}</span>
       </h1>
 
-      <p class="text-sm text-[#8b949e] leading-relaxed border-l-2 border-[#38bdf8] pl-3 mb-6">
+      <p class="text-xs sm:text-sm text-[#8b949e] leading-relaxed border-l-2 border-[#38bdf8] pl-3 mb-5 sm:mb-6">
         <span class="lang-en-only">{projectEn.data.description}</span>
         <span class="lang-sv-only">{projectSv.data.description}</span>
       </p>
 
       <!-- Tech tags & Links -->
-      <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pt-2">
         <div class="flex flex-wrap gap-1.5">
           {projectEn.data.tech.map((t) => (
-            <span class="text-xs font-mono text-[#8b949e] bg-[#161b22] px-2 py-0.5 rounded border border-[#30363d]">
+            <span class="text-[11px] sm:text-xs font-mono text-[#8b949e] bg-[#161b22] px-2 py-0.5 rounded border border-[#30363d]">
               #{t}
             </span>
           ))}
         </div>
 
-        <div class="flex items-center gap-3 text-xs font-mono">
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-mono">
           {(projectEn.data.pdfUrl || projectSv?.data?.pdfUrl) && (
             <a 
               href={projectEn.data.pdfUrl || projectSv?.data?.pdfUrl}
               download={projectEn.data.pdfName || projectSv?.data?.pdfName || `${slug}.pdf`}
               target="_blank"
               rel="noopener noreferrer"
-              class="px-3 py-1.5 rounded bg-[#161b22] border border-[#10b981]/50 text-[#10b981] hover:border-[#10b981] hover:text-[#e6edf3] transition-all flex items-center gap-1.5"
+              class="px-3 py-1.5 min-h-[34px] sm:min-h-auto rounded bg-[#161b22] border border-[#10b981]/50 text-[#10b981] hover:border-[#10b981] hover:text-[#e6edf3] transition-all flex items-center gap-1.5"
             >
               <span>↓</span>
               <span>PDF spec</span>
@@ -128,7 +128,7 @@ const statusColors: Record<string, string> = {
               href={projectEn.data.repoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              class="px-3 py-1.5 rounded bg-[#161b22] border border-[#30363d] text-[#38bdf8] hover:border-[#38bdf8] hover:text-[#e6edf3] transition-all flex items-center gap-1.5"
+              class="px-3 py-1.5 min-h-[34px] sm:min-h-auto rounded bg-[#161b22] border border-[#30363d] text-[#38bdf8] hover:border-[#38bdf8] hover:text-[#e6edf3] transition-all flex items-center gap-1.5"
             >
               <span data-i18n="projects_source_code">Source code</span>
               <span class="text-[10px]">↗</span>
@@ -139,7 +139,7 @@ const statusColors: Record<string, string> = {
               href={projectEn.data.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
-              class="px-3 py-1.5 rounded bg-[#161b22] border border-[#30363d] text-[#10b981] hover:border-[#10b981] hover:text-[#e6edf3] transition-all flex items-center gap-1.5"
+              class="px-3 py-1.5 min-h-[34px] sm:min-h-auto rounded bg-[#161b22] border border-[#30363d] text-[#10b981] hover:border-[#10b981] hover:text-[#e6edf3] transition-all flex items-center gap-1.5"
             >
               <span data-i18n="projects_live_demo">Live demo</span>
               <span class="text-[10px]">↗</span>

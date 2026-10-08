@@ -8,19 +8,19 @@ const isHome = currentPath === '/';
 ---
 
 <!-- Placeholder div in normal document flow to guarantee 0px layout shift -->
-<div class="h-16 w-full mb-8 select-none pointer-events-none" aria-hidden="true"></div>
+<div class="h-14 sm:h-16 w-full mb-4 sm:mb-8 select-none pointer-events-none" aria-hidden="true"></div>
 
 <!-- Full-width Fixed Header: spans 100vw so background never cuts off -->
 <header id="site-header" class="fixed top-0 left-0 right-0 w-full z-50 pointer-events-none transition-[background-color,border-color,box-shadow] duration-250 ease-out">
   <div 
     id="header-surface" 
-    class="pointer-events-auto w-full max-w-[1400px] mx-auto px-3 sm:px-8 py-3 sm:py-3.5 transition-[padding-top,padding-bottom] duration-250 ease-out"
+    class="pointer-events-auto w-full max-w-[1400px] mx-auto px-2.5 sm:px-8 py-2 sm:py-3.5 pt-[calc(0.5rem+env(safe-area-inset-top,0px))] sm:pt-3.5 transition-[padding-top,padding-bottom] duration-250 ease-out"
   >
-    <div class="w-full flex items-center justify-between gap-2 sm:gap-6">
+    <div class="w-full flex items-center justify-between gap-1.5 sm:gap-6">
       <!-- Brand / Logo (Far left to maximize center reading area) -->
       <div id="header-brand" class="flex items-center gap-2 sm:gap-3 shrink-0">
         <a href="/" class="group flex items-center gap-1.5 sm:gap-2 text-sm font-semibold tracking-tight transition-colors">
-          <span class={`px-2 py-0.5 rounded font-mono text-xs font-bold transition-all ${
+          <span class={`px-2 py-1 sm:py-0.5 rounded font-mono text-xs font-bold transition-all min-h-[32px] sm:min-h-auto flex items-center ${
             isHome 
               ? 'bg-[#161b22] border border-[#10b981] text-[#10b981]' 
               : 'bg-[#161b22] border border-[#30363d] text-[#10b981]'
@@ -43,11 +43,11 @@ const isHome = currentPath === '/';
       </div>
 
       <!-- Navigation & Controls (Far right to maximize center reading area) -->
-      <nav id="header-nav" class="flex items-center flex-nowrap gap-1 sm:gap-2 text-xs font-mono shrink-0" aria-label="Huvudnavigation">
+      <nav id="header-nav" class="flex items-center flex-nowrap gap-1 sm:gap-2 text-xs font-mono shrink-0 overflow-x-auto no-scrollbar" aria-label="Huvudnavigation">
         <button 
           type="button" 
           id="header-terminal-toggle" 
-          class="px-2 sm:px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981] hover:text-[#e6edf3] hover:border-[#10b981] transition-all cursor-pointer flex items-center gap-1 sm:gap-1.5 shadow-sm text-xs shrink-0"
+          class="px-2 sm:px-2.5 py-1.5 sm:py-1 min-h-[32px] sm:min-h-auto rounded bg-[#161b22] border border-[#30363d] text-[#10b981] hover:text-[#e6edf3] hover:border-[#10b981] active:scale-95 transition-all cursor-pointer flex items-center gap-1 sm:gap-1.5 shadow-sm text-xs shrink-0"
           title="Toggle terminal (open/close)"
         >
           <span>&gt;_</span>
@@ -55,7 +55,7 @@ const isHome = currentPath === '/';
         </button>
         <a 
           href="/projects" 
-          class={`nav-link px-1.5 sm:px-2.5 py-1 rounded border transition-all text-xs shrink-0 ${
+          class={`nav-link px-2 sm:px-2.5 py-1.5 sm:py-1 min-h-[32px] sm:min-h-auto rounded border transition-all text-xs shrink-0 flex items-center justify-center ${
             isProjects 
               ? 'border-[#a78bfa] text-[#e6edf3] bg-[#a78bfa]/5' 
               : 'bg-[#161b22] border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#a78bfa]'
@@ -67,7 +67,7 @@ const isHome = currentPath === '/';
         </a>
         <a 
           href="/thoughts" 
-          class={`nav-link px-1.5 sm:px-2.5 py-1 rounded border transition-all text-xs shrink-0 ${
+          class={`nav-link px-2 sm:px-2.5 py-1.5 sm:py-1 min-h-[32px] sm:min-h-auto rounded border transition-all text-xs shrink-0 flex items-center justify-center ${
             isThoughts 
               ? 'border-[#f59e0b] text-[#e6edf3] bg-[#f59e0b]/5' 
               : 'bg-[#161b22] border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#f59e0b]'
@@ -79,7 +79,7 @@ const isHome = currentPath === '/';
         </a>
         <a 
           href="/files" 
-          class={`nav-link px-1.5 sm:px-2.5 py-1 rounded border transition-all text-xs shrink-0 ${
+          class={`nav-link px-2 sm:px-2.5 py-1.5 sm:py-1 min-h-[32px] sm:min-h-auto rounded border transition-all text-xs shrink-0 flex items-center justify-center ${
             isFiles 
               ? 'border-[#38bdf8] text-[#e6edf3] bg-[#38bdf8]/5' 
               : 'bg-[#161b22] border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#38bdf8]'
@@ -104,7 +104,7 @@ const isHome = currentPath === '/';
           <button 
             type="button" 
             id="btn-lang-en" 
-            class="lang-btn px-1.5 sm:px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#10b981] bg-[#0d1117] border border-[#10b981]/40 shadow-sm"
+            class="lang-btn px-2 sm:px-2 py-1 sm:py-0.5 min-h-[30px] sm:min-h-auto text-[10px] font-bold rounded transition-all cursor-pointer text-[#10b981] bg-[#0d1117] border border-[#10b981]/40 shadow-sm"
             aria-label="Switch to English"
           >
             EN
@@ -112,7 +112,7 @@ const isHome = currentPath === '/';
           <button 
             type="button" 
             id="btn-lang-sv" 
-            class="lang-btn px-1.5 sm:px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]"
+            class="lang-btn px-2 sm:px-2 py-1 sm:py-0.5 min-h-[30px] sm:min-h-auto text-[10px] font-bold rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]"
             aria-label="Växla till svenska"
           >
             SV

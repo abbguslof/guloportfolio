@@ -60,19 +60,19 @@ if (category === 'guide') {
 
   <main id="main-content" tabindex="-1" class="w-full py-4 space-y-8 outline-none">
     <!-- Back button & Tags row -->
-    <div class="mb-8 flex items-center justify-between">
+    <div class="mb-5 sm:mb-8 flex flex-wrap items-center justify-between gap-2.5">
       <a 
         href="/thoughts" 
-        class="inline-flex items-center gap-1.5 text-xs font-mono text-[#8b949e] hover:text-[#10b981] transition-colors px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d]"
+        class="inline-flex items-center gap-1.5 text-xs font-mono text-[#8b949e] hover:text-[#10b981] transition-colors px-3 py-1.5 min-h-[34px] sm:min-h-auto rounded bg-[#161b22] border border-[#30363d]"
       >
         <span data-i18n="thoughts_back_btn">← [~/thoughts]</span>
       </a>
 
-      <div class="flex items-center gap-1.5">
+      <div class="flex items-center gap-1.5 flex-wrap">
         {post.data.tags.map((tag) => (
           <a 
             href={`/thoughts`}
-            class="text-[11px] font-mono text-[#38bdf8] bg-[#161b22] px-2 py-0.5 rounded border border-[#30363d] hover:border-[#38bdf8] transition-colors"
+            class="text-[11px] font-mono text-[#38bdf8] bg-[#161b22] px-2 py-1 min-h-[28px] sm:min-h-auto rounded border border-[#30363d] hover:border-[#38bdf8] transition-colors flex items-center"
           >
             [{tag}]
           </a>
@@ -81,15 +81,15 @@ if (category === 'guide') {
     </div>
 
     <!-- Article Header -->
-    <header class="pb-6 mb-8 border-b border-[#30363d]">
+    <header class="pb-5 sm:pb-6 mb-6 sm:mb-8 border-b border-[#30363d]">
       <div class="flex items-center justify-between gap-3 text-xs font-mono text-[#8b949e] mb-3 flex-wrap">
-        <div class="flex items-center gap-2.5 flex-wrap">
+        <div class="flex items-center gap-2 flex-wrap">
           <span class={`text-[11px] font-bold px-2 py-0.5 rounded border ${catBadgeClass}`} data-i18n={catBadgeKey}>
             {catLabel}
           </span>
-          <time datetime={formattedDate}>{formattedDate}</time>
+          <time datetime={formattedDate} class="text-[11px] sm:text-xs">{formattedDate}</time>
           <span>•</span>
-          <span>
+          <span class="text-[11px] sm:text-xs">
             <span class="lang-en-only">{wordCount} words</span>
             <span class="lang-sv-only">{wordCount} ord</span>
           </span>
@@ -101,7 +101,7 @@ if (category === 'guide') {
             download={post.data.pdfName || `${post.id}.pdf`}
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center gap-1.5 text-xs font-mono font-semibold px-2.5 py-1 rounded bg-[#161b22] border border-[#10b981]/50 text-[#10b981] hover:bg-[#10b981]/15 hover:border-[#10b981] transition-all ml-auto shadow-sm group"
+            class="inline-flex items-center gap-1.5 text-xs font-mono font-semibold px-2.5 py-1.5 min-h-[32px] rounded bg-[#161b22] border border-[#10b981]/50 text-[#10b981] hover:bg-[#10b981]/15 hover:border-[#10b981] transition-all ml-auto shadow-sm group"
             title={post.data.pdfName || 'Download companion PDF'}
           >
             <span class="text-xs group-hover:translate-y-0.5 transition-transform">↓</span>
@@ -114,12 +114,12 @@ if (category === 'guide') {
         )}
       </div>
 
-      <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-[#e6edf3] tracking-tight leading-snug">
+      <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-[#e6edf3] tracking-tight leading-snug break-words">
         {post.data.title}
       </h1>
 
       {post.data.description && (
-        <p class={`text-sm text-[#8b949e] mt-3 leading-relaxed border-l-2 ${catBorderClass} pl-3`}>
+        <p class={`text-xs sm:text-sm text-[#8b949e] mt-3 leading-relaxed border-l-2 ${catBorderClass} pl-3`}>
           {post.data.description}
         </p>
       )}

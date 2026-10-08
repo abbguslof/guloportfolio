@@ -32,13 +32,13 @@ const latestThoughts = sortedThoughts.slice(0, 5);
   <!-- Header -->
   <Header />
 
-  <main id="main-content" tabindex="-1" class="w-full space-y-16 outline-none">
+  <main id="main-content" tabindex="-1" class="w-full space-y-10 sm:space-y-16 outline-none">
     <!-- 1. Hero: Interactive Terminal (Med Chafa-porträtt, fungerande fönsterknappar & Bash) -->
     <InteractiveTerminal isSubpage={false} />
 
     <!-- 2. Utvalda Projekt & Homelab (Portfolio Showcase) -->
     <section id="projects" class="w-full" aria-labelledby="projects-heading">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-6 border-b border-[#30363d] gap-2">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-5 sm:mb-6 border-b border-[#30363d] gap-2">
         <div class="flex items-center gap-2">
           <span class="text-[#a78bfa] font-bold">#</span>
           <h2 id="projects-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]" data-i18n="home_hero_projects_title">
@@ -49,7 +49,7 @@ const latestThoughts = sortedThoughts.slice(0, 5);
         <div class="flex items-center gap-3 text-xs font-mono">
           <a 
             href="/projects" 
-            class="text-[#38bdf8] hover:text-[#e6edf3] hover:underline transition-colors flex items-center gap-1"
+            class="text-[#38bdf8] hover:text-[#e6edf3] hover:underline transition-colors flex items-center gap-1 py-1"
             data-i18n="home_hero_projects_view_all"
             data-i18n-count={sortedProjects.length}
           >
@@ -58,7 +58,7 @@ const latestThoughts = sortedThoughts.slice(0, 5);
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
         {displayProjects.map((project) => (
           <ProjectCard 
             titleEn={project.en.data.title}
@@ -78,7 +78,7 @@ const latestThoughts = sortedThoughts.slice(0, 5);
 
     <!-- 3. Senaste Tankar, Guider & Anteckningar (Max 5 poster med kategori, datum & utdrag) -->
     <section id="thoughts" class="w-full" aria-labelledby="thoughts-heading">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-5 border-b border-[#30363d] gap-2">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-4 sm:mb-5 border-b border-[#30363d] gap-2">
         <div class="flex items-center gap-2">
           <span class="text-[#f59e0b] font-bold">#</span>
           <h2 id="thoughts-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3] flex items-center gap-2" data-i18n="home_hero_thoughts_title">
@@ -92,7 +92,7 @@ const latestThoughts = sortedThoughts.slice(0, 5);
         <div class="flex items-center gap-3 text-xs font-mono">
           <a 
             href="/thoughts" 
-            class="text-[#38bdf8] hover:text-[#e6edf3] hover:underline transition-colors flex items-center gap-1"
+            class="text-[#38bdf8] hover:text-[#e6edf3] hover:underline transition-colors flex items-center gap-1 py-1"
             data-i18n="home_hero_thoughts_view_all"
             data-i18n-count={sortedThoughts.length}
           >
@@ -102,7 +102,7 @@ const latestThoughts = sortedThoughts.slice(0, 5);
       </div>
 
       <!-- Articles list container with rich rows -->
-      <div class="thought-container rounded-lg bg-[#161b22] border border-[#30363d] p-3 divide-y divide-[#30363d]/40">
+      <div class="thought-container rounded-lg bg-[#161b22] border border-[#30363d] p-2.5 sm:p-3 divide-y divide-[#30363d]/40">
         {latestThoughts.map((post) => (
           <ThoughtRow 
             title={post.data.title}
@@ -119,7 +119,7 @@ const latestThoughts = sortedThoughts.slice(0, 5);
       <div class="mt-4 text-center">
         <a 
           href="/thoughts" 
-          class="inline-flex items-center gap-2 text-xs font-mono text-[#8b949e] hover:text-[#10b981] px-4 py-2 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#10b981] transition-all"
+          class="inline-flex items-center justify-center gap-2 text-xs font-mono text-[#8b949e] hover:text-[#10b981] px-4 py-2.5 sm:py-2 min-h-[38px] sm:min-h-auto rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#10b981] transition-all w-full sm:w-auto"
           data-i18n="home_hero_thoughts_bottom_btn"
           data-i18n-count={sortedThoughts.length}
         >

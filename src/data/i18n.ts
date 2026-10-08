@@ -167,7 +167,7 @@ export const translations = {
     // Terminal
     term_input_placeholder: "type 'help', 'school', 'swim', 'cat whoami.md'...",
     term_closed_title: 'Who is gulo? // About me & background',
-    term_reopen_btn: 'Open terminal again',
+    term_reopen_btn: 'Open terminal',
     term_minimized_pill: 'MINIMIZED (click to expand)',
     term_bio_trigger_label: 'Profile & bio available in background',
     term_bio_trigger_action: 'Click to show bio',
@@ -356,7 +356,7 @@ export const translations = {
     // Terminal
     term_input_placeholder: "skriv 'help', 'school', 'swim', 'cat whoami.md'...",
     term_closed_title: 'Vem är gulo? // Om mig & bakgrund',
-    term_reopen_btn: 'Öppna terminalen igen',
+    term_reopen_btn: 'Öppna terminal',
     term_minimized_pill: 'MINIMERAD (klicka för att expandera)',
     term_bio_trigger_label: 'Profil & biografi finns i bakgrunden',
     term_bio_trigger_action: 'Klicka för att visa bio',
