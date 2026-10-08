@@ -49,8 +49,8 @@ export function handleGitCommand(args: string[], lang: LangCode): string {
 
     default:
       return lang === 'sv'
-        ? `<div class="text-[#f85149] text-xs font-mono">git: '${args[0]}' är inte ett giltigt git-kommando. Skriv <code class="text-[#10b981]">git --help</code> för kommandolista.</div>`
-        : `<div class="text-[#f85149] text-xs font-mono">git: '${args[0]}' is not a git command. Type <code class="text-[#10b981]">git --help</code> for command list.</div>`;
+        ? `<div class="text-[#f85149] text-xs font-mono">git: '${escapeHtml(args[0])}' är inte ett giltigt git-kommando. Skriv <code class="text-[#10b981]">git --help</code> för kommandolista.</div>`
+        : `<div class="text-[#f85149] text-xs font-mono">git: '${escapeHtml(args[0])}' is not a git command. Type <code class="text-[#10b981]">git --help</code> for command list.</div>`;
   }
 }
 

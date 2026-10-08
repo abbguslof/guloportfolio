@@ -135,9 +135,20 @@ for (const [slug, pair] of projectMap.entries()) {
       type: 'file',
       size: '1.4 KB',
       description: pEn.data.description,
-      content: `# ${pEn.data.title}\nStatus: [${pEn.data.status}] | Category: ${pEn.data.category}\nTech: ${(pEn.data.tech || []).join(', ')}\n\n${pEn.data.description}\n\nView on web: open ${slug}`,
+      content: `# ${pEn.data.title}\nStatus: [${pEn.data.status}] | Category: ${pEn.data.category}\nTech: ${(pEn.data.tech || []).join(', ')}\n\n${pEn.data.description}\n\nView on web: open ${slug}${pEn.data.pdfUrl ? `\nDownload Project PDF: wget ${pEn.data.pdfName || `${slug}.pdf`}` : ''}`,
       actionUrl: `/projects/${slug}`,
     };
+    if (pEn.data.pdfUrl) {
+      const pdfFilename = (pEn.data.pdfName && pEn.data.pdfName.toLowerCase().endsWith('.pdf')) ? pEn.data.pdfName : `${slug}.pdf`;
+      projectNodesEn[pdfFilename] = {
+        type: 'file',
+        size: 'PDF spec',
+        description: `Project Document (PDF): ${pEn.data.title}`,
+        content: `[Project PDF Specification]\nTitle: ${pEn.data.title}\nSource: ${pEn.data.pdfUrl}\nDownload to disk with: wget ${pdfFilename}`,
+        actionUrl: pEn.data.pdfUrl,
+        isPdf: true,
+      };
+    }
   }
 
   if (pSv) {
@@ -145,9 +156,21 @@ for (const [slug, pair] of projectMap.entries()) {
       type: 'file',
       size: '1.4 KB',
       description: pSv.data.description,
-      content: `# ${pSv.data.title}\nStatus: [${pSv.data.status}] | Kategori: ${pSv.data.category}\nTeknologier: ${(pSv.data.tech || []).join(', ')}\n\n${pSv.data.description}\n\nÖppna på webben: open ${slug}`,
+      content: `# ${pSv.data.title}\nStatus: [${pSv.data.status}] | Kategori: ${pSv.data.category}\nTeknologier: ${(pSv.data.tech || []).join(', ')}\n\n${pSv.data.description}\n\nÖppna på webben: open ${slug}${(pSv.data.pdfUrl || pEn?.data?.pdfUrl) ? `\nLadda ned projekt-PDF: wget ${pSv.data.pdfName || pEn?.data?.pdfName || `${slug}.pdf`}` : ''}`,
       actionUrl: `/projects/${slug}`,
     };
+    const pdfUrlSv = pSv.data.pdfUrl || pEn?.data.pdfUrl;
+    if (pdfUrlSv) {
+      const pdfFilename = (pSv.data.pdfName && pSv.data.pdfName.toLowerCase().endsWith('.pdf')) ? pSv.data.pdfName : ((pEn?.data?.pdfName && pEn.data.pdfName.toLowerCase().endsWith('.pdf')) ? pEn.data.pdfName : `${slug}.pdf`);
+      projectNodesSv[pdfFilename] = {
+        type: 'file',
+        size: 'PDF spec',
+        description: `Projektdokument (PDF): ${pSv.data.title}`,
+        content: `[Projektspecifikation PDF]\nTitel: ${pSv.data.title}\nKälla: ${pdfUrlSv}\nLadda ned till disk med: wget ${pdfFilename}`,
+        actionUrl: pdfUrlSv,
+        isPdf: true,
+      };
+    }
   }
 }
 
@@ -157,7 +180,7 @@ const thoughtNodes: Record<string, any> = {};
 for (const t of rawThoughts) {
   const dateStr = t.data.pubDate ? new Date(t.data.pubDate).toISOString().split('T')[0] : '2026';
   const catLabel = (t.data.category || 'tanke').toUpperCase();
-  const preview = `[${catLabel}] ${t.data.title}\nDate: ${dateStr} | Category: ${t.data.category || 'tanke'} | Tags: ${(t.data.tags || []).join(', ')}\n\n"${t.data.description}"\n\nRead full post: open ${t.id}`;
+  const preview = `[${catLabel}] ${t.data.title}\nDate: ${dateStr} | Category: ${t.data.category || 'tanke'} | Tags: ${(t.data.tags || []).join(', ')}\n\n"${t.data.description}"\n\nRead full post: open ${t.id}${t.data.pdfUrl ? `\nCompanion PDF: wget ${t.data.pdfName || `${t.id}.pdf`}` : ''}`;
   thoughtNodes[`${t.id}.md`] = {
     type: 'file',
     size: '1.8 KB',
@@ -165,6 +188,19 @@ for (const t of rawThoughts) {
     content: preview,
     actionUrl: `/thoughts/${t.id}`,
   };
+
+  // Only create virtual PDF node IF pdfUrl is explicitly defined!
+  if (t.data.pdfUrl) {
+    const pdfFilename = (t.data.pdfName && t.data.pdfName.toLowerCase().endsWith('.pdf')) ? t.data.pdfName : `${t.id}.pdf`;
+    thoughtNodes[pdfFilename] = {
+      type: 'file',
+      size: 'PDF doc',
+      description: `Companion PDF: ${t.data.title}`,
+      content: `[Companion PDF Document]\nTitle: ${t.data.title}\nSource: ${t.data.pdfUrl}\nDownload to disk with: wget ${pdfFilename}`,
+      actionUrl: t.data.pdfUrl,
+      isPdf: true,
+    };
+  }
 }
 
 // 4. Läs dynamiska nedladdningsbara filer
@@ -670,28 +706,33 @@ const dynamicFileSystemSv = {
   import type { CommandContext, DirNode, FileNode, LangCode } from '../scripts/terminal/types';
 
   function initTerminalEngine() {
-    const termSection = document.getElementById('terminal-section');
-    const termWindow = document.getElementById('terminal-window');
-    const termBody = document.getElementById('terminal-body');
+    const rawSection = document.getElementById('terminal-section');
+    const rawWindow = document.getElementById('terminal-window');
+    const rawBody = document.getElementById('terminal-body');
+    const rawForm = document.getElementById('terminal-form');
+    const rawInput = document.getElementById('terminal-input');
+    const rawHistory = document.getElementById('terminal-history');
+
+    if (!rawSection || !rawWindow || !rawBody || !rawForm || !rawInput || !rawHistory) return;
+
+    const termSection = rawSection as HTMLElement;
+    const termWindow = rawWindow as HTMLElement;
+    const termBody = rawBody as HTMLElement;
+    const form = rawForm as HTMLFormElement;
+    const input = rawInput as HTMLInputElement;
+    const history = rawHistory as HTMLDivElement;
+
     const closedCard = document.getElementById('terminal-closed-card');
     const reopenBtn = document.getElementById('btn-reopen-terminal');
     const titleBar = document.getElementById('terminal-titlebar');
     const titleText = document.getElementById('window-title-text');
     const statusPill = document.getElementById('window-status-pill');
     const fullscreenHint = document.getElementById('fullscreen-hint');
-
     const minimizedCatHint = document.getElementById('terminal-minimized-cat-hint');
-
     const btnClose = document.getElementById('btn-win-close');
     const btnMinimize = document.getElementById('btn-win-minimize');
     const btnMaximize = document.getElementById('btn-win-maximize');
-
-    const form = document.getElementById('terminal-form') as HTMLFormElement | null;
-    const input = document.getElementById('terminal-input') as HTMLInputElement | null;
-    const history = document.getElementById('terminal-history') as HTMLDivElement | null;
     const promptCwd = document.getElementById('prompt-cwd');
-
-    if (!termSection || !termWindow || !termBody || !form || !input || !history) return;
 
     const isSubpage = termSection.getAttribute('data-is-subpage') === 'true';
 
@@ -1745,9 +1786,27 @@ const dynamicFileSystemSv = {
 
         if ((mainCmd === 'wget' || mainCmd === 'dl' || mainCmd === 'download') && tokens.length === 2) {
           const filesDir = fileSystem.children['files'];
+          const thoughtsDir = fileSystem.children['thoughts'];
+          const projectsDir = fileSystem.children['projects'];
+          const currentDir = getCurrentDir();
+
+          availableItems = [];
+
           if (filesDir && filesDir.type === 'dir') {
-            availableItems = Object.keys(filesDir.children);
+            availableItems.push(...Object.keys(filesDir.children));
           }
+          if (thoughtsDir && thoughtsDir.type === 'dir') {
+            availableItems.push(...Object.keys(thoughtsDir.children).filter(f => f.endsWith('.pdf')));
+          }
+          if (projectsDir && projectsDir.type === 'dir') {
+            availableItems.push(...Object.keys(projectsDir.children).filter(f => f.endsWith('.pdf')));
+          }
+          if (currentDir && currentDir.type === 'dir') {
+            availableItems.push(...Object.keys(currentDir.children).filter(f => 
+              f.endsWith('.pdf') || f.endsWith('.zip') || f.endsWith('.sh') || f.endsWith('.gz') || f.endsWith('.tar.gz')
+            ));
+          }
+          availableItems = Array.from(new Set(availableItems));
           const matches = availableItems.filter(item => item.toLowerCase().startsWith(lastToken.toLowerCase()));
           if (matches.length === 1) {
             tokens[tokens.length - 1] = matches[0];

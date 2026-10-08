@@ -71,9 +71,10 @@ export function handleGameCommand(args: string[], lang: LangCode): string {
   // User provided a guess
   const guessNum = parseInt(subCmd, 10);
   if (isNaN(guessNum)) {
+    const rawInput = escapeHtml(args[0] || '');
     return lang === 'sv'
-      ? `<div class="text-[#f85149] text-xs font-mono">"${args[0]}" är inte ett giltigt heltal. Skriv t.ex. <code class="text-[#10b981]">guess 50</code>.</div>`
-      : `<div class="text-[#f85149] text-xs font-mono">"${args[0]}" is not a valid integer. Type e.g. <code class="text-[#10b981]">guess 50</code>.</div>`;
+      ? `<div class="text-[#f85149] text-xs font-mono">"${rawInput}" är inte ett giltigt heltal. Skriv t.ex. <code class="text-[#10b981]">guess 50</code>.</div>`
+      : `<div class="text-[#f85149] text-xs font-mono">"${rawInput}" is not a valid integer. Type e.g. <code class="text-[#10b981]">guess 50</code>.</div>`;
   }
 
   if (!state.isActive) {
@@ -142,4 +143,8 @@ function startNewGame() {
   state.isActive = true;
   state.target = Math.floor(Math.random() * 100) + 1;
   state.attempts = 0;
+}
+
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }

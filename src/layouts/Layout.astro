@@ -34,13 +34,19 @@ const finalDescSv = descriptionSv || descriptionEn || description;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
 
+    <!-- Security & Hardening -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self';" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
     <!-- SEO & Metadata with Instant Pre-Hydration Bilingual Sync -->
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site ?? 'https://gulo.se')} />
     <title data-title-en={finalTitleEn} data-title-sv={finalTitleSv}>{finalTitleEn}</title>
     <meta name="description" content={finalDescEn} data-desc-en={finalDescEn} data-desc-sv={finalDescSv} />
     <meta name="theme-color" content="#0d1117" />
     <meta property="og:title" content={finalTitleEn} />
     <meta property="og:description" content={finalDescEn} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site ?? 'https://gulo.se')} />
 
     <!-- Pre-hydration language detection & metadata synchronization (defaults to 'en') -->
     <script is:inline>

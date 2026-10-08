@@ -25,11 +25,16 @@ if (category === 'guide') {
   catBadgeKey = 'thoughts_cat_guide_badge';
   catDefaultText = '[GUIDE]';
   catHoverText = 'group-hover:text-[#38bdf8]';
-} else if (category === 'anteckning') {
+} else if (category === 'anteckning' || category === 'note') {
   catBadgeClass = 'text-[#10b981] border-[#10b981]/40 bg-[#10b981]/10';
   catBadgeKey = 'thoughts_cat_anteckning_badge';
   catDefaultText = '[NOTE]';
   catHoverText = 'group-hover:text-[#10b981]';
+} else if (category === 'idea' || category === 'idé') {
+  catBadgeClass = 'text-[#a78bfa] border-[#a78bfa]/40 bg-[#a78bfa]/10';
+  catBadgeKey = 'thoughts_cat_idea_badge';
+  catDefaultText = '[IDEA]';
+  catHoverText = 'group-hover:text-[#a78bfa]';
 }
 ---
 

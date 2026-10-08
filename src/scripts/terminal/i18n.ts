@@ -51,6 +51,7 @@ export function getStandardHelpHtml(lang: LangCode): string {
       <span><strong class="text-[#10b981]">ls [-la]</strong> lista filer</span>
       <span><strong class="text-[#10b981]">cd &lt;mapp&gt;</strong> byt katalog</span>
       <span><strong class="text-[#10b981]">cat &lt;fil&gt;</strong> visa filinnehåll</span>
+      <span><strong class="text-[#10b981]">grep &lt;mönster&gt; [fil]</strong> sök text</span>
       <span><strong class="text-[#10b981]">nvim [fil] / vim</strong> texteditor</span>
       <span><strong class="text-[#10b981]">wget &lt;fil&gt;</strong> ladda ned från files/</span>
       <span><strong class="text-[#10b981]">open &lt;mål&gt;</strong> öppna sida/fil</span>
@@ -97,6 +98,7 @@ export function getStandardHelpHtml(lang: LangCode): string {
       <span><strong class="text-[#10b981]">ls [-la]</strong> list files</span>
       <span><strong class="text-[#10b981]">cd &lt;dir&gt;</strong> change directory</span>
       <span><strong class="text-[#10b981]">cat &lt;file&gt;</strong> view file contents</span>
+      <span><strong class="text-[#10b981]">grep &lt;pattern&gt; [file]</strong> search text</span>
       <span><strong class="text-[#10b981]">nvim [file] / vim</strong> text editor</span>
       <span><strong class="text-[#10b981]">wget &lt;file&gt;</strong> download from files/</span>
       <span><strong class="text-[#10b981]">open &lt;target&gt;</strong> open file or page</span>
@@ -176,9 +178,10 @@ export function getExtendedHelpHtml(lang: LangCode): string {
           <div><code class="text-[#10b981]">ls [-la] [mapp]</code> : Lista filer, storlek och rättigheter</div>
           <div><code class="text-[#10b981]">cd &lt;katalog&gt;</code> : Navigera (<code class="text-[#e6edf3]">cd projects</code>, <code class="text-[#e6edf3]">cd ..</code>, <code class="text-[#e6edf3]">cd ~</code>)</div>
           <div><code class="text-[#10b981]">cat &lt;fil&gt;</code> : Skriv ut innehållet i en fil i terminalen</div>
+          <div><code class="text-[#10b981]">grep [-inrl] &lt;mönster&gt; [fil]</code> : Sök textmönster med radnummer &amp; markering</div>
           <div><code class="text-[#10b981]">nvim [fil]</code>, <code class="text-[#10b981]">vim</code> : Neovim TUI buffer-visare med radnummer</div>
           <div><code class="text-[#10b981]">pwd</code> : Skriv ut den aktuella sökvägen</div>
-          <div><code class="text-[#10b981]">wget &lt;fil&gt;</code> : Ladda ned faktiska resurser från files/ (alias: dl, download)</div>
+          <div><code class="text-[#10b981]">wget &lt;fil&gt;</code> : Ladda ned faktiska resurser &amp; PDF:er (alias: dl, download)</div>
         </div>
       </div>
 
@@ -271,9 +274,10 @@ export function getExtendedHelpHtml(lang: LangCode): string {
           <div><code class="text-[#10b981]">ls [-la] [dir]</code> : List files, file sizes and permissions</div>
           <div><code class="text-[#10b981]">cd &lt;dir&gt;</code> : Navigate directories (<code class="text-[#e6edf3]">cd projects</code>, <code class="text-[#e6edf3]">cd ..</code>, <code class="text-[#e6edf3]">cd ~</code>)</div>
           <div><code class="text-[#10b981]">cat &lt;file&gt;</code> : Print document contents to the shell</div>
+          <div><code class="text-[#10b981]">grep [-inrl] &lt;pattern&gt; [file]</code> : Search text patterns with line numbers &amp; highlighting</div>
           <div><code class="text-[#10b981]">nvim [file]</code>, <code class="text-[#10b981]">vim</code> : Neovim TUI buffer view with line numbers</div>
           <div><code class="text-[#10b981]">pwd</code> : Print working directory</div>
-          <div><code class="text-[#10b981]">wget &lt;file&gt;</code> : Download actual archive file to disk (alias: dl, download)</div>
+          <div><code class="text-[#10b981]">wget &lt;file&gt;</code> : Download actual archive file or companion PDF to disk (alias: dl, download)</div>
         </div>
       </div>
 

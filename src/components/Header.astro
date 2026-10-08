@@ -310,11 +310,11 @@ const isHome = currentPath === '/';
     window.dispatchEvent(new CustomEvent('connection-state-change', { detail: { isOnline } }));
   }
 
-  // Lightweight probe to verify true WAN connectivity and measure RTT ping
+  // Lightweight probe to verify true connectivity and measure RTT ping
   let isProbing = false;
   async function checkConnectivity() {
     if (isProbing) return;
-    if (!navigator.onLine) {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
       updateOnlineUI(false);
       window.dispatchEvent(new CustomEvent('network-ping', { detail: { latency: null, isOnline: false } }));
       return;
@@ -324,25 +324,25 @@ const isHome = currentPath === '/';
     const t0 = performance.now();
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2500);
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-      // Probe external 204 endpoint with mode: 'no-cors' for true WAN verification
-      // Transmits 0 bytes and immediately fails if WAN/Internet is disconnected
-      await fetch('https://www.google.com/generate_204', {
-        method: 'GET',
-        mode: 'no-cors',
+      // Probe same-origin lightweight asset (CSP-compliant, zero CORS errors, works on dev and production)
+      const res = await fetch('/favicon.svg?t=' + Date.now(), {
+        method: 'HEAD',
         cache: 'no-store',
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
 
       const latency = Math.max(1, Math.round(performance.now() - t0));
-      updateOnlineUI(true);
-      window.dispatchEvent(new CustomEvent('network-ping', { detail: { latency, isOnline: true } }));
+      const online = res.ok || (typeof navigator !== 'undefined' && navigator.onLine);
+      updateOnlineUI(online);
+      window.dispatchEvent(new CustomEvent('network-ping', { detail: { latency, isOnline: online } }));
     } catch {
-      // WAN unreachable or timed out
-      updateOnlineUI(false);
-      window.dispatchEvent(new CustomEvent('network-ping', { detail: { latency: null, isOnline: false } }));
+      // Fallback to browser navigator.onLine if probe is aborted or locally cached
+      const online = typeof navigator !== 'undefined' ? navigator.onLine : true;
+      updateOnlineUI(online);
+      window.dispatchEvent(new CustomEvent('network-ping', { detail: { latency: null, isOnline: online } }));
     } finally {
       isProbing = false;
     }

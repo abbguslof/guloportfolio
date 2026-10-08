@@ -1,0 +1,15 @@
+{
+  "name": "Resource Display Name",
+  "filename": "package-or-script.tar.gz",
+  "size": "1.2 MB",
+  "category": "Homelab",
+  "fileUrl": "/downloads/package-or-script.tar.gz",
+  "description": "Clear explanation of what this package contains and when to use it.",
+  "usage": "tar -xzf package-or-script.tar.gz && ./setup.sh",
+  "updatedAt": "2026-10-08",
+  "checksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "tags": ["Linux", "Homelab", "Scripts"],
+  "featured": true,
+  "relatedProjects": ["mc-cluster"],
+  "relatedThoughts": ["mc-jvm-flags"]
+}
