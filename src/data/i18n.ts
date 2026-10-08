@@ -9,7 +9,7 @@ export const translations = {
     brand_online: 'ONLINE',
     header_status_online: 'ONLINE',
     header_status_offline: 'OFFLINE',
-    
+
     // Header navigation
     nav_skip_content: 'Skip to content',
     nav_terminal: 'terminal',
@@ -17,14 +17,14 @@ export const translations = {
     nav_thoughts: 'blog / thoughts',
     nav_thoughts_short: 'thoughts',
     nav_files: 'files',
-    
+
     // Homepage
     home_hero_projects_title: 'Featured Projects & Homelab',
     home_hero_projects_view_all: '[View full portfolio ({count}) →]',
     home_hero_thoughts_title: 'Latest Thoughts, Guides & Notes',
     home_hero_thoughts_view_all: '[Full blog archive ({count}) →]',
     home_hero_thoughts_bottom_btn: 'View all thoughts, guides and notes in the archive ({count} posts) →',
-    
+
     // Projects page & cards
     projects_breadcrumb_home: '[~/home]',
     projects_breadcrumb_current: 'projects',
@@ -54,7 +54,7 @@ export const translations = {
     projects_source_code: 'Source code',
     projects_live_demo: 'Live demo',
     projects_no_match: 'No projects found matching the query.',
-    
+
     // Thoughts page & rows
     thoughts_breadcrumb_home: '[~/home]',
     thoughts_breadcrumb_current: 'thoughts',
@@ -100,7 +100,7 @@ export const translations = {
     thoughts_lang_notice_desc: 'Thoughts, guides, and notes are published purely in English. Projects and other sections are available in both English and Swedish.',
     thoughts_lang_notice_compact: 'Thoughts, guides, and notes are published in English only.',
     thoughts_archive_lang_note: '(Articles and notes are published in English)',
-    
+
     // Files page
     files_breadcrumb_home: '[~/home]',
     files_breadcrumb_current: 'files',
@@ -138,7 +138,7 @@ export const translations = {
     files_checksum_label: 'Integrity check (SHA-256):',
     files_copy_hash: 'Copy hash',
     files_no_match: 'No files match your search or filter.',
-    
+
     // Footer
     footer_diagnostics: 'SYSTEM DIAGNOSTICS & TELEMETRY',
     footer_nominal: 'ALL_SYSTEMS_NOMINAL',
@@ -154,7 +154,7 @@ export const translations = {
     footer_link_portfolio: '[portfolio]',
     footer_link_blog: '[blog]',
     footer_link_files: '[files]',
-    
+
     // 404 Page
     not_found_status: 'HTTP 404 // COMMAND_NOT_FOUND',
     not_found_title: 'Route Not Found in Playground',
@@ -168,6 +168,15 @@ export const translations = {
     term_input_placeholder: "type 'help', 'school', 'swim', 'cat whoami.md'...",
     term_closed_title: 'Who is gulo? // About me & background',
     term_reopen_btn: 'Open terminal',
+    term_boot_status: 'STATION_BOOT // SYSTEM_READY',
+    term_boot_greeting: "HI, I'M GUSTAV",
+    term_boot_sub: 'Gustav Löfqvist // gulo',
+    boot_prefix: "hi, i'm",
+    boot_education: 'Computer Science & Engineering • Chalmers',
+    boot_loading: 'launching terminal...',
+    term_boot_tagline: 'Computer Science & Engineering',
+    term_boot_mounting: 'Mounting terminal...',
+    term_boot_skip_hint: '[press any key / click to skip]',
     term_minimized_pill: 'MINIMIZED (click to expand)',
     term_bio_trigger_label: 'Profile & bio available in background',
     term_bio_trigger_action: 'Click to show bio',
@@ -198,7 +207,7 @@ export const translations = {
     brand_online: 'ONLINE',
     header_status_online: 'ONLINE',
     header_status_offline: 'OFFLINE',
-    
+
     // Header navigation
     nav_skip_content: 'Hoppa till innehåll',
     nav_terminal: 'terminal',
@@ -206,14 +215,14 @@ export const translations = {
     nav_thoughts: 'blogg / tankar',
     nav_thoughts_short: 'tankar',
     nav_files: 'filer',
-    
+
     // Homepage
     home_hero_projects_title: 'Utvalda Projekt & Homelab',
     home_hero_projects_view_all: '[Se hela portfolion ({count}) →]',
     home_hero_thoughts_title: 'Senaste Tankar, Guider & Anteckningar',
     home_hero_thoughts_view_all: '[Hela bloggarkivet ({count}) →]',
     home_hero_thoughts_bottom_btn: 'Visa alla tankar, guider och anteckningar i arkivet ({count} st) →',
-    
+
     // Projects page & cards
     projects_breadcrumb_home: '[~/startsidan]',
     projects_breadcrumb_current: 'projekt',
@@ -243,7 +252,7 @@ export const translations = {
     projects_source_code: 'Källkod',
     projects_live_demo: 'Live demo',
     projects_no_match: 'Inga projekt matchar din sökning eller det valda filtret.',
-    
+
     // Thoughts page & rows
     thoughts_breadcrumb_home: '[~/startsidan]',
     thoughts_breadcrumb_current: 'tankar',
@@ -289,7 +298,7 @@ export const translations = {
     thoughts_lang_notice_desc: 'Tankar, guider och anteckningar skrivs och publiceras enbart på engelska. Projekt och övriga delar av stationen finns på både svenska och engelska.',
     thoughts_lang_notice_compact: 'Tankar, guider och anteckningar publiceras bara på engelska.',
     thoughts_archive_lang_note: '(Inläggen i arkivet publiceras enbart på engelska)',
-    
+
     // Files page
     files_breadcrumb_home: '[~/startsidan]',
     files_breadcrumb_current: 'filer',
@@ -327,7 +336,7 @@ export const translations = {
     files_checksum_label: 'Integritetskontroll (SHA-256):',
     files_copy_hash: 'Kopiera hash',
     files_no_match: 'Inga filer matchar din sökning eller det valda filtret.',
-    
+
     // Footer
     footer_diagnostics: 'SYSTEMDIAGNOSTIK & TELEMETRI',
     footer_nominal: 'ALLA_SYSTEM_NOMINELLA',
@@ -343,7 +352,7 @@ export const translations = {
     footer_link_portfolio: '[portfolio]',
     footer_link_blog: '[blogg]',
     footer_link_files: '[filer]',
-    
+
     // 404 Page
     not_found_status: 'HTTP 404 // KOMMANDO_HITTADES_INTE',
     not_found_title: 'Sökvägen hittades inte',
@@ -357,6 +366,15 @@ export const translations = {
     term_input_placeholder: "skriv 'help', 'school', 'swim', 'cat whoami.md'...",
     term_closed_title: 'Vem är gulo? // Om mig & bakgrund',
     term_reopen_btn: 'Öppna terminal',
+    term_boot_status: 'STATION_BOOT // SYSTEM_READY',
+    term_boot_greeting: 'HEJ, JAG ÄR GUSTAV',
+    term_boot_sub: 'Gustav Löfqvist // gulo',
+    boot_prefix: 'hej, jag är',
+    boot_education: 'Civilingenjör Datateknik • Chalmers',
+    boot_loading: 'startar terminalen...',
+    term_boot_tagline: 'Datateknik @ Chalmers • Systemutvecklare • Simmare',
+    term_boot_mounting: 'Initierar terminal...',
+    term_boot_skip_hint: '[valfri tangent / klicka för att hoppa över]',
     term_minimized_pill: 'MINIMERAD (klicka för att expandera)',
     term_bio_trigger_label: 'Profil & biografi finns i bakgrunden',
     term_bio_trigger_action: 'Klicka för att visa bio',

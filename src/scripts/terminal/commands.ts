@@ -55,6 +55,25 @@ export function getCommands(): Record<string, CommandFunction> {
       return getBioOutput(ctx.lang);
     },
 
+    intro: (_args, ctx) => {
+      const isSv = ctx.lang === 'sv';
+      return `<div class="space-y-2 py-1">
+  <div class="text-[#10b981] font-bold text-sm sm:text-base">&gt; ${isSv ? 'HEJ, JAG ÄR GUSTAV' : "HI, I'M GUSTAV"}</div>
+  <pre class="text-[#10b981] text-[9px] sm:text-[10px] leading-tight font-mono hidden sm:block select-none opacity-90">
+ ██████╗ ██╗   ██╗███████╗████████╗ █████╗ ██╗   ██╗
+██╔════╝ ██║   ██║██╔════╝╚══██╔══╝██╔══██╗██║   ██║
+██║  ███╗██║   ██║███████╗   ██║   ███████║██║   ██║
+██║   ██║██║   ██║╚════██║   ██║   ██╔══██║╚██╗ ██╔╝
+╚██████╔╝╚██████╔╝███████║   ██║   ██║  ██║ ╚████╔╝ 
+  </pre>
+  <div class="text-[#e6edf3] font-semibold text-xs sm:text-sm">Gustav Löfstedt // <span class="text-[#38bdf8]">gulo</span></div>
+  <div class="text-[#8b949e] text-xs">${isSv ? 'Civilingenjör Datateknik @ Chalmers Tekniska Högskola (Åk 2).' : 'Second-year M.Sc. Computer Science &amp; Engineering @ Chalmers University of Technology.'}</div>
+  <div class="text-[#8b949e] text-xs">${isSv ? 'Systemutveckling (C, Rust, Linux), tävlingssimning och homelab.' : 'Systems programming (C, Rust, Linux), competitive swimming, and homelab enthusiast.'}</div>
+</div>`;
+    },
+    boot: (args, ctx) => commands.intro(args, ctx),
+    gustav: (args, ctx) => commands.intro(args, ctx),
+
     // 1d. CV & RESUME
     cv: (_args, ctx) => getCvOutput(ctx.lang),
 
@@ -718,6 +737,9 @@ ${ctx.escapeHtml(node.content)}
       sessionStorage.removeItem('terminal_cmd_history');
       sessionStorage.removeItem('terminal_history_html');
       sessionStorage.removeItem('terminal_nav_scroll_y');
+      sessionStorage.removeItem('terminal_opened_on_mobile');
+      sessionStorage.removeItem('gulo_boot_intro_played');
+      sessionStorage.removeItem('navigated_via_cli');
       localStorage.removeItem('terminal_cmd_history');
 
       // Unhide thought notice on current page if present
@@ -727,41 +749,17 @@ ${ctx.escapeHtml(node.content)}
       // 4. Reset cwd to ~
       ctx.setCurrentPath([]);
 
-      // 5. Purge command history & clear terminal output
+      // 5. Purge command history & clear terminal output buffer
       ctx.clearHistory();
 
-      return `
-<div class="space-y-2 font-mono text-xs p-3.5 rounded bg-[#0d1117] border border-[#10b981]/50 text-[#e6edf3]">
-  <div class="text-[#10b981] font-bold flex items-center gap-2 text-sm border-b border-[#30363d]/60 pb-1.5">
-    <span>✓</span> <span>SYSTEM RESET // FACTORY DEFAULTS RESTORED</span>
-  </div>
-  <div class="text-[#8b949e] text-xs space-y-1">
-    <div class="flex items-center gap-2">
-      <span class="text-[#10b981]">●</span> <span>Language reset:</span>
-      <span class="text-[#e6edf3] font-semibold">English (EN)</span>
-    </div>
-    <div class="flex items-center gap-2">
-      <span class="text-[#38bdf8]">●</span> <span>Ambient background:</span>
-      <span class="text-[#e6edf3] font-semibold">standard (dark cockpit)</span>
-    </div>
-    <div class="flex items-center gap-2">
-      <span class="text-[#f59e0b]">●</span> <span>Dismissed notices:</span>
-      <span class="text-[#e6edf3] font-semibold">Restored &amp; unhidden</span>
-    </div>
-    <div class="flex items-center gap-2">
-      <span class="text-[#a78bfa]">●</span> <span>Terminal history &amp; buffer:</span>
-      <span class="text-[#e6edf3] font-semibold">Purged</span>
-    </div>
-    <div class="flex items-center gap-2">
-      <span class="text-[#8b949e]">●</span> <span>Working directory:</span>
-      <span class="text-[#e6edf3] font-semibold">~</span>
-    </div>
-  </div>
-  <div class="text-[11px] text-[#8b949e] pt-1.5 border-t border-[#30363d]/40">
-    All user preferences, session flags, and console state have been reset to initial cockpit defaults.
-  </div>
-</div>`;
+      // 6. Trigger reboot sequence across all pages (even subpages like /thoughts)
+      window.dispatchEvent(new CustomEvent('terminal-reboot'));
+
+      // Return empty string so no output is printed in the terminal
+      return '';
     },
+    reboot: (args, ctx) => commands.reset(args, ctx),
+    restart: (args, ctx) => commands.reset(args, ctx),
     'factory-reset': (args, ctx) => commands.reset(args, ctx),
     defaults: (args, ctx) => commands.reset(args, ctx),
     default: (args, ctx) => commands.reset(args, ctx),

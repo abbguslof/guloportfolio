@@ -351,6 +351,21 @@ const dynamicFileSystemSv = {
     <>
       <script is:inline>
         (function() {
+          var navEntries = performance.getEntriesByType && performance.getEntriesByType('navigation');
+          var isReload = (navEntries && navEntries[0] && navEntries[0].type === 'reload') || 
+                         (window.performance && window.performance.navigation && window.performance.navigation.type === 1);
+          if (isReload) {
+            sessionStorage.removeItem('terminal_history_html');
+            sessionStorage.removeItem('terminal_cmd_history');
+            sessionStorage.removeItem('terminal_body_scroll');
+            sessionStorage.removeItem('terminal_nav_scroll_y');
+            sessionStorage.removeItem('navigated_via_cli');
+            sessionStorage.removeItem('terminal_cat_hint_dismissed');
+            sessionStorage.removeItem('gulo_boot_intro_played');
+            sessionStorage.removeItem('terminal_closed_by_user');
+            sessionStorage.removeItem('terminal_opened_on_mobile');
+          }
+
           var isPhone = window.innerWidth < 640;
           var isClosed = sessionStorage.getItem('terminal_closed_by_user') === 'true';
           var viaCli = sessionStorage.getItem('navigated_via_cli') === 'true';
@@ -432,7 +447,7 @@ const dynamicFileSystemSv = {
   <!-- Terminal Window Container -->
   <div 
     id="terminal-window" 
-    class="rounded-lg border border-[#30363d] bg-[#161b22] shadow-2xl transition-all duration-200 overflow-hidden flex flex-col max-h-[min(880px,78dvh)]"
+    class="relative rounded-lg border border-[#30363d] bg-[#161b22] shadow-2xl transition-all duration-200 overflow-hidden flex flex-col max-h-[min(880px,78dvh)]"
   >
     <!-- Window Title Bar with Interactive Controls -->
     <div 
@@ -501,13 +516,164 @@ const dynamicFileSystemSv = {
       </div>
     </div>
 
+    <!-- 0. Authentic Linux Kernel Boot Intro Overlay (Runs strictly once per visit, desktop only) -->
+    <div 
+      id="terminal-boot-screen" 
+      style="display: none;" 
+      class="absolute inset-x-0 bottom-0 top-[36px] sm:top-[38px] z-40 bg-[#161b22] p-4 sm:p-6 font-mono text-xs select-none cursor-pointer flex flex-col justify-center items-center overflow-hidden shadow-2xl"
+    >
+      <!-- STAGE 1: Fast Linux Kernel Console Output (Full terminal window view) -->
+      <div 
+        id="boot-stage-kernel" 
+        class="w-full h-full flex flex-col justify-start space-y-0.5 sm:space-y-1 text-[10px] sm:text-[11.5px] leading-tight sm:leading-snug text-[#8b949e] overflow-hidden"
+      >
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2">
+          <span class="text-[#38bdf8] font-semibold">[    0.000000]</span>
+          <span>Linux version 6.12.8-zen1 (gulo@chalmers-station) (gcc 14.2.1)</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2">
+          <span class="text-[#38bdf8] font-semibold">[    0.012489]</span>
+          <span>Command line: BOOT_IMAGE=/vmlinuz-linux-zen root=UUID=nvme0n1p2 quiet rw</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2">
+          <span class="text-[#38bdf8] font-semibold">[    0.024102]</span>
+          <span>x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2">
+          <span class="text-[#38bdf8] font-semibold">[    0.038411]</span>
+          <span>systemd[1]: Detected architecture x86-64, cgroups v2 enabled</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2">
+          <span class="text-[#38bdf8] font-semibold">[    0.051900]</span>
+          <span>btrfs: subvolume /home/gulo mounted with zstd:3 compression</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2">
+          <span class="text-[#10b981] font-bold">[  OK  ]</span>
+          <span class="text-[#e6edf3]">Started D-Bus System Message Bus (dbus.service)</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2 text-[#f59e0b]">
+          <span class="text-[#f59e0b] font-bold">[ WARN ]</span>
+          <span class="text-[#f59e0b]">cat_driver: feline supervisor asleep on exhaust fan; purrs acknowledged</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2">
+          <span class="text-[#10b981] font-bold">[  OK  ]</span>
+          <span class="text-[#e6edf3]">Reached target Local Encrypted Storage</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2">
+          <span class="text-[#10b981] font-bold">[  OK  ]</span>
+          <span class="text-[#e6edf3]">Mounted root filesystem on /dev/nvme0n1p2 (/ rw)</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2 text-[#f59e0b]">
+          <span class="text-[#f59e0b] font-bold">[ WARN ]</span>
+          <span class="text-[#f59e0b]">coffee_daemon: caffeine reserves at 14%; scheduling espresso refill</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2">
+          <span class="text-[#10b981] font-bold">[  OK  ]</span>
+          <span class="text-[#e6edf3]">Started WireGuard Secure Tunnel: wg0 (gothenburg-lan)</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2">
+          <span class="text-[#10b981] font-bold">[  OK  ]</span>
+          <span class="text-[#e6edf3]">Network link online: Gothenburg, SE (latency ~11.8ms)</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2 text-[#f59e0b]">
+          <span class="text-[#f59e0b] font-bold">[ WARN ]</span>
+          <span class="text-[#f59e0b]">valhalla_swimd: butterfly stroke drag elevated; streamline patch applied</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2">
+          <span class="text-[#10b981] font-bold">[  OK  ]</span>
+          <span class="text-[#e6edf3]">hid_custom_kbd: 65% mechanical switches lubed with Krytox 205g0</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2 text-[#f59e0b]">
+          <span class="text-[#f59e0b] font-bold">[ WARN ]</span>
+          <span class="text-[#f59e0b]">chalmers_examd: 0 errors detected in math proof; statistical anomaly suspected</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2">
+          <span class="text-[#10b981] font-bold">[  OK  ]</span>
+          <span class="text-[#e6edf3]">Started PaperMC Dedicated SMP: mc-station.service (20.0 TPS)</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2">
+          <span class="text-[#10b981] font-bold">[  OK  ]</span>
+          <span class="text-[#e6edf3]">Synchronized system clock via NTP (ntp.se)</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2">
+          <span class="text-[#10b981] font-bold">[  OK  ]</span>
+          <span class="text-[#e6edf3]">Loaded Neovim Lua environment &amp; treesitter parsers</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2 text-[#f59e0b]">
+          <span class="text-[#f59e0b] font-bold">[ WARN ]</span>
+          <span class="text-[#f59e0b]">tmux_session: 18 detached sessions found; hoarding tendencies noted</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2">
+          <span class="text-[#10b981] font-bold">[  OK  ]</span>
+          <span class="text-[#e6edf3]">Reached target Multi-User System</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2">
+          <span class="text-[#10b981] font-bold">[  OK  ]</span>
+          <span class="text-[#e6edf3]">Station target reached: playground.target</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2">
+          <span class="text-[#10b981] font-bold">[  OK  ]</span>
+          <span class="text-[#e6edf3]">Authenticated user session: gustav (gulo)</span>
+        </div>
+        <div class="boot-line flex items-center gap-1.5 sm:gap-2 text-[#38bdf8]">
+          <span class="text-[#38bdf8] font-bold">[  OK  ]</span>
+          <span class="text-[#38bdf8]">Handing over console to station boot splash...</span>
+        </div>
+      </div>
+
+      <!-- STAGE 2: Standalone Centered Boot Splash Screen (GUSTAV_) -->
+      <div 
+        id="boot-stage-logo" 
+        style="display: none;" 
+        class="w-full max-w-lg mx-auto my-auto flex flex-col justify-center items-center text-center p-6 sm:p-8 rounded-xl bg-[#0d1117] border border-[#30363d] shadow-2xl"
+      >
+        <div class="text-xs sm:text-sm font-mono text-[#8b949e] uppercase tracking-widest flex items-center justify-center gap-2 mb-1.5">
+          <span class="text-[#10b981] font-bold">&gt;</span>
+          <span id="boot-prefix-text" data-i18n="boot_prefix">hi, i'm</span>
+        </div>
+
+        <div class="text-5xl sm:text-7xl md:text-8xl font-black font-mono tracking-tight text-[#e6edf3] leading-none my-2 select-none">
+          GUSTAV<span class="text-[#10b981] boot-cursor-blink">_</span>
+        </div>
+
+        <div id="boot-sub-text" data-i18n="boot_education" class="mt-2 text-xs sm:text-sm font-mono text-[#8b949e]">
+          Computer Science &amp; Engineering • Chalmers
+        </div>
+
+        <div class="mt-4 text-[11px] text-[#10b981] flex items-center justify-center gap-2 font-mono">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-ping"></span>
+          <span id="boot-status-text" data-i18n="boot_loading">launching terminal...</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Terminal Collapsible Body -->
-    <div id="terminal-body" class="p-3 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto overflow-y-auto flex-1 transition-all">
+    <div id="terminal-body" class="relative p-3 sm:p-5 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto overflow-y-auto flex-1 transition-all">
+      <script is:inline>
+        (function() {
+          var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          var isPhone = window.innerWidth < 640;
+          var hasBootPlayed = sessionStorage.getItem('gulo_boot_intro_played') === 'true';
+          var isClosed = sessionStorage.getItem('terminal_closed_by_user') === 'true';
+          var viaCli = sessionStorage.getItem('navigated_via_cli') === 'true';
+          var isSub = window.location.pathname !== '/' && window.location.pathname !== '';
+          if (!isPhone && !prefersReducedMotion && !hasBootPlayed && !isClosed && !viaCli && !isSub) {
+            var bs = document.getElementById('terminal-boot-screen');
+            var tb = document.getElementById('terminal-body');
+            if (bs) bs.style.display = 'flex';
+            if (tb) {
+              tb.style.visibility = 'hidden';
+              tb.style.opacity = '0';
+            }
+          }
+        })();
+      </script>
+
       <!-- Fastfetch Layout -->
       <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 pb-4 sm:pb-5 border-b border-[#30363d]/80">
-        <!-- Fastfetch ASCII Emblem (Left column) -->
-        <div class="shrink-0 select-none font-mono text-[10px] sm:text-xs leading-[1.2] p-2.5 sm:p-3 rounded bg-[#161b22] border border-[#30363d]/80 flex flex-col justify-center items-center text-center max-w-full overflow-hidden">
-          <pre class="leading-tight text-center font-mono">
+          <!-- Fastfetch ASCII Emblem (Left column) -->
+          <div class="shrink-0 select-none font-mono text-[10px] sm:text-xs leading-[1.2] p-2.5 sm:p-3 rounded bg-[#161b22] border border-[#30363d]/80 flex flex-col justify-center items-center text-center max-w-full overflow-hidden">
+            <pre class="leading-tight text-center font-mono">
 <span class="text-[#38bdf8]">     /\_____/\     </span>
 <span class="text-[#38bdf8]">    /</span>  <span class="text-[#e6edf3] font-bold">o</span>   <span class="text-[#e6edf3] font-bold">o</span>  <span class="text-[#38bdf8]">\    </span>
 <span class="text-[#10b981]">   (</span> <span class="text-[#38bdf8]">==</span>  <span class="text-[#10b981] font-bold">^</span>  <span class="text-[#38bdf8]">==</span> <span class="text-[#10b981]">)   </span>
@@ -515,102 +681,91 @@ const dynamicFileSystemSv = {
 <span class="text-[#10b981]">   (</span>  <span class="text-[#38bdf8]">[D-24]</span>   <span class="text-[#10b981]">)   </span>
 <span class="text-[#10b981]">  (</span> <span class="text-[#38bdf8]">(  )</span>   <span class="text-[#38bdf8]">(  )</span> <span class="text-[#10b981]">)  </span>
 <span class="text-[#38bdf8]"> (__(__)___(__)__) </span>
-          </pre>
-          <div id="fastfetch-badge" class="mt-2 text-[10px] font-bold text-[#10b981] tracking-wider uppercase">
-            {fastfetchDataEn.badge || 'CHALMERS // D-24'}
-          </div>
-          <div id="fastfetch-tagline" class="text-[9px] text-[#8b949e]">
-            {fastfetchDataEn.tagline || 'swimmer • sysdev'}
-          </div>
-        </div>
-
-        <!-- Fastfetch Specs (Right column) -->
-        <div class="flex-1 min-w-0 w-full space-y-1 text-xs sm:text-sm">
-          <!-- Fastfetch Header: user@host -->
-          <div>
-            <span id="fastfetch-user" class="text-[#10b981] font-bold">{fastfetchDataEn.user || 'gulo'}</span><span class="text-[#8b949e]">@</span><span id="fastfetch-host" class="text-[#38bdf8] font-bold">{fastfetchDataEn.host || 'chalmers-station'}</span>
-            <div class="text-[#30363d] overflow-hidden whitespace-nowrap tracking-tighter leading-none mt-0.5 select-none w-full" aria-hidden="true">
-              ---------------------------------------------------
+            </pre>
+            <div id="fastfetch-badge" class="mt-2 text-[10px] font-bold text-[#10b981] tracking-wider uppercase">
+              {fastfetchDataEn.badge || 'CHALMERS // D-24'}
+            </div>
+            <div id="fastfetch-tagline" class="text-[9px] text-[#8b949e]">
+              {fastfetchDataEn.tagline || 'swimmer • sysdev'}
             </div>
           </div>
 
-          <!-- Specs list -->
-          <div class="space-y-1 pt-1 text-xs" id="fastfetch-specs-list">
-            {fastfetchDataEn.specs.map((item: any) => {
-              const colorClass = item.color === 'emerald' ? 'text-[#10b981]' : item.color === 'amber' ? 'text-[#f59e0b]' : 'text-[#38bdf8]';
-              return (
-                <div class="grid grid-cols-[82px_1fr] sm:grid-cols-[110px_1fr] gap-x-2 text-[11px] sm:text-xs fastfetch-spec-row">
-                  <span class={`${colorClass} font-semibold spec-key-label truncate`}>{item.key}:</span>
-                  {item.online ? (
-                    <span class="text-[#10b981] font-medium flex items-center gap-1.5 spec-val-label break-words">
-                      <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-ping shrink-0"></span>
-                      <span>{item.value}</span>
-                    </span>
-                  ) : (
-                    <span class="text-[#e6edf3] spec-val-label break-words">{item.value}</span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+          <!-- Fastfetch Specs (Right column) -->
+          <div class="flex-1 min-w-0 w-full space-y-1 text-xs sm:text-sm">
+            <!-- Fastfetch Header: user@host -->
+            <div>
+              <span id="fastfetch-user" class="text-[#10b981] font-bold">{fastfetchDataEn.user || 'gulo'}</span><span class="text-[#8b949e]">@</span><span id="fastfetch-host" class="text-[#38bdf8] font-bold">{fastfetchDataEn.host || 'chalmers-station'}</span>
+              <div class="text-[#30363d] overflow-hidden whitespace-nowrap tracking-tighter leading-none mt-0.5 select-none w-full" aria-hidden="true">
+                ---------------------------------------------------
+              </div>
+            </div>
 
-          <!-- Terminal 8-color test palette bar -->
-          <div class="pt-2 flex items-center gap-1.5" title="Terminal 8-color test palette">
-            <span class="w-4 h-2.5 rounded-xs bg-[#0d1117] border border-[#30363d]"></span>
-            <span class="w-4 h-2.5 rounded-xs bg-[#f85149]"></span>
-            <span class="w-4 h-2.5 rounded-xs bg-[#10b981]"></span>
-            <span class="w-4 h-2.5 rounded-xs bg-[#f59e0b]"></span>
-            <span class="w-4 h-2.5 rounded-xs bg-[#38bdf8]"></span>
-            <span class="w-4 h-2.5 rounded-xs bg-[#a78bfa]"></span>
-            <span class="w-4 h-2.5 rounded-xs bg-[#56d364]"></span>
-            <span class="w-4 h-2.5 rounded-xs bg-[#e6edf3]"></span>
+            <!-- Specs list -->
+            <div class="space-y-1 pt-1 text-xs" id="fastfetch-specs-list">
+              {fastfetchDataEn.specs.map((item: any) => {
+                const colorClass = item.color === 'emerald' ? 'text-[#10b981]' : item.color === 'amber' ? 'text-[#f59e0b]' : 'text-[#38bdf8]';
+                return (
+                  <div class="grid grid-cols-[82px_1fr] sm:grid-cols-[110px_1fr] gap-x-2 text-[11px] sm:text-xs fastfetch-spec-row">
+                    <span class={`${colorClass} font-semibold spec-key-label truncate`}>{item.key}:</span>
+                    {item.online ? (
+                      <span class="text-[#10b981] font-medium flex items-center gap-1.5 spec-val-label break-words">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-ping shrink-0"></span>
+                        <span>{item.value}</span>
+                      </span>
+                    ) : (
+                      <span class="text-[#e6edf3] spec-val-label break-words">{item.value}</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <!-- Terminal 8-color test palette bar -->
+            <div class="pt-2 flex items-center gap-1.5" title="Terminal 8-color test palette">
+              <span class="w-4 h-2.5 rounded-xs bg-[#0d1117] border border-[#30363d]"></span>
+              <span class="w-4 h-2.5 rounded-xs bg-[#f85149]"></span>
+              <span class="w-4 h-2.5 rounded-xs bg-[#10b981]"></span>
+              <span class="w-4 h-2.5 rounded-xs bg-[#f59e0b]"></span>
+              <span class="w-4 h-2.5 rounded-xs bg-[#38bdf8]"></span>
+              <span class="w-4 h-2.5 rounded-xs bg-[#a78bfa]"></span>
+              <span class="w-4 h-2.5 rounded-xs bg-[#56d364]"></span>
+              <span class="w-4 h-2.5 rounded-xs bg-[#e6edf3]"></span>
+            </div>
           </div>
         </div>
+
+        <!-- Terminal Ready Banner -->
+        <div id="terminal-ready-banner" class="pt-2 text-[#8b949e] text-[11px] sm:text-xs select-none">
+          Terminal ready. Type <code class="text-[#10b981] font-bold">help</code> for command list (<code class="text-[#38bdf8]">school</code>, <code class="text-[#38bdf8]">swim</code>, <code class="text-[#38bdf8]">ls</code>, <code class="text-[#38bdf8]">cd</code>, <code class="text-[#38bdf8]">cat</code>, <code class="text-[#38bdf8]">open</code>). Press <code class="text-[#10b981]">Tab</code> to auto-complete.
+        </div>
+
+        <!-- Terminal Output History -->
+        <div id="terminal-history" class="pt-2 space-y-2.5" aria-live="polite"></div>
+
+        <!-- Active Interactive Prompt Row -->
+        <form id="terminal-form" class="mt-3 flex items-center gap-1.5 sm:gap-2 pt-2 border-t border-[#30363d]/40">
+          <label id="terminal-prompt-label" for="terminal-input" class="text-xs sm:text-sm text-[#10b981] font-semibold whitespace-nowrap select-none flex items-center gap-0.5 sm:gap-1 shrink-0">
+            <span class="hidden sm:inline">visitor@playground</span>
+            <span class="sm:hidden">visitor</span>
+            <span class="text-[#8b949e]">:</span>
+            <span id="prompt-cwd" class="text-[#38bdf8]">~</span>
+            <span class="text-[#e6edf3]">$</span>
+          </label>
+          <input 
+            id="terminal-input" 
+            type="text" 
+            autocomplete="off" 
+            autocorrect="off" 
+            autocapitalize="off" 
+            spellcheck="false" 
+            class="flex-1 min-w-0 bg-transparent border-none text-[#e6edf3] text-xs sm:text-sm focus:outline-none focus:ring-0 p-0 font-mono caret-[#10b981]"
+            placeholder="type 'help', 'school', 'swim', 'cat whoami.md'..."
+            data-i18n-placeholder="term_input_placeholder"
+          />
+          <button type="submit" class="sr-only" tabindex="-1">Run command</button>
+        </form>
       </div>
-
-      <!-- Quick mobile tap command chips -->
-      <div class="pt-2.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar select-none text-[11px] font-mono text-[#8b949e]">
-        <span class="text-[10px] text-[#8b949e]/80 shrink-0 font-semibold uppercase tracking-wider hidden xs:inline" data-i18n="term_quick_label">Run:</span>
-        <button type="button" class="quick-cmd-chip px-2.5 py-1 min-h-[28px] rounded bg-[#0d1117] border border-[#30363d] text-[#10b981] hover:border-[#10b981] hover:bg-[#10b981]/10 active:scale-95 transition-all cursor-pointer shrink-0 font-bold" data-cmd="help">help</button>
-        <button type="button" class="quick-cmd-chip px-2.5 py-1 min-h-[28px] rounded bg-[#0d1117] border border-[#30363d] text-[#38bdf8] hover:border-[#38bdf8] hover:bg-[#38bdf8]/10 active:scale-95 transition-all cursor-pointer shrink-0 font-bold" data-cmd="bio">bio</button>
-        <button type="button" class="quick-cmd-chip px-2.5 py-1 min-h-[28px] rounded bg-[#0d1117] border border-[#30363d] text-[#a78bfa] hover:border-[#a78bfa] hover:bg-[#a78bfa]/10 active:scale-95 transition-all cursor-pointer shrink-0 font-bold" data-cmd="projects">projects</button>
-        <button type="button" class="quick-cmd-chip px-2.5 py-1 min-h-[28px] rounded bg-[#0d1117] border border-[#30363d] text-[#f59e0b] hover:border-[#f59e0b] hover:bg-[#f59e0b]/10 active:scale-95 transition-all cursor-pointer shrink-0 font-bold" data-cmd="thoughts">thoughts</button>
-        <button type="button" class="quick-cmd-chip px-2.5 py-1 min-h-[28px] rounded bg-[#0d1117] border border-[#30363d] text-[#10b981] hover:border-[#10b981] hover:bg-[#10b981]/10 active:scale-95 transition-all cursor-pointer shrink-0 font-bold" data-cmd="status">status</button>
-        <button type="button" class="quick-cmd-chip px-2.5 py-1 min-h-[28px] rounded bg-[#0d1117] border border-[#30363d] text-[#8b949e] hover:border-[#8b949e] hover:bg-[#8b949e]/10 active:scale-95 transition-all cursor-pointer shrink-0 font-bold" data-cmd="clear">clear</button>
-      </div>
-
-      <!-- Terminal Ready Banner -->
-      <div id="terminal-ready-banner" class="pt-2 text-[#8b949e] text-[11px] sm:text-xs select-none">
-        Terminal ready. Type <code class="text-[#10b981] font-bold">help</code> or tap chips above (<code class="text-[#38bdf8]">school</code>, <code class="text-[#38bdf8]">swim</code>, <code class="text-[#38bdf8]">ls</code>, <code class="text-[#38bdf8]">cd</code>, <code class="text-[#38bdf8]">cat</code>, <code class="text-[#38bdf8]">open</code>). Press <code class="text-[#10b981]">Tab</code> to auto-complete.
-      </div>
-
-      <!-- Terminal Output History -->
-      <div id="terminal-history" class="pt-2 space-y-2.5" aria-live="polite"></div>
-
-      <!-- Active Interactive Prompt Row -->
-      <form id="terminal-form" class="mt-3 flex items-center gap-1.5 sm:gap-2 pt-2 border-t border-[#30363d]/40">
-        <label id="terminal-prompt-label" for="terminal-input" class="text-xs sm:text-sm text-[#10b981] font-semibold whitespace-nowrap select-none flex items-center gap-0.5 sm:gap-1 shrink-0">
-          <span class="hidden sm:inline">visitor@playground</span>
-          <span class="sm:hidden">visitor</span>
-          <span class="text-[#8b949e]">:</span>
-          <span id="prompt-cwd" class="text-[#38bdf8]">~</span>
-          <span class="text-[#e6edf3]">$</span>
-        </label>
-        <input 
-          id="terminal-input" 
-          type="text" 
-          autocomplete="off" 
-          autocorrect="off" 
-          autocapitalize="off" 
-          spellcheck="false" 
-          class="flex-1 min-w-0 bg-transparent border-none text-[#e6edf3] text-xs sm:text-sm focus:outline-none focus:ring-0 p-0 font-mono caret-[#10b981]"
-          placeholder="type 'help', 'school', 'swim', 'cat whoami.md'..."
-          data-i18n-placeholder="term_input_placeholder"
-        />
-        <button type="submit" class="sr-only" tabindex="-1">Run command</button>
-      </form>
     </div>
-  </div>
 
   <!-- Minimized State Cat Notice: zero-height overlay wrapper ensures ZERO layout shift on sections below -->
   {!isSubpage && (
@@ -758,6 +913,8 @@ const dynamicFileSystemSv = {
     const promptCwd = document.getElementById('prompt-cwd');
 
     const isSubpage = termSection.getAttribute('data-is-subpage') === 'true';
+    const is404 = termSection.getAttribute('data-is-404') === 'true';
+    const viaCli = sessionStorage.getItem('navigated_via_cli') === 'true';
 
     let isMinimized = false;
     let isMaximized = false;
@@ -769,6 +926,193 @@ const dynamicFileSystemSv = {
       sessionStorage.removeItem('terminal_cat_hint_dismissed');
     }
     let catHintDismissed = sessionStorage.getItem('terminal_cat_hint_dismissed') === 'true';
+
+    // ==========================================
+    // 0. AUTHENTIC LINUX BOOT INTRO (ONCE PER VISIT, DESKTOP ONLY)
+    // ==========================================
+    // ==========================================
+    // 0. AUTHENTIC LINUX BOOT INTRO (ONCE PER VISIT, DESKTOP ONLY)
+    // ==========================================
+    const BOOT_CONFIG = {
+      storageKey: 'gulo_boot_intro_played',
+      timings: {
+        // Stage 1: Kernel cascade starts at 70ms and finishes at ~480ms + 150ms pause = 630ms
+        kernelHandoff: 630,
+        // Handoff transition animation duration (ms)
+        handoffAnimMs: 120,
+        // Stage 2: Time centered Gustav splash stays on screen (ms)
+        splashDuration: 2200,
+        // Stage 3: Snappy fade out into interactive shell (ms)
+        exitFadeMs: 150,
+      },
+      i18n: {
+        en: {
+          prefix: "hi, i'm",
+          sub: 'Computer Science & Engineering • Chalmers',
+          status: 'launching terminal...',
+        },
+        sv: {
+          prefix: 'hej, jag är',
+          sub: 'Civilingenjör Datateknik • Chalmers',
+          status: 'startar terminalen...',
+        },
+      },
+    };
+
+    let bootScreen = document.getElementById('terminal-boot-screen');
+    let bootTimers: any[] = [];
+    let bootKeyHandler: ((e: KeyboardEvent) => void) | null = null;
+
+    function clearBootTimers() {
+      bootTimers.forEach(t => clearTimeout(t));
+      bootTimers = [];
+    }
+
+    function dismissBootIntro(immediate = false) {
+      clearBootTimers();
+      if (bootKeyHandler) {
+        window.removeEventListener('keydown', bootKeyHandler);
+        bootKeyHandler = null;
+      }
+
+      if (termBody) {
+        termBody.style.visibility = 'visible';
+        termBody.style.transition = immediate ? 'none' : `opacity ${BOOT_CONFIG.timings.exitFadeMs}ms ease-out`;
+        termBody.style.opacity = '1';
+      }
+      if (!bootScreen) return;
+      if (immediate) {
+        bootScreen.style.display = 'none';
+        bootScreen.style.opacity = '0';
+        bootScreen.style.pointerEvents = 'none';
+        input?.focus({ preventScroll: true });
+        return;
+      }
+      bootScreen.style.transition = `opacity ${BOOT_CONFIG.timings.exitFadeMs}ms ease-out`;
+      bootScreen.style.opacity = '0';
+      bootScreen.style.pointerEvents = 'none';
+      const t = setTimeout(() => {
+        if (bootScreen) bootScreen.style.display = 'none';
+        input?.focus({ preventScroll: true });
+      }, BOOT_CONFIG.timings.exitFadeMs + 10);
+      bootTimers.push(t);
+    }
+
+    function playBootIntro(force = false) {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const isPhone = window.innerWidth < 640;
+
+      if (isPhone || prefersReducedMotion) {
+        sessionStorage.setItem(BOOT_CONFIG.storageKey, 'true');
+        if (bootScreen) bootScreen.style.display = 'none';
+        if (termBody) {
+          termBody.style.visibility = 'visible';
+          termBody.style.opacity = '1';
+        }
+        return;
+      }
+
+      const hasBootPlayed = sessionStorage.getItem(BOOT_CONFIG.storageKey) === 'true';
+      if (!force && (hasBootPlayed || isSubpage || is404 || viaCli)) {
+        sessionStorage.setItem(BOOT_CONFIG.storageKey, 'true');
+        if (bootScreen) bootScreen.style.display = 'none';
+        if (termBody) {
+          termBody.style.visibility = 'visible';
+          termBody.style.opacity = '1';
+        }
+        return;
+      }
+
+      sessionStorage.setItem(BOOT_CONFIG.storageKey, 'true');
+      clearBootTimers();
+      if (bootKeyHandler) {
+        window.removeEventListener('keydown', bootKeyHandler);
+        bootKeyHandler = null;
+      }
+
+      // Ensure window and section are open and visible (especially when rebooting on subpages like /thoughts)
+      termSection.classList.remove('hidden');
+      termWindow.classList.remove('hidden', 'term-closing');
+      closedCard?.classList.add('hidden');
+      if (isMinimized) unminimize(true);
+
+      if (termBody) {
+        termBody.style.visibility = 'hidden';
+        termBody.style.opacity = '0';
+        termBody.style.transition = 'none';
+      }
+
+      if (bootScreen) {
+        // Clone node to cleanly restart all CSS keyframe animations from frame 0
+        const cloned = bootScreen.cloneNode(true) as HTMLElement;
+        bootScreen.parentNode?.replaceChild(cloned, bootScreen);
+        bootScreen = cloned;
+
+        // Reset stage states inside cloned node
+        const stageKernel = bootScreen.querySelector('#boot-stage-kernel') as HTMLElement | null;
+        const stageLogo = bootScreen.querySelector('#boot-stage-logo') as HTMLElement | null;
+        if (stageKernel) {
+          stageKernel.style.display = 'flex';
+          stageKernel.classList.remove('boot-console-exit');
+        }
+        if (stageLogo) {
+          stageLogo.style.display = 'none';
+          stageLogo.classList.remove('boot-stage-logo-animate');
+        }
+
+        updateBootLogoLang(getSiteLang());
+
+        bootScreen.style.display = 'flex';
+        bootScreen.style.opacity = '1';
+        bootScreen.style.pointerEvents = 'auto';
+        bootScreen.style.transition = 'none';
+
+        // Stage 1 (Kernel) -> Mini Pause -> Console Exit Animation -> Stage 2 (Centered Splash)
+        const t1 = setTimeout(() => {
+          if (!stageKernel) return;
+          stageKernel.classList.add('boot-console-exit');
+
+          const t2 = setTimeout(() => {
+            stageKernel.style.display = 'none';
+            if (stageLogo) {
+              stageLogo.style.display = 'flex';
+              stageLogo.classList.add('boot-stage-logo-animate');
+            }
+          }, BOOT_CONFIG.timings.handoffAnimMs);
+          bootTimers.push(t2);
+        }, BOOT_CONFIG.timings.kernelHandoff);
+        bootTimers.push(t1);
+
+        // Stage 2 stays on screen for splashDuration (2200ms)
+        const totalDuration = BOOT_CONFIG.timings.kernelHandoff + BOOT_CONFIG.timings.handoffAnimMs + BOOT_CONFIG.timings.splashDuration;
+        const tDismiss = setTimeout(() => dismissBootIntro(false), totalDuration);
+        bootTimers.push(tDismiss);
+
+        // Immediate skip on any user input (click anywhere or any keypress)
+        const tSkip = setTimeout(() => {
+          if (!bootScreen || !document.body.contains(bootScreen)) return;
+
+          bootScreen.addEventListener('click', () => {
+            dismissBootIntro(true);
+          }, { once: true });
+
+          bootKeyHandler = (e: KeyboardEvent) => {
+            if (['Shift', 'Control', 'Alt', 'Meta'].includes(e.key)) return;
+            dismissBootIntro(true);
+          };
+          window.addEventListener('keydown', bootKeyHandler, { once: true });
+        }, 50);
+        bootTimers.push(tSkip);
+      }
+    }
+
+    // Run initial check
+    playBootIntro(false);
+
+    // Replay intro when user runs 'reset' / 'reboot' command on any page
+    window.addEventListener('terminal-reboot', () => {
+      playBootIntro(true);
+    });
 
     // ==========================================
     // 1. DYNAMIC VIRTUAL FILESYSTEM (EN / SV)
@@ -884,10 +1228,21 @@ const dynamicFileSystemSv = {
       }
     }
 
+    function updateBootLogoLang(lang: 'en' | 'sv') {
+      const conf = BOOT_CONFIG.i18n[lang] || BOOT_CONFIG.i18n.en;
+      const prefixEl = document.getElementById('boot-prefix-text');
+      const subEl = document.getElementById('boot-sub-text') || document.getElementById('boot-edu-text');
+      const statusEl = document.getElementById('boot-status-text');
+      if (prefixEl) prefixEl.textContent = conf.prefix;
+      if (subEl) subEl.textContent = conf.sub;
+      if (statusEl) statusEl.textContent = conf.status;
+    }
+
     // Uppdatera fastfetch DOM, closed card dot och placeholder initialt oavsett språk
     const initialIsOnline = isSiteOnline();
     updateFastfetchDOM(activeLang, initialIsOnline);
     updateClosedCardDot(initialIsOnline);
+    updateBootLogoLang(activeLang);
     if (input) {
       input.placeholder = activeLang === 'sv'
         ? "skriv 'help', 'school', 'swim', 'cat whoami.md'..."
@@ -917,6 +1272,7 @@ const dynamicFileSystemSv = {
       activeLang = newLang;
       fileSystem = loadFileSystem(newLang);
       updateFastfetchDOM(newLang);
+      updateBootLogoLang(newLang);
       updateTitle();
 
       if (input) {
@@ -950,6 +1306,7 @@ const dynamicFileSystemSv = {
     let isClosing = false;
     function userCloseWindow() {
       if (isClosing) return;
+      dismissBootIntro(true);
       isClosing = true;
 
       // Klick på kryss räknas som att kattnotisen inte ska behöva komma tillbaka under sessionen
@@ -1130,6 +1487,7 @@ const dynamicFileSystemSv = {
 
     // Minimize helper: delayed appearance (3s) if not previously dismissed
     function applyMinimize() {
+      dismissBootIntro(true);
       if (isMaximized) unmaximize(true);
       isMinimized = true;
       termBody.classList.add('is-minimized');
@@ -1224,21 +1582,6 @@ const dynamicFileSystemSv = {
 
     reopenBtn?.addEventListener('click', () => restoreWindow(false));
 
-    // Tap-to-run quick command chips for mobile & desktop
-    document.querySelectorAll<HTMLButtonElement>('.quick-cmd-chip').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const cmd = btn.getAttribute('data-cmd');
-        if (cmd && input) {
-          input.value = cmd;
-          form.dispatchEvent(new Event('submit', { cancelable: true }));
-          setTimeout(() => {
-            termBody.scrollTop = termBody.scrollHeight;
-          }, 50);
-        }
-      });
-    });
-
     // Lyssna på header-knappens växlings-event
     window.addEventListener('toggle-terminal', () => {
       toggleTerminalVisibility();
@@ -1289,8 +1632,6 @@ const dynamicFileSystemSv = {
     function getCwdLabel(): string {
       return currentPath.length === 0 ? '~' : `~/${currentPath.join('/')}`;
     }
-
-    const is404 = termSection.getAttribute('data-is-404') === 'true';
 
     function updateTitle() {
       const lang = getSiteLang();
@@ -1784,7 +2125,7 @@ const dynamicFileSystemSv = {
             'date', 'uptime', 'fastfetch', 'neofetch', 'fetch', 'uname', 'hostname', 'history',
             'git', 'calc', 'guess', './helloworld.sh', 'helloworld.sh', 'hello', 'tjena', 'hej', 'hejsan', 'halloj',
             'bg', 'exit', 'wget', 'dl', 'download',
-            'reset', 'factory-reset', 'defaults'
+            'reset', 'reboot', 'restart', 'factory-reset', 'defaults'
           ];
           const matches = cmdList.filter(c => c.startsWith(lastToken.toLowerCase()));
 
@@ -2031,6 +2372,113 @@ const dynamicFileSystemSv = {
 </script>
 
 <style>
+  /* Authentic Linux Kernel Boot Cascade */
+  @keyframes bootCascade {
+    from {
+      opacity: 0;
+      transform: translateY(2px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .boot-line {
+    opacity: 0;
+    animation: bootCascade 0.035s ease-out forwards;
+  }
+  .boot-line:nth-child(1)  { animation-delay: 0.070s; }
+  .boot-line:nth-child(2)  { animation-delay: 0.088s; }
+  .boot-line:nth-child(3)  { animation-delay: 0.106s; }
+  .boot-line:nth-child(4)  { animation-delay: 0.124s; }
+  .boot-line:nth-child(5)  { animation-delay: 0.142s; }
+  .boot-line:nth-child(6)  { animation-delay: 0.160s; }
+  .boot-line:nth-child(7)  { animation-delay: 0.180s; }
+  .boot-line:nth-child(8)  { animation-delay: 0.198s; }
+  .boot-line:nth-child(9)  { animation-delay: 0.216s; }
+  .boot-line:nth-child(10) { animation-delay: 0.236s; }
+  .boot-line:nth-child(11) { animation-delay: 0.254s; }
+  .boot-line:nth-child(12) { animation-delay: 0.272s; }
+  .boot-line:nth-child(13) { animation-delay: 0.292s; }
+  .boot-line:nth-child(14) { animation-delay: 0.310s; }
+  .boot-line:nth-child(15) { animation-delay: 0.330s; }
+  .boot-line:nth-child(16) { animation-delay: 0.348s; }
+  .boot-line:nth-child(17) { animation-delay: 0.366s; }
+  .boot-line:nth-child(18) { animation-delay: 0.384s; }
+  .boot-line:nth-child(19) { animation-delay: 0.404s; }
+  .boot-line:nth-child(20) { animation-delay: 0.422s; }
+  .boot-line:nth-child(21) { animation-delay: 0.440s; }
+  .boot-line:nth-child(22) { animation-delay: 0.458s; }
+  .boot-line:nth-child(23) { animation-delay: 0.476s; }
+
+  @keyframes bootConsoleHandoff {
+    0% {
+      opacity: 1;
+      transform: scale(1);
+      filter: brightness(1);
+    }
+    40% {
+      opacity: 0.85;
+      transform: scale(0.995);
+      filter: brightness(1.25);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.985);
+      filter: brightness(0.6);
+    }
+  }
+
+  .boot-console-exit {
+    animation: bootConsoleHandoff 0.12s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes bootSplashEnter {
+    0% {
+      opacity: 0;
+      transform: scale(0.95);
+      filter: blur(2px);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+      filter: blur(0);
+    }
+  }
+
+  .boot-stage-logo-animate {
+    animation: bootSplashEnter 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes bootCursorPulse {
+    0%, 100% {
+      opacity: 1;
+      filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.6));
+    }
+    50% {
+      opacity: 0.35;
+      filter: drop-shadow(0 0 1px rgba(16, 185, 129, 0.2));
+    }
+  }
+
+  .boot-cursor-blink {
+    animation: bootCursorPulse 0.9s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #terminal-boot-screen {
+      display: none !important;
+    }
+    .boot-line,
+    .boot-console-exit,
+    .boot-stage-logo-animate,
+    .boot-cursor-blink {
+      animation: none !important;
+      opacity: 1 !important;
+    }
+  }
+
   /* Indicator dot on closed card when offline/online */
   #closed-card-dot.is-offline {
     background-color: #f85149 !important;

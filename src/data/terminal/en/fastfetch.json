@@ -5,6 +5,11 @@
   "tagline": "swimmer • sysdev",
   "specs": [
     {
+      "key": "Author",
+      "value": "Gustav Löfqvist (gulo)",
+      "color": "emerald"
+    },
+    {
       "key": "OS",
       "value": "Debian GNU/Linux 12 (bookworm) x86_64",
       "color": "sky"
