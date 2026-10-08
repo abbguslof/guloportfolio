@@ -92,7 +92,7 @@ function renderGitStatus(lang: LangCode): string {
   <div class="pt-2 text-[#8b949e]">Changes not staged for commit:</div>
   <div class="text-[#8b949e] pl-4 text-[11px]">(use "git add &lt;file&gt;..." to update what will be committed)</div>
   <div class="pl-4 text-[#f59e0b] font-semibold">modified:   whoami.md <span class="text-[#8b949e] font-normal">(continuous learning &amp; growth)</span></div>
-  <div class="pl-4 text-[#f59e0b] font-semibold">modified:   skills.md <span class="text-[#8b949e] font-normal">(adding more Rust &amp; low-level systems)</span></div>
+  <div class="pl-4 text-[#f59e0b] font-semibold">modified:   skills.md <span class="text-[#8b949e] font-normal">(optimizing Proxmox homelab &amp; systems)</span></div>
   <div class="pt-2 text-[#8b949e]">Untracked files:</div>
   <div class="text-[#8b949e] pl-4 text-[11px]">(use "git add &lt;file&gt;..." to include in what will be committed)</div>
   <div class="pl-4 text-[#f85149]">.secret/</div>
@@ -118,19 +118,19 @@ function renderGitLog(args: string[], _lang: LangCode): string {
 <div class="text-xs font-mono space-y-3 p-3 rounded bg-[#0d1117] border border-[#30363d]">
   <div>
     <div class="text-[#f59e0b]">commit c1d7ff1b83d9e4a <span class="text-[#38bdf8] font-bold">(HEAD -&gt; main, origin/main)</span></div>
-    <div class="text-[#8b949e]">Author: gulo &lt;gulo@chalmers.se&gt;</div>
+    <div class="text-[#8b949e]">Author: gulo &lt;gurra@gulo.se&gt;</div>
     <div class="text-[#8b949e]">Date:   Sun Oct 5 20:00:00 2026 +0200</div>
     <div class="text-[#e6edf3] pl-4 pt-1 font-semibold">feat: polish cockpit aesthetics, instant WebGL transitions &amp; secret eastereggs</div>
   </div>
   <div class="border-t border-[#30363d]/40 pt-2">
     <div class="text-[#f59e0b]">commit 8e20ab49fa2312b</div>
-    <div class="text-[#8b949e]">Author: gulo &lt;gulo@chalmers.se&gt;</div>
+    <div class="text-[#8b949e]">Author: gulo &lt;gurra@gulo.se&gt;</div>
     <div class="text-[#8b949e]">Date:   Wed Oct 1 14:22:10 2026 +0200</div>
     <div class="text-[#e6edf3] pl-4 pt-1 font-semibold">refactor: optimize Minecraft cluster docker orchestration &amp; backups</div>
   </div>
   <div class="border-t border-[#30363d]/40 pt-2">
     <div class="text-[#f59e0b]">commit 10b9810ef4412a0</div>
-    <div class="text-[#8b949e]">Author: gulo &lt;gulo@chalmers.se&gt;</div>
+    <div class="text-[#8b949e]">Author: gulo &lt;gurra@gulo.se&gt;</div>
     <div class="text-[#8b949e]">Date:   Mon Sep 15 09:12:00 2026 +0200</div>
     <div class="text-[#e6edf3] pl-4 pt-1 font-semibold">init: chalmers datateknik digital garden &amp; homelab architecture</div>
   </div>
@@ -141,7 +141,7 @@ function renderGitBranch(_lang: LangCode): string {
   return `
 <div class="text-xs font-mono space-y-1 p-2 rounded bg-[#0d1117] border border-[#30363d]">
   <div class="text-[#10b981] font-bold">* main</div>
-  <div class="text-[#8b949e] pl-2">feature/rust-os-kernel</div>
+  <div class="text-[#8b949e] pl-2">feature/proxmox-homelab-cluster</div>
   <div class="text-[#8b949e] pl-2">homelab/minecraft-cluster</div>
   <div class="text-[#8b949e] pl-2">remotes/origin/main</div>
 </div>`;
@@ -150,14 +150,14 @@ function renderGitBranch(_lang: LangCode): string {
 function renderGitDiff(_lang: LangCode): string {
   return `
 <div class="text-xs font-mono space-y-1 p-3 rounded bg-[#0d1117] border border-[#30363d]">
-  <div class="text-[#8b949e] font-bold">diff --git a/skills.md b/skills.md</div>
+  <div class="text-[#8b949e] font-bold diff-title">diff --git a/skills.md b/skills.md</div>
   <div class="text-[#8b949e]">--- a/skills.md</div>
   <div class="text-[#8b949e]">+++ b/skills.md</div>
   <div class="text-[#38bdf8]">@@ -4,4 +4,6 @@ Focus Areas:</div>
-  <div class="text-[#8b949e]">  - C / C++ systems programming</div>
-  <div class="text-[#8b949e]">  - Linux &amp; Debian server operations</div>
-  <div class="text-[#10b981] bg-[#10b981]/10 px-1">+ - Distributed systems &amp; low-level memory safety</div>
-  <div class="text-[#10b981] bg-[#10b981]/10 px-1">+ - Drinking excessive amounts of tea during exam weeks</div>
+  <div class="text-[#8b949e]">  - C / Python systems programming</div>
+  <div class="text-[#8b949e]">  - Linux &amp; Proxmox server operations</div>
+  <div class="text-[#10b981] bg-[#10b981]/10 px-1">+ - Distributed systems &amp; network security</div>
+  <div class="text-[#10b981] bg-[#10b981]/10 px-1">+ - Elite sprint swimming &amp; academic discipline</div>
 </div>`;
 }
 
@@ -166,8 +166,8 @@ function renderGitRemote(args: string[]): string {
   if (isVerbose) {
     return `
 <div class="text-xs font-mono space-y-1 p-2 rounded bg-[#0d1117] border border-[#30363d]">
-  <div><span class="text-[#38bdf8]">origin</span>  https://github.com/abbguslof/portfoliosite.git (fetch)</div>
-  <div><span class="text-[#38bdf8]">origin</span>  https://github.com/abbguslof/portfoliosite.git (push)</div>
+  <div><span class="text-[#38bdf8]">origin</span>  https://github.com/abbguslof/guloportfolio.git (fetch)</div>
+  <div><span class="text-[#38bdf8]">origin</span>  https://github.com/abbguslof/guloportfolio.git (push)</div>
 </div>`;
   }
   return `<div class="text-xs font-mono text-[#38bdf8]">origin</div>`;

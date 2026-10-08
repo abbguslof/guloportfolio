@@ -57,7 +57,7 @@ export function getCommands(): Record<string, CommandFunction> {
 
     intro: (_args, ctx) => {
       const isSv = ctx.lang === 'sv';
-      return `<div class="space-y-2 py-1">
+      return `<div class="space-y-2 py-1 font-mono">
   <div class="text-[#10b981] font-bold text-sm sm:text-base">&gt; ${isSv ? 'HEJ, JAG ÄR GUSTAV' : "HI, I'M GUSTAV"}</div>
   <pre class="text-[#10b981] text-[9px] sm:text-[10px] leading-tight font-mono hidden sm:block select-none opacity-90">
  ██████╗ ██╗   ██╗███████╗████████╗ █████╗ ██╗   ██╗
@@ -67,8 +67,10 @@ export function getCommands(): Record<string, CommandFunction> {
 ╚██████╔╝╚██████╔╝███████║   ██║   ██║  ██║ ╚████╔╝ 
   </pre>
   <div class="text-[#e6edf3] font-semibold text-xs sm:text-sm">Gustav Löfqvist // <span class="text-[#38bdf8]">gulo</span></div>
-  <div class="text-[#8b949e] text-xs">${isSv ? 'Civilingenjör Datateknik @ Chalmers Tekniska Högskola (Åk 2).' : 'Second-year M.Sc. Computer Science &amp; Engineering @ Chalmers University of Technology.'}</div>
-  <div class="text-[#8b949e] text-xs">${isSv ? 'Systemutveckling (C, Rust, Linux), tävlingssimning och homelab.' : 'Systems programming (C, Rust, Linux), competitive swimming, and homelab enthusiast.'}</div>
+  <div class="text-[#8b949e] text-xs">${isSv ? 'Civilingenjör Datateknik @ Chalmers Tekniska Högskola (Åk 2, EDIT-huset, RIU-elitidrottare).' : 'Second-year M.Sc. Computer Science &amp; Engineering @ Chalmers (EDIT building, accepted RIU elite athlete).'}</div>
+  <div class="text-[#8b949e] text-xs">${isSv ? 'Elitsprintsimmare för MASS &amp; Growth Objective (Åbybadet/GoCo). SM-silver 4x50m frisim.' : 'Elite sprint swimmer for MASS &amp; Growth Objective (Åbybadet/GoCo). SM Silver 4x50m freestyle.'}</div>
+  <div class="text-[#8b949e] text-xs">${isSv ? 'Tech: Python, C, Java, JavaScript, Omarchy (Arch + Hyprland) &amp; Proxmox VE homelab.' : 'Tech: Python, C, Java, JavaScript, Omarchy (Arch + Hyprland) &amp; Proxmox VE homelab.'}</div>
+  <div class="text-[11px] text-[#38bdf8] pt-1 border-t border-[#30363d]/40">${isSv ? 'Kommandon: bio, cv, school, swim, contact, status' : 'Commands: bio, cv, school, swim, contact, status'}</div>
 </div>`;
     },
     boot: (args, ctx) => commands.intro(args, ctx),
@@ -142,38 +144,72 @@ export function getCommands(): Record<string, CommandFunction> {
     english: (_args, ctx) => commands.lang(['english'], ctx),
     engelska: (_args, ctx) => commands.lang(['engelska'], ctx),
 
-    // 2. INFORMATION CARDS
+    // 2. INFORMATION CARDS & BASH ALIASES
     school: (_args, ctx) => {
-      const fileNode = ctx.fileSystem.children['school.md'] || ctx.fileSystem.children['chalmers.md'] || ctx.fileSystem.children['chalmers.txt'];
+      const fileNode = ctx.fileSystem.children['school.md'];
       if (fileNode && fileNode.type === 'file' && fileNode.content) {
         return ctx.renderMarkdownCard(fileNode.content);
       }
       return `<div class="text-[#8b949e] font-mono">Chalmers University of Technology — Computer Science & Engineering (D-24)</div>`;
     },
+    chalmers: (args, ctx) => commands.school(args, ctx),
+    study: (args, ctx) => commands.school(args, ctx),
+    education: (args, ctx) => commands.school(args, ctx),
+    studies: (args, ctx) => commands.school(args, ctx),
+    skola: (args, ctx) => commands.school(args, ctx),
+    studier: (args, ctx) => commands.school(args, ctx),
+    utbildning: (args, ctx) => commands.school(args, ctx),
 
     swim: (_args, ctx) => {
-      const fileNode = ctx.fileSystem.children['swim.md'] || ctx.fileSystem.children['swim.txt'];
+      const fileNode = ctx.fileSystem.children['swim.md'];
       if (fileNode && fileNode.type === 'file' && fileNode.content) {
         return ctx.renderMarkdownCard(fileNode.content);
       }
-      return `<div class="text-[#38bdf8] font-mono">Valhallabadet 50m — Competitive swimming (5-6 sessions/week)</div>`;
+      return `<div class="text-[#38bdf8] font-mono">Åbybadet &amp; GoCo — MASS &amp; Growth Objective (5+ swim sessions/week)</div>`;
     },
+    simma: (args, ctx) => commands.swim(args, ctx),
+    simning: (args, ctx) => commands.swim(args, ctx),
+    swimming: (args, ctx) => commands.swim(args, ctx),
 
     whoami: (_args, ctx) => {
       const fileNode = ctx.fileSystem.children['whoami.md'];
       if (fileNode && fileNode.type === 'file' && fileNode.content) {
         return ctx.renderMarkdownCard(fileNode.content);
       }
-      return `<div class="text-[#10b981] font-mono">gulo // Chalmers student, swimmer & developer</div>`;
+      return `<div class="text-[#10b981] font-mono">gulo // Chalmers student, sprint swimmer &amp; developer</div>`;
     },
+    me: (args, ctx) => commands.whoami(args, ctx),
+    gulo: (args, ctx) => commands.whoami(args, ctx),
 
     contact: (_args, ctx) => {
       const fileNode = ctx.fileSystem.children['contact.md'];
       if (fileNode && fileNode.type === 'file' && fileNode.content) {
         return ctx.renderMarkdownCard(fileNode.content);
       }
-      return `<div class="text-[#10b981] font-mono">GitHub: github.com/abbguslof | Email: contact@example.com</div>`;
+      return `<div class="text-[#10b981] font-mono">GitHub: github.com/abbguslof | Email: gurra@gulo.se</div>`;
     },
+    kontakt: (args, ctx) => commands.contact(args, ctx),
+    email: (args, ctx) => commands.contact(args, ctx),
+    epost: (args, ctx) => commands.contact(args, ctx),
+
+    // .bashrc and homelab command aliases
+    proxmox: (_args, ctx) => {
+      return ctx.lang === 'sv'
+        ? `<div class="text-[#10b981] font-mono">Proxmox VE-kluster: Alla noder mår prima och är online. [Server PC, Raspberry Pi-kluster, Docker, WireGuard]</div>`
+        : `<div class="text-[#10b981] font-mono">Proxmox VE cluster: All nodes healthy and operational. [Server PC, Raspberry Pi cluster, Docker, WireGuard]</div>`;
+    },
+    mc: (_args, ctx) => {
+      return ctx.lang === 'sv'
+        ? `<div class="text-[#10b981] font-mono">PaperMC / Velocity-kluster kör med stabila 20.0 TPS. [SMP &amp; proxy aktiva]</div>`
+        : `<div class="text-[#10b981] font-mono">PaperMC / Velocity cluster running smooth at 20.0 TPS. [SMP &amp; proxy active]</div>`;
+    },
+    minecraft: (args, ctx) => commands.mc(args, ctx),
+    sleep: (_args, ctx) => {
+      return ctx.lang === 'sv'
+        ? `<div class="text-[#f59e0b] font-mono">Error: 404 Sleep Not Found under tentavecka 😴</div>`
+        : `<div class="text-[#f59e0b] font-mono">Error: 404 Sleep Not Found during exam week 😴</div>`;
+    },
+    sova: (args, ctx) => commands.sleep(args, ctx),
 
     // 3. GIT SIMULATION
     git: (args, ctx) => {

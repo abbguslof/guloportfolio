@@ -19,7 +19,7 @@ export interface ScheduleEvent {
   };
   startDate: string; // YYYY-MM-DD
   endDate: string; // YYYY-MM-DD
-  statusPreset: 'exam' | 'camp' | 'hackathon' | 'vacation' | 'regular';
+  statusPreset: 'exam' | 'camp' | 'hackathon' | 'vacation' | 'regular' | 'swim';
   description: {
     sv: string;
     en: string;
@@ -32,93 +32,183 @@ export interface ScheduleEvent {
 
 export const scheduleEvents: ScheduleEvent[] = [
   {
-    id: 'lp1-tentor-2026',
+    id: 'turkey-camp-2026',
     name: {
-      sv: 'Tentavecka Läsperiod 1 (Chalmers)',
-      en: 'Study Period 1 Finals / Exam Week (Chalmers)',
+      sv: 'Elitträningsläger i Turkiet (Growth Objective)',
+      en: 'Elite Swim Training Camp in Turkey (Growth Objective)',
     },
-    startDate: '2026-10-19',
-    endDate: '2026-10-24',
-    statusPreset: 'exam',
-    description: {
-      sv: 'Tentor i Operativsystem & Datakommunikation. Högt fokus, begränsad svarstid.',
-      en: 'Final exams in Operating Systems & Data Communications. Deep focus, reduced availability.',
-    },
-    badge: {
-      sv: 'TENTAVECKA LP1',
-      en: 'EXAM WEEK SP1',
-    },
-  },
-  {
-    id: 'autumn-camp-2026',
-    name: {
-      sv: 'Höstläger Simning (Valhallabadet)',
-      en: 'Autumn Swim Training Camp (Valhallabadet)',
-    },
-    startDate: '2026-11-02',
-    endDate: '2026-11-06',
+    startDate: '2026-10-14',
+    endDate: '2026-10-23',
     statusPreset: 'camp',
     description: {
-      sv: 'Dubbelpass i 50m-bassäng, laktattester och teknikslipning.',
-      en: 'Double sessions in 50m pool, lactate threshold testing, stroke refinement.',
+      sv: 'Intensivt träningsläger med Growth Objective. Dubbelpass, fysträning & sprintoptimering.',
+      en: 'Intensive training camp with Growth Objective. Double swim sessions, dryland & sprint mechanics.',
     },
     badge: {
-      sv: 'SIMLÄGER 50M',
-      en: 'SWIM CAMP 50M',
+      sv: 'SIMLÄGER TURKIET',
+      en: 'TURKEY SWIM CAMP',
     },
   },
   {
-    id: 'lp2-tentor-2026',
+    id: 'lp1-tentor-2026',
     name: {
-      sv: 'Tentavecka Läsperiod 2 (Chalmers)',
-      en: 'Study Period 2 Finals / Exam Week (Chalmers)',
+      sv: 'Tentamensperiod 1 (Chalmers)',
+      en: 'Exam Period 1 / Finals (Chalmers)',
     },
-    startDate: '2026-12-14',
-    endDate: '2026-12-19',
+    startDate: '2026-10-24',
+    endDate: '2026-10-30',
     statusPreset: 'exam',
     description: {
-      sv: 'Tentor i Distribuerade System & Algoritmer. Serverunderhåll på paus.',
-      en: 'Finals in Distributed Systems & Algorithms. Server maintenance on hold.',
+      sv: 'Tentavecka på Chalmers Datateknik. Högt pluggfokus, begränsad svarstid.',
+      en: 'Final exams at Chalmers Computer Science & Eng. Deep focus, reduced availability.',
     },
     badge: {
-      sv: 'TENTAVECKA LP2',
-      en: 'EXAM WEEK SP2',
+      sv: 'TENTAMENSPERIOD 1',
+      en: 'EXAM PERIOD 1',
     },
   },
   {
-    id: 'winter-break-2026',
+    id: 'sm-kortbana-2026',
     name: {
-      sv: 'Vinterledighet & Homelab Hackathon',
-      en: 'Winter Break & Homelab Sprint',
+      sv: 'SM / U21-SM kortbana 25m (Linköping)',
+      en: 'Swedish National Championships 25m (Linköping)',
+    },
+    startDate: '2026-12-09',
+    endDate: '2026-12-13',
+    statusPreset: 'swim',
+    description: {
+      sv: 'Tävlar på Svenska Mästerskapen för MASS & Growth Objective. 50m/100m frisim och fjäril.',
+      en: 'Competing at Swedish Nationals for MASS & Growth Objective. 50m/100m freestyle and butterfly.',
+    },
+    badge: {
+      sv: 'SM LINKÖPING 25M',
+      en: 'SM NATIONALS 25M',
+    },
+  },
+  {
+    id: 'vinter-studier-2026',
+    name: {
+      sv: 'Självstudier & Vinterledighet',
+      en: 'Self-Study & Winter Break',
     },
     startDate: '2026-12-21',
-    endDate: '2027-01-08',
-    statusPreset: 'hackathon',
+    endDate: '2026-12-30',
+    statusPreset: 'vacation',
     description: {
-      sv: 'Ledighet från kurser. Migrerar Minecraft-klustret till ny kernel & bygger dotfiles.',
-      en: 'Break from classes. Migrating Minecraft cluster to new kernel & refactoring dotfiles.',
+      sv: 'Uppehåll från föreläsningar. Självstudier, homelab och återhämtning.',
+      en: 'Break from lectures. Self-study, homelab tinkering, and recovery.',
     },
     badge: {
-      sv: 'HOMELAB SPRINT',
-      en: 'HOMELAB SPRINT',
+      sv: 'VINTERLEDIGHET',
+      en: 'WINTER BREAK',
     },
   },
   {
-    id: 'omtentavecka-2027',
+    id: 'lp2-tentor-2027',
     name: {
-      sv: 'Omtentavecka Chalmers',
-      en: 'Re-exam Week Chalmers',
+      sv: 'Tentamensperiod 2 (Chalmers)',
+      en: 'Exam Period 2 / Finals (Chalmers)',
     },
-    startDate: '2027-01-04',
-    endDate: '2027-01-09',
+    startDate: '2027-01-09',
+    endDate: '2027-01-16',
     statusPreset: 'exam',
     description: {
-      sv: 'Omtentor och laborationsuppsamling.',
-      en: 'Re-exams and laboratory completion week.',
+      sv: 'Tentor på Chalmers tekniska högskola.',
+      en: 'Final examinations at Chalmers University of Technology.',
     },
     badge: {
-      sv: 'OMTENTAVECKA',
-      en: 'RE-EXAMS',
+      sv: 'TENTAMENSPERIOD 2',
+      en: 'EXAM PERIOD 2',
+    },
+  },
+  {
+    id: 'charm-2027',
+    name: {
+      sv: 'CHARM Arbetsmarknadsdagar',
+      en: 'CHARM Career Fair (Chalmers)',
+    },
+    startDate: '2027-02-09',
+    endDate: '2027-02-10',
+    statusPreset: 'hackathon',
+    description: {
+      sv: 'Chalmers arbetsmarknadsdagar. Nätverkar och diskuterar sommarjobb 2027 & exjobb.',
+      en: 'Chalmers career fair. Networking for summer 2027 internships & thesis.',
+    },
+    badge: {
+      sv: 'CHARM 2027',
+      en: 'CHARM CAREER FAIR',
+    },
+  },
+  {
+    id: 'lp3-tentor-2027',
+    name: {
+      sv: 'Tentamensperiod 3 (Chalmers)',
+      en: 'Exam Period 3 / Finals (Chalmers)',
+    },
+    startDate: '2027-03-13',
+    endDate: '2027-03-20',
+    statusPreset: 'exam',
+    description: {
+      sv: 'Tentamensvecka för läsperiod 3.',
+      en: 'Exam week for study period 3.',
+    },
+    badge: {
+      sv: 'TENTAMENSPERIOD 3',
+      en: 'EXAM PERIOD 3',
+    },
+  },
+  {
+    id: 'lp4-tentor-2027',
+    name: {
+      sv: 'Tentamensperiod 4 (Chalmers)',
+      en: 'Exam Period 4 / Finals (Chalmers)',
+    },
+    startDate: '2027-05-29',
+    endDate: '2027-06-05',
+    statusPreset: 'exam',
+    description: {
+      sv: 'Sluttentor för läsåret på Chalmers.',
+      en: 'Academic year-end final exams at Chalmers.',
+    },
+    badge: {
+      sv: 'TENTAMENSPERIOD 4',
+      en: 'EXAM PERIOD 4',
+    },
+  },
+  {
+    id: 'sm-langbana-2027',
+    name: {
+      sv: 'SM / Para-SM / U21-SM 50m (Norrköping)',
+      en: 'Swedish National Championships 50m (Norrköping)',
+    },
+    startDate: '2027-06-30',
+    endDate: '2027-07-04',
+    statusPreset: 'swim',
+    description: {
+      sv: 'Svenska Mästerskapen i långbana (50m) på Centralbadet i Norrköping.',
+      en: 'Swedish National Championships (50m) at Centralbadet in Norrköping.',
+    },
+    badge: {
+      sv: 'SM NORRKÖPING 50M',
+      en: 'SM NATIONALS 50M',
+    },
+  },
+  {
+    id: 'sm-kortbana-2027',
+    name: {
+      sv: 'SM / U21-SM 25m (Stockholm Eriksdal)',
+      en: 'Swedish National Championships 25m (Stockholm)',
+    },
+    startDate: '2027-12-15',
+    endDate: '2027-12-19',
+    statusPreset: 'swim',
+    description: {
+      sv: 'Kortbane-SM på Eriksdalsbadet i Stockholm.',
+      en: 'Short course Swedish Nationals at Eriksdalsbadet in Stockholm.',
+    },
+    badge: {
+      sv: 'SM STOCKHOLM 25M',
+      en: 'SM NATIONALS 25M',
     },
   },
 ];

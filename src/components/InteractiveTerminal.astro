@@ -50,16 +50,17 @@ let fastfetchDataEn: any = {
   badge: 'CHALMERS // D-24',
   tagline: 'swimmer • sysdev',
   specs: [
-    { key: 'OS', value: 'Debian GNU/Linux 12 (bookworm) x86_64', color: 'sky' },
-    { key: 'Host', value: 'chalmers-workstation', color: 'sky' },
+    { key: 'Author', value: 'Gustav Löfqvist (gulo)', color: 'emerald' },
+    { key: 'OS', value: 'Omarchy (Arch Linux + Hyprland)', color: 'sky' },
+    { key: 'Host', value: 'chalmers-station', color: 'sky' },
     { key: 'Kernel', value: 'Linux 6.12.8-zen1', color: 'sky' },
     { key: 'Uptime', value: '42 days, 8 hours, 14 mins', color: 'sky' },
-    { key: 'Shell', value: 'zsh 5.9 / bash 5.2 • kitty', color: 'sky' },
-    { key: 'Editor', value: 'Neovim v0.10.2 (Lua dotfiles)', color: 'sky' },
-    { key: 'Education', value: 'M.Sc. Computer Science & Eng @ Chalmers (Year 2)', color: 'emerald' },
-    { key: 'Swimming', value: 'Valhallabadet (5-6 sessions/wk, freestyle/fly)', color: 'emerald' },
-    { key: 'Homelab', value: 'PaperMC SMP cluster, Docker, Velocity', color: 'emerald' },
-    { key: 'Status', value: '[ONLINE] Exam week & server ops', color: 'amber', online: true }
+    { key: 'Shell', value: 'bash 5.2 / zsh 5.9 • alacritty', color: 'sky' },
+    { key: 'Editor', value: 'Neovim', color: 'sky' },
+    { key: 'Education', value: 'M.Sc. Computer Science & Eng @ Chalmers (EDIT, Year 2)', color: 'emerald' },
+    { key: 'Swimming', value: 'MASS & Growth Objective // Åbybadet & GoCo (Sprint free/fly)', color: 'emerald' },
+    { key: 'Homelab', value: 'Proxmox VE, Raspberry Pi, Web & MC clusters', color: 'emerald' },
+    { key: 'Status', value: '[ONLINE] Studying & Sprint training', color: 'amber', online: true }
   ]
 };
 
@@ -75,16 +76,17 @@ let fastfetchDataSv: any = {
   badge: 'CHALMERS // D-24',
   tagline: 'simmare • sysdev',
   specs: [
-    { key: 'OS', value: 'Debian GNU/Linux 12 (bookworm) x86_64', color: 'sky' },
-    { key: 'Host', value: 'chalmers-workstation', color: 'sky' },
+    { key: 'Skapare', value: 'Gustav Löfqvist (gulo)', color: 'emerald' },
+    { key: 'OS', value: 'Omarchy (Arch Linux + Hyprland)', color: 'sky' },
+    { key: 'Host', value: 'chalmers-station', color: 'sky' },
     { key: 'Kernel', value: 'Linux 6.12.8-zen1', color: 'sky' },
     { key: 'Uptime', value: '42 dagar, 8 timmar, 14 min', color: 'sky' },
-    { key: 'Shell', value: 'zsh 5.9 / bash 5.2 • kitty', color: 'sky' },
-    { key: 'Editor', value: 'Neovim v0.10.2 (Lua dotfiles)', color: 'sky' },
-    { key: 'Utbildning', value: 'Civilingenjör Datateknik @ Chalmers (Åk 2)', color: 'emerald' },
-    { key: 'Simning', value: 'Valhallabadet (5-6 pass/v, frisim/fjäril)', color: 'emerald' },
-    { key: 'Homelab', value: 'PaperMC SMP-kluster, Docker, Velocity', color: 'emerald' },
-    { key: 'Status', value: '[ONLINE] Tentavecka & serverdrift', color: 'amber', online: true }
+    { key: 'Shell', value: 'bash 5.2 / zsh 5.9 • alacritty', color: 'sky' },
+    { key: 'Editor', value: 'Neovim', color: 'sky' },
+    { key: 'Utbildning', value: 'Civilingenjör Datateknik @ Chalmers (EDIT, Åk 2)', color: 'emerald' },
+    { key: 'Simning', value: 'MASS & Growth Objective // Åbybadet & GoCo (Sprint frisim/fjäril)', color: 'emerald' },
+    { key: 'Homelab', value: 'Proxmox VE, Raspberry Pi, Webb & MC-kluster', color: 'emerald' },
+    { key: 'Status', value: '[ONLINE] Studier & Sprintträning', color: 'amber', online: true }
   ]
 };
 
@@ -405,14 +407,14 @@ const dynamicFileSystemSv = {
           <div>
             <span class="text-[#38bdf8] font-semibold block mb-0.5" data-i18n="term_card_chalmers_title">Chalmers University of Technology</span>
             <p class="text-[#e6edf3] leading-relaxed" data-i18n="term_card_chalmers_desc">
-              Second-year student in the M.Sc. in Computer Science &amp; Engineering program. Focused on operating systems, memory safety, distributed systems, and low-level C/Rust.
+              Second-year student in the M.Sc. in Computer Science &amp; Engineering program. Accepted RIU elite athlete student at the EDIT building. Focusing on systems architecture, algorithms, and development.
             </p>
           </div>
 
           <div>
             <span class="text-[#38bdf8] font-semibold block mb-0.5" data-i18n="term_card_swim_title">Competitive Swimming</span>
             <p class="text-[#e6edf3] leading-relaxed" data-i18n="term_card_swim_desc">
-              Active competitive swimmer training at Valhallabadet (5-6 sessions/week). Swimming provides the mental discipline and focus needed to solve difficult technical challenges.
+              Competitive sprint swimmer for MASS and Growth Objective (Åbybadet &amp; GoCo, 5+ swim &amp; 3 gym sessions/week). 50m &amp; 100m freestyle and butterfly sprint specialist.
             </p>
           </div>
         </div>
@@ -421,14 +423,14 @@ const dynamicFileSystemSv = {
           <div>
             <span class="text-[#38bdf8] font-semibold block mb-0.5" data-i18n="term_card_homelab_title">Homelab &amp; Infrastructure</span>
             <p class="text-[#e6edf3] leading-relaxed" data-i18n="term_card_homelab_desc">
-              Running a dedicated Minecraft cluster (PaperMC 1.20 SMP) on Debian 12 with isolated Docker containers, automated zstd backups, and WireGuard VPN.
+              Dedicated Proxmox VE server and Raspberry Pi cluster. Deploying websites, Minecraft clusters, and internal services.
             </p>
           </div>
 
           <div>
-            <span class="text-[#38bdf8] font-semibold block mb-0.5" data-i18n="term_card_creative_title">Creative, 35mm Film &amp; Dotfiles</span>
+            <span class="text-[#38bdf8] font-semibold block mb-0.5" data-i18n="term_card_creative_title">Creative, Outdoors &amp; Media</span>
             <p class="text-[#e6edf3] leading-relaxed" data-i18n="term_card_creative_desc">
-              Shooting analog 35mm photography, building Neovim dotfiles in Lua, playing co-op games, and tweaking Linux environments (Arch + Hyprland).
+              Outdoors enthusiast (hiking, climbing, cycling, discgolf, golf), photo and video production with Sony ZV-E10, and tweaking Omarchy (Arch + Hyprland).
             </p>
           </div>
         </div>
@@ -577,7 +579,7 @@ const dynamicFileSystemSv = {
         </div>
         <div class="boot-line flex items-center gap-1.5 sm:gap-2 text-[#f59e0b]">
           <span class="text-[#f59e0b] font-bold">[ WARN ]</span>
-          <span class="text-[#f59e0b]">valhalla_swimd: butterfly stroke drag elevated; streamline patch applied</span>
+          <span class="text-[#f59e0b]">mass_swimd: butterfly stroke drag elevated; Åbybadet streamline patch applied</span>
         </div>
         <div class="boot-line flex items-center gap-1.5 sm:gap-2">
           <span class="text-[#10b981] font-bold">[  OK  ]</span>
@@ -971,7 +973,7 @@ const dynamicFileSystemSv = {
     function dismissBootIntro(immediate = false) {
       clearBootTimers();
       if (bootKeyHandler) {
-        window.removeEventListener('keydown', bootKeyHandler);
+        window.removeEventListener('keydown', bootKeyHandler, { capture: true } as any);
         bootKeyHandler = null;
       }
 
@@ -985,7 +987,14 @@ const dynamicFileSystemSv = {
         bootScreen.style.display = 'none';
         bootScreen.style.opacity = '0';
         bootScreen.style.pointerEvents = 'none';
-        input?.focus({ preventScroll: true });
+        // Delay input focus slightly (15ms) to ensure the key event has completely finished
+        // so that the dismissal keystroke is never entered into the terminal prompt.
+        setTimeout(() => {
+          if (input) {
+            input.value = '';
+            input.focus({ preventScroll: true });
+          }
+        }, 15);
         return;
       }
       bootScreen.style.transition = `opacity ${BOOT_CONFIG.timings.exitFadeMs}ms ease-out`;
@@ -993,7 +1002,10 @@ const dynamicFileSystemSv = {
       bootScreen.style.pointerEvents = 'none';
       const t = setTimeout(() => {
         if (bootScreen) bootScreen.style.display = 'none';
-        input?.focus({ preventScroll: true });
+        if (input) {
+          input.value = '';
+          input.focus({ preventScroll: true });
+        }
       }, BOOT_CONFIG.timings.exitFadeMs + 10);
       bootTimers.push(t);
     }
@@ -1026,8 +1038,14 @@ const dynamicFileSystemSv = {
       sessionStorage.setItem(BOOT_CONFIG.storageKey, 'true');
       clearBootTimers();
       if (bootKeyHandler) {
-        window.removeEventListener('keydown', bootKeyHandler);
+        window.removeEventListener('keydown', bootKeyHandler, { capture: true } as any);
         bootKeyHandler = null;
+      }
+
+      // Ensure input is blurred and empty during boot intro
+      if (input) {
+        input.blur();
+        input.value = '';
       }
 
       // Ensure window and section are open and visible (especially when rebooting on subpages like /thoughts)
@@ -1092,16 +1110,23 @@ const dynamicFileSystemSv = {
         const tSkip = setTimeout(() => {
           if (!bootScreen || !document.body.contains(bootScreen)) return;
 
-          bootScreen.addEventListener('click', () => {
+          bootScreen.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             dismissBootIntro(true);
           }, { once: true });
 
           bootKeyHandler = (e: KeyboardEvent) => {
             if (['Shift', 'Control', 'Alt', 'Meta'].includes(e.key)) return;
+            // Prevent keystroke from reaching the terminal input or performing default browser actions
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+            if (input) input.value = '';
             dismissBootIntro(true);
           };
-          window.addEventListener('keydown', bootKeyHandler, { once: true });
-        }, 50);
+          window.addEventListener('keydown', bootKeyHandler, { capture: true, once: true });
+        }, 10);
         bootTimers.push(tSkip);
       }
     }
@@ -2115,10 +2140,11 @@ const dynamicFileSystemSv = {
         // Tab på första ordet -> komplettera kommando
         if (tokens.length <= 1) {
           const cmdList = [
-            'help', 'status', 'schedule', 'tentor', 'school', 'swim', 'whoami', 'contact', 'discord', 'kontakt',
+            'help', 'status', 'schedule', 'tentor', 'school', 'study', 'education', 'chalmers', 'swim', 'whoami', 'gustav', 'contact', 'discord', 'kontakt',
             'home', 'hem', 'main', 'cockpit', 'root',
             'bio', 'about', 'tldr', 'info', 'profil', 'profile',
             'cv', 'resume', 'recruit', 'stats', 'btop', 'htop',
+            'proxmox', 'mc', 'minecraft', 'sleep', 'sova',
             'lang', 'language', 'sprak', 'språk', 'se', 'sv', 'swe', 'swedish', 'svenska', 'en', 'eng', 'english', 'engelska',
             'ls', 'cd', 'cat', 'nvim', 'vim', 'vi', 'pwd', 'grep', 'open', 
             'projects', 'project', 'thoughts', 'thought', 'blog', 'note', 'notes', 'guide', 'guides', 'files', 'clear', 

@@ -11,12 +11,12 @@
     },
     {
       "key": "OS",
-      "value": "Debian GNU/Linux 12 (bookworm) x86_64",
+      "value": "Omarchy (Arch Linux + Hyprland)",
       "color": "sky"
     },
     {
       "key": "Host",
-      "value": "chalmers-workstation",
+      "value": "chalmers-station",
       "color": "sky"
     },
     {
@@ -31,32 +31,32 @@
     },
     {
       "key": "Shell",
-      "value": "zsh 5.9 / bash 5.2 • kitty",
+      "value": "bash 5.2 / zsh 5.9 • alacritty",
       "color": "sky"
     },
     {
       "key": "Editor",
-      "value": "Neovim v0.10.2 (Lua dotfiles)",
+      "value": "Neovim",
       "color": "sky"
     },
     {
       "key": "Education",
-      "value": "M.Sc. Computer Science & Eng @ Chalmers (Year 2)",
+      "value": "M.Sc. Computer Science & Eng @ Chalmers (EDIT, Year 2)",
       "color": "emerald"
     },
     {
       "key": "Swimming",
-      "value": "Valhallabadet (5-6 sessions/wk, freestyle/fly)",
+      "value": "MASS & Growth Objective // Åbybadet & GoCo (Sprint free/fly)",
       "color": "emerald"
     },
     {
       "key": "Homelab",
-      "value": "PaperMC SMP cluster, Docker, Velocity",
+      "value": "Proxmox VE, Raspberry Pi, Web & MC clusters",
       "color": "emerald"
     },
     {
       "key": "Status",
-      "value": "[ONLINE] Exam week & server ops",
+      "value": "[ONLINE] Studying & Sprint training",
       "color": "amber",
       "online": true
     }

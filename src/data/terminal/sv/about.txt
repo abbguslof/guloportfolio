@@ -1,5 +1,0 @@
-Vem är gulo?
-- Utbildning: Civilingenjör Datateknik @ Chalmers Tekniska Högskola (Åk 2)
-- Sport: Kapplöpningssimmare (Valhallabadet, 50m frisim & fjäril)
-- Tech: Homelab, Linux, Rust, C, Docker, Minecraft-servrar
-- Fritid: Analogt fotografi (35mm film), Gaming, Dotfiles

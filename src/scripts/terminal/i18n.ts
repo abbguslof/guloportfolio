@@ -29,7 +29,7 @@ export function getStandardHelpHtml(lang: LangCode): string {
       <div><span class="text-[#10b981] font-semibold">bio / about</span> : Komplett profil, CV &amp; översikt</div>
       <div><span class="text-[#10b981] font-semibold">status</span> : Live-status, homelab &amp; tillgänglighet</div>
       <div><span class="text-[#10b981] font-semibold">schedule / tentor</span> : Chalmers tentaveckor &amp; planering</div>
-      <div><span class="text-[#10b981] font-semibold">school / chalmers</span> : Chalmers-studier &amp; kurser</div>
+      <div><span class="text-[#10b981] font-semibold">school / study</span> : Chalmers-studier, kurser &amp; RIU</div>
       <div><span class="text-[#10b981] font-semibold">swim</span> : Simningspass &amp; träningstider</div>
       <div><span class="text-[#10b981] font-semibold">whoami</span> : Information om mig &amp; bakgrund</div>
       <div><span class="text-[#10b981] font-semibold">contact</span> : Kontaktvägar &amp; sociala medier</div>
@@ -76,7 +76,7 @@ export function getStandardHelpHtml(lang: LangCode): string {
       <div><span class="text-[#10b981] font-semibold">bio / about</span> : Complete profile, CV &amp; overview</div>
       <div><span class="text-[#10b981] font-semibold">status</span> : Live status, homelab &amp; availability</div>
       <div><span class="text-[#10b981] font-semibold">schedule / exams</span> : Chalmers finals &amp; exam calendar</div>
-      <div><span class="text-[#10b981] font-semibold">school / chalmers</span> : Chalmers coursework &amp; focus</div>
+      <div><span class="text-[#10b981] font-semibold">school / study</span> : Chalmers coursework, focus &amp; RIU</div>
       <div><span class="text-[#10b981] font-semibold">swim</span> : Swim routines &amp; training stats</div>
       <div><span class="text-[#10b981] font-semibold">whoami</span> : Background &amp; profile overview</div>
       <div><span class="text-[#10b981] font-semibold">contact</span> : Contact info &amp; social handles</div>
@@ -136,9 +136,10 @@ export function getExtendedHelpHtml(lang: LangCode): string {
           <div><code class="text-[#10b981]">cv</code>, <code class="text-[#10b981]">resume</code>, <code class="text-[#10b981]">recruit</code> : Utbildning, tekniska färdigheter &amp; meriter</div>
           <div><code class="text-[#10b981]">status</code> : Live-status för homelab, studier &amp; tillgänglighet</div>
           <div><code class="text-[#10b981]">schedule</code>, <code class="text-[#10b981]">tentor</code> : Chalmers tentaveckor &amp; träningsläger</div>
-          <div><code class="text-[#10b981]">school</code>, <code class="text-[#10b981]">chalmers</code> : Civilingenjör Datateknik @ Chalmers (D-24)</div>
-          <div><code class="text-[#10b981]">swim</code> : Tävlingssimning i Valhallabadet &amp; passrutiner</div>
-          <div><code class="text-[#10b981]">whoami</code>, <code class="text-[#10b981]">contact</code> : Vem jag är, GitHub, e-post &amp; sociala medier</div>
+          <div><code class="text-[#10b981]">school</code>, <code class="text-[#10b981]">study</code>, <code class="text-[#10b981]">education</code> : Civilingenjör Datateknik @ Chalmers (D-24)</div>
+          <div><code class="text-[#10b981]">swim</code> : Tävlingssimning för MASS &amp; Growth Objective</div>
+          <div><code class="text-[#10b981]">whoami</code>, <code class="text-[#10b981]">gustav</code>, <code class="text-[#10b981]">contact</code> : Vem jag är, GitHub, e-post &amp; sociala medier</div>
+          <div><code class="text-[#10b981]">proxmox</code>, <code class="text-[#10b981]">mc</code>, <code class="text-[#10b981]">sleep</code> : Bashrc-alias &amp; homelab-status</div>
         </div>
       </div>
 
@@ -232,9 +233,10 @@ export function getExtendedHelpHtml(lang: LangCode): string {
           <div><code class="text-[#10b981]">cv</code>, <code class="text-[#10b981]">resume</code>, <code class="text-[#10b981]">recruit</code> : Education, technical skillsets &amp; experience</div>
           <div><code class="text-[#10b981]">status</code> : Live homelab status, academic focus &amp; availability</div>
           <div><code class="text-[#10b981]">schedule</code>, <code class="text-[#10b981]">exams</code> : Chalmers exam calendar &amp; training camps</div>
-          <div><code class="text-[#10b981]">school</code>, <code class="text-[#10b981]">chalmers</code> : Chalmers Computer Science degree (D-24)</div>
-          <div><code class="text-[#10b981]">swim</code> : Competitive swim routines &amp; Valhallabadet sets</div>
-          <div><code class="text-[#10b981]">whoami</code>, <code class="text-[#10b981]">contact</code> : Identity, GitHub, email &amp; social profiles</div>
+          <div><code class="text-[#10b981]">school</code>, <code class="text-[#10b981]">study</code>, <code class="text-[#10b981]">education</code> : Chalmers Computer Science degree (D-24)</div>
+          <div><code class="text-[#10b981]">swim</code> : Competitive swimming for MASS &amp; Growth Objective</div>
+          <div><code class="text-[#10b981]">whoami</code>, <code class="text-[#10b981]">gustav</code>, <code class="text-[#10b981]">contact</code> : Identity, GitHub, email &amp; social profiles</div>
+          <div><code class="text-[#10b981]">proxmox</code>, <code class="text-[#10b981]">mc</code>, <code class="text-[#10b981]">sleep</code> : Bashrc aliases &amp; homelab status</div>
         </div>
       </div>
 
@@ -391,7 +393,7 @@ export function getOsOpinionOutput(lang: LangCode): string {
     <p class="text-[#10b981] font-bold">Men sedan startar man om i 0.8 sekunder utan att bli tillfrågad om Outlook, OneDrive, Copilot och Edge. Och då vet man att det var värt det. 🐧</p>
   </div>
   <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/40 pt-1">
-    <span class="text-[#38bdf8]">BTW, I use</span> <span class="text-[#10b981] font-bold">Arch... nej, Debian. Okej, det beror på.</span>
+    <span class="text-[#38bdf8]">BTW, I use</span> <span class="text-[#10b981] font-bold">Omarchy (Arch Linux + Hyprland).</span>
   </div>
 </div>`;
   }
@@ -409,7 +411,7 @@ export function getOsOpinionOutput(lang: LangCode): string {
     <p class="text-[#10b981] font-bold">But then you reboot in 0.8 seconds without being asked about Outlook, OneDrive, Copilot and Edge. And you know it was worth it. 🐧</p>
   </div>
   <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/40 pt-1">
-    <span class="text-[#38bdf8]">BTW, I use</span> <span class="text-[#10b981] font-bold">Arch... no wait, Debian. Well, it depends.</span>
+    <span class="text-[#38bdf8]">BTW, I use</span> <span class="text-[#10b981] font-bold">Omarchy (Arch Linux + Hyprland).</span>
   </div>
 </div>`;
 }
@@ -664,19 +666,19 @@ export function getBioOutput(lang: LangCode): string {
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-1 text-[#8b949e]">
       <div class="p-2 rounded bg-[#161b22] border border-[#30363d]">
         <div class="text-[#38bdf8] font-bold mb-0.5">🎓 Chalmers Studier</div>
-        <div>Civilingenjör Datateknik (åk 2). Fokus på minneshantering, C/Rust, datastrukturer och distribuerade nätverk.</div>
+        <div>Civilingenjör Datateknik (åk 2, EDIT-huset, RIU-elitidrottare). Fokus på systemarkitektur, algoritmer och programutveckling.</div>
       </div>
       <div class="p-2 rounded bg-[#161b22] border border-[#30363d]">
         <div class="text-[#38bdf8] font-bold mb-0.5">🏊‍♂️ Simning &amp; Disciplin</div>
-        <div>Tävlingssimmar 5–6 pass i veckan på Valhallabadet. Träningen ger skarp mental uthållighet och struktur.</div>
+        <div>Elitsprintsimmare för MASS &amp; Growth Objective (Åbybadet &amp; GoCo, 5+ simpass, 3 gympass/v). SM-medaljör.</div>
       </div>
       <div class="p-2 rounded bg-[#161b22] border border-[#30363d]">
-        <div class="text-[#38bdf8] font-bold mb-0.5">🖥️ Homelab &amp; Nätverk</div>
-        <div>Dedikerat PaperMC-kluster på Debian 12, isolerade Docker-containrar, WireGuard och automatiserade zstd-backuper.</div>
+        <div class="text-[#38bdf8] font-bold mb-0.5">🖥️ Homelab &amp; Driftsättning</div>
+        <div>Server-PC med Proxmox VE, Raspberry Pi-kluster. Driftsätter webbplatser, Minecraft-kluster och interna tjänster.</div>
       </div>
       <div class="p-2 rounded bg-[#161b22] border border-[#30363d]">
-        <div class="text-[#38bdf8] font-bold mb-0.5">📸 Analogt &amp; Miljö</div>
-        <div>Fotograferar 35mm film, bygger Neovim-plugins i Lua och trivs bäst i anpassade terminalmiljöer.</div>
+        <div class="text-[#38bdf8] font-bold mb-0.5">🌲 Friluftsliv &amp; Media</div>
+        <div>Vandring, klättring, discgolf, foto &amp; video med Sony ZV-E10, samt Omarchy (Arch + Hyprland).</div>
       </div>
     </div>
   </div>
@@ -707,19 +709,19 @@ export function getBioOutput(lang: LangCode): string {
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-1 text-[#8b949e]">
       <div class="p-2 rounded bg-[#161b22] border border-[#30363d]">
         <div class="text-[#38bdf8] font-bold mb-0.5">🎓 Chalmers Academics</div>
-        <div>M.Sc. Computer Science (Year 2). Focus on memory safety, operating systems, C/Rust, and network concurrency.</div>
+        <div>M.Sc. Computer Science (Year 2, EDIT building, RIU elite athlete). Focus on systems architecture, algorithms, and development.</div>
       </div>
       <div class="p-2 rounded bg-[#161b22] border border-[#30363d]">
-        <div class="text-[#38bdf8] font-bold mb-0.5">🏊‍♂️ Competitive Swimming</div>
-        <div>Training 5–6 sessions/week at Valhallabadet. Swimming builds mental discipline and deep resilience.</div>
+        <div class="text-[#38bdf8] font-bold mb-0.5">🏊‍♂️ Sprint Swimming</div>
+        <div>Elite sprint swimmer for MASS &amp; Growth Objective (Åbybadet &amp; GoCo, 5+ swim &amp; 3 gym sessions/wk). SM medalist.</div>
       </div>
       <div class="p-2 rounded bg-[#161b22] border border-[#30363d]">
-        <div class="text-[#38bdf8] font-bold mb-0.5">🖥️ Homelab &amp; Systems</div>
-        <div>Dedicated PaperMC cluster on Debian 12, isolated Docker containers, WireGuard mesh, and zstd cron backups.</div>
+        <div class="text-[#38bdf8] font-bold mb-0.5">🖥️ Homelab &amp; Deployment</div>
+        <div>Proxmox VE server, Raspberry Pi cluster. Deploying websites, Minecraft clusters, and internal services.</div>
       </div>
       <div class="p-2 rounded bg-[#161b22] border border-[#30363d]">
-        <div class="text-[#38bdf8] font-bold mb-0.5">📸 Analog &amp; Dotfiles</div>
-        <div>Shooting 35mm mechanical film, configuring Neovim in Lua, and optimizing sleek Linux workflows.</div>
+        <div class="text-[#38bdf8] font-bold mb-0.5">🌲 Outdoors &amp; Media</div>
+        <div>Hiking, climbing, cycling, discgolf, Sony ZV-E10 photo/video, and Omarchy (Arch + Hyprland).</div>
       </div>
     </div>
   </div>
@@ -753,42 +755,53 @@ export function getCvOutput(lang: LangCode): string {
 
   <div class="space-y-2.5 text-[#e6edf3]">
     <div>
-      <div class="text-[#10b981] font-bold text-xs">🎓 Utbildning</div>
-      <div class="pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] space-y-0.5 mt-0.5">
-        <div class="text-[#e6edf3] font-semibold">Chalmers tekniska högskola (2024 – 2029)</div>
-        <div>Civilingenjör i Datateknik (300 HP), åk 2. Kurser i OS, datastrukturer, maskinnära programmering, diskret matematik.</div>
+      <div class="text-[#10b981] font-bold text-xs">🎓 Utbildning &amp; Bakgrund</div>
+      <div class="pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] space-y-1 mt-0.5">
+        <div><span class="text-[#e6edf3] font-semibold">Chalmers tekniska högskola (2024 – 2029)</span>: Civilingenjör i Datateknik (300 HP), åk 2. Antagen RIU-elitidrottare.</div>
+        <div><span class="text-[#e6edf3] font-semibold">Wheeling University, USA (2023 – 2024)</span>: Business Management &amp; NCAA D2-simning på fullt stipendium. Dean's List, Conference Champion &amp; Freshman of the Year.</div>
+        <div><span class="text-[#e6edf3] font-semibold">Mälardalens universitet, Västerås (Okt 2022 – Dec 2023)</span>: Datavetenskapliga kurser i Python, Linux &amp; Nätverkssäkerhet.</div>
+        <div><span class="text-[#e6edf3] font-semibold">Hitachigymnasiet (2020 – 2023)</span>: Spetsteknik Smarta system &amp; AI.</div>
       </div>
     </div>
 
     <div>
       <div class="text-[#10b981] font-bold text-xs">🛠️ Tekniska Kärnkompetenser</div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] mt-0.5">
-        <div><span class="text-[#38bdf8]">Programmering:</span> C, Rust, TypeScript, Python, Bash, SQL</div>
-        <div><span class="text-[#38bdf8]">Infrastruktur:</span> Linux (Debian, Arch), Docker, WireGuard, Nginx</div>
-        <div><span class="text-[#38bdf8]">Webb &amp; Ramverk:</span> Astro, TailwindCSS, Node.js, REST APIs</div>
-        <div><span class="text-[#38bdf8]">Verktyg:</span> Git, Neovim, Valgrind, GDB, tmux, systemd</div>
+        <div><span class="text-[#38bdf8]">Programmering:</span> Python, C, Java, JavaScript m.fl.</div>
+        <div><span class="text-[#38bdf8]">Infrastruktur:</span> Proxmox VE, Linux (Arch, Debian), Docker, WireGuard</div>
+        <div><span class="text-[#38bdf8]">Verktyg:</span> Git, Neovim, Alacritty, REST APIs, CI/CD</div>
+        <div><span class="text-[#38bdf8]">System:</span> Omarchy (Arch + Hyprland), macOS, Windows</div>
       </div>
     </div>
 
     <div>
-      <div class="text-[#10b981] font-bold text-xs">🚀 Homelab &amp; Utvalda Projekt</div>
+      <div class="text-[#10b981] font-bold text-xs">🚀 Driftsättning &amp; Homelab</div>
       <div class="pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] space-y-1 mt-0.5">
-        <div><span class="text-[#e6edf3] font-semibold">Minecraft Cluster &amp; Homelab:</span> Självhostad PaperMC SMP på Debian med Aikar JVM-flaggor, WireGuard VPN och container-isolering.</div>
-        <div><span class="text-[#e6edf3] font-semibold">Systems Scheduler (C):</span> CPU schemaläggningssimulator med round-robin &amp; prioriteringsköer.</div>
+        <div><span class="text-[#e6edf3] font-semibold">Självhostad infrastruktur:</span> Dedikerad serverdator med Proxmox VE samt Raspberry Pi-kluster. Driftsätter, underhåller och hanterar kontinuerligt ett brett utbud av tjänster – däribland webbplatser, Minecraft-kluster (Velocity &amp; PaperMC), interna verktyg och automatiserade schemalagda backuper.</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="text-[#10b981] font-bold text-xs">💡 Personliga Styrkor &amp; Lärande</div>
+      <div class="pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] mt-0.5">
+        Drivs av ständig utveckling, nyfikenhet och problemlösning. Har en stor passion för att lära mig nya saker och är mycket snabb och skicklig på att ta till mig ny information och behärska ny teknik.
       </div>
     </div>
 
     <div>
       <div class="text-[#10b981] font-bold text-xs">🏊 Idrottsmeriter &amp; Ledarskap</div>
       <div class="pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] mt-0.5">
-        Aktiv tävlingssimmare på elitnivå (5–6 pass/vecka). Erfarenhet av målinriktat lagarbete, disciplin och hantering av höga krav under press.
+        Elitsprintsimmare för MASS &amp; Growth Objective (Åbybadet/GoCo). SM-silver 4x50m frisim 2025, Student-SM guld 50m frisim 2026. 5+ simpass och 3 gympass per vecka.
       </div>
     </div>
   </div>
 
-  <div class="text-[10px] text-[#8b949e] border-t border-[#30363d]/40 pt-1.5 flex items-center justify-between">
-    <span>GitHub: github.com/abbguslof</span>
-    <span class="text-[#38bdf8]">Skriv 'contact' för direktkontakt</span>
+  <div class="text-[10px] text-[#8b949e] border-t border-[#30363d]/40 pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
+    <div>📄 <span class="text-[#e6edf3]">Komplett formellt CV fås via mejl:</span> <a href="mailto:gurra@gulo.se" class="text-[#38bdf8] underline hover:text-[#7dd3fc]">gurra@gulo.se</a></div>
+    <div class="flex items-center gap-3">
+      <span>GitHub: <a href="https://github.com/abbguslof" target="_blank" rel="noopener noreferrer" class="text-[#e6edf3] hover:text-[#38bdf8]">github.com/abbguslof</a></span>
+      <span class="text-[#38bdf8]">Kommando: 'contact'</span>
+    </div>
   </div>
 </div>`
     : `
@@ -803,42 +816,53 @@ export function getCvOutput(lang: LangCode): string {
 
   <div class="space-y-2.5 text-[#e6edf3]">
     <div>
-      <div class="text-[#10b981] font-bold text-xs">🎓 Education</div>
-      <div class="pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] space-y-0.5 mt-0.5">
-        <div class="text-[#e6edf3] font-semibold">Chalmers University of Technology (2024 – 2029)</div>
-        <div>M.Sc. in Computer Science &amp; Engineering (300 ECTS), Year 2. Core focus: OS, memory safety, data structures, low-level architecture.</div>
+      <div class="text-[#10b981] font-bold text-xs">🎓 Education &amp; Background</div>
+      <div class="pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] space-y-1 mt-0.5">
+        <div><span class="text-[#e6edf3] font-semibold">Chalmers University of Technology (2024 – 2029)</span>: M.Sc. in Computer Science &amp; Engineering (300 ECTS), Year 2. Accepted RIU elite athlete student.</div>
+        <div><span class="text-[#e6edf3] font-semibold">Wheeling University, USA (2023 – 2024)</span>: Business Management &amp; NCAA D2 swimming on full athletic scholarship. Dean's List, Conference Champion &amp; Freshman of the Year.</div>
+        <div><span class="text-[#e6edf3] font-semibold">Mälardalen University, Västerås (Oct 2022 – Dec 2023)</span>: Computer Science coursework in Python, Linux &amp; Network Security.</div>
+        <div><span class="text-[#e6edf3] font-semibold">Hitachigymnasiet (2020 – 2023)</span>: Smart Systems &amp; AI specialization.</div>
       </div>
     </div>
 
     <div>
       <div class="text-[#10b981] font-bold text-xs">🛠️ Technical Competencies</div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] mt-0.5">
-        <div><span class="text-[#38bdf8]">Languages:</span> C, Rust, TypeScript, Python, Bash, SQL</div>
-        <div><span class="text-[#38bdf8]">Infrastructure:</span> Linux (Debian, Arch), Docker, WireGuard, Nginx</div>
-        <div><span class="text-[#38bdf8]">Web &amp; Frameworks:</span> Astro, TailwindCSS, Node.js, REST APIs</div>
-        <div><span class="text-[#38bdf8]">Tooling:</span> Git, Neovim, Valgrind, GDB, tmux, systemd</div>
+        <div><span class="text-[#38bdf8]">Languages:</span> Python, C, Java, JavaScript, and more</div>
+        <div><span class="text-[#38bdf8]">Infrastructure:</span> Proxmox VE, Linux (Arch, Debian), Docker, WireGuard</div>
+        <div><span class="text-[#38bdf8]">Tooling:</span> Git, Neovim, Alacritty, REST APIs, CI/CD</div>
+        <div><span class="text-[#38bdf8]">Operating Systems:</span> Omarchy (Arch + Hyprland), macOS, Windows</div>
       </div>
     </div>
 
     <div>
-      <div class="text-[#10b981] font-bold text-xs">🚀 Homelab &amp; Selected Projects</div>
+      <div class="text-[#10b981] font-bold text-xs">🚀 Deployment &amp; Homelab</div>
       <div class="pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] space-y-1 mt-0.5">
-        <div><span class="text-[#e6edf3] font-semibold">Minecraft Cluster:</span> Self-hosted PaperMC SMP on Debian 12 with tuned Aikar flags, WireGuard VPN and container sandbox.</div>
-        <div><span class="text-[#e6edf3] font-semibold">Systems Scheduler (C):</span> Multi-algorithm CPU scheduler simulator implementing round-robin &amp; priority queues.</div>
+        <div><span class="text-[#e6edf3] font-semibold">Self-hosted Infrastructure:</span> Dedicated server PC with Proxmox VE and Raspberry Pi cluster. Continuously deploying, maintaining, and managing a variety of services – including websites, Minecraft clusters (Velocity &amp; PaperMC), internal tooling, and automated backup pipelines.</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="text-[#10b981] font-bold text-xs">💡 Mindset &amp; Rapid Learning</div>
+      <div class="pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] mt-0.5">
+        Driven by continuous learning, curiosity, and hands-on problem solving. Passionate about learning new things with proven ability to quickly absorb complex information and master new technologies.
       </div>
     </div>
 
     <div>
       <div class="text-[#10b981] font-bold text-xs">🏊 Athletics &amp; Work Ethic</div>
       <div class="pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] mt-0.5">
-        Competitive swimmer training 5–6 sessions/week. Proven track record of rigorous time management, self-motivation, and focus.
+        Competitive sprint swimmer for MASS &amp; Growth Objective (Åbybadet/GoCo). SM Silver 4x50m free 2025, Student-SM Gold 50m free 2026. 5+ swim and 3 gym sessions weekly.
       </div>
     </div>
   </div>
 
-  <div class="text-[10px] text-[#8b949e] border-t border-[#30363d]/40 pt-1.5 flex items-center justify-between">
-    <span>GitHub: github.com/abbguslof</span>
-    <span class="text-[#38bdf8]">Type 'contact' for direct inquiries</span>
+  <div class="text-[10px] text-[#8b949e] border-t border-[#30363d]/40 pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
+    <div>📄 <span class="text-[#e6edf3]">Complete formal CV available via email:</span> <a href="mailto:gurra@gulo.se" class="text-[#38bdf8] underline hover:text-[#7dd3fc]">gurra@gulo.se</a></div>
+    <div class="flex items-center gap-3">
+      <span>GitHub: <a href="https://github.com/abbguslof" target="_blank" rel="noopener noreferrer" class="text-[#e6edf3] hover:text-[#38bdf8]">github.com/abbguslof</a></span>
+      <span class="text-[#38bdf8]">Command: 'contact'</span>
+    </div>
   </div>
 </div>`;
 }
@@ -897,7 +921,7 @@ export function getStatsMonitorOutput(lang: LangCode): string {
     <!-- Swim Weekly Volume -->
     <div>
       <div class="flex justify-between text-[#8b949e] mb-0.5">
-        <span class="text-[#38bdf8] font-bold">${isSv ? 'SIMNING VOLYM (Valhallabadet 50m)' : 'SWIMMING VOLUME (Valhallabadet 50m)'}</span>
+        <span class="text-[#38bdf8] font-bold">${isSv ? 'SIMNING VOLYM (Åbybadet 50m / GoCo)' : 'SWIMMING VOLUME (Åbybadet &amp; GoCo 50m)'}</span>
         <span class="text-[#38bdf8]">22.5 km / 25 km mål (90%)</span>
       </div>
       <div class="h-2 w-full bg-[#161b22] rounded overflow-hidden flex border border-[#30363d]">

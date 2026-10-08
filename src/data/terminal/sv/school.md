@@ -1,7 +1,7 @@
 # CHALMERS TEKNISKA HÖGSKOLA — CIVILINGENJÖR DATATEKNIK (D-24)
-- Status: Årskurs 2 / Civilingenjör
+- Status: Årskurs 2 / Civilingenjör (Antagen RIU-elitidrottare)
 - Campus: Johanneberg, Göteborg (EDIT-huset)
-- Aktuella kurser: Operativsystem, Datorarkitektur, Datakommunikation, Algoritmer
-- Laborationer: Flertrådade schemaläggare i C, kontextbyten för RISC-V, minneshantering
+- Bakgrund: Wheeling University (USA, Business Management & NCAA D2-simning), Mälardalens universitet (Datavetenskap: Python, Linux & Nätverkssäkerhet), Hitachigymnasiet (AI & Smarta system)
+- Kärnkompetens: Python, C, Java, JavaScript, Algoritmer, Systemarkitektur
 ---
-Skriv open chalmers-sys-sched för att läsa projektet, eller projects för portfolion.
+Skriv 'cv' för fullständig akademisk och idrottslig tidslinje, eller besök /projects.

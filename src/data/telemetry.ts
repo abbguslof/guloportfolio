@@ -10,7 +10,7 @@
  * was launched! Format: ISO-8601 (YYYY-MM-DDTHH:mm:ssZ)
  * ============================================================================
  */
-export const SITE_LAUNCH_DATE = '2026-01-01T00:00:00Z';
+export const SITE_LAUNCH_DATE = '2026-10-08T18:03:00+02:00';
 
 export interface CalculatedUptime {
   days: number;

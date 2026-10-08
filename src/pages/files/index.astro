@@ -126,7 +126,8 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
     </div>
 
     <!-- Files List -->
-    <div class="space-y-4" id="files-container">
+    {downloads.length > 0 ? (
+      <div class="space-y-4" id="files-container">
       {downloads.map((item) => {
         const itemRelatedProjects = (item.relatedProjects || [])
           .map((id) => projectMap.get(id))
@@ -315,6 +316,12 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
         No files match your search or filter.
       </div>
     </div>
+    ) : (
+      <div class="rounded-lg bg-[#161b22] border border-[#30363d] p-8 sm:p-12 text-center text-xs font-mono text-[#8b949e] space-y-2">
+        <div class="text-[#10b981] font-bold text-sm" data-i18n="files_empty_title">[STAGING // FILE ARCHIVE]</div>
+        <p data-i18n="files_empty_desc">Downloadable resources and configs are being updated. Available shortly.</p>
+      </div>
+    )}
 
     <!-- Return Nav -->
     <div class="pt-8 border-t border-[#30363d] flex items-center justify-between text-xs text-[#8b949e]">

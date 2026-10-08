@@ -222,7 +222,8 @@ const allTags = Array.from(
     </div>
 
     <!-- Articles Digital Garden / Log List -->
-    <div class="space-y-4" id="thoughts-list">
+    {sortedThoughts.length > 0 ? (
+      <div class="space-y-4" id="thoughts-list">
       {sortedThoughts.map((post) => {
         const formattedDate = post.data.pubDate.toISOString().slice(0, 10);
         const rawCategory = post.data.category || 'tanke';
@@ -340,6 +341,12 @@ const allTags = Array.from(
         No notes or articles match your search or filter.
       </div>
     </div>
+    ) : (
+      <div class="rounded-lg bg-[#161b22] border border-[#30363d] p-8 sm:p-12 text-center text-xs font-mono text-[#8b949e] space-y-2">
+        <div class="text-[#f59e0b] font-bold text-sm" data-i18n="thoughts_empty_title">[STAGING // POST ARCHIVE]</div>
+        <p data-i18n="thoughts_empty_desc">Notes and articles are currently being staged. New posts incoming.</p>
+      </div>
+    )}
 
     <!-- Bottom Return Nav -->
     <div class="pt-8 border-t border-[#30363d] flex items-center justify-between text-xs font-mono text-[#8b949e]">

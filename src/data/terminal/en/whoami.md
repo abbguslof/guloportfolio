@@ -1,7 +1,8 @@
-# gulo // Chalmers student, swimmer & developer
-- Studies: Computer Science & Engineering @ Chalmers University of Technology (Year 2, Johanneberg).
-- Athletics: Competitive swimmer at Valhallabadet (5-6 sessions/week, freestyle & butterfly).
-- Homelab: PaperMC SMP cluster on Debian 12, Velocity, Docker & isolated subnets.
-- Interests: Linux kernel tuning, analog photography (35mm film), Neovim dotfiles in Lua.
+# gulo // Chalmers student, sprint swimmer & developer
+- Studies: Computer Science & Engineering @ Chalmers University of Technology (Year 2, EDIT building, RIU elite athlete).
+- Athletics: Competitive sprint swimmer for MASS & Growth Objective (Åbybadet & GoCo, 50m/100m freestyle & butterfly).
+- Tech & OS: Omarchy (Arch Linux + Hyprland), Alacritty, Neovim. Dualboot Windows/macOS. Python, C, Java, JavaScript.
+- Homelab: Proxmox VE server & Raspberry Pi cluster. Deploying websites, Minecraft clusters, and internal services.
+- Interests: Outdoors (hiking, climbing, cycling, discgolf, golf), photo & video (Sony ZV-E10).
 ---
-Status: [ONLINE] Exam week & server ops in Gothenburg
+Status: [ONLINE] Studying & Sprint training in Gothenburg

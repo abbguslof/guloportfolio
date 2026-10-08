@@ -106,36 +106,45 @@ const sortedProjects = await getGroupedProjects();
     </div>
 
     <!-- Portfolio Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-stretch" id="projects-grid">
-      {sortedProjects.map((project) => (
-        <div 
-          class="project-item h-full flex flex-col" 
-          data-cat={project.en.data.category.toLowerCase()}
-          data-title-en={project.en.data.title.toLowerCase()}
-          data-title-sv={project.sv.data.title.toLowerCase()}
-          data-desc-en={project.en.data.description.toLowerCase()}
-          data-desc-sv={project.sv.data.description.toLowerCase()}
-          data-tech={(project.en.data.tech || []).join(' ').toLowerCase()}
-        >
-          <ProjectCard 
-            titleEn={project.en.data.title}
-            titleSv={project.sv.data.title}
-            descEn={project.en.data.description}
-            descSv={project.sv.data.description}
-            status={project.en.data.status}
-            category={project.en.data.category}
-            tech={project.en.data.tech}
-            repoUrl={project.en.data.repoUrl}
-            liveUrl={project.en.data.liveUrl}
-            slug={project.slug}
-          />
+    {sortedProjects.length > 0 ? (
+      <>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-stretch" id="projects-grid">
+          {sortedProjects.map((project) => (
+            <div 
+              class="project-item h-full flex flex-col" 
+              data-cat={project.en.data.category.toLowerCase()}
+              data-title-en={project.en.data.title.toLowerCase()}
+              data-title-sv={project.sv.data.title.toLowerCase()}
+              data-desc-en={project.en.data.description.toLowerCase()}
+              data-desc-sv={project.sv.data.description.toLowerCase()}
+              data-tech={(project.en.data.tech || []).join(' ').toLowerCase()}
+            >
+              <ProjectCard 
+                titleEn={project.en.data.title}
+                titleSv={project.sv.data.title}
+                descEn={project.en.data.description}
+                descSv={project.sv.data.description}
+                status={project.en.data.status}
+                category={project.en.data.category}
+                tech={project.en.data.tech}
+                repoUrl={project.en.data.repoUrl}
+                liveUrl={project.en.data.liveUrl}
+                slug={project.slug}
+              />
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
 
-    <div id="no-projects-msg" class="py-12 text-center text-xs font-mono text-[#8b949e] hidden" data-i18n="projects_no_match">
-      No projects found matching the query.
-    </div>
+        <div id="no-projects-msg" class="py-12 text-center text-xs font-mono text-[#8b949e] hidden" data-i18n="projects_no_match">
+          No projects found matching the query.
+        </div>
+      </>
+    ) : (
+      <div class="rounded-lg bg-[#161b22] border border-[#30363d] p-8 sm:p-12 text-center text-xs font-mono text-[#8b949e] space-y-2">
+        <div class="text-[#a78bfa] font-bold text-sm" data-i18n="projects_empty_title">[STAGING // REPOSITORY SYNC]</div>
+        <p data-i18n="projects_empty_desc">Portfolio projects are currently being staged and verified. Check back soon.</p>
+      </div>
+    )}
 
     <!-- Bottom return navigation -->
     <div class="pt-8 border-t border-[#30363d] flex items-center justify-between text-xs font-mono text-[#8b949e]">

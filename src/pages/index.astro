@@ -58,22 +58,29 @@ const latestThoughts = sortedThoughts.slice(0, 5);
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-        {displayProjects.map((project) => (
-          <ProjectCard 
-            titleEn={project.en.data.title}
-            titleSv={project.sv.data.title}
-            descEn={project.en.data.description}
-            descSv={project.sv.data.description}
-            status={project.en.data.status}
-            category={project.en.data.category}
-            tech={project.en.data.tech}
-            repoUrl={project.en.data.repoUrl}
-            liveUrl={project.en.data.liveUrl}
-            slug={project.slug}
-          />
-        ))}
-      </div>
+      {displayProjects.length > 0 ? (
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+          {displayProjects.map((project) => (
+            <ProjectCard 
+              titleEn={project.en.data.title}
+              titleSv={project.sv.data.title}
+              descEn={project.en.data.description}
+              descSv={project.sv.data.description}
+              status={project.en.data.status}
+              category={project.en.data.category}
+              tech={project.en.data.tech}
+              repoUrl={project.en.data.repoUrl}
+              liveUrl={project.en.data.liveUrl}
+              slug={project.slug}
+            />
+          ))}
+        </div>
+      ) : (
+        <div class="rounded-lg bg-[#161b22] border border-[#30363d] p-8 text-center text-xs font-mono text-[#8b949e] space-y-2">
+          <div class="text-[#a78bfa] font-bold text-sm" data-i18n="projects_empty_title">[STAGING // REPOSITORY SYNC]</div>
+          <p data-i18n="projects_empty_desc">Portfolio projects are currently being staged and verified. Check back soon.</p>
+        </div>
+      )}
     </section>
 
     <!-- 3. Senaste Tankar, Guider & Anteckningar (Max 5 poster med kategori, datum & utdrag) -->
@@ -102,30 +109,38 @@ const latestThoughts = sortedThoughts.slice(0, 5);
       </div>
 
       <!-- Articles list container with rich rows -->
-      <div class="thought-container rounded-lg bg-[#161b22] border border-[#30363d] p-2.5 sm:p-3 divide-y divide-[#30363d]/40">
-        {latestThoughts.map((post) => (
-          <ThoughtRow 
-            title={post.data.title}
-            slug={post.id}
-            pubDate={post.data.pubDate}
-            category={post.data.category}
-            description={post.data.description}
-            tags={post.data.tags}
-          />
-        ))}
-      </div>
+      {latestThoughts.length > 0 ? (
+        <>
+          <div class="thought-container rounded-lg bg-[#161b22] border border-[#30363d] p-2.5 sm:p-3 divide-y divide-[#30363d]/40">
+            {latestThoughts.map((post) => (
+              <ThoughtRow 
+                title={post.data.title}
+                slug={post.id}
+                pubDate={post.data.pubDate}
+                category={post.data.category}
+                description={post.data.description}
+                tags={post.data.tags}
+              />
+            ))}
+          </div>
 
-      <!-- Bottom link to full archive -->
-      <div class="mt-4 text-center">
-        <a 
-          href="/thoughts" 
-          class="inline-flex items-center justify-center gap-2 text-xs font-mono text-[#8b949e] hover:text-[#10b981] px-4 py-2.5 sm:py-2 min-h-[38px] sm:min-h-auto rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#10b981] transition-all w-full sm:w-auto"
-          data-i18n="home_hero_thoughts_bottom_btn"
-          data-i18n-count={sortedThoughts.length}
-        >
-          View all thoughts, guides and notes in the archive ({sortedThoughts.length} posts) →
-        </a>
-      </div>
+          <div class="mt-4 text-center">
+            <a 
+              href="/thoughts" 
+              class="inline-flex items-center justify-center gap-2 text-xs font-mono text-[#8b949e] hover:text-[#10b981] px-4 py-2.5 sm:py-2 min-h-[38px] sm:min-h-auto rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#10b981] transition-all w-full sm:w-auto"
+              data-i18n="home_hero_thoughts_bottom_btn"
+              data-i18n-count={sortedThoughts.length}
+            >
+              View all thoughts, guides and notes in the archive ({sortedThoughts.length} posts) →
+            </a>
+          </div>
+        </>
+      ) : (
+        <div class="rounded-lg bg-[#161b22] border border-[#30363d] p-8 text-center text-xs font-mono text-[#8b949e] space-y-2">
+          <div class="text-[#f59e0b] font-bold text-sm" data-i18n="thoughts_empty_title">[STAGING // POST ARCHIVE]</div>
+          <p data-i18n="thoughts_empty_desc">Notes and articles are currently being staged. New posts incoming.</p>
+        </div>
+      )}
     </section>
   </main>
 

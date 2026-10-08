@@ -41,7 +41,7 @@ export interface StatusProfile {
   };
 }
 
-export type PresetKey = 'regular' | 'exam' | 'camp' | 'hackathon' | 'vacation';
+export type PresetKey = 'regular' | 'exam' | 'camp' | 'hackathon' | 'vacation' | 'swim';
 
 export const statusPresets: Record<PresetKey, StatusProfile> = {
   regular: {
@@ -51,48 +51,48 @@ export const statusPresets: Record<PresetKey, StatusProfile> = {
       en: '[ONLINE] Semester & Swimming',
     },
     activity: {
-      sv: 'Civilingenjör Datateknik (åk 2) på Chalmers. Tränar 5-6 simpass i veckan.',
-      en: 'M.Sc. Computer Science & Engineering (Year 2) at Chalmers. Swimming 5-6 sessions/week.',
+      sv: 'Civilingenjör Datateknik (åk 2) på Chalmers (EDIT-huset, RIU-student). Tränar 5-6 simpass och 3 gympass i veckan.',
+      en: 'M.Sc. Computer Science & Engineering (Year 2) at Chalmers (EDIT building, RIU student). 5+ swim & 3 gym sessions/week.',
     },
     focus: {
-      sv: 'Operativsystem, distribuerade system, C/Rust & optimering.',
-      en: 'Operating systems, distributed systems, C/Rust & low-level optimization.',
+      sv: 'Datateknik, nätverkssäkerhet, Linux (Omarchy/Arch) & sprintsimning på Åbybadet/GoCo.',
+      en: 'Computer engineering, network security, Linux (Omarchy/Arch) & sprint swimming at Åbybadet/GoCo.',
     },
     mood: {
-      sv: '☕ Kaffe, Vim-keybindings, och rena shell-skript.',
-      en: '☕ Coffee, Vim keybindings, and lean shell scripts.',
+      sv: '☕ Kaffe, Neovim-keybindings, och Proxmox-arkitektur.',
+      en: '☕ Coffee, Neovim keybindings, and Proxmox architecture.',
     },
     homelab: {
-      sv: '🟢 Minecraft PaperMC 1.20 SMP server online (Debian 12 + Docker + WireGuard).',
-      en: '🟢 Minecraft PaperMC 1.20 SMP cluster online (Debian 12 + Docker + WireGuard).',
+      sv: '🟢 Proxmox server, Raspberry Pi-enheter och självhostade tjänster online.',
+      en: '🟢 Proxmox server, Raspberry Pi cluster, and self-hosted services online.',
     },
     availability: {
-      sv: 'Öppen för sommarjobb, intressanta systemprojekt & hackathons.',
-      en: 'Open for summer internships, interesting systems projects & hackathons.',
+      sv: 'Öppen för sommarjobb 2027, praktik & examensarbete (just nu mest playground).',
+      en: 'Open for summer 2027 internships, thesis & technical projects (currently playground).',
     },
   },
 
   exam: {
     name: 'Exam Week / Tentavecka',
     badge: {
-      sv: '[⚠ TENTOR] Tentavecka & Intensivplugg',
+      sv: '[⚠ TENTOR] Tentamensperiod & Plugg',
       en: '[⚠ FINALS] Finals Week & Deep Focus',
     },
     activity: {
-      sv: 'Tentavecka på Chalmers! Repeterar teorifrågor, minneshantering och bevis.',
-      en: 'Exam week at Chalmers! Reviewing systems theory, memory safety and proofs.',
+      sv: 'Tentamensperiod på Chalmers! Repeterar teorifrågor, algoritmer och datateknik.',
+      en: 'Final exams period at Chalmers! Reviewing systems theory, algorithms, and computing fundamentals.',
     },
     focus: {
-      sv: 'Tentaplugg & problemlösning. Svarstider kan vara något fördröjda.',
-      en: 'Exam preparation & problem solving. Response times may be slightly delayed.',
+      sv: 'Tentaplugg & problemlösning i EDIT-huset. Svarstider kan vara något fördröjda.',
+      en: 'Exam preparation & problem solving in the EDIT building. Response times may be slightly delayed.',
     },
     mood: {
       sv: '📚 Svart kaffe, whiteboard-pennor och öronproppar.',
       en: '📚 Black coffee, whiteboard markers, and earplugs.',
     },
     homelab: {
-      sv: '🟡 Serverkluster i underhållsläge / auto-backup aktivt utan manuella ändringar.',
-      en: '🟡 Server cluster in maintenance mode / automated backups active.',
+      sv: '🟡 Serverarkitektur i underhållsläge / automatisk backup aktiv.',
+      en: '🟡 Server architecture in maintenance mode / automated backups active.',
     },
     availability: {
       sv: 'Begränsad tillgänglighet fram till tentaperiodens slut.',
@@ -103,28 +103,56 @@ export const statusPresets: Record<PresetKey, StatusProfile> = {
   camp: {
     name: 'Swim Training Camp / Träningsläger',
     badge: {
-      sv: '[🏊 SIMLÄGER] Träningsläger 50m',
-      en: '[🏊 SWIM CAMP] 50m Training Camp',
+      sv: '[🏊 SIMLÄGER] Elitträningsläger i Turkiet',
+      en: '[🏊 SWIM CAMP] Elite Training Camp in Turkey',
     },
     activity: {
-      sv: 'Intensivt träningsläger i 50m-bassäng (Valhallabadet). Dubbelpass varje dag.',
-      en: 'Intensive 50m swimming camp at Valhallabadet. Double sessions daily.',
+      sv: 'Intensivt elitträningsläger med Growth Objective (GO). Dubbla simpass och sprintoptimering.',
+      en: 'Intensive elite training camp with Growth Objective (GO). Double swim sessions & sprint mechanics.',
     },
     focus: {
-      sv: 'Fjärilsim, frisimstempo och återhämtning.',
-      en: 'Butterfly stroke, freestyle pacing, and athletic recovery.',
+      sv: '50m/100m frisim och fjäril, starteknik, laktattester och återhämtning.',
+      en: '50m/100m freestyle and butterfly, start mechanics, and athletic recovery.',
     },
     mood: {
-      sv: '🏊 Klorlukt, havregrynsgröt och tidiga morgnar.',
-      en: '🏊 Chlorine scent, oatmeal bowls, and early morning starts.',
+      sv: '🏊 Klorlukt, havregrynsgröt och tidiga morgonpass.',
+      en: '🏊 Chlorine scent, oatmeal bowls, and early morning practices.',
     },
     homelab: {
-      sv: '🟢 Autonoma monitorer aktiva via WireGuard.',
-      en: '🟢 Automated alerts active over WireGuard tunnel.',
+      sv: '🟢 Homelab körs autonomt med övervakning över WireGuard.',
+      en: '🟢 Homelab running autonomously with WireGuard monitoring.',
     },
     availability: {
-      sv: 'Nås säkrast efter kl 19 eller tidiga eftermiddagar.',
-      en: 'Best reached in evenings after 19:00 or early afternoons.',
+      sv: 'Nås säkrast på kvällstid efter dagens träningspass.',
+      en: 'Best reached in evenings after training sessions.',
+    },
+  },
+
+  swim: {
+    name: 'National Championships / Svenska Mästerskapen',
+    badge: {
+      sv: '[🏊 SM-VECKA] Svenska Mästerskapen',
+      en: '[🏊 NATIONALS] Swedish Championships',
+    },
+    activity: {
+      sv: 'Tävlar på SM för Mölndals Allmänna Simsällskap (MASS) & Growth Objective (GO).',
+      en: 'Competing at the Swedish National Championships for MASS & Growth Objective (GO).',
+    },
+    focus: {
+      sv: 'Individuell sprint (50m/100m fri och fjäril) och lagkapper för MASS.',
+      en: 'Individual sprint events (50m/100m free & fly) and relays for MASS.',
+    },
+    mood: {
+      sv: '⚡ Full tävlingsfokus, snabba lopp och laganda.',
+      en: '⚡ Full race focus, sprint speed, and team spirit.',
+    },
+    homelab: {
+      sv: '🟢 Servrar och driftsatta tjänster rullar stabilt i bakgrunden.',
+      en: '🟢 Servers and deployed services humming stably in the background.',
+    },
+    availability: {
+      sv: 'Fokus på tävlingspassen. Svarar på mejl mellan tävlingspassen.',
+      en: 'Focused on race sessions. Checking email between prelims and finals.',
     },
   },
 
@@ -135,52 +163,52 @@ export const statusPresets: Record<PresetKey, StatusProfile> = {
       en: '[⚡ SPRINT] Homelab & Code Sprint',
     },
     activity: {
-      sv: 'Heltidsfokus på personliga infrastrukturprojekt, Linux kernel & Neovim-plugins.',
-      en: 'Dedicated hacking sprint on homelab infra, Linux kernel & Neovim plugins.',
+      sv: 'Heltidsfokus på personliga infrastrukturprojekt, Linux, Proxmox och självhostade tjänster.',
+      en: 'Dedicated hacking sprint on homelab infra, Linux, Proxmox & self-hosted services.',
     },
     focus: {
-      sv: 'Docker swarm migration, WireGuard routing & prestandamätningar.',
-      en: 'Docker swarm migration, WireGuard routing & benchmarking.',
+      sv: 'Nätverkssäkerhet, Proxmox VM-arkitektur & utvecklingsverktyg.',
+      en: 'Network security, Proxmox VM architecture & developer tooling.',
     },
     mood: {
-      sv: '💻 Lo-fi beats, tmux sessions och git rebase.',
-      en: '💻 Lo-fi beats, multi-pane tmux sessions, and interactive git rebase.',
+      sv: '💻 Lo-fi beats, Alacritty-fönster och git commit.',
+      en: '💻 Lo-fi beats, Alacritty terminal windows, and git commits.',
     },
     homelab: {
-      sv: '🚀 Nya microservices rullas ut och testas under hög belastning.',
-      en: '🚀 Deploying new microservices and load testing server nodes.',
+      sv: '🚀 Nya containrar och tjänster driftsätts på Proxmox-klustret.',
+      en: '🚀 Deploying new containers and services on the Proxmox cluster.',
     },
     availability: {
-      sv: 'Mycket aktiv på GitHub & Discord!',
-      en: 'Very active on GitHub & Discord!',
+      sv: 'Aktiv på GitHub!',
+      en: 'Active on GitHub!',
     },
   },
 
   vacation: {
     name: 'Vacation / Ledighet',
     badge: {
-      sv: '[🏖 LEDIG] Sommar- eller vinterledighet',
+      sv: '[🏖 LEDIG] Vinter- eller sommarledighet',
       en: '[🏖 OFF-GRID] Vacation / Off-season',
     },
     activity: {
-      sv: 'Ute i skärgården, fotar 35mm film eller läser skönlitteratur.',
-      en: 'Exploring the archipelago, shooting 35mm film, or reading.',
+      sv: 'Friluftsliv, klättring, vandring, cykling eller foto/video med Sony ZV-E10.',
+      en: 'Outdoors, climbing, hiking, cycling, or video/photo with Sony ZV-E10.',
     },
     focus: {
-      sv: 'Nedvarvning och återhämtning.',
-      en: 'Decompressing and offline recharging.',
+      sv: 'Nedvarvning, rörelse i naturen och återhämtning.',
+      en: 'Decompressing, outdoor activities, and recharging.',
     },
     mood: {
-      sv: '🌲 Skogsdoft, analog kamera och flygplansläge.',
-      en: '🌲 Forest breeze, mechanical film camera, and airplane mode.',
+      sv: '🌲 Frisk luft, natur och offline-läge.',
+      en: '🌲 Fresh air, nature, and offline mode.',
     },
     homelab: {
       sv: '🟢 Homelab körs i lågenergiläge med automatiska larm.',
       en: '🟢 Homelab running low-power baseline with automatic alerts.',
     },
     availability: {
-      sv: 'Svarar sporadiskt på e-post.',
-      en: 'Checking emails intermittently.',
+      sv: 'Svarar sporadiskt på e-post (gurra@gulo.se).',
+      en: 'Checking emails intermittently (gurra@gulo.se).',
     },
   },
 };
@@ -189,7 +217,7 @@ export const statusPresets: Record<PresetKey, StatusProfile> = {
  * Configure your preferred status mode:
  * - 'auto' : Dynamically checks src/data/schedule.ts for matching dates (exams, camps).
  *            Falls back to 'regular' if no event is currently active.
- * - 'regular' | 'exam' | 'camp' | 'hackathon' | 'vacation' : Manually locks to this preset.
+ * - 'regular' | 'exam' | 'camp' | 'hackathon' | 'vacation' | 'swim' : Manually locks to this preset.
  */
 export const activePresetMode: 'auto' | PresetKey = 'auto';
 
@@ -218,8 +246,8 @@ export function getActiveStatus(targetDate: Date = new Date()): ActiveStatusResu
     user: 'gulo',
     host: 'chalmers-station',
     location: {
-      sv: 'Göteborg // Chalmers Johanneberg & Valhallabadet',
-      en: 'Gothenburg, Sweden // Chalmers Johanneberg & Valhallabadet',
+      sv: 'Göteborg // Chalmers EDIT & Åbybadet / GoCo',
+      en: 'Gothenburg, Sweden // Chalmers EDIT & Åbybadet / GoCo',
     },
     activity: currentEvent ? currentEvent.description : profile.activity,
     focus: profile.focus,

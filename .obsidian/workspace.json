@@ -20,23 +20,8 @@
               "icon": "lucide-file",
               "title": "CONTRIBUTING"
             }
-          },
-          {
-            "id": "8ac1bbcc3d822519",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "aboutme.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "aboutme"
-            }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -203,19 +188,22 @@
       "bases:Create new base": false
     }
   },
-  "active": "8ac1bbcc3d822519",
+  "active": "e9ad49497331819f",
   "lastOpenFiles": [
-    "aboutme.md",
+    "dist/_astro/InteractiveTerminal.astro_astro_type_script_index_0_lang.BjC1broF.js",
+    "dist/_astro/Footer.BPYmpfBk.css",
+    "dist/_astro/i18n-client.BOeVGFOd.js",
+    "dist/_astro/Layout.astro_astro_type_script_index_0_lang.CpQ9NpKX.js",
+    "dist/_astro/InteractiveTerminal.astro_astro_type_script_index_0_lang.DWC4vftf.js",
+    "dist/_astro/Header.astro_astro_type_script_index_0_lang.4qBiCr9h.js",
+    "dist/_astro/InteractiveTerminal.astro_astro_type_script_index_0_lang.DtcHx6wH.js",
     "dist/index.html",
-    "dist/thoughts/c-pointers-valgrind/index.html",
-    "dist/thoughts/mc-jvm-flags/index.html",
-    "dist/thoughts/systemd-docker-notes/index.html",
-    "dist/thoughts/zsh-tmux-workflow/index.html",
-    "dist/thoughts/chalmers-simning-kod/index.html",
-    "dist/thoughts/analog-foto-slow-tech/index.html",
-    "dist/thoughts/zsh-tmux-workflow",
-    "dist/thoughts/systemd-docker-notes",
-    "dist/thoughts/mc-jvm-flags",
+    "dist/thoughts/index.html",
+    "dist/thoughts",
+    "dist/projects/index.html",
+    "infoaboutme/whatisgo.md",
+    "infoaboutme/MASTER_CONTENT_SPEC.md",
+    "aboutme.md",
     "dist/images/avatar.jpg",
     "dist/favicon.svg",
     "CONTRIBUTING.md",

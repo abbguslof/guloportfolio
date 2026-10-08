@@ -1,8 +1,8 @@
 # 📫 KONTAKT & LÄNKAR // GULO
-- GitHub: [github.com/gulo ↗](https://github.com)
-- Email: [gulo@example.com ↗](mailto:gulo@example.com)
-- Discord: gulo#0001 (eller pinga på Chalmers Discord-servern)
-- Phone: +46 70 123 45 67 (tillgänglig vardagar under terminstid)
-- Chalmers: EDIT-huset, Maskingränd / Johanneberg
+- E-post: [gurra@gulo.se](mailto:gurra@gulo.se)
+- GitHub: [github.com/abbguslof ↗](https://github.com/abbguslof)
+- LinkedIn: [linkedin.com/in/gustavlofqvist ↗](https://www.linkedin.com/in/gustavlofqvist/)
+- Discord: guslof
+- Campus: EDIT-huset, Johanneberg, Göteborg
 ---
-Hör gärna av dig om homelab, simning, Rust eller projektidéer!
+Hör gärna av dig angående sommarjobb, exjobb, tech eller simning!

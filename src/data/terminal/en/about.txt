@@ -1,5 +1,0 @@
-Who is gulo?
-- Education: M.Sc. Computer Science & Engineering @ Chalmers University of Technology (Year 2)
-- Athletics: Competitive swimmer (Valhallabadet, 50m freestyle & butterfly)
-- Tech: Homelab, Linux, Rust, C, Docker, Minecraft server clusters
-- Hobbies: Analog photography (35mm film), Gaming, Lua dotfiles

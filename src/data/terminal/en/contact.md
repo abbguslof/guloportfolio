@@ -1,8 +1,8 @@
 # 📫 CONTACT & LINKS // GULO
-- GitHub: [github.com/gulo ↗](https://github.com)
-- Email: [gulo@example.com ↗](mailto:gulo@example.com)
-- Discord: gulo#0001 (or ping in Chalmers Discord server)
-- Phone: +46 70 123 45 67 (weekdays during academic terms)
-- Chalmers: EDIT building, Maskingränd / Johanneberg
+- Email: [gurra@gulo.se](mailto:gurra@gulo.se)
+- GitHub: [github.com/abbguslof ↗](https://github.com/abbguslof)
+- LinkedIn: [linkedin.com/in/gustavlofqvist ↗](https://www.linkedin.com/in/gustavlofqvist/)
+- Discord: guslof
+- Campus: EDIT building, Johanneberg, Gothenburg
 ---
-Feel free to reach out regarding homelab, swimming, Rust, or project ideas!
+Feel free to reach out regarding internships, thesis opportunities, tech or swimming!
