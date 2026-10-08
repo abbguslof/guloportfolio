@@ -63,7 +63,7 @@ if (category === 'guide') {
     <div class="mb-5 sm:mb-8 flex flex-wrap items-center justify-between gap-2.5">
       <a 
         href="/thoughts" 
-        class="inline-flex items-center gap-1.5 text-xs font-mono text-[#8b949e] hover:text-[#10b981] transition-colors px-3 py-1.5 min-h-[34px] sm:min-h-auto rounded bg-[#161b22] border border-[#30363d]"
+        class="inline-flex items-center gap-1.5 text-xs font-mono text-[#8b949e] hover:text-[#10b981] hover:bg-[#1f242c] hover:border-[#484f58] transition-all px-3 py-1.5 min-h-[34px] sm:min-h-auto rounded bg-[#161b22] border border-[#30363d]"
       >
         <span data-i18n="thoughts_back_btn">← [~/thoughts]</span>
       </a>
@@ -72,7 +72,7 @@ if (category === 'guide') {
         {post.data.tags.map((tag) => (
           <a 
             href={`/thoughts`}
-            class="text-[11px] font-mono text-[#38bdf8] bg-[#161b22] px-2 py-1 min-h-[28px] sm:min-h-auto rounded border border-[#30363d] hover:border-[#38bdf8] transition-colors flex items-center"
+            class="text-[11px] font-mono text-[#38bdf8] bg-[#161b22] px-2 py-1 min-h-[28px] sm:min-h-auto rounded border border-[#30363d] hover:bg-[#1f242c] hover:border-[#38bdf8] transition-all flex items-center"
           >
             [{tag}]
           </a>
@@ -159,13 +159,13 @@ if (category === 'guide') {
       prose-h3:text-base prose-h3:text-[#38bdf8]
       prose-p:text-[#c9d1d9] prose-p:leading-relaxed
       prose-blockquote:border-l-[#10b981] prose-blockquote:text-[#8b949e] prose-blockquote:italic
-      prose-a:text-[#38bdf8] prose-a:underline hover:prose-a:text-[#10b981]">
+      prose-a:text-[#38bdf8] prose-a:underline prose-a:hover:text-[#10b981]">
       <Content />
     </article>
 
     <!-- Attached Downloads / Resources linked directly to this post -->
     {linkedDownloads.length > 0 && (
-      <div class="mt-12 p-4 rounded-lg bg-[#161b22] border border-[#30363d] font-mono">
+      <div class="mt-12 p-4 rounded-lg bg-[#161b22] border border-[#30363d] font-mono tui-panel">
         <div class="text-xs font-bold text-[#10b981] mb-2 flex items-center gap-2">
           <span>↓</span>
           <span data-i18n="thoughts_downloads_title">DOWNLOADABLE RESOURCES LINKED TO THIS POST:</span>
@@ -180,7 +180,7 @@ if (category === 'guide') {
               <a 
                 href={dl.data.fileUrl} 
                 download={dl.data.filename}
-                class="px-3 py-1 rounded bg-[#0d1117] border border-[#30363d] text-[#10b981] hover:border-[#10b981] transition-all text-xs text-center"
+                class="px-3 py-1.5 rounded bg-[#0d1117] border border-[#30363d] text-[#10b981] hover:bg-[#10b981] hover:text-[#0d1117] hover:border-[#10b981] transition-all text-xs text-center font-medium"
               >
                 [Download {dl.data.filename} ↓]
               </a>
@@ -195,13 +195,13 @@ if (category === 'guide') {
       <div class="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4">
         <a 
           href="/thoughts" 
-          class="text-[#8b949e] hover:text-[#10b981] transition-colors"
+          class="text-[#8b949e] hover:text-[#10b981] hover:underline transition-colors"
         >
           <span data-i18n="thoughts_back_overview">[← Return to overview]</span>
         </a>
         <a 
           href="/" 
-          class="text-[#8b949e] hover:text-[#10b981] transition-colors"
+          class="text-[#8b949e] hover:text-[#10b981] hover:underline transition-colors"
         >
           <span data-i18n="thoughts_back_home">[Back to the cockpit]</span>
         </a>

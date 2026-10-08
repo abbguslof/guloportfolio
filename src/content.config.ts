@@ -1,19 +1,56 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
+// Robust preprocessors to gracefully handle empty, null, or whitespace-only YAML frontmatter values
+const optionalString = z.preprocess((val) => {
+  if (val === null || val === undefined) return undefined;
+  if (typeof val === 'string') {
+    const trimmed = val.trim();
+    if (trimmed === '' || trimmed === '""' || trimmed === "''") return undefined;
+    return trimmed;
+  }
+  return val;
+}, z.string().optional());
+
+const optionalUrl = z.preprocess((val) => {
+  if (val === null || val === undefined) return undefined;
+  if (typeof val === 'string') {
+    const trimmed = val.trim();
+    if (trimmed === '' || trimmed === '""' || trimmed === "''") return undefined;
+    return trimmed;
+  }
+  return val;
+}, z.string().url().optional());
+
+const optionalStringArray = z.preprocess((val) => {
+  if (val === null || val === undefined) return [];
+  if (Array.isArray(val)) {
+    return val
+      .filter((item): item is string => typeof item === 'string')
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0);
+  }
+  if (typeof val === 'string') {
+    const trimmed = val.trim();
+    if (trimmed === '' || trimmed === '[]') return [];
+    return [trimmed];
+  }
+  return val;
+}, z.array(z.string()).default([]));
+
 const thoughts = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/thoughts' }),
   schema: z.object({
     title: z.string(),
-    description: z.string().optional(),
+    description: optionalString,
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
     category: z.enum(['tanke', 'thought', 'guide', 'anteckning', 'note', 'idea', 'idé']).default('tanke'),
-    tags: z.array(z.string()).default([]),
+    tags: optionalStringArray,
     featured: z.boolean().default(false),
     draft: z.boolean().default(false),
-    pdfUrl: z.string().optional(),
-    pdfName: z.string().optional(),
+    pdfUrl: optionalString,
+    pdfName: optionalString,
   }),
 });
 
@@ -24,13 +61,13 @@ const projects = defineCollection({
     description: z.string(),
     status: z.enum(['ACTIVE', 'MAINTAINED', 'COMPLETED', 'WIP', 'ARCHIVED']),
     category: z.enum(['School', 'Homelab', 'Minecraft', 'Web', 'Other']),
-    tech: z.array(z.string()),
-    repoUrl: z.string().url().optional(),
-    liveUrl: z.string().url().optional(),
+    tech: optionalStringArray,
+    repoUrl: optionalUrl,
+    liveUrl: optionalUrl,
     order: z.number().default(100),
     featured: z.boolean().default(false),
-    pdfUrl: z.string().optional(),
-    pdfName: z.string().optional(),
+    pdfUrl: optionalString,
+    pdfName: optionalString,
   }),
 });
 

@@ -49,12 +49,15 @@ const projectUrl = `/projects/${slug}`;
 const catKey = `projects_cat_${category.toLowerCase()}`;
 ---
 
-<div class="project-card group relative flex flex-col justify-between h-full p-4 sm:p-5 rounded-lg bg-[#161b22] border border-[#30363d] hover:bg-[#1f242c] hover:border-[#38bdf8]/70 hover:shadow-lg transition-all">
+<div 
+  class="project-card group relative flex flex-col justify-between h-full p-4 sm:p-5 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#38bdf8] hover:bg-[#1f242c] transition-all"
+  data-category={category.toLowerCase()}
+>
   <div class="flex flex-col flex-1">
     <!-- Top Metadata: Category & Status -->
     <div class="flex items-center justify-between gap-2 mb-3">
       <span 
-        class="text-[11px] font-mono font-medium text-[#8b949e] uppercase tracking-wider px-2 py-0.5 rounded bg-[#0d1117] border border-[#30363d]"
+        class="text-[11px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded border text-[#38bdf8] border-[#38bdf8]/40 bg-[#38bdf8]/10"
         data-i18n={catKey}
       >
         {category}
@@ -65,12 +68,14 @@ const catKey = `projects_cat_${category.toLowerCase()}`;
     </div>
 
     <!-- Title (Primary Click target -> Goes to /projects/[slug]) -->
-    <h3 class="text-sm sm:text-base font-semibold text-[#e6edf3] group-hover:text-[#38bdf8] transition-colors mb-2 line-clamp-2">
-      <a href={projectUrl} class="focus-visible:outline-none flex items-center justify-between">
+    <h3 class="text-sm sm:text-base font-semibold text-[#e6edf3] mb-2">
+      <a href={projectUrl} class="focus-visible:outline-none flex items-start justify-between gap-3 group-hover:text-[#38bdf8] transition-colors">
         <span class="absolute inset-0 rounded-lg pointer-events-none" aria-hidden="true"></span>
-        <span class="lang-en-only">{tEn}</span>
-        <span class="lang-sv-only">{tSv}</span>
-        <span class="text-xs text-[#8b949e] group-hover:text-[#38bdf8] group-hover:translate-x-0.5 transition-all">→</span>
+        <span class="line-clamp-2 flex-1">
+          <span class="lang-en-only">{tEn}</span>
+          <span class="lang-sv-only">{tSv}</span>
+        </span>
+        <span class="text-xs text-[#8b949e] group-hover:text-[#38bdf8] group-hover:translate-x-1 transition-transform shrink-0 pt-0.5 pr-1 inline-block" aria-hidden="true">→</span>
       </a>
     </h3>
 

@@ -57,10 +57,10 @@ export function applySiteLang(lang: Lang): void {
   if (btnEn && btnSv) {
     if (lang === 'en') {
       btnEn.className = 'lang-btn px-1.5 sm:px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#10b981] bg-[#0d1117] border border-[#10b981]/40 shadow-sm';
-      btnSv.className = 'lang-btn px-1.5 sm:px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]';
+      btnSv.className = 'lang-btn px-1.5 sm:px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#1f242c]/60';
     } else {
       btnSv.className = 'lang-btn px-1.5 sm:px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#10b981] bg-[#0d1117] border border-[#10b981]/40 shadow-sm';
-      btnEn.className = 'lang-btn px-1.5 sm:px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3]';
+      btnEn.className = 'lang-btn px-1.5 sm:px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#1f242c]/60';
     }
   }
 

@@ -83,7 +83,7 @@ const allTags = Array.from(
           <!-- Card 1: TANKE -->
           <button 
             type="button" 
-            class="cat-toggle-card text-left p-2.5 sm:p-3.5 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#f59e0b]/80 active:scale-[0.99] transition-all cursor-pointer group flex flex-col justify-between gap-1.5 sm:gap-2.5 select-none"
+            class="cat-toggle-card halo-amber text-left p-2.5 sm:p-3.5 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#f59e0b]/80 hover:bg-[#1f242c] active:scale-[0.99] transition-all cursor-pointer group flex flex-col justify-between gap-1.5 sm:gap-2.5 select-none"
             data-cat="tanke"
             aria-pressed="false"
           >
@@ -106,7 +106,7 @@ const allTags = Array.from(
           <!-- Card 2: GUIDE -->
           <button 
             type="button" 
-            class="cat-toggle-card text-left p-2.5 sm:p-3.5 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#38bdf8]/80 active:scale-[0.99] transition-all cursor-pointer group flex flex-col justify-between gap-1.5 sm:gap-2.5 select-none"
+            class="cat-toggle-card halo-cyan text-left p-2.5 sm:p-3.5 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#38bdf8]/80 hover:bg-[#1f242c] active:scale-[0.99] transition-all cursor-pointer group flex flex-col justify-between gap-1.5 sm:gap-2.5 select-none"
             data-cat="guide"
             aria-pressed="false"
           >
@@ -129,7 +129,7 @@ const allTags = Array.from(
           <!-- Card 3: ANTECKNING -->
           <button 
             type="button" 
-            class="cat-toggle-card text-left p-2.5 sm:p-3.5 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#10b981]/80 active:scale-[0.99] transition-all cursor-pointer group flex flex-col justify-between gap-1.5 sm:gap-2.5 select-none"
+            class="cat-toggle-card halo-emerald text-left p-2.5 sm:p-3.5 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#10b981]/80 hover:bg-[#1f242c] active:scale-[0.99] transition-all cursor-pointer group flex flex-col justify-between gap-1.5 sm:gap-2.5 select-none"
             data-cat="anteckning"
             aria-pressed="false"
           >
@@ -183,7 +183,7 @@ const allTags = Array.from(
             {allTags.map((tag) => (
               <button 
                 type="button" 
-                class="tag-filter-btn px-2.5 py-1 min-h-[30px] sm:min-h-auto rounded bg-[#161b22] text-[#8b949e] text-[11px] border border-[#30363d] hover:text-[#e6edf3] transition-all cursor-pointer flex items-center"
+                class="tag-filter-btn px-2.5 py-1 min-h-[30px] sm:min-h-auto rounded bg-[#161b22] text-[#8b949e] text-[11px] border border-[#30363d] hover:text-[#e6edf3] hover:bg-[#1f242c] hover:border-[#484f58] transition-all cursor-pointer flex items-center"
                 data-tag={tag.toLowerCase()}
               >
                 #{tag}
@@ -198,7 +198,7 @@ const allTags = Array.from(
               <button 
                 type="button" 
                 id="btn-sort-newest" 
-                class="sort-btn active px-3 py-1.5 min-h-[32px] sm:min-h-auto rounded text-[11px] font-semibold bg-[#161b22] text-[#e6edf3] border border-[#30363d] cursor-pointer transition-all flex items-center"
+                class="sort-btn active px-3 py-1.5 min-h-[32px] sm:min-h-auto rounded text-[11px] font-semibold bg-[#161b22] text-[#e6edf3] border border-[#30363d] cursor-pointer transition-all flex items-center shadow-sm"
                 data-order="desc"
                 data-i18n-title="thoughts_sort_newest_title"
                 title="Sort by newest publication date first"
@@ -208,7 +208,7 @@ const allTags = Array.from(
               <button 
                 type="button" 
                 id="btn-sort-oldest" 
-                class="sort-btn px-3 py-1.5 min-h-[32px] sm:min-h-auto rounded text-[11px] text-[#8b949e] hover:text-[#e6edf3] cursor-pointer transition-all flex items-center"
+                class="sort-btn px-3 py-1.5 min-h-[32px] sm:min-h-auto rounded text-[11px] text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#1f242c] cursor-pointer transition-all flex items-center"
                 data-order="asc"
                 data-i18n-title="thoughts_sort_oldest_title"
                 title="Sort by oldest publication date first"
@@ -238,6 +238,7 @@ const allTags = Array.from(
         let catCardHoverBorder = 'hover:border-[#f59e0b]/80';
         let catHoverText = 'group-hover:text-[#f59e0b]';
         let catQuoteBorder = 'group-hover:border-[#f59e0b]';
+        let catHaloClass = 'halo-amber';
 
         if (category === 'guide') {
           catBadgeClass = 'text-[#38bdf8] border-[#38bdf8]/40 bg-[#38bdf8]/10';
@@ -246,6 +247,7 @@ const allTags = Array.from(
           catCardHoverBorder = 'hover:border-[#38bdf8]/80';
           catHoverText = 'group-hover:text-[#38bdf8]';
           catQuoteBorder = 'group-hover:border-[#38bdf8]';
+          catHaloClass = 'halo-cyan';
         } else if (category === 'anteckning') {
           catBadgeClass = 'text-[#10b981] border-[#10b981]/40 bg-[#10b981]/10';
           catBadgeKey = 'thoughts_cat_anteckning_badge';
@@ -253,6 +255,7 @@ const allTags = Array.from(
           catCardHoverBorder = 'hover:border-[#10b981]/80';
           catHoverText = 'group-hover:text-[#10b981]';
           catQuoteBorder = 'group-hover:border-[#10b981]';
+          catHaloClass = 'halo-emerald';
         } else if (category === 'idea') {
           catBadgeClass = 'text-[#a78bfa] border-[#a78bfa]/40 bg-[#a78bfa]/10';
           catBadgeKey = 'thoughts_cat_idea_badge';
@@ -260,11 +263,12 @@ const allTags = Array.from(
           catCardHoverBorder = 'hover:border-[#a78bfa]/80';
           catHoverText = 'group-hover:text-[#a78bfa]';
           catQuoteBorder = 'group-hover:border-[#a78bfa]';
+          catHaloClass = 'halo-purple';
         }
 
         return (
           <article 
-            class={`thought-card rounded-lg bg-[#161b22] border border-[#30363d] ${catCardHoverBorder} transition-all p-5 space-y-3 group`}
+            class={`thought-card ${catHaloClass} rounded-lg bg-[#161b22] border border-[#30363d] ${catCardHoverBorder} hover:bg-[#1f242c] transition-all p-5 space-y-3 group`}
             data-category={category}
             data-tags={(post.data.tags || []).join(',').toLowerCase()}
             data-title={post.data.title.toLowerCase()}
@@ -308,11 +312,9 @@ const allTags = Array.from(
 
             <!-- Title -->
             <h2 class={`text-base sm:text-lg font-bold text-[#e6edf3] ${catHoverText} transition-colors`}>
-              <a href={`/thoughts/${post.id}`} class="hover:underline flex items-center justify-between gap-2">
-                <span>{post.data.title}</span>
-                <span class={`text-xs text-[#8b949e] ${catHoverText} group-hover:translate-x-1 transition-all shrink-0 font-mono`} data-i18n="thoughts_read_more">
-                  read →
-                </span>
+              <a href={`/thoughts/${post.id}`} class="focus-visible:outline-none flex items-start justify-between gap-3">
+                <span class="flex-1">{post.data.title}</span>
+                <span class={`text-xs text-[#8b949e] ${catHoverText} group-hover:translate-x-1 transition-transform shrink-0 pt-0.5 pr-1 inline-block font-mono`} aria-hidden="true">→</span>
               </a>
             </h2>
 
@@ -402,11 +404,11 @@ const allTags = Array.from(
 
         // Återställ basklasser
         card.classList.remove(
-          'ring-1', 'ring-[#f59e0b]', 'border-[#f59e0b]', 'bg-[#f59e0b]/10',
-          'ring-[#38bdf8]', 'border-[#38bdf8]', 'bg-[#38bdf8]/10',
-          'ring-[#10b981]', 'border-[#10b981]', 'bg-[#10b981]/10'
+          'ring-1', 'ring-[#f59e0b]', 'border-[#f59e0b]', 'bg-[#f59e0b]/10', 'bg-[#f59e0b]/20',
+          'ring-[#38bdf8]', 'border-[#38bdf8]', 'bg-[#38bdf8]/10', 'bg-[#38bdf8]/20',
+          'ring-[#10b981]', 'border-[#10b981]', 'bg-[#10b981]/10', 'bg-[#10b981]/20'
         );
-        card.classList.add('bg-[#161b22]', 'border-[#30363d]');
+        card.classList.add('bg-[#161b22]', 'border-[#30363d]', 'hover:bg-[#1f242c]');
 
         if (dot) {
           dot.classList.remove('bg-[#f59e0b]', 'border-[#f59e0b]', 'bg-[#38bdf8]', 'border-[#38bdf8]', 'bg-[#10b981]', 'border-[#10b981]');
@@ -418,17 +420,17 @@ const allTags = Array.from(
         }
 
         if (isSelected) {
-          card.classList.remove('bg-[#161b22]', 'border-[#30363d]');
+          card.classList.remove('bg-[#161b22]', 'border-[#30363d]', 'hover:bg-[#1f242c]');
           if (cat === 'tanke') {
-            card.classList.add('ring-1', 'ring-[#f59e0b]', 'border-[#f59e0b]', 'bg-[#f59e0b]/10');
+            card.classList.add('ring-1', 'ring-[#f59e0b]', 'border-[#f59e0b]', 'bg-[#f59e0b]/20');
             if (dot) { dot.classList.remove('border-[#8b949e]'); dot.classList.add('bg-[#f59e0b]', 'border-[#f59e0b]'); }
             if (statusText) { statusText.classList.add('text-[#f59e0b]', 'font-semibold'); statusText.textContent = activeText; }
           } else if (cat === 'guide') {
-            card.classList.add('ring-1', 'ring-[#38bdf8]', 'border-[#38bdf8]', 'bg-[#38bdf8]/10');
+            card.classList.add('ring-1', 'ring-[#38bdf8]', 'border-[#38bdf8]', 'bg-[#38bdf8]/20');
             if (dot) { dot.classList.remove('border-[#8b949e]'); dot.classList.add('bg-[#38bdf8]', 'border-[#38bdf8]'); }
             if (statusText) { statusText.classList.add('text-[#38bdf8]', 'font-semibold'); statusText.textContent = activeText; }
           } else if (cat === 'anteckning') {
-            card.classList.add('ring-1', 'ring-[#10b981]', 'border-[#10b981]', 'bg-[#10b981]/10');
+            card.classList.add('ring-1', 'ring-[#10b981]', 'border-[#10b981]', 'bg-[#10b981]/20');
             if (dot) { dot.classList.remove('border-[#8b949e]'); dot.classList.add('bg-[#10b981]', 'border-[#10b981]'); }
             if (statusText) { statusText.classList.add('text-[#10b981]', 'font-semibold'); statusText.textContent = activeText; }
           }

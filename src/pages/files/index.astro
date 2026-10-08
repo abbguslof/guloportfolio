@@ -99,8 +99,8 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
                 type="button" 
                 class={`file-cat-btn px-3 py-1.5 sm:py-1 min-h-[34px] sm:min-h-auto rounded border transition-all cursor-pointer flex items-center ${
                   i === 0 
-                    ? 'active bg-[#10b981] text-[#0d1117] font-semibold border-[#10b981]' 
-                    : 'bg-[#161b22] text-[#8b949e] border-[#30363d] hover:text-[#e6edf3]'
+                    ? 'active bg-[#10b981] text-[#0d1117] font-semibold border-[#10b981] shadow-sm' 
+                    : 'bg-[#161b22] text-[#8b949e] border-[#30363d] hover:text-[#e6edf3] hover:bg-[#1f242c] hover:border-[#484f58]'
                 }`}
                 data-cat={i === 0 ? 'all' : cat.toLowerCase()}
               >
@@ -114,7 +114,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
             <span class="text-[#8b949e] text-[11px]" data-i18n="files_sort_label">Sort:</span>
             <select 
               id="file-sort-select" 
-              class="bg-[#161b22] text-[#e6edf3] text-xs px-3 py-1.5 sm:py-1 min-h-[34px] sm:min-h-auto rounded border border-[#30363d] focus:outline-none focus:border-[#10b981] cursor-pointer font-mono"
+              class="bg-[#161b22] text-[#e6edf3] text-xs px-3 py-1.5 sm:py-1 min-h-[34px] sm:min-h-auto rounded border border-[#30363d] hover:border-[#484f58] focus:outline-none focus:border-[#10b981] cursor-pointer font-mono transition-colors"
             >
               <option value="newest" data-i18n="files_sort_newest">Recently updated</option>
               <option value="name" data-i18n="files_sort_name_asc">Name (A-Z)</option>
@@ -138,7 +138,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
 
         return (
           <article 
-            class="file-card rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#484f58] transition-all overflow-hidden"
+            class="file-card rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#38bdf8]/60 transition-all overflow-hidden"
             data-category={item.category.toLowerCase()}
             data-name={item.name.toLowerCase()}
             data-filename={item.filename.toLowerCase()}
@@ -150,7 +150,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
           >
             <!-- Card Main Row (Clickable for instant details, accessible via Tab/Enter) -->
             <div 
-              class="file-card-header p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 cursor-pointer hover:bg-[#1c2128]/50 transition-colors"
+              class="file-card-header p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 cursor-pointer hover:bg-[#1f242c] transition-colors"
               tabindex="0"
               role="button"
               aria-expanded="false"
@@ -204,7 +204,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
                 
                 <button 
                   type="button" 
-                  class="file-expand-toggle flex-1 sm:flex-none inline-flex items-center justify-center gap-1 px-3 py-2 sm:py-1.5 rounded bg-[#161b22] border border-[#30363d] text-xs text-[#8b949e] hover:text-[#e6edf3] hover:border-[#8b949e] active:scale-95 transition-all cursor-pointer min-h-[38px] sm:min-h-auto sm:min-w-[110px]"
+                  class="file-expand-toggle flex-1 sm:flex-none inline-flex items-center justify-center gap-1 px-3 py-2 sm:py-1.5 rounded bg-[#161b22] border border-[#30363d] text-xs text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#1f242c] hover:border-[#484f58] active:scale-95 transition-all cursor-pointer min-h-[38px] sm:min-h-auto sm:min-w-[110px]"
                   aria-expanded="false"
                 >
                   <span class="toggle-text" data-i18n="files_info_expand">[More info ▼]</span>
@@ -213,7 +213,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
             </div>
 
             <!-- Expandable Information Drawer -->
-            <div class="file-drawer hidden px-3.5 sm:px-5 pb-5 pt-3 border-t border-[#30363d]/60 bg-[#0d1117]/60 space-y-4 text-xs">
+            <div class="file-drawer hidden px-3.5 sm:px-5 pb-5 pt-3 border-t border-[#30363d]/60 bg-[#0d1117]/80 space-y-4 text-xs">
               <!-- Usage command / guide -->
               {item.usage && (
                 <div class="space-y-1.5">
@@ -225,7 +225,7 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
                     <code class="text-[#10b981] text-xs break-all sm:break-normal overflow-x-auto">{item.usage}</code>
                     <button 
                       type="button" 
-                      class="copy-cmd-btn self-start sm:self-auto shrink-0 px-2.5 py-1 min-h-[30px] sm:min-h-auto rounded bg-[#161b22] border border-[#30363d] text-[11px] sm:text-[10px] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#10b981] active:scale-95 transition-colors cursor-pointer"
+                      class="copy-cmd-btn self-start sm:self-auto shrink-0 px-2.5 py-1 min-h-[30px] sm:min-h-auto rounded bg-[#161b22] border border-[#30363d] text-[11px] sm:text-[10px] text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#1f242c] hover:border-[#10b981] active:scale-95 transition-colors cursor-pointer"
                       data-cmd={item.usage}
                       title="Copy command"
                     >
@@ -407,12 +407,12 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
         currentCat = btn.getAttribute('data-cat') || 'all';
 
         catBtns.forEach((b) => {
-          b.classList.remove('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]');
-          b.classList.add('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]');
+          b.classList.remove('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]', 'shadow-sm');
+          b.classList.add('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]', 'hover:text-[#e6edf3]', 'hover:bg-[#1f242c]', 'hover:border-[#484f58]');
         });
 
-        btn.classList.remove('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]');
-        btn.classList.add('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]');
+        btn.classList.remove('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]', 'hover:text-[#e6edf3]', 'hover:bg-[#1f242c]', 'hover:border-[#484f58]');
+        btn.classList.add('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]', 'shadow-sm');
 
         filterAndSort();
       });

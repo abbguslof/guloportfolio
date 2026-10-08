@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "CONTRIBUTING.md",
+                "file": "src/content/thoughts/dopaminecontroller.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "CONTRIBUTING"
+              "title": "dopaminecontroller"
             }
           }
         ]
@@ -83,7 +83,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 200
   },
   "right": {
     "id": "3085c84c5b5882cc",
@@ -99,7 +99,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Welcome.md",
+                "file": "src/content/thoughts/dopaminecontroller.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -185,36 +185,48 @@
       "daily-notes:Open today's daily note": false,
       "templates:Insert template": false,
       "command-palette:Open command palette": false,
-      "bases:Create new base": false
+      "bases:Create new base": false,
+      "scribe:Scribe": false
     }
   },
-  "active": "e9ad49497331819f",
+  "active": "8858cb4d8b80d5e8",
   "lastOpenFiles": [
-    "dist/_astro/InteractiveTerminal.astro_astro_type_script_index_0_lang.BjC1broF.js",
-    "dist/_astro/Footer.BPYmpfBk.css",
-    "dist/_astro/i18n-client.BOeVGFOd.js",
-    "dist/_astro/Layout.astro_astro_type_script_index_0_lang.CpQ9NpKX.js",
-    "dist/_astro/InteractiveTerminal.astro_astro_type_script_index_0_lang.DWC4vftf.js",
-    "dist/_astro/Header.astro_astro_type_script_index_0_lang.4qBiCr9h.js",
-    "dist/_astro/InteractiveTerminal.astro_astro_type_script_index_0_lang.DtcHx6wH.js",
     "dist/index.html",
+    "dist/thoughts/dopaminecontroller/index.html",
     "dist/thoughts/index.html",
+    "dist/thoughts/dopaminecontroller",
     "dist/thoughts",
     "dist/projects/index.html",
+    "dist/projects",
+    "dist/files/index.html",
+    "dist/files",
+    "dist/404.html",
+    "dist/_astro/jetbrains-mono-vietnamese-700-normal.BDLVIk2r.woff",
+    "dist/images/avatar.jpg",
+    "dist/favicon.svg",
+    "guide.md",
+    "src/content/thoughts/dopaminecontroller.md",
+    "src/content/thoughts/guide copy.md",
+    "src/content/projects/project.md",
+    "src/content/guide.md",
+    "src/content/thoughts/removedopaminkillers.md",
+    "src/content/thoughts/removedopaminkillersasd.md",
+    "src/content/thoughts/removedopaminkillers copy.md",
+    "scribe-recording-2026-10-08.md",
+    "scribe-recording-2026-10-08.722.md",
+    "scribe-recording-2026-10-08.803.md",
+    "templates/guide.md",
+    "templates/project.md",
+    "templates/idea.md",
+    "CONTRIBUTING.md",
     "infoaboutme/whatisgo.md",
     "infoaboutme/MASTER_CONTENT_SPEC.md",
     "aboutme.md",
-    "dist/images/avatar.jpg",
-    "dist/favicon.svg",
-    "CONTRIBUTING.md",
     "AGENTS.md",
     "README.md",
     "public/images/avatar.jpg",
     "public/favicon.svg",
     "templates/thought.md",
-    "templates/project.md",
-    "templates/idea.md",
-    "templates/guide.md",
     "Welcome.md"
   ]
 }

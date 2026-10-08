@@ -330,19 +330,19 @@ const dynamicFileSystemSv = {
           SUGGESTED DISCOVERY VECTORS:
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-          <a href="/" class="p-3 rounded bg-[#0d1117] border border-[#30363d] hover:border-[#10b981] text-[#10b981] hover:text-[#e6edf3] transition-all flex items-center justify-between group">
+          <a href="/" class="p-3 rounded bg-[#0d1117] border border-[#30363d] hover:border-[#10b981] hover:bg-[#1f242c] text-[#10b981] hover:text-[#e6edf3] transition-all flex items-center justify-between group">
             <span data-i18n="not_found_back_cockpit">[← Back to Cockpit]</span>
             <span class="text-[#8b949e] group-hover:text-[#10b981]">~</span>
           </a>
-          <a href="/projects" class="p-3 rounded bg-[#0d1117] border border-[#30363d] hover:border-[#a78bfa] text-[#a78bfa] hover:text-[#e6edf3] transition-all flex items-center justify-between group">
+          <a href="/projects" class="p-3 rounded bg-[#0d1117] border border-[#30363d] hover:border-[#a78bfa] hover:bg-[#1f242c] text-[#a78bfa] hover:text-[#e6edf3] transition-all flex items-center justify-between group">
             <span data-i18n="not_found_browse_projects">[Explore Projects →]</span>
             <span class="text-[#8b949e] group-hover:text-[#a78bfa]">~/projects</span>
           </a>
-          <a href="/thoughts" class="p-3 rounded bg-[#0d1117] border border-[#30363d] hover:border-[#f59e0b] text-[#f59e0b] hover:text-[#e6edf3] transition-all flex items-center justify-between group">
+          <a href="/thoughts" class="p-3 rounded bg-[#0d1117] border border-[#30363d] hover:border-[#f59e0b] hover:bg-[#1f242c] text-[#f59e0b] hover:text-[#e6edf3] transition-all flex items-center justify-between group">
             <span data-i18n="not_found_read_thoughts">[Read Blog &amp; Notes →]</span>
             <span class="text-[#8b949e] group-hover:text-[#f59e0b]">~/thoughts</span>
           </a>
-          <a href="/files" class="p-3 rounded bg-[#0d1117] border border-[#30363d] hover:border-[#38bdf8] text-[#38bdf8] hover:text-[#e6edf3] transition-all flex items-center justify-between group">
+          <a href="/files" class="p-3 rounded bg-[#0d1117] border border-[#30363d] hover:border-[#38bdf8] hover:bg-[#1f242c] text-[#38bdf8] hover:text-[#e6edf3] transition-all flex items-center justify-between group">
             <span data-i18n="not_found_download_files">[Download Archives →]</span>
             <span class="text-[#8b949e] group-hover:text-[#38bdf8]">~/files</span>
           </a>
@@ -382,7 +382,7 @@ const dynamicFileSystemSv = {
       </script>
       <div 
         id="terminal-closed-card" 
-        class="hidden mb-6 p-4 sm:p-6 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#10b981]/60 transition-all shadow-xl"
+        class="hidden mb-6 p-4 sm:p-6 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#10b981]/60 hover:bg-[#1f242c] transition-all shadow-xl"
       >
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 sm:pb-4 mb-3 sm:mb-4 border-b border-[#30363d] gap-3">
         <div class="flex items-center gap-3">
@@ -394,7 +394,7 @@ const dynamicFileSystemSv = {
         <button 
           type="button" 
           id="btn-reopen-terminal" 
-          class="hidden sm:flex text-xs font-mono px-3.5 py-1.5 rounded bg-[#0d1117] border border-[#30363d] text-[#10b981] hover:border-[#10b981] hover:bg-[#10b981]/10 active:scale-95 transition-all cursor-pointer items-center gap-2 self-start sm:self-auto shadow-sm"
+          class="hidden sm:flex text-xs font-mono px-3.5 py-1.5 rounded bg-[#0d1117] border border-[#30363d] text-[#10b981] hover:border-[#10b981] hover:bg-[#10b981]/15 active:scale-95 transition-all cursor-pointer items-center gap-2 self-start sm:self-auto shadow-sm"
         >
           <span>&gt;_</span>
           <span id="closed-card-reopen-text" data-i18n="term_reopen_btn">Open terminal</span>
@@ -454,7 +454,7 @@ const dynamicFileSystemSv = {
     <!-- Window Title Bar with Interactive Controls -->
     <div 
       id="terminal-titlebar"
-      class="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 bg-[#161b22] border-b border-[#30363d] select-none cursor-pointer shrink-0"
+      class="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 bg-[#161b22] hover:bg-[#1f242c]/70 border-b border-[#30363d] select-none cursor-pointer shrink-0 transition-colors"
       title="Click titlebar to expand if minimized, or double click for fullscreen"
       data-i18n-title="term_titlebar_hint"
     >

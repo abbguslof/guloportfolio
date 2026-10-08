@@ -70,6 +70,11 @@ body {
 }
 
 /* Custom terminal scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #30363d #0d1117;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -88,18 +93,40 @@ body {
   background: #484f58;
 }
 
-/* Terminal selection */
-::selection {
-  background: #2ea043;
-  color: #0d1117;
+/* ============================================================================
+   COCKPIT TERMINAL SELECTION
+   Universal crisp dark text on vivid green highlight across every element
+   ============================================================================ */
+::selection,
+*::selection,
+input::selection,
+textarea::selection,
+pre::selection,
+code::selection,
+span::selection,
+a::selection,
+p::selection,
+h1::selection,
+h2::selection,
+h3::selection,
+blockquote::selection {
+  background-color: #2ea043 !important;
+  color: #0d1117 !important;
+  -webkit-text-fill-color: #0d1117 !important;
+  text-shadow: none !important;
 }
 
-/* Cockpit Subtle Translucency & Delicate Shadow across all pages */
-.bg-\[\#161b22\] {
-  background-color: rgba(22, 27, 34, 0.91) !important;
+::-moz-selection,
+*::-moz-selection {
+  background-color: #2ea043 !important;
+  color: #0d1117 !important;
+  text-shadow: none !important;
 }
 
-/* Apply unified subtle backdrop blur to all structural panels, windows and cards */
+/* ============================================================================
+   COCKPIT TRANSLUCENCY & DEPTH SYSTEM
+   Unified glassmorphic surfaces, subtle blur & depth shadows across all pages
+   ============================================================================ */
 .file-card,
 .cat-toggle-card,
 .thought-card,
@@ -107,41 +134,182 @@ body {
 .project-card,
 .tui-window,
 .tui-card,
+.tui-panel,
 #terminal-window,
 #terminal-closed-card,
 div.rounded-lg.bg-\[\#161b22\],
 article.rounded-lg.bg-\[\#161b22\],
 footer > div > div.rounded-lg {
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background-color: rgba(22, 27, 34, 0.88);
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  border: 1px solid #30363d;
+  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-/* Explicitly ensure inputs and search containers never suffer from backdrop-filter compositor blur */
-input,
+/* Interactive Card Hover Base Elevation */
+.file-card:hover,
+#terminal-closed-card:hover {
+  background-color: rgba(31, 36, 44, 0.96);
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.project-card:hover,
+.thought-card:hover {
+  background-color: rgba(31, 36, 44, 0.96);
+}
+
+/* ============================================================================
+   CATEGORY OUTLINE & SELECTION SYSTEM (Projects & Thoughts)
+   Crisp, clean category-colored outlines on hover & focus — NO fuzzy glow
+   ============================================================================ */
+
+/* Thoughts Category Outlines (Amber, Cyan, Emerald, Purple) */
+.thought-card.halo-amber:hover,
+.thought-card[data-category="tanke"]:hover,
+.thought-card[data-category="thought"]:hover {
+  border-color: #f59e0b !important;
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.55) !important;
+}
+
+.thought-card.halo-cyan:hover,
+.thought-card[data-category="guide"]:hover {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.55) !important;
+}
+
+.thought-card.halo-emerald:hover,
+.thought-card[data-category="anteckning"]:hover,
+.thought-card[data-category="note"]:hover {
+  border-color: #10b981 !important;
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.55) !important;
+}
+
+.thought-card.halo-purple:hover,
+.thought-card[data-category="idea"]:hover,
+.thought-card[data-category="idé"]:hover {
+  border-color: #a78bfa !important;
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Category Filter Toggle Cards on /thoughts */
+.cat-toggle-card[data-cat="tanke"]:hover:not([aria-pressed="true"]) {
+  border-color: #f59e0b !important;
+  background-color: rgba(245, 158, 11, 0.06) !important;
+}
+
+.cat-toggle-card[data-cat="guide"]:hover:not([aria-pressed="true"]) {
+  border-color: #38bdf8 !important;
+  background-color: rgba(56, 189, 248, 0.06) !important;
+}
+
+.cat-toggle-card[data-cat="anteckning"]:hover:not([aria-pressed="true"]) {
+  border-color: #10b981 !important;
+  background-color: rgba(16, 185, 129, 0.06) !important;
+}
+
+/* Selected state for thoughts category cards: the full thing turns into its category color */
+.cat-toggle-card[data-cat="tanke"][aria-pressed="true"] {
+  background-color: rgba(245, 158, 11, 0.22) !important;
+  border-color: #f59e0b !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45) !important;
+}
+
+.cat-toggle-card[data-cat="tanke"][aria-pressed="true"] p,
+.cat-toggle-card[data-cat="tanke"][aria-pressed="true"] .cat-status-text {
+  color: #fde68a !important;
+}
+
+.cat-toggle-card[data-cat="guide"][aria-pressed="true"] {
+  background-color: rgba(56, 189, 248, 0.22) !important;
+  border-color: #38bdf8 !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45) !important;
+}
+
+.cat-toggle-card[data-cat="guide"][aria-pressed="true"] p,
+.cat-toggle-card[data-cat="guide"][aria-pressed="true"] .cat-status-text {
+  color: #bae6fd !important;
+}
+
+.cat-toggle-card[data-cat="anteckning"][aria-pressed="true"] {
+  background-color: rgba(16, 185, 129, 0.22) !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45) !important;
+}
+
+.cat-toggle-card[data-cat="anteckning"][aria-pressed="true"] p,
+.cat-toggle-card[data-cat="anteckning"][aria-pressed="true"] .cat-status-text {
+  color: #a7f3d0 !important;
+}
+
+/* Homepage Thought Rows (Dynamic category left-bar outline) */
+.thought-item.halo-amber:hover {
+  box-shadow: inset 3px 0 0 #f59e0b;
+}
+.thought-item.halo-cyan:hover {
+  box-shadow: inset 3px 0 0 #38bdf8;
+}
+.thought-item.halo-emerald:hover {
+  box-shadow: inset 3px 0 0 #10b981;
+}
+.thought-item.halo-purple:hover {
+  box-shadow: inset 3px 0 0 #a78bfa;
+}
+
+/* Projects: All projects consistently use the signature project blue (#38bdf8) */
+.project-card:hover {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Default thought card hover fallback */
+.thought-card:hover {
+  border-color: #f59e0b !important;
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Form Inputs, Search Grep Bars & Select Elements (Crisp & completely opaque) */
+input[type="text"],
+input[type="search"],
+input[type="email"],
 textarea,
-input.bg-\[\#161b22\] {
+select {
+  background-color: #161b22;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+  caret-color: #10b981;
 }
 
-.hover\:bg-\[\#1f242c\]:hover {
-  background-color: rgba(31, 36, 44, 0.985) !important;
+input[type="text"]:focus,
+input[type="search"]:focus,
+input[type="email"]:focus,
+textarea:focus,
+select:focus {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 1px #10b981, 0 0 12px rgba(16, 185, 129, 0.25) !important;
 }
 
-/* Super subtle depth shadow for terminal, cards & information blocks */
-.file-card,
+select option {
+  background-color: #161b22;
+  color: #e6edf3;
+}
+
+/* Smooth universal transition for buttons, links, pills and interactive elements */
+a,
+button,
+.nav-link,
+.proj-filter-btn,
+.tag-filter-btn,
+.file-cat-btn,
+.sort-btn,
+.copy-cmd-btn,
+.code-copy-btn,
+.file-download-btn,
+.file-expand-toggle,
 .cat-toggle-card,
-.thought-card,
-.thought-container,
-.project-card,
-.tui-window,
-.tui-card,
-#terminal-window,
-#terminal-closed-card,
-div.rounded-lg.bg-\[\#161b22\],
-article.rounded-lg.bg-\[\#161b22\],
-footer > div > div.rounded-lg {
-  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.38), 0 0 0 1px rgba(255, 255, 255, 0.02);
+.thought-item {
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
 
 /* ============================================================================
@@ -182,6 +350,24 @@ pre.astro-code code {
   font-size: 0.825em !important;
   font-family: var(--font-mono) !important;
 }
+
+/* ============================================================================
+   MARKDOWN PROSE LINKS (Interactive & Clear Hover Feedback)
+   ============================================================================ */
+.prose a {
+  color: #38bdf8 !important;
+  text-decoration: underline !important;
+  text-decoration-color: rgba(56, 189, 248, 0.45) !important;
+  text-underline-offset: 3px !important;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease !important;
+  cursor: pointer !important;
+}
+
+.prose a:hover {
+  color: #10b981 !important;
+  text-decoration-color: #10b981 !important;
+}
+
 
 /* Code block copy button */
 .code-copy-btn {
@@ -266,12 +452,33 @@ select:focus-visible,
   outline-offset: 2px !important;
 }
 
-/* Smooth cockpit illumination when focusing inside cards */
-.project-card:has(a:focus-visible),
-.file-card:has(.file-card-header:focus-visible),
-.thought-card:has(a:focus-visible) {
+/* Category-aware cockpit illumination when focusing inside cards (Clean outline, NO glow) */
+.thought-card[data-category="tanke"]:has(a:focus-visible),
+.thought-card[data-category="thought"]:has(a:focus-visible),
+.thought-card.halo-amber:has(a:focus-visible) {
+  border-color: #f59e0b !important;
+}
+
+.thought-card[data-category="guide"]:has(a:focus-visible),
+.thought-card.halo-cyan:has(a:focus-visible),
+.project-card:has(a:focus-visible) {
+  border-color: #38bdf8 !important;
+}
+
+.thought-card[data-category="anteckning"]:has(a:focus-visible),
+.thought-card[data-category="note"]:has(a:focus-visible),
+.thought-card.halo-emerald:has(a:focus-visible) {
   border-color: #10b981 !important;
-  box-shadow: 0 0 16px rgba(16, 185, 129, 0.35) !important;
+}
+
+.thought-card[data-category="idea"]:has(a:focus-visible),
+.thought-card[data-category="idé"]:has(a:focus-visible),
+.thought-card.halo-purple:has(a:focus-visible) {
+  border-color: #a78bfa !important;
+}
+
+.file-card:has(.file-card-header:focus-visible) {
+  border-color: #10b981 !important;
 }
 
 /* Responsive mobile table & pre overflow container protection */
