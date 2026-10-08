@@ -255,3 +255,25 @@ select:focus-visible,
   border-color: #10b981 !important;
   box-shadow: 0 0 16px rgba(16, 185, 129, 0.35) !important;
 }
+
+/* Responsive mobile table & pre overflow container protection */
+.prose table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure mobile interactive touch targets are comfortable */
+@media (max-width: 640px) {
+  .lang-btn {
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .nav-link {
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+  }
+}

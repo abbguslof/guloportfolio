@@ -13,10 +13,9 @@ const sortedThoughts = thoughts
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 
 // Räkna antal per kategori
-const countAll = sortedThoughts.length;
-const countTankar = sortedThoughts.filter((t) => t.data.category === 'tanke').length;
+const countTankar = sortedThoughts.filter((t) => t.data.category === 'tanke' || t.data.category === 'thought').length;
 const countGuider = sortedThoughts.filter((t) => t.data.category === 'guide').length;
-const countAnteckningar = sortedThoughts.filter((t) => t.data.category === 'anteckning').length;
+const countAnteckningar = sortedThoughts.filter((t) => t.data.category === 'anteckning' || t.data.category === 'note').length;
 
 const allTags = Array.from(
   new Set(sortedThoughts.flatMap((post) => post.data.tags))
@@ -223,7 +222,8 @@ const allTags = Array.from(
     <div class="space-y-4" id="thoughts-list">
       {sortedThoughts.map((post) => {
         const formattedDate = post.data.pubDate.toISOString().slice(0, 10);
-        const category = post.data.category || 'tanke';
+        const rawCategory = post.data.category || 'tanke';
+        const category = (rawCategory === 'thought') ? 'tanke' : ((rawCategory === 'note') ? 'anteckning' : ((rawCategory === 'idé') ? 'idea' : rawCategory));
         const timestamp = post.data.pubDate.getTime();
         const reading = calculateReadingTime(post.body || '');
 
@@ -249,6 +249,13 @@ const allTags = Array.from(
           catCardHoverBorder = 'hover:border-[#10b981]/80';
           catHoverText = 'group-hover:text-[#10b981]';
           catQuoteBorder = 'group-hover:border-[#10b981]';
+        } else if (category === 'idea') {
+          catBadgeClass = 'text-[#a78bfa] border-[#a78bfa]/40 bg-[#a78bfa]/10';
+          catBadgeKey = 'thoughts_cat_idea_badge';
+          catLabel = '[IDEA]';
+          catCardHoverBorder = 'hover:border-[#a78bfa]/80';
+          catHoverText = 'group-hover:text-[#a78bfa]';
+          catQuoteBorder = 'group-hover:border-[#a78bfa]';
         }
 
         return (
@@ -286,6 +293,12 @@ const allTags = Array.from(
                     #{tag}
                   </span>
                 ))}
+                {post.data.pdfUrl && (
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-[#10b981]/10 border border-[#10b981]/40 text-[#10b981] font-mono flex items-center gap-0.5 font-semibold" title={post.data.pdfName || 'Companion PDF available'}>
+                    <span>↓</span>
+                    <span>PDF</span>
+                  </span>
+                )}
               </div>
             </div>
 

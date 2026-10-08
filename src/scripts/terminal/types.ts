@@ -13,7 +13,7 @@ export type FileNode = {
 
 export type DirNode = {
   type: 'dir';
-  description: string;
+  description?: string;
   children: Record<string, DirNode | FileNode>;
 };
 

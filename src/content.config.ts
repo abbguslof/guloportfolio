@@ -8,10 +8,12 @@ const thoughts = defineCollection({
     description: z.string().optional(),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
-    category: z.enum(['tanke', 'guide', 'anteckning']).default('tanke'),
+    category: z.enum(['tanke', 'thought', 'guide', 'anteckning', 'note', 'idea', 'idé']).default('tanke'),
     tags: z.array(z.string()).default([]),
     featured: z.boolean().default(false),
     draft: z.boolean().default(false),
+    pdfUrl: z.string().optional(),
+    pdfName: z.string().optional(),
   }),
 });
 
@@ -27,6 +29,8 @@ const projects = defineCollection({
     liveUrl: z.string().url().optional(),
     order: z.number().default(100),
     featured: z.boolean().default(false),
+    pdfUrl: z.string().optional(),
+    pdfName: z.string().optional(),
   }),
 });
 

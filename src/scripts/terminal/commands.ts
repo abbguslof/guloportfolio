@@ -365,6 +365,168 @@ ${ctx.escapeHtml(node.content)}
 </div>`;
     },
 
+    // 8a-2. GREP PATTERN MATCHER
+    grep: (args, ctx) => {
+      const isSv = ctx.lang === 'sv';
+      if (!args[0]) {
+        return isSv
+          ? `<div class="text-[#f59e0b] text-xs font-mono space-y-1">
+              <div>Användning: <code class="text-[#10b981]">grep [-inrl] &lt;mönster&gt; [fil|katalog]</code></div>
+              <div class="text-[#8b949e]">Exempel: <code class="text-[#38bdf8]">grep rust</code>, <code class="text-[#38bdf8]">grep -i docker whoami.md</code>, <code class="text-[#38bdf8]">grep -r valgrind thoughts/</code></div>
+             </div>`
+          : `<div class="text-[#f59e0b] text-xs font-mono space-y-1">
+              <div>Usage: <code class="text-[#10b981]">grep [-inrl] &lt;pattern&gt; [file|dir]</code></div>
+              <div class="text-[#8b949e]">Examples: <code class="text-[#38bdf8]">grep rust</code>, <code class="text-[#38bdf8]">grep -i docker whoami.md</code>, <code class="text-[#38bdf8]">grep -r valgrind thoughts/</code></div>
+             </div>`;
+      }
+
+      // Parse flags and positional arguments
+      const flags = new Set<string>();
+      const positionals: string[] = [];
+
+      for (const arg of args) {
+        if (arg.startsWith('-') && arg.length > 1 && !arg.startsWith('--')) {
+          for (const char of arg.slice(1)) {
+            flags.add(char);
+          }
+        } else if (arg.startsWith('--')) {
+          flags.add(arg.slice(2));
+        } else {
+          positionals.push(arg);
+        }
+      }
+
+      if (positionals.length === 0) {
+        return `<div class="text-[#f85149] text-xs font-mono">${isSv ? 'grep: inget sökmönster angivet.' : 'grep: no search pattern specified.'}</div>`;
+      }
+
+      const patternStr = positionals[0];
+      const targetArg = positionals[1]; // optional file/dir
+
+      const ignoreCase = flags.has('i') || flags.has('ignore-case') || true;
+      const showLineNumbers = flags.has('n') || flags.has('line-number') || true;
+      const filesOnly = flags.has('l') || flags.has('files-with-matches');
+      const countOnly = flags.has('c') || flags.has('count');
+      const invertMatch = flags.has('v') || flags.has('invert-match');
+
+      function collectFiles(dirNode: DirNode, currentPrefix: string): { path: string; node: FileNode }[] {
+        const results: { path: string; node: FileNode }[] = [];
+        for (const [name, child] of Object.entries(dirNode.children)) {
+          const itemPath = currentPrefix ? `${currentPrefix}/${name}` : name;
+          if (child.type === 'file') {
+            results.push({ path: itemPath, node: child as FileNode });
+          } else if (child.type === 'dir') {
+            results.push(...collectFiles(child as DirNode, itemPath));
+          }
+        }
+        return results;
+      }
+
+      let filesToSearch: { path: string; node: FileNode }[] = [];
+      let singleFile = false;
+
+      if (targetArg) {
+        const targetSegments = ctx.resolvePath(ctx.currentPath, targetArg);
+        let targetNode = ctx.resolveNode(targetSegments);
+
+        if (!targetNode && ctx.currentPath.length > 0 && ctx.fileSystem.children[targetArg]) {
+          targetNode = ctx.fileSystem.children[targetArg];
+        }
+
+        if (!targetNode) {
+          return `<div class="text-[#f85149] text-xs font-mono">grep: ${ctx.escapeHtml(targetArg)}: ${isSv ? 'Ingen sådan fil eller katalog' : 'No such file or directory'}</div>`;
+        }
+
+        if (targetNode.type === 'file') {
+          filesToSearch.push({ path: targetArg, node: targetNode as FileNode });
+          singleFile = true;
+        } else {
+          filesToSearch = collectFiles(targetNode as DirNode, targetArg.replace(/\/$/, ''));
+        }
+      } else {
+        const currentDir = ctx.getCurrentDir();
+        filesToSearch = collectFiles(currentDir, ctx.currentPath.join('/'));
+      }
+
+      if (filesToSearch.length === 0) {
+        return `<div class="text-[#8b949e] text-xs font-mono">${isSv ? 'Inga filer att söka igenom.' : 'No files to search.'}</div>`;
+      }
+
+      let regex: RegExp;
+      try {
+        regex = new RegExp(patternStr, ignoreCase ? 'gi' : 'g');
+      } catch {
+        const escaped = patternStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        regex = new RegExp(escaped, ignoreCase ? 'gi' : 'g');
+      }
+
+      interface MatchResult {
+        filePath: string;
+        lineNum: number;
+        lineContent: string;
+        highlightedContent: string;
+      }
+
+      const matches: MatchResult[] = [];
+      const fileCounts: Record<string, number> = {};
+
+      for (const file of filesToSearch) {
+        const content = file.node.content || '';
+        const lines = content.split('\n');
+        fileCounts[file.path] = 0;
+
+        lines.forEach((line, idx) => {
+          regex.lastIndex = 0;
+          const isMatch = regex.test(line);
+          const shouldInclude = invertMatch ? !isMatch : isMatch;
+
+          if (shouldInclude) {
+            fileCounts[file.path]++;
+            let highlighted = ctx.escapeHtml(line);
+            if (!invertMatch) {
+              regex.lastIndex = 0;
+              highlighted = ctx.escapeHtml(line).replace(
+                new RegExp(regex.source, regex.flags),
+                (m) => `<mark class="bg-[#f59e0b]/30 text-[#f59e0b] px-0.5 rounded font-bold">${m}</mark>`
+              );
+            }
+            matches.push({
+              filePath: file.path,
+              lineNum: idx + 1,
+              lineContent: line,
+              highlightedContent: highlighted,
+            });
+          }
+        });
+      }
+
+      if (filesOnly) {
+        const matchingFiles = Object.keys(fileCounts).filter(p => fileCounts[p] > 0);
+        if (matchingFiles.length === 0) {
+          return `<div class="text-[#8b949e] text-xs font-mono">${isSv ? `Inga matchningar hittades för '${ctx.escapeHtml(patternStr)}'.` : `No matches found for '${ctx.escapeHtml(patternStr)}'.`}</div>`;
+        }
+        return `<div class="font-mono text-xs space-y-0.5 text-[#38bdf8]">${matchingFiles.map(f => `<div>${ctx.escapeHtml(f)}</div>`).join('')}</div>`;
+      }
+
+      if (countOnly) {
+        return `<div class="font-mono text-xs space-y-0.5">${Object.entries(fileCounts).map(([f, c]) => 
+          `<div><span class="text-[#38bdf8]">${ctx.escapeHtml(f)}</span>: <span class="text-[#10b981] font-bold">${c}</span></div>`
+        ).join('')}</div>`;
+      }
+
+      if (matches.length === 0) {
+        return `<div class="text-[#8b949e] text-xs font-mono">${isSv ? `grep: Inga matchningar hittades för '${ctx.escapeHtml(patternStr)}'.` : `grep: No matches found for '${ctx.escapeHtml(patternStr)}'.`}</div>`;
+      }
+
+      const rows = matches.map(m => {
+        const filePrefix = singleFile ? '' : `<span class="text-[#38bdf8] font-bold">${ctx.escapeHtml(m.filePath)}</span><span class="text-[#30363d]">:</span>`;
+        const linePrefix = showLineNumbers ? `<span class="text-[#10b981] font-mono">${m.lineNum}</span><span class="text-[#30363d]">:</span> ` : ' ';
+        return `<div class="leading-relaxed">${filePrefix}${linePrefix}<span class="text-[#e6edf3] font-mono">${m.highlightedContent}</span></div>`;
+      }).join('');
+
+      return `<div class="font-mono text-xs space-y-1 p-2.5 rounded bg-[#0d1117] border border-[#30363d] overflow-x-auto max-h-96">${rows}</div>`;
+    },
+
     // 8b. NEOVIM TUI EDITOR SIMULATOR
     nvim: (args, ctx) => handleNvimCommand(args, ctx),
 
@@ -618,6 +780,50 @@ ${ctx.escapeHtml(node.content)}
       ctx.exitTerminal();
     },
 
+    // 10b. SAFE ECHO COMMAND
+    echo: (args, ctx) => {
+      if (args.length === 0) return '<div></div>';
+      const isInterpretEscapes = args[0] === '-e';
+      const cleanArgs = isInterpretEscapes ? args.slice(1) : args;
+      let rawText = cleanArgs.join(' ');
+      if ((rawText.startsWith('"') && rawText.endsWith('"')) || (rawText.startsWith("'") && rawText.endsWith("'"))) {
+        rawText = rawText.slice(1, -1);
+      }
+      return `<div class="text-[#e6edf3] font-mono text-xs whitespace-pre-wrap">${ctx.escapeHtml(rawText)}</div>`;
+    },
+
+    // 10c. MAN & TLDR COMMANDS
+    man: (args, ctx) => {
+      const topic = (args[0] || '').toLowerCase().trim();
+      const isSv = ctx.lang === 'sv';
+      if (!topic) {
+        return `<div class="text-[#f59e0b] font-mono text-xs">${isSv ? 'Användning: man <kommando> (t.ex. man git, man nvim, man calc, man wget)' : 'Usage: man <command> (e.g. man git, man nvim, man calc, man wget)'}</div>`;
+      }
+      const manuals: Record<string, { descSv: string; descEn: string; syn: string }> = {
+        help: { descSv: 'Visar tillgängliga kommandon i terminalen.', descEn: 'Displays available commands in the terminal.', syn: 'help [--extended]' },
+        grep: { descSv: 'Söker efter mönster i filer och kataloger med radnummer och syntaxfärgning.', descEn: 'Searches for patterns across files and directories with line numbers and highlighting.', syn: 'grep [-inrl] <mönster> [fil|katalog]' },
+        git: { descSv: 'Simulerad Git-klient för versionshantering & inspektion av repot.', descEn: 'Simulated Git client for version control & repo inspection.', syn: 'git [status|log|branch|diff|remote|push]' },
+        nvim: { descSv: 'Interaktiv Neovim TUI bufferinspektör med TokyoNight statusline.', descEn: 'Interactive Neovim TUI buffer inspector with TokyoNight statusline.', syn: 'nvim [filnamn]' },
+        calc: { descSv: 'Säker matematisk miniräknare utan eval.', descEn: 'Safe mathematical expression evaluator without eval.', syn: 'calc <uttryck>' },
+        wget: { descSv: 'Laddar ned resurser, arkivpaket och artikeldokument (PDF) direkt till din disk.', descEn: 'Downloads resources, archive packages, and article companion PDFs directly to your disk.', syn: 'wget <filnamn>' },
+        bg: { descSv: 'Växlar ambient visuell bakgrundseffekt i cockpiten.', descEn: 'Switches ambient visual background effect in the cockpit.', syn: 'bg [standard|topo|dither|ascii|dots|pixel|shimmer|off]' },
+        status: { descSv: 'Visar aktuell live-telemetri, homelab & tillgänglighet.', descEn: 'Displays current live telemetry, homelab status & availability.', syn: 'status' },
+        echo: { descSv: 'Skriver ut säker text till terminalen.', descEn: 'Prints sanitized text to the terminal.', syn: 'echo <text>' }
+      };
+
+      const m = manuals[topic];
+      if (m) {
+        return `
+<div class="p-3 rounded bg-[#0d1117] border border-[#30363d] font-mono text-xs space-y-1.5">
+  <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">MANUAL: ${ctx.escapeHtml(topic.toUpperCase())}(1)</div>
+  <div><span class="text-[#38bdf8] font-semibold">${isSv ? 'SYNTAX' : 'SYNOPSIS'}:</span> <code class="text-[#e6edf3]">${ctx.escapeHtml(m.syn)}</code></div>
+  <div><span class="text-[#38bdf8] font-semibold">${isSv ? 'BESKRIVNING' : 'DESCRIPTION'}:</span> <span class="text-[#8b949e]">${isSv ? ctx.escapeHtml(m.descSv) : ctx.escapeHtml(m.descEn)}</span></div>
+</div>`;
+      }
+      return `<div class="text-[#f85149] font-mono text-xs">${isSv ? `Ingen manual hittades för '${ctx.escapeHtml(topic)}'. Skriv 'help' för kommandolista.` : `No manual entry for '${ctx.escapeHtml(topic)}'. Type 'help' for command list.`}</div>`;
+    },
+    tldr: (args, ctx) => commands.man(args, ctx),
+
     // 11. NEOFETCH / FASTFETCH (print system diagnostic banner inline)
     neofetch: (_args, ctx) => getFastfetchOutput(ctx.lang),
     fastfetch: (_args, ctx) => getFastfetchOutput(ctx.lang),
@@ -660,29 +866,37 @@ ${ctx.escapeHtml(node.content)}
       return `<div class="font-mono text-xs space-y-0.5">${lines}</div>`;
     },
 
-    // 14. WGET COMMAND (primary command for downloading files from files/ archive)
+    // 14. WGET COMMAND (primary command for downloading files from files/ archive & companion PDFs)
     wget: (args, ctx) => {
       const isSv = ctx.lang === 'sv';
       const filesDir = ctx.fileSystem.children['files'];
+      const thoughtsDir = ctx.fileSystem.children['thoughts'];
+      const projectsDir = ctx.fileSystem.children['projects'];
 
       if (!args[0]) {
+        const downloadables: string[] = [];
         if (filesDir && filesDir.type === 'dir') {
-          const list = Object.keys(filesDir.children)
-            .map(f => `<span class="text-[#10b981]">${ctx.escapeHtml(f)}</span>`)
-            .join(', ');
-          return isSv
-            ? `<div class="text-[#f59e0b] text-xs font-mono space-y-1">
-                <div>Användning: <code class="text-[#10b981]">wget &lt;filnamn&gt;</code> — Ladda ned en resurs från <code class="text-[#38bdf8]">files/</code>.</div>
-                <div class="text-[#8b949e]">Tillgängliga filer i files/: ${list}</div>
-               </div>`
-            : `<div class="text-[#f59e0b] text-xs font-mono space-y-1">
-                <div>Usage: <code class="text-[#10b981]">wget &lt;filename&gt;</code> — Download a resource from <code class="text-[#38bdf8]">files/</code>.</div>
-                <div class="text-[#8b949e]">Available files in files/: ${list}</div>
-               </div>`;
+          downloadables.push(...Object.keys(filesDir.children));
         }
+        if (thoughtsDir && thoughtsDir.type === 'dir') {
+          downloadables.push(...Object.keys(thoughtsDir.children).filter(f => f.endsWith('.pdf')));
+        }
+        if (projectsDir && projectsDir.type === 'dir') {
+          downloadables.push(...Object.keys(projectsDir.children).filter(f => f.endsWith('.pdf')));
+        }
+        const list = downloadables.length > 0
+          ? downloadables.map(f => `<span class="text-[#10b981]">${ctx.escapeHtml(f)}</span>`).join(', ')
+          : (isSv ? 'inga filer tillgängliga' : 'no files available');
+
         return isSv
-          ? `<div class="text-[#f59e0b] text-xs font-mono">Användning: <code class="text-[#10b981]">wget &lt;filnamn&gt;</code> — Laddar ned från arkivet. Skriv <code class="text-[#38bdf8]">ls files</code> för att se filer.</div>`
-          : `<div class="text-[#f59e0b] text-xs font-mono">Usage: <code class="text-[#10b981]">wget &lt;filename&gt;</code> — Downloads from archive. Type <code class="text-[#38bdf8]">ls files</code> to list files.</div>`;
+          ? `<div class="text-[#f59e0b] text-xs font-mono space-y-1">
+              <div>Användning: <code class="text-[#10b981]">wget &lt;filnamn&gt;</code> — Ladda ned en resurs eller PDF till din disk.</div>
+              <div class="text-[#8b949e]">Tillgängliga filer &amp; PDF:er: ${list}</div>
+             </div>`
+          : `<div class="text-[#f59e0b] text-xs font-mono space-y-1">
+              <div>Usage: <code class="text-[#10b981]">wget &lt;filename&gt;</code> — Download a resource or PDF to your disk.</div>
+              <div class="text-[#8b949e]">Available files &amp; PDFs: ${list}</div>
+             </div>`;
       }
 
       let filename = args[0].trim();
@@ -693,17 +907,32 @@ ${ctx.escapeHtml(node.content)}
         filename = filename.slice(6);
       } else if (filename.startsWith('./files/')) {
         filename = filename.slice(8);
+      } else if (filename.startsWith('thoughts/')) {
+        filename = filename.slice(9);
+      } else if (filename.startsWith('./thoughts/')) {
+        filename = filename.slice(11);
+      } else if (filename.startsWith('projects/')) {
+        filename = filename.slice(9);
+      } else if (filename.startsWith('./projects/')) {
+        filename = filename.slice(11);
       } else if (filename.startsWith('./')) {
         filename = filename.slice(2);
       }
 
-      // Check if user tried to download a virtual root shell doc (whoami.md, school.md, helloworld.sh, etc.)
-      const isInternalDoc = ctx.fileSystem.children[filename] && ctx.fileSystem.children[filename].type === 'file';
-      const isInsideFilesDir = ctx.currentPath.length > 0 && ctx.currentPath[0] === 'files';
-
-      // 1. Search in files/ directory first (intended location for downloadable files)
       let targetNode: any = null;
-      if (filesDir && filesDir.type === 'dir') {
+
+      // 1. Search in current directory first
+      const current = ctx.getCurrentDir();
+      if (current && current.children[filename] && current.children[filename].type === 'file') {
+        const candidate = current.children[filename] as FileNode;
+        if (candidate.actionUrl || (candidate as any).isPdf) {
+          targetNode = candidate;
+          matchedName = filename;
+        }
+      }
+
+      // 2. Search in files/ directory (primary downloads archive)
+      if (!targetNode && filesDir && filesDir.type === 'dir') {
         if (filesDir.children[filename] && filesDir.children[filename].type === 'file') {
           targetNode = filesDir.children[filename];
           matchedName = filename;
@@ -718,29 +947,62 @@ ${ctx.escapeHtml(node.content)}
         }
       }
 
-      // 2. If user is currently in files/ directory, also check current directory
-      if (!targetNode && isInsideFilesDir) {
-        const current = ctx.getCurrentDir();
-        if (current && current.children[filename] && current.children[filename].type === 'file') {
-          targetNode = current.children[filename];
-          matchedName = filename;
+      // 3. Search in thoughts/ directory (for companion PDFs ONLY)
+      if (!targetNode && thoughtsDir && thoughtsDir.type === 'dir') {
+        if (thoughtsDir.children[filename] && thoughtsDir.children[filename].type === 'file') {
+          const candidate = thoughtsDir.children[filename] as FileNode;
+          if ((candidate as any).isPdf || filename.endsWith('.pdf')) {
+            targetNode = candidate;
+            matchedName = filename;
+          }
+        } else {
+          const matchKey = Object.keys(thoughtsDir.children).find(k => 
+            k.endsWith('.pdf') && (k.toLowerCase() === filename.toLowerCase() || k.toLowerCase().startsWith(filename.toLowerCase()) || k.toLowerCase().includes(filename.toLowerCase()))
+          );
+          if (matchKey) {
+            targetNode = thoughtsDir.children[matchKey];
+            matchedName = matchKey;
+          }
         }
       }
 
-      // If user attempted to wget a root virtual markdown/doc file:
+      // 4. Search in projects/ directory (for project companion PDFs ONLY)
+      if (!targetNode && projectsDir && projectsDir.type === 'dir') {
+        if (projectsDir.children[filename] && projectsDir.children[filename].type === 'file') {
+          const candidate = projectsDir.children[filename] as FileNode;
+          if ((candidate as any).isPdf || filename.endsWith('.pdf')) {
+            targetNode = candidate;
+            matchedName = filename;
+          }
+        } else {
+          const matchKey = Object.keys(projectsDir.children).find(k => 
+            k.endsWith('.pdf') && (k.toLowerCase() === filename.toLowerCase() || k.toLowerCase().startsWith(filename.toLowerCase()) || k.toLowerCase().includes(filename.toLowerCase()))
+          );
+          if (matchKey) {
+            targetNode = projectsDir.children[matchKey];
+            matchedName = matchKey;
+          }
+        }
+      }
+
+      // Check if user attempted to wget a markdown shell document that has NO pdf attached
+      const isInternalDoc = (!targetNode && (
+        (ctx.fileSystem.children[filename] && ctx.fileSystem.children[filename].type === 'file') ||
+        (thoughtsDir && thoughtsDir.type === 'dir' && thoughtsDir.children[filename]) ||
+        (projectsDir && projectsDir.type === 'dir' && projectsDir.children[filename])
+      ));
+
       if (!targetNode && isInternalDoc) {
         return isSv
           ? `<div class="text-[#f59e0b] font-mono text-xs p-2.5 rounded bg-[#0d1117] border border-[#f59e0b]/40 space-y-1">
-              <div class="text-[#f59e0b] font-bold">wget: '${ctx.escapeHtml(filename)}' är ett internt terminaldokument</div>
-              <div class="text-[#8b949e]">Detta är ett virtuellt skalsystemsdokument och laddas inte ned till disken.</div>
-              <div class="text-[#e6edf3]">Läs med: <code class="text-[#10b981]">cat ${ctx.escapeHtml(filename)}</code> eller <code class="text-[#10b981]">nvim ${ctx.escapeHtml(filename)}</code></div>
-              <div class="text-[#8b949e] text-[11px] pt-1 border-t border-[#30363d]/40">Nedladdningsbara paket finns i <code class="text-[#38bdf8]">files/</code> (skriv <code class="text-[#38bdf8]">ls files</code>).</div>
+              <div class="text-[#f59e0b] font-bold">wget: '${ctx.escapeHtml(filename)}' saknar nedladdningsbar PDF</div>
+              <div class="text-[#8b949e]">Detta dokument har ingen kopplad PDF och är enbart tillgängligt som webbartikel / skalsystemstext.</div>
+              <div class="text-[#e6edf3]">Läs med: <code class="text-[#10b981]">cat ${ctx.escapeHtml(filename)}</code> eller <code class="text-[#10b981]">open ${ctx.escapeHtml(filename)}</code></div>
              </div>`
           : `<div class="text-[#f59e0b] font-mono text-xs p-2.5 rounded bg-[#0d1117] border border-[#f59e0b]/40 space-y-1">
-              <div class="text-[#f59e0b] font-bold">wget: '${ctx.escapeHtml(filename)}' is an internal terminal document</div>
-              <div class="text-[#8b949e]">This is a virtual shell document and cannot be downloaded to disk.</div>
-              <div class="text-[#e6edf3]">Inspect with: <code class="text-[#10b981]">cat ${ctx.escapeHtml(filename)}</code> or <code class="text-[#10b981]">nvim ${ctx.escapeHtml(filename)}</code></div>
-              <div class="text-[#8b949e] text-[11px] pt-1 border-t border-[#30363d]/40">Downloadable files reside in <code class="text-[#38bdf8]">files/</code> (type <code class="text-[#38bdf8]">ls files</code>).</div>
+              <div class="text-[#f59e0b] font-bold">wget: '${ctx.escapeHtml(filename)}' has no downloadable PDF attached</div>
+              <div class="text-[#8b949e]">This document does not have a companion PDF and is only available as a web post / text document.</div>
+              <div class="text-[#e6edf3]">Read with: <code class="text-[#10b981]">cat ${ctx.escapeHtml(filename)}</code> or <code class="text-[#10b981]">open ${ctx.escapeHtml(filename)}</code></div>
              </div>`;
       }
 
@@ -806,6 +1068,8 @@ ${ctx.escapeHtml(node.content)}
 
   commands['chalmers'] = commands['school'];
   commands['dir'] = commands['ls'];
+  commands['egrep'] = commands['grep'];
+  commands['fgrep'] = commands['grep'];
   commands['cls'] = commands['clear'];
   commands['close'] = commands['exit'];
 

@@ -5,6 +5,8 @@ pubDate: 2026-02-18
 category: "anteckning"
 tags: ["Docker", "Linux", "Debian", "Homelab"]
 draft: false
+pdfUrl: "/downloads/systemd-docker-notes.pdf"
+pdfName: "systemd-docker-notes.pdf"
 ---
 
 Reference note for the homelab server. Rather than relying solely on the Docker daemon's internal restart policies, I manage production Compose stacks via dedicated systemd unit files.

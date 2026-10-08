@@ -26,7 +26,7 @@ export function applySiteLang(lang: Lang): void {
     if (key && dict[key] !== undefined) {
       // If there are replacement tokens like {count}
       const count = el.getAttribute('data-i18n-count');
-      let text = dict[key];
+      let text: string = dict[key];
       if (count !== null) {
         text = text.replace('{count}', count);
       }

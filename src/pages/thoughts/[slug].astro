@@ -36,11 +36,16 @@ if (category === 'guide') {
   catBorderClass = 'border-[#38bdf8]';
   catBadgeKey = 'thoughts_cat_guide_badge';
   catLabel = '[GUIDE]';
-} else if (category === 'anteckning') {
+} else if (category === 'anteckning' || category === 'note') {
   catBadgeClass = 'text-[#10b981] border-[#10b981]/40 bg-[#10b981]/10';
   catBorderClass = 'border-[#10b981]';
   catBadgeKey = 'thoughts_cat_anteckning_badge';
   catLabel = '[NOTE]';
+} else if (category === 'idea' || category === 'idé') {
+  catBadgeClass = 'text-[#a78bfa] border-[#a78bfa]/40 bg-[#a78bfa]/10';
+  catBorderClass = 'border-[#a78bfa]';
+  catBadgeKey = 'thoughts_cat_idea_badge';
+  catLabel = '[IDEA]';
 }
 ---
 
@@ -54,7 +59,7 @@ if (category === 'guide') {
   <InteractiveTerminal isSubpage={true} />
 
   <main id="main-content" tabindex="-1" class="w-full py-4 space-y-8 outline-none">
-    <!-- Back button -->
+    <!-- Back button & Tags row -->
     <div class="mb-8 flex items-center justify-between">
       <a 
         href="/thoughts" 
@@ -77,16 +82,36 @@ if (category === 'guide') {
 
     <!-- Article Header -->
     <header class="pb-6 mb-8 border-b border-[#30363d]">
-      <div class="flex items-center gap-2.5 text-xs font-mono text-[#8b949e] mb-3 flex-wrap">
-        <span class={`text-[11px] font-bold px-2 py-0.5 rounded border ${catBadgeClass}`} data-i18n={catBadgeKey}>
-          {catLabel}
-        </span>
-        <time datetime={formattedDate}>{formattedDate}</time>
-        <span>•</span>
-        <span>
-          <span class="lang-en-only">{wordCount} words</span>
-          <span class="lang-sv-only">{wordCount} ord</span>
-        </span>
+      <div class="flex items-center justify-between gap-3 text-xs font-mono text-[#8b949e] mb-3 flex-wrap">
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <span class={`text-[11px] font-bold px-2 py-0.5 rounded border ${catBadgeClass}`} data-i18n={catBadgeKey}>
+            {catLabel}
+          </span>
+          <time datetime={formattedDate}>{formattedDate}</time>
+          <span>•</span>
+          <span>
+            <span class="lang-en-only">{wordCount} words</span>
+            <span class="lang-sv-only">{wordCount} ord</span>
+          </span>
+        </div>
+
+        {post.data.pdfUrl && (
+          <a 
+            href={post.data.pdfUrl}
+            download={post.data.pdfName || `${post.id}.pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 text-xs font-mono font-semibold px-2.5 py-1 rounded bg-[#161b22] border border-[#10b981]/50 text-[#10b981] hover:bg-[#10b981]/15 hover:border-[#10b981] transition-all ml-auto shadow-sm group"
+            title={post.data.pdfName || 'Download companion PDF'}
+          >
+            <span class="text-xs group-hover:translate-y-0.5 transition-transform">↓</span>
+            <span>PDF</span>
+            {post.data.pdfName && (
+              <span class="text-[10px] text-[#8b949e] hidden sm:inline">({post.data.pdfName})</span>
+            )}
+            <span class="text-[10px] text-[#8b949e]">↗</span>
+          </a>
+        )}
       </div>
 
       <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-[#e6edf3] tracking-tight leading-snug">
