@@ -1218,6 +1218,53 @@ ${ctx.escapeHtml(node.content)}
       : "Nature's most relentless survivor. Never backs down, never freezes."}
   </p>
 </div>`;
+    },
+
+    // 17. CLASSIC UNIX EASTER EGGS
+    sudo: (args, ctx) => {
+      const full = args.join(' ').trim().toLowerCase();
+      const isSv = ctx.lang === 'sv';
+      if (full === 'make me a sandwich' || full === 'make sandwich' || full === 'sandwich') {
+        return `<div class="text-[#10b981] font-mono text-xs">${isSv ? '[sudo] Varsågod, en smörgås är serverad! (XKCD 149)' : '[sudo] Okay. Sandwich served! (XKCD 149)'}</div>`;
+      }
+      if (full.startsWith('rm') || full.includes('rm -rf') || full.includes('format')) {
+        return `<div class="text-[#f85149] font-mono text-xs">${isSv ? '[sudo] root: Försök inte! Gustavs Linux-partition är skrivskyddad för besökare.' : '[sudo] root: Nice try! Gustav\'s Linux partition is read-only for visitors.'}</div>`;
+      }
+      return `<div class="text-[#f85149] font-mono text-xs">${isSv ? 'visitor finns inte i sudoers-filen. Denna incident har loggats.' : 'visitor is not in the sudoers file. This incident will be reported.'}</div>`;
+    },
+
+    cowsay: (args, ctx) => {
+      const rawText = (args.length > 0 ? args.join(' ') : (ctx.lang === 'sv' ? 'Muu! Välkommen till Gulos station.' : "Moo! Welcome to Gulo's station.")).slice(0, 60);
+      const border = '-'.repeat(rawText.length + 2);
+      return `
+<pre class="text-[#e6edf3] font-mono text-xs leading-tight select-none py-1">
+  ${border}
+&lt; ${ctx.escapeHtml(rawText)} &gt;
+  ${border}
+        \\   ^__^
+         \\  (oo)\\_______
+            (__)\\       )\\/\\
+                ||----w |
+                ||     ||
+</pre>`;
+    },
+
+    sl: (_args, _ctx) => {
+      return `
+<pre class="text-[#38bdf8] font-mono text-[11px] leading-tight select-none py-1">
+      ====        ________                ___________ 
+  _D _|  |_______/        \\__I_I_____===__|_________| 
+   |(_)---  |   H\\________/ _____ |   | __   |      | 
+   /     |  |   H  |  |   | |___| |   | |__| |      | 
+  |      |  |   H  |__--------------------| [CHOO CHOO]
+  ========--|___H___________________________________|
+     (o)      (o)(o)                     (o)(o)
+</pre>`;
+    },
+
+    rm: (_args, ctx) => {
+      const isSv = ctx.lang === 'sv';
+      return `<div class="text-[#f85149] font-mono text-xs">${isSv ? 'rm: kan inte ta bort fil: Skrivskyddat filsystem (read-only).' : 'rm: cannot remove: Read-only file system.'}</div>`;
     }
   };
 
