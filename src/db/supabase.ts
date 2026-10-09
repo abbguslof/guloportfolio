@@ -1,7 +1,7 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = (import.meta.env.PUBLIC_SUPABASE_URL || import.meta.env.SUPABASE_URL || '').trim();
-const supabaseKey = (import.meta.env.PUBLIC_SUPABASE_KEY || import.meta.env.SUPABASE_KEY || '').trim();
+const supabaseUrl = ((typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.PUBLIC_SUPABASE_URL || import.meta.env.SUPABASE_URL)) || (typeof process !== 'undefined' && process.env && (process.env.PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL)) || '').trim();
+const supabaseKey = ((typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.PUBLIC_SUPABASE_KEY || import.meta.env.SUPABASE_KEY)) || (typeof process !== 'undefined' && process.env && (process.env.PUBLIC_SUPABASE_KEY || process.env.SUPABASE_KEY)) || '').trim();
 
 let clientInstance: SupabaseClient | null = null;
 

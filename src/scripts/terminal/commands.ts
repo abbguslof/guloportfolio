@@ -219,7 +219,12 @@ export function getCommands(): Record<string, CommandFunction> {
       return `<div class="text-[#10b981] font-mono">gulo // Chalmers student, sprint swimmer &amp; developer</div>`;
     },
     me: (args, ctx) => commands.whoami(args, ctx),
-    gulo: (args, ctx) => commands.whoami(args, ctx),
+    gulo: (args, ctx) => {
+      if (args[0] && args[0].toLowerCase() === 'gulo') {
+        return commands.gulogulo(args, ctx);
+      }
+      return commands.whoami(args, ctx);
+    },
 
     contact: (_args, ctx) => {
       const fileNode = ctx.fileSystem.children['contact.md'];
@@ -1159,7 +1164,61 @@ ${ctx.escapeHtml(node.content)}
 
     // 15. LINUX / WINDOWS SECRET COMMAND
     linux: (_args, ctx) => getOsOpinionOutput(ctx.lang),
-    windows: (_args, ctx) => getOsOpinionOutput(ctx.lang)
+    windows: (_args, ctx) => getOsOpinionOutput(ctx.lang),
+
+    // 16. GULO GULO (WOLVERINE // JÄRV) SECRET EASTER EGG
+    gulogulo: (_args, ctx) => {
+      if (typeof window !== 'undefined') {
+        const win = document.getElementById('terminal-window');
+        if (win) {
+          win.classList.remove('wolverine-shake');
+          void win.offsetWidth;
+          win.classList.add('wolverine-shake');
+          setTimeout(() => win.classList.remove('wolverine-shake'), 450);
+        }
+        try {
+          const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+          if (AudioContextClass) {
+            const actx = new AudioContextClass();
+            const osc = actx.createOscillator();
+            const gain = actx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(100, actx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(32, actx.currentTime + 0.32);
+            gain.gain.setValueAtTime(0.06, actx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.32);
+            osc.connect(gain);
+            gain.connect(actx.destination);
+            osc.start();
+            osc.stop(actx.currentTime + 0.32);
+          }
+        } catch {}
+      }
+
+      const isSv = ctx.lang === 'sv';
+      return `
+<div class="font-mono text-xs p-2.5 sm:p-3 rounded-lg bg-[#0d1117] border border-[#f59e0b]/40 text-[#e6edf3] space-y-1.5 my-1">
+  <div class="flex items-center justify-between text-[#f59e0b]">
+    <div class="flex items-center gap-2 font-bold">
+      <span class="text-[#f59e0b]">&gt;</span>
+      <span>Gulo gulo</span>
+      <span class="text-[#8b949e] font-normal text-[11px]">${isSv ? '// Järven' : '// The Wolverine'}</span>
+    </div>
+    <span class="text-[10px] text-[#f59e0b] px-1.5 py-0.5 rounded bg-[#f59e0b]/10 border border-[#f59e0b]/30">[secret]</span>
+  </div>
+
+  <pre class="text-[#f59e0b] text-[11px] sm:text-xs leading-tight select-none py-0.5">
+  /\\___/\\
+ ( =▼.▼= )  *GROWL!*
+ (  爪 爪 )</pre>
+
+  <p class="text-[#8b949e] text-[11px] sm:text-xs leading-relaxed">
+    ${isSv 
+      ? 'Nordens mest orubbliga rovdjur. Backar aldrig, fryser aldrig.' 
+      : "Nature's most relentless survivor. Never backs down, never freezes."}
+  </p>
+</div>`;
+    }
   };
 
   // Aliases
@@ -1170,6 +1229,11 @@ ${ctx.escapeHtml(node.content)}
   commands['secrets'] = commands['secret'];
   commands['easteregg'] = commands['secret'];
   commands['eastereggs'] = commands['secret'];
+  commands['wolverine'] = commands['gulogulo'];
+  commands['järv'] = commands['gulogulo'];
+  commands['jarv'] = commands['gulogulo'];
+  commands['gulo-gulo'] = commands['gulogulo'];
+  commands['gulo_gulo'] = commands['gulogulo'];
 
   commands['chalmers'] = commands['school'];
   commands['dir'] = commands['ls'];
@@ -1180,7 +1244,6 @@ ${ctx.escapeHtml(node.content)}
 
   commands['whoisgulo'] = commands['whoami'];
   commands['whoamgulo'] = commands['whoami'];
-  commands['gulo'] = commands['whoami'];
   commands['whois'] = commands['whoami'];
   commands['who'] = commands['whoami'];
 
