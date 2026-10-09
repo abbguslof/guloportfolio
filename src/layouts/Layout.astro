@@ -49,7 +49,7 @@ const ogImageUrl = new URL(image, siteUrl).toString();
     <meta name="generator" content={Astro.generator} />
 
     <!-- Security & Hardening -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self';" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; object-src 'none'; base-uri 'self';" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
     <!-- SEO, Canonical & Social Sharing Cards (iMessage, WhatsApp, Discord, Slack, X, LinkedIn) -->
