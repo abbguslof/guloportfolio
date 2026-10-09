@@ -2316,34 +2316,81 @@ const dynamicFileSystemSv = {
 
         // Tab på första ordet -> komplettera kommando
         if (tokens.length <= 1) {
-          const cmdList = [
-            'help', 'status', 'schedule', 'tentor', 'school', 'study', 'education', 'chalmers', 'swim', 'whoami', 'gustav', 'contact', 'discord', 'kontakt',
-            'home', 'hem', 'main', 'cockpit', 'root',
+          // Curated clean primary commands shown when user hits Tab on an empty prompt (zero visual clutter)
+          const primaryCommands = [
+            'help', 'status', 'whoami', 'bio', 'cv', 'school', 'swim', 'contact', 'msg',
+            'projects', 'thoughts', 'files', 'calc', 'guess', 'git', 'nvim',
+            'ls', 'cd', 'cat', 'grep', 'open', 'wget', 'bg', 'lang',
+            'fastfetch', 'uptime', 'history', 'clear', 'reset', 'exit'
+          ];
+
+          // Full list of completable commands when the user has started typing
+          // Includes aliases & allowed fun commands (cowsay, gulo), but strictly excludes secret/cool easter eggs (matrix, secret, etc.)
+          const completableCmds = [
+            'help', 'status', 'schedule', 'tentor', 'school', 'study', 'education', 'chalmers',
+            'swim', 'simma', 'swimming', 'whoami', 'who', 'gustav', 'contact', 'discord', 'kontakt', 'email', 'mail',
+            'home', 'hem', 'cockpit',
             'bio', 'about', 'tldr', 'info', 'profil', 'profile',
             'cv', 'resume', 'recruit', 'stats', 'btop', 'htop',
             'proxmox', 'mc', 'minecraft', 'sleep', 'sova',
-            'lang', 'language', 'sprak', 'språk', 'se', 'sv', 'swe', 'swedish', 'svenska', 'en', 'eng', 'english', 'engelska',
-            'ls', 'cd', 'cat', 'nvim', 'vim', 'vi', 'pwd', 'grep', 'open', 
-            'projects', 'project', 'thoughts', 'thought', 'blog', 'note', 'notes', 'guide', 'guides', 'files', 'clear', 
+            'lang', 'language', 'sprak', 'språk', 'se', 'sv', 'swe', 'en', 'eng', 'swedish', 'english',
+            'ls', 'cd', 'cat', 'nvim', 'vim', 'vi', 'pwd', 'grep', 'open',
+            'projects', 'project', 'thoughts', 'thought', 'blog', 'blogg', 'note', 'notes', 'guide', 'guides', 'files', 'clear', 'cls',
             'date', 'uptime', 'fastfetch', 'neofetch', 'fetch', 'uname', 'hostname', 'history',
-            'git', 'calc', 'guess', './helloworld.sh', 'helloworld.sh', 'hello', 'tjena', 'hej', 'hejsan', 'halloj',
+            'git', 'calc', 'guess', 'game', 'spel', './helloworld.sh', 'helloworld.sh',
+            // Greetings (only autocomplete when user starts typing them)
+            'hello', 'tjena', 'hej', 'hejsan', 'halloj', 'hallå', 'hi', 'hey', 'sup', 'yo',
+            // Messaging
             'msg', 'message', 'say', 'feedback',
-            'bg', 'exit', 'wget', 'dl', 'download',
-            'reset', 'reboot', 'restart', 'factory-reset', 'defaults'
+            // Shell actions & downloads
+            'bg', 'exit', 'close', 'wget', 'dl', 'download',
+            'reset', 'reboot', 'restart', 'factory-reset', 'defaults',
+            // Allowed fun easter eggs (as requested: cowsay, gulo, etc. - matrix & secrets excluded)
+            'cowsay', 'gulo', 'gulogulo', 'wolverine', 'järv', 'jarv',
+            'sudo', 'sl', 'rm', 'linux', 'windows', 'echo', 'man'
           ];
-          const matches = cmdList.filter(c => c.startsWith(lastToken.toLowerCase()));
 
-          if (matches.length === 1) {
-            input.value = matches[0] + ' ';
-          } else if (matches.length > 1) {
+          if (!lastToken) {
+            // Bare Tab on empty prompt -> show only the clean, distinct primary commands
             const lastChild = history.lastElementChild;
             if (lastChild && lastChild.classList.contains('tab-hint-row')) {
               return;
             }
             const hint = document.createElement('div');
             hint.className = 'tab-hint-row text-xs text-[#38bdf8] pl-3 my-1 font-mono';
-            hint.textContent = matches.join('   ');
+            hint.textContent = primaryCommands.join('   ');
             history.appendChild(hint);
+            if (termBody) termBody.scrollTop = termBody.scrollHeight;
+            return;
+          }
+
+          const matches = completableCmds.filter(c => c.toLowerCase().startsWith(lastToken.toLowerCase()));
+
+          if (matches.length === 1) {
+            input.value = matches[0] + ' ';
+          } else if (matches.length > 1) {
+            // Longest common prefix auto-fill
+            let commonPrefix = matches[0];
+            for (let i = 1; i < matches.length; i++) {
+              while (!matches[i].toLowerCase().startsWith(commonPrefix.toLowerCase())) {
+                commonPrefix = commonPrefix.slice(0, -1);
+                if (!commonPrefix) break;
+              }
+            }
+
+            if (commonPrefix && commonPrefix.length > lastToken.length) {
+              input.value = commonPrefix;
+            } else {
+              const lastChild = history.lastElementChild;
+              if (lastChild && lastChild.classList.contains('tab-hint-row')) {
+                return;
+              }
+              const hint = document.createElement('div');
+              hint.className = 'tab-hint-row text-xs text-[#38bdf8] pl-3 my-1 font-mono';
+              hint.textContent = matches.join('   ');
+              history.appendChild(hint);
+              if (termBody) termBody.scrollTop = termBody.scrollHeight;
+            }
           }
           return;
         }
