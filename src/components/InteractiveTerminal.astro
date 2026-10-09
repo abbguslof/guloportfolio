@@ -883,6 +883,8 @@ const dynamicFileSystemSv = {
   import { getSiteLang } from '../scripts/terminal/i18n';
   import { isSiteOnline, setSiteOnline } from '../data/telemetry';
   import type { CommandContext, DirNode, FileNode, LangCode } from '../scripts/terminal/types';
+  import { logTerminalEvent } from '../scripts/terminal/telemetry';
+  import { sendTerminalMessage, getPendingMessage, setPendingMessage, detectConversationalIntent } from '../scripts/terminal/messaging';
 
   function initTerminalEngine() {
     const rawSection = document.getElementById('terminal-section');
@@ -2058,6 +2060,67 @@ const dynamicFileSystemSv = {
         }
       };
 
+      // Check if user was prompted to send a dad-proof conversational message
+      const pendingMsg = getPendingMessage();
+      if (pendingMsg) {
+        const lowerCmd = cleanCmd.toLowerCase();
+        if (['j', 'y', 'ja', 'yes', 'send', 'skicka'].includes(lowerCmd)) {
+          setPendingMessage(null);
+          const currentLang = getSiteLang();
+          const isSv = currentLang === 'sv';
+          const msgId = 'msg-send-' + Math.random().toString(36).slice(2, 9);
+
+          const statusBox = document.createElement('div');
+          statusBox.className = 'text-xs pl-3 border-l border-[#10b981] my-1 font-mono';
+          statusBox.innerHTML = `<div id="${msgId}" class="text-xs font-mono text-[#38bdf8] flex items-center gap-2 py-0.5">
+            <span class="inline-block animate-spin text-[#10b981]">⠋</span>
+            <span>${isSv ? 'Sparar meddelande till Gustavs inkorg...' : "Saving message to Gustav's inbox..."}</span>
+          </div>`;
+          history.appendChild(statusBox);
+
+          logTerminalEvent({ command: 'msg', rawInput: pendingMsg, status: 'message_sent', lang: currentLang });
+
+          setTimeout(async () => {
+            const res = await sendTerminalMessage(pendingMsg, currentLang as any);
+            const container = document.getElementById(msgId);
+            if (container) {
+              container.innerHTML = res.feedback;
+            }
+          }, 50);
+
+          input.value = '';
+          input.focus({ preventScroll: true });
+          if (termBody) {
+            termBody.scrollTop = termBody.scrollHeight;
+            requestAnimationFrame(() => {
+              if (termBody) termBody.scrollTop = termBody.scrollHeight;
+            });
+          }
+          return;
+        } else if (['n', 'nej', 'no', 'cancel', 'avbryt', 'q', 'quit'].includes(lowerCmd)) {
+          setPendingMessage(null);
+          const isSv = getSiteLang() === 'sv';
+          const cancelBox = document.createElement('div');
+          cancelBox.className = 'text-xs pl-3 border-l border-[#8b949e] text-[#8b949e] my-1 font-mono';
+          cancelBox.textContent = isSv ? 'Avbrutet. Meddelandet skickades inte.' : 'Cancelled. Message was not sent.';
+          history.appendChild(cancelBox);
+
+          logTerminalEvent({ command: 'msg', rawInput: cleanCmd, status: 'cancelled', lang: getSiteLang() });
+
+          input.value = '';
+          input.focus({ preventScroll: true });
+          if (termBody) {
+            termBody.scrollTop = termBody.scrollHeight;
+            requestAnimationFrame(() => {
+              if (termBody) termBody.scrollTop = termBody.scrollHeight;
+            });
+          }
+          return;
+        } else {
+          setPendingMessage(null);
+        }
+      }
+
       if (commandRegistry[main]) {
         const res = commandRegistry[main](args, ctx);
         if (res) {
@@ -2066,6 +2129,7 @@ const dynamicFileSystemSv = {
           resBox.innerHTML = res;
           history.appendChild(resBox);
         }
+        logTerminalEvent({ command: main, rawInput: cleanCmd, status: 'success', lang: ctx.lang });
       } else if (cleanCmd === './helloworld.sh' || cleanCmd === 'helloworld.sh' || cleanCmd === './helloworld') {
         const res = commandRegistry['./helloworld.sh'](args, ctx);
         if (res) {
@@ -2074,14 +2138,44 @@ const dynamicFileSystemSv = {
           resBox.innerHTML = res;
           history.appendChild(resBox);
         }
+        logTerminalEvent({ command: 'helloworld.sh', rawInput: cleanCmd, status: 'success', lang: ctx.lang });
       } else {
-        const errBox = document.createElement('div');
-        errBox.className = 'text-xs text-[#f85149] pl-3 border-l border-[#f85149]/40 my-1 font-mono';
-        const _errLang = getSiteLang();
-        errBox.innerHTML = _errLang === 'sv'
-          ? `Kommando hittades inte: '${escapeHtml(cleanCmd)}'. Skriv <span class="text-[#10b981] font-bold">help</span> för hjälplista (eller <span class="text-[#10b981]">help -e</span>).`
-          : `Command not found: '${escapeHtml(cleanCmd)}'. Type <span class="text-[#10b981] font-bold">help</span> for available commands (or <span class="text-[#10b981]">help -e</span>).`;
-        history.appendChild(errBox);
+        const conv = detectConversationalIntent(cleanCmd);
+        if (conv && conv.isConversational) {
+          setPendingMessage(conv.extractedMessage);
+          const isSv = ctx.lang === 'sv';
+          const promptBox = document.createElement('div');
+          promptBox.className = 'text-xs pl-3 border-l border-[#10b981]/50 my-1 font-mono';
+          promptBox.innerHTML = `
+<div class="space-y-1.5 p-3 rounded bg-[#0d1117] border border-[#10b981]/50">
+  <div class="text-[#10b981] font-bold flex items-center gap-2">
+    <span>💡</span>
+    <span>${isSv ? 'HÄLSNING / MEDDELANDE UPPTÄCKT' : 'GREETING / MESSAGE DETECTED'}</span>
+  </div>
+  <p class="text-[#e6edf3]">
+    ${isSv ? 'Det ser ut som en hälsning till Gustav! Vill du skicka detta till hans inkorg?' : "Looks like a note to Gustav! Would you like to send this to his inbox?"}
+  </p>
+  <div class="text-[#38bdf8] bg-[#161b22] p-2 rounded border border-[#30363d] italic break-words">
+    "${escapeHtml(conv.extractedMessage)}"
+  </div>
+  <div class="text-[#8b949e] pt-1 flex items-center gap-3">
+    <span>${isSv ? 'Tryck <span class="text-[#10b981] font-bold">[j]</span> för att skicka' : 'Type <span class="text-[#10b981] font-bold">[y]</span> to send'}</span>
+    <span>•</span>
+    <span>${isSv ? '<span class="text-[#f85149]">[n]</span> för att avbryta' : '<span class="text-[#f85149]">[n]</span> to cancel'}</span>
+  </div>
+</div>`;
+          history.appendChild(promptBox);
+          logTerminalEvent({ command: 'conversational_prompt', rawInput: cleanCmd, status: 'success', lang: ctx.lang });
+        } else {
+          const errBox = document.createElement('div');
+          errBox.className = 'text-xs text-[#f85149] pl-3 border-l border-[#f85149]/40 my-1 font-mono';
+          const _errLang = getSiteLang();
+          errBox.innerHTML = _errLang === 'sv'
+            ? `Kommando hittades inte: '${escapeHtml(cleanCmd)}'. Skriv <span class="text-[#10b981] font-bold">help</span> för hjälplista (eller <span class="text-[#10b981]">help -e</span>).`
+            : `Command not found: '${escapeHtml(cleanCmd)}'. Type <span class="text-[#10b981] font-bold">help</span> for available commands (or <span class="text-[#10b981]">help -e</span>).`;
+          history.appendChild(errBox);
+          logTerminalEvent({ command: main, rawInput: cleanCmd, status: 'not_found', lang: ctx.lang });
+        }
       }
 
       input.value = '';
@@ -2211,6 +2305,7 @@ const dynamicFileSystemSv = {
             'projects', 'project', 'thoughts', 'thought', 'blog', 'note', 'notes', 'guide', 'guides', 'files', 'clear', 
             'date', 'uptime', 'fastfetch', 'neofetch', 'fetch', 'uname', 'hostname', 'history',
             'git', 'calc', 'guess', './helloworld.sh', 'helloworld.sh', 'hello', 'tjena', 'hej', 'hejsan', 'halloj',
+            'msg', 'message', 'say', 'feedback',
             'bg', 'exit', 'wget', 'dl', 'download',
             'reset', 'reboot', 'restart', 'factory-reset', 'defaults'
           ];

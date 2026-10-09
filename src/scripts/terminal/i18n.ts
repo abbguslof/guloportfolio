@@ -33,6 +33,7 @@ export function getStandardHelpHtml(lang: LangCode): string {
       <div><span class="text-[#10b981] font-semibold">swim</span> : Simningspass &amp; träningstider</div>
       <div><span class="text-[#10b981] font-semibold">whoami</span> : Information om mig &amp; bakgrund</div>
       <div><span class="text-[#10b981] font-semibold">contact</span> : Kontaktvägar &amp; sociala medier</div>
+      <div><span class="text-[#10b981] font-semibold">msg &lt;text&gt;</span> : Skicka en hälsning till Gustavs inkorg 📬</div>
     </div>
     <div>
       <div class="text-[#38bdf8] font-bold mb-1">Navigering &amp; Webb:</div>
@@ -80,6 +81,7 @@ export function getStandardHelpHtml(lang: LangCode): string {
       <div><span class="text-[#10b981] font-semibold">swim</span> : Swim routines &amp; training stats</div>
       <div><span class="text-[#10b981] font-semibold">whoami</span> : Background &amp; profile overview</div>
       <div><span class="text-[#10b981] font-semibold">contact</span> : Contact info &amp; social handles</div>
+      <div><span class="text-[#10b981] font-semibold">msg &lt;text&gt;</span> : Send a note to Gustav's inbox 📬</div>
     </div>
     <div>
       <div class="text-[#38bdf8] font-bold mb-1">Navigation &amp; Web:</div>
@@ -193,6 +195,7 @@ export function getExtendedHelpHtml(lang: LangCode): string {
           <div><code class="text-[#10b981]">guess [&lt;tal&gt;]</code> : Interaktivt gissningsspel (1-100) med poängräkning</div>
           <div><code class="text-[#10b981]">./helloworld.sh</code> : Kör det virtuella välkomstskriptet</div>
           <div><code class="text-[#10b981]">hello / hej / tjena</code> : Hälsningsfraser</div>
+          <div><code class="text-[#10b981]">msg &lt;meddelande&gt;</code> : Skicka en hälsning till Gustavs inkorg 📬 (alias: say, message)</div>
         </div>
       </div>
 
@@ -290,6 +293,7 @@ export function getExtendedHelpHtml(lang: LangCode): string {
           <div><code class="text-[#10b981]">guess [&lt;num&gt;]</code> : Interactive number guessing game (1-100) with score tracking</div>
           <div><code class="text-[#10b981]">./helloworld.sh</code> : Execute the virtual shell script</div>
           <div><code class="text-[#10b981]">hello / hi / hey</code> : Friendly greetings</div>
+          <div><code class="text-[#10b981]">msg &lt;message&gt;</code> : Send a note straight to Gustav's inbox 📬 (alias: say, message)</div>
         </div>
       </div>
 

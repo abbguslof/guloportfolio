@@ -19,10 +19,43 @@ import { handleGameCommand } from './game';
 import { handleNvimCommand } from './nvim';
 import { calculateUptime, isSiteOnline } from '../../data/telemetry';
 import { setSiteLang } from '../i18n-client';
+import { sendTerminalMessage, setPendingMessage } from './messaging';
 
 export type CommandFunction = (args: string[], ctx: CommandContext) => string | void;
 
 export function getCommands(): Record<string, CommandFunction> {
+  const handleGreeting = (greetingWord: string, args: string[], ctx: CommandContext): string => {
+    const isSv = ctx.lang === 'sv';
+    if (args && args.length > 0) {
+      let extra = args.join(' ').trim();
+      if (extra.startsWith('-') || extra.startsWith(':')) {
+        extra = extra.replace(/^[-:\s]+/, '').trim();
+      }
+      if (extra.length >= 2) {
+        setPendingMessage(extra);
+        return `
+<div class="text-xs font-mono space-y-1.5 p-3 rounded bg-[#0d1117] border border-[#10b981]/50 my-1">
+  <div class="text-[#10b981] font-bold flex items-center gap-2">
+    <span>💡</span>
+    <span>${isSv ? 'HÄLSNING / MEDDELANDE UPPTÄCKT' : 'GREETING / MESSAGE DETECTED'}</span>
+  </div>
+  <p class="text-[#e6edf3]">
+    ${isSv ? 'Det ser ut som en hälsning till Gustav! Vill du skicka detta till hans inkorg?' : 'Looks like a note to Gustav! Would you like to send this to his inbox?'}
+  </p>
+  <div class="text-[#38bdf8] bg-[#161b22] p-2 rounded border border-[#30363d] italic break-words">
+    "${ctx.escapeHtml(extra)}"
+  </div>
+  <div class="text-[#8b949e] pt-1 flex items-center gap-3">
+    <span>${isSv ? 'Tryck <span class="text-[#10b981] font-bold">[j]</span> för att skicka' : 'Type <span class="text-[#10b981] font-bold">[y]</span> to send'}</span>
+    <span>•</span>
+    <span>${isSv ? '<span class="text-[#f85149]">[n]</span> för att avbryta' : '<span class="text-[#f85149]">[n]</span> to cancel'}</span>
+  </div>
+</div>`;
+      }
+    }
+    return getGreetingResponse(greetingWord, ctx.lang);
+  };
+
   const commands: Record<string, CommandFunction> = {
     // 1. HELP & DISCOVERY
     help: (args, ctx) => {
@@ -246,17 +279,48 @@ export function getCommands(): Record<string, CommandFunction> {
       return commands.bash(args, ctx);
     },
 
-    // 7. GREETINGS
-    hello: (args, ctx) => getGreetingResponse(args[0] || 'hello', ctx.lang),
-    hi: (args, ctx) => getGreetingResponse(args[0] || 'hi', ctx.lang),
-    hey: (args, ctx) => getGreetingResponse(args[0] || 'hey', ctx.lang),
-    hej: (args, ctx) => getGreetingResponse(args[0] || 'hej', ctx.lang),
-    hejsan: (args, ctx) => getGreetingResponse(args[0] || 'hejsan', ctx.lang),
-    halloj: (args, ctx) => getGreetingResponse(args[0] || 'halloj', ctx.lang),
-    tjena: (args, ctx) => getGreetingResponse(args[0] || 'tjena', ctx.lang),
-    yo: (args, ctx) => getGreetingResponse(args[0] || 'yo', ctx.lang),
-    hallå: (args, ctx) => getGreetingResponse(args[0] || 'hallå', ctx.lang),
-    sup: (args, ctx) => getGreetingResponse(args[0] || 'sup', ctx.lang),
+    // 6.5. VISITOR MESSAGING & GUESTBOOK
+    msg: (args, ctx) => {
+      const isSv = ctx.lang === 'sv';
+      if (!args || args.length === 0) {
+        return `<div class="text-[#8b949e] font-mono text-xs">
+          ${isSv 
+            ? 'Användning: <code class="text-[#10b981]">msg &lt;ditt meddelande&gt;</code> (skickar en direkt hälsning till Gustav)' 
+            : 'Usage: <code class="text-[#10b981]">msg &lt;your message&gt;</code> (sends a direct note to Gustav)'}
+        </div>`;
+      }
+
+      const messageText = args.join(' ').trim();
+      const msgId = 'msg-send-' + Math.random().toString(36).slice(2, 9);
+
+      setTimeout(async () => {
+        const res = await sendTerminalMessage(messageText, ctx.lang as any);
+        const container = document.getElementById(msgId);
+        if (container) {
+          container.innerHTML = res.feedback;
+        }
+      }, 50);
+
+      return `<div id="${msgId}" class="text-xs font-mono text-[#38bdf8] flex items-center gap-2 py-0.5">
+        <span class="inline-block animate-spin text-[#10b981]">⠋</span>
+        <span>${isSv ? 'Sparar meddelande till Gustavs inkorg...' : 'Saving message to Gustav\'s inbox...'}</span>
+      </div>`;
+    },
+    message: (args, ctx) => commands.msg(args, ctx),
+    say: (args, ctx) => commands.msg(args, ctx),
+    feedback: (args, ctx) => commands.msg(args, ctx),
+
+    // 7. GREETINGS & DAD-PROOF CONVERSATION
+    hello: (args, ctx) => handleGreeting('hello', args, ctx),
+    hi: (args, ctx) => handleGreeting('hi', args, ctx),
+    hey: (args, ctx) => handleGreeting('hey', args, ctx),
+    hej: (args, ctx) => handleGreeting('hej', args, ctx),
+    hejsan: (args, ctx) => handleGreeting('hejsan', args, ctx),
+    halloj: (args, ctx) => handleGreeting('halloj', args, ctx),
+    tjena: (args, ctx) => handleGreeting('tjena', args, ctx),
+    yo: (args, ctx) => handleGreeting('yo', args, ctx),
+    hallå: (args, ctx) => handleGreeting('hallå', args, ctx),
+    sup: (args, ctx) => handleGreeting('sup', args, ctx),
 
     // 8. NAVIGATION SHORTCUTS & ALIASES
     projects: (_args, ctx) => {
