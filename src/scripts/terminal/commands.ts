@@ -34,21 +34,28 @@ export function getCommands(): Record<string, CommandFunction> {
       if (extra.length >= 2) {
         setPendingMessage(extra);
         return `
-<div class="text-xs font-mono space-y-1.5 p-3 rounded bg-[#0d1117] border border-[#10b981]/50 my-1">
+<div class="msg-pending-prompt-card text-xs font-mono space-y-2 p-2.5 sm:p-3 rounded-lg bg-[#0d1117] border border-[#10b981]/50 my-1 shadow-md">
   <div class="text-[#10b981] font-bold flex items-center gap-2">
     <span>💡</span>
     <span>${isSv ? 'HÄLSNING / MEDDELANDE UPPTÄCKT' : 'GREETING / MESSAGE DETECTED'}</span>
   </div>
-  <p class="text-[#e6edf3]">
-    ${isSv ? 'Det ser ut som en hälsning till Gustav! Vill du skicka detta till hans inkorg?' : 'Looks like a note to Gustav! Would you like to send this to his inbox?'}
+  <p class="text-[#e6edf3] text-xs leading-relaxed">
+    ${isSv ? 'Det ser ut som en hälsning till Gustav! Vill du skicka detta till hans inkorg?' : "Looks like a note to Gustav! Would you like to send this to his inbox?"}
   </p>
-  <div class="text-[#38bdf8] bg-[#161b22] p-2 rounded border border-[#30363d] italic break-words">
+  <div class="text-[#38bdf8] bg-[#161b22] p-2 rounded border border-[#30363d] italic break-words text-xs">
     "${ctx.escapeHtml(extra)}"
   </div>
-  <div class="text-[#8b949e] pt-1 flex items-center gap-3">
-    <span>${isSv ? 'Tryck <span class="text-[#10b981] font-bold">[j]</span> för att skicka' : 'Type <span class="text-[#10b981] font-bold">[y]</span> to send'}</span>
-    <span>•</span>
-    <span>${isSv ? '<span class="text-[#f85149]">[n]</span> för att avbryta' : '<span class="text-[#f85149]">[n]</span> to cancel'}</span>
+  <div class="text-[#8b949e] pt-1 flex items-center gap-x-2 gap-y-1.5 flex-wrap text-[11px] sm:text-xs leading-relaxed">
+    <span class="inline-flex items-center flex-wrap gap-1">
+      <span>${isSv ? 'Tryck' : 'Type'}</span>
+      <button type="button" class="btn-send-pending-msg text-[#10b981] hover:text-[#e6edf3] active:opacity-60 hover:underline font-bold cursor-pointer transition-all px-1.5 py-0.5 -my-0.5 rounded hover:bg-[#10b981]/15 active:scale-95 font-mono inline-flex items-center select-none touch-manipulation" title="${isSv ? 'Klicka för att skicka' : 'Click to send'}">${isSv ? '[j]' : '[y]'}</button>
+      <span>${isSv ? 'för att skicka' : 'to send'}</span>
+    </span>
+    <span class="text-[#484f58] select-none">•</span>
+    <span class="inline-flex items-center flex-wrap gap-1">
+      <button type="button" class="btn-cancel-pending-msg text-[#f85149] hover:text-[#e6edf3] active:opacity-60 hover:underline font-bold cursor-pointer transition-all px-1.5 py-0.5 -my-0.5 rounded hover:bg-[#f85149]/15 active:scale-95 font-mono inline-flex items-center select-none touch-manipulation" title="${isSv ? 'Klicka för att avbryta' : 'Click to cancel'}">[n]</button>
+      <span>${isSv ? 'för att avbryta' : 'to cancel'}</span>
+    </span>
   </div>
 </div>`;
       }
