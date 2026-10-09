@@ -133,6 +133,14 @@ For research notes or course reports written in **Overleaf / LaTeX**:
   - Simulated Neovim viewer (`nvim whoami.md`) with TokyoNight statusline.
   - Companion PDF downloading (`wget my-paper.pdf`) with dynamic autocomplete.
   - Tab auto-completion, Ctrl+C interrupt, Ctrl+L screen clear, command history (↑/↓ arrows).
+- **Authentic Two-Stage Linux Kernel Boot Intro**:
+  - Realistic 23-line dmesg cascade transitioning smoothly into a centered cockpit splash screen.
+  - Natural typewriter animation typing "launching terminal" / "startar terminalen" with steady trailing dots and cursor.
+  - 100% bilingual (EN / SV), reduced-motion friendly, instant-skip on any keypress or click, and replayable via the `reboot` / `reset` command.
+- **Rich Open Graph Social Cards & Complete Favicon Suite**:
+  - Custom 1200×630 Open Graph preview card (`/images/og-card.png`) featuring ambient cockpit glow, wolverine emblem, and terminal highlights.
+  - Complete `og:*` and `twitter:card="summary_large_image"` metadata for rich previews on iMessage, Discord, WhatsApp, Twitter/X, and LinkedIn.
+  - Multi-resolution icon set (`.svg` vector, `.ico` fallback, 32×32 and 16×16 PNGs, iOS `apple-touch-icon.png`) and Progressive Web App manifest (`site.webmanifest`).
 - **Overleaf LaTeX / Markdown Parity & Companion PDFs**:
   - 1:1 parity with Overleaf LaTeX templates (`\entryMeta{TYPE}{DATE}{STATUS}{TAGS}`).
   - Optional `pdfUrl` and `pdfName` on thoughts and projects render a clean download button on the slug page (aligned next to the word count under tags).
@@ -157,8 +165,14 @@ portfoliosite/
 │   └── ci.yml                # CI build verification for PRs and develop
 ├── public/
 │   ├── CNAME                 # Custom domain configuration (gulo.se)
+│   ├── android-chrome-*.png  # Android Chrome PWA icons (192x192, 512x512)
+│   ├── apple-touch-icon.png  # Apple iOS home screen / Safari touch icon (180x180)
+│   ├── favicon.ico           # Multi-resolution legacy & scraper fallback icon
+│   ├── favicon.svg           # High-resolution scalable vector favicon
+│   ├── favicon-*.png         # Raster tab favicons (16x16, 32x32)
+│   ├── site.webmanifest      # Progressive Web App manifest & theme config
 │   ├── downloads/            # Binary assets (.pdf, .zip, .sh, .tar.gz)
-│   ├── favicon.svg           # High-resolution SVG favicon
+│   ├── images/               # High-res graphics, logo variants & 1200x630 og-card.png
 │   └── vendor/               # Ambient shader runtime
 ├── scripts/
 │   └── scaffold.js           # CLI generator for thoughts, projects & downloads
@@ -169,7 +183,7 @@ portfoliosite/
 │   │   ├── projects/         # Markdown project writeups
 │   │   └── thoughts/         # Markdown notes & articles
 │   ├── data/                 # Configs, i18n dictionary, fastfetch & status.ts
-│   ├── layouts/              # Layout.astro with CSP, SEO & canonical URL
+│   ├── layouts/              # Layout.astro with CSP, Open Graph, SEO & canonical URL
 │   ├── pages/                # Route pages (index, projects, thoughts, files, 404)
 │   ├── scripts/              # Terminal dispatcher, calc, git, nvim, i18n
 │   └── styles/               # Tailwind v4 theme & global styles

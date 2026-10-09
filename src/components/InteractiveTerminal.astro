@@ -642,9 +642,8 @@ const dynamicFileSystemSv = {
           Computer Science &amp; Engineering • Chalmers
         </div>
 
-        <div class="mt-4 text-[11px] text-[#10b981] flex items-center justify-center gap-2 font-mono">
-          <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-ping"></span>
-          <span id="boot-status-text" data-i18n="boot_loading">launching terminal...</span>
+        <div class="mt-4 text-[11px] sm:text-xs text-[#10b981] flex items-center justify-center font-mono min-h-[1.25rem]">
+          <span id="boot-status-text" class="whitespace-pre"></span><span id="boot-status-cursor" class="inline-block w-1.5 h-3 ml-0.5 bg-[#10b981] align-middle boot-type-cursor"></span>
         </div>
       </div>
     </div>
@@ -938,25 +937,25 @@ const dynamicFileSystemSv = {
     const BOOT_CONFIG = {
       storageKey: 'gulo_boot_intro_played',
       timings: {
-        // Stage 1: Kernel cascade starts at 70ms and finishes at ~480ms + 150ms pause = 630ms
-        kernelHandoff: 630,
+        // Stage 1: Kernel cascade starts at 64ms and finishes at ~440ms + 140ms pause = 580ms (~8% faster)
+        kernelHandoff: 580,
         // Handoff transition animation duration (ms)
-        handoffAnimMs: 120,
-        // Stage 2: Time centered Gustav splash stays on screen (ms)
-        splashDuration: 2200,
+        handoffAnimMs: 110,
+        // Stage 2: Time centered Gustav splash stays on screen (ms) (2025ms, ~8% faster)
+        splashDuration: 2025,
         // Stage 3: Snappy fade out into interactive shell (ms)
-        exitFadeMs: 150,
+        exitFadeMs: 140,
       },
       i18n: {
         en: {
           prefix: "hi, i'm",
           sub: 'Computer Science & Engineering • Chalmers',
-          status: 'launching terminal...',
+          baseText: 'launching terminal',
         },
         sv: {
           prefix: 'hej, jag är',
           sub: 'Civilingenjör Datateknik • Chalmers',
-          status: 'startar terminalen...',
+          baseText: 'startar terminalen',
         },
       },
     };
@@ -964,8 +963,64 @@ const dynamicFileSystemSv = {
     let bootScreen = document.getElementById('terminal-boot-screen');
     let bootTimers: any[] = [];
     let bootKeyHandler: ((e: KeyboardEvent) => void) | null = null;
+    let bootStartTimeout: any = null;
+    let bootTypewriterTimer: any = null;
+    let bootDotsTimer: any = null;
+
+    function stopBootTypewriter() {
+      if (bootStartTimeout) {
+        clearTimeout(bootStartTimeout);
+        bootStartTimeout = null;
+      }
+      if (bootTypewriterTimer) {
+        clearInterval(bootTypewriterTimer);
+        bootTypewriterTimer = null;
+      }
+      if (bootDotsTimer) {
+        clearInterval(bootDotsTimer);
+        bootDotsTimer = null;
+      }
+    }
+
+    function startBootTypewriter(lang: 'en' | 'sv') {
+      stopBootTypewriter();
+      const statusEl = (bootScreen?.querySelector('#boot-status-text') as HTMLElement | null) || document.getElementById('boot-status-text');
+      if (!statusEl) return;
+
+      const conf = BOOT_CONFIG.i18n[lang] || BOOT_CONFIG.i18n.en;
+      const baseText = conf.baseText;
+      statusEl.textContent = '';
+      let charIndex = 0;
+
+      // Slight initial delay (~160ms) so user can take in the card before typing starts
+      const initialDelayMs = 160;
+      const charIntervalMs = 48; // Calibrated typing speed (smooth, readable, not rushed)
+      const dotIntervalMs = 175; // Steady dot pace (~4-5 dots total before boot)
+
+      bootStartTimeout = setTimeout(() => {
+        bootTypewriterTimer = setInterval(() => {
+          charIndex++;
+          statusEl.textContent = baseText.slice(0, charIndex);
+          if (charIndex >= baseText.length) {
+            clearInterval(bootTypewriterTimer);
+            bootTypewriterTimer = null;
+
+            // Once base text is typed out, steadily append dots until terminal boots
+            let dotCount = 0;
+            bootDotsTimer = setInterval(() => {
+              dotCount++;
+              statusEl.textContent = baseText + '.'.repeat(dotCount);
+            }, dotIntervalMs);
+            bootTimers.push(bootDotsTimer);
+          }
+        }, charIntervalMs);
+        bootTimers.push(bootTypewriterTimer);
+      }, initialDelayMs);
+      bootTimers.push(bootStartTimeout);
+    }
 
     function clearBootTimers() {
+      stopBootTypewriter();
       bootTimers.forEach(t => clearTimeout(t));
       bootTimers = [];
     }
@@ -1076,6 +1131,8 @@ const dynamicFileSystemSv = {
         if (stageLogo) {
           stageLogo.style.display = 'none';
           stageLogo.classList.remove('boot-stage-logo-animate');
+          const statusEl = stageLogo.querySelector('#boot-status-text');
+          if (statusEl) statusEl.textContent = '';
         }
 
         updateBootLogoLang(getSiteLang());
@@ -1095,13 +1152,14 @@ const dynamicFileSystemSv = {
             if (stageLogo) {
               stageLogo.style.display = 'flex';
               stageLogo.classList.add('boot-stage-logo-animate');
+              startBootTypewriter(getSiteLang());
             }
           }, BOOT_CONFIG.timings.handoffAnimMs);
           bootTimers.push(t2);
         }, BOOT_CONFIG.timings.kernelHandoff);
         bootTimers.push(t1);
 
-        // Stage 2 stays on screen for splashDuration (2200ms)
+        // Stage 2 stays on screen for splashDuration (2025ms)
         const totalDuration = BOOT_CONFIG.timings.kernelHandoff + BOOT_CONFIG.timings.handoffAnimMs + BOOT_CONFIG.timings.splashDuration;
         const tDismiss = setTimeout(() => dismissBootIntro(false), totalDuration);
         bootTimers.push(tDismiss);
@@ -1255,12 +1313,15 @@ const dynamicFileSystemSv = {
 
     function updateBootLogoLang(lang: 'en' | 'sv') {
       const conf = BOOT_CONFIG.i18n[lang] || BOOT_CONFIG.i18n.en;
-      const prefixEl = document.getElementById('boot-prefix-text');
-      const subEl = document.getElementById('boot-sub-text') || document.getElementById('boot-edu-text');
-      const statusEl = document.getElementById('boot-status-text');
+      const prefixEl = (bootScreen?.querySelector('#boot-prefix-text') as HTMLElement | null) || document.getElementById('boot-prefix-text');
+      const subEl = (bootScreen?.querySelector('#boot-sub-text') as HTMLElement | null) || document.getElementById('boot-sub-text') || document.getElementById('boot-edu-text');
       if (prefixEl) prefixEl.textContent = conf.prefix;
       if (subEl) subEl.textContent = conf.sub;
-      if (statusEl) statusEl.textContent = conf.status;
+
+      const stageLogo = bootScreen?.querySelector('#boot-stage-logo') as HTMLElement | null;
+      if (stageLogo && stageLogo.style.display !== 'none') {
+        startBootTypewriter(lang);
+      }
     }
 
     // Uppdatera fastfetch DOM, closed card dot och placeholder initialt oavsett språk
@@ -2412,31 +2473,31 @@ const dynamicFileSystemSv = {
 
   .boot-line {
     opacity: 0;
-    animation: bootCascade 0.035s ease-out forwards;
+    animation: bootCascade 0.032s ease-out forwards;
   }
-  .boot-line:nth-child(1)  { animation-delay: 0.070s; }
-  .boot-line:nth-child(2)  { animation-delay: 0.088s; }
-  .boot-line:nth-child(3)  { animation-delay: 0.106s; }
-  .boot-line:nth-child(4)  { animation-delay: 0.124s; }
-  .boot-line:nth-child(5)  { animation-delay: 0.142s; }
-  .boot-line:nth-child(6)  { animation-delay: 0.160s; }
-  .boot-line:nth-child(7)  { animation-delay: 0.180s; }
-  .boot-line:nth-child(8)  { animation-delay: 0.198s; }
-  .boot-line:nth-child(9)  { animation-delay: 0.216s; }
-  .boot-line:nth-child(10) { animation-delay: 0.236s; }
-  .boot-line:nth-child(11) { animation-delay: 0.254s; }
-  .boot-line:nth-child(12) { animation-delay: 0.272s; }
-  .boot-line:nth-child(13) { animation-delay: 0.292s; }
-  .boot-line:nth-child(14) { animation-delay: 0.310s; }
-  .boot-line:nth-child(15) { animation-delay: 0.330s; }
-  .boot-line:nth-child(16) { animation-delay: 0.348s; }
-  .boot-line:nth-child(17) { animation-delay: 0.366s; }
-  .boot-line:nth-child(18) { animation-delay: 0.384s; }
-  .boot-line:nth-child(19) { animation-delay: 0.404s; }
-  .boot-line:nth-child(20) { animation-delay: 0.422s; }
-  .boot-line:nth-child(21) { animation-delay: 0.440s; }
-  .boot-line:nth-child(22) { animation-delay: 0.458s; }
-  .boot-line:nth-child(23) { animation-delay: 0.476s; }
+  .boot-line:nth-child(1)  { animation-delay: 0.064s; }
+  .boot-line:nth-child(2)  { animation-delay: 0.081s; }
+  .boot-line:nth-child(3)  { animation-delay: 0.098s; }
+  .boot-line:nth-child(4)  { animation-delay: 0.114s; }
+  .boot-line:nth-child(5)  { animation-delay: 0.131s; }
+  .boot-line:nth-child(6)  { animation-delay: 0.147s; }
+  .boot-line:nth-child(7)  { animation-delay: 0.166s; }
+  .boot-line:nth-child(8)  { animation-delay: 0.182s; }
+  .boot-line:nth-child(9)  { animation-delay: 0.199s; }
+  .boot-line:nth-child(10) { animation-delay: 0.217s; }
+  .boot-line:nth-child(11) { animation-delay: 0.234s; }
+  .boot-line:nth-child(12) { animation-delay: 0.250s; }
+  .boot-line:nth-child(13) { animation-delay: 0.269s; }
+  .boot-line:nth-child(14) { animation-delay: 0.285s; }
+  .boot-line:nth-child(15) { animation-delay: 0.304s; }
+  .boot-line:nth-child(16) { animation-delay: 0.320s; }
+  .boot-line:nth-child(17) { animation-delay: 0.337s; }
+  .boot-line:nth-child(18) { animation-delay: 0.353s; }
+  .boot-line:nth-child(19) { animation-delay: 0.372s; }
+  .boot-line:nth-child(20) { animation-delay: 0.388s; }
+  .boot-line:nth-child(21) { animation-delay: 0.405s; }
+  .boot-line:nth-child(22) { animation-delay: 0.421s; }
+  .boot-line:nth-child(23) { animation-delay: 0.438s; }
 
   @keyframes bootConsoleHandoff {
     0% {
@@ -2457,7 +2518,7 @@ const dynamicFileSystemSv = {
   }
 
   .boot-console-exit {
-    animation: bootConsoleHandoff 0.12s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: bootConsoleHandoff 0.11s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
 
   @keyframes bootSplashEnter {
@@ -2474,7 +2535,7 @@ const dynamicFileSystemSv = {
   }
 
   .boot-stage-logo-animate {
-    animation: bootSplashEnter 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: bootSplashEnter 0.17s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   @keyframes bootCursorPulse {
@@ -2492,6 +2553,19 @@ const dynamicFileSystemSv = {
     animation: bootCursorPulse 0.9s ease-in-out infinite;
   }
 
+  @keyframes bootTypeCursorBlink {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .boot-type-cursor {
+    animation: bootTypeCursorBlink 0.5s ease-in-out infinite;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     #terminal-boot-screen {
       display: none !important;
@@ -2499,7 +2573,8 @@ const dynamicFileSystemSv = {
     .boot-line,
     .boot-console-exit,
     .boot-stage-logo-animate,
-    .boot-cursor-blink {
+    .boot-cursor-blink,
+    .boot-type-cursor {
       animation: none !important;
       opacity: 1 !important;
     }
