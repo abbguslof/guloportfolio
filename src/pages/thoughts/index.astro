@@ -1,5 +1,5 @@
 ---
-// src/pages/thoughts/index.astro - Fullständig Blogg-, Tanke- & Anteckningsarkiv
+// src/pages/thoughts/index.astro - Writing archive
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import InteractiveTerminal from '../../components/InteractiveTerminal.astro';
@@ -12,351 +12,223 @@ const sortedThoughts = thoughts
   .filter((post) => !post.data.draft)
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 
-// Räkna antal per kategori
-const countTankar = sortedThoughts.filter((t) => t.data.category === 'tanke' || t.data.category === 'thought').length;
-const countGuider = sortedThoughts.filter((t) => t.data.category === 'guide').length;
-const countAnteckningar = sortedThoughts.filter((t) => t.data.category === 'anteckning' || t.data.category === 'note').length;
+const categoryDefs = [
+  { key: 'tanke', labelKey: 'thoughts_cat_tanke_badge', label: '[Thought]', className: 'cat-thought' },
+  { key: 'guide', labelKey: 'thoughts_cat_guide_badge', label: '[Guide]', className: 'cat-guide' },
+  { key: 'anteckning', labelKey: 'thoughts_cat_anteckning_badge', label: '[Note]', className: 'cat-note' },
+  { key: 'idea', labelKey: 'thoughts_cat_idea_badge', label: '[Idea]', className: 'cat-idea' },
+];
+
+const normalizeCategory = (raw: string) => {
+  if (raw === 'thought') return 'tanke';
+  if (raw === 'note') return 'anteckning';
+  if (raw === 'idé') return 'idea';
+  return raw;
+};
+
+const counts = sortedThoughts.reduce<Record<string, number>>((acc, post) => {
+  const key = normalizeCategory(post.data.category || 'tanke');
+  acc[key] = (acc[key] || 0) + 1;
+  return acc;
+}, {});
+
+const activeCategories = categoryDefs.filter((cat) => (counts[cat.key] || 0) > 0);
 
 const allTags = Array.from(
   new Set(sortedThoughts.flatMap((post) => post.data.tags))
 ).sort();
 ---
 
-<Layout 
-  titleEn="Thoughts, Guides & Notes // gulo" 
-  titleSv="Tankar, Guider & Anteckningar // gulo"
-  descriptionEn="Personal notes from Chalmers Computer Science & Engineering, competitive swimming, Minecraft homelab, and C/Linux system programming."
-  descriptionSv="Anteckningar från Chalmers Datateknik, tävlingssimning, Minecraft-homelab och systemprogrammering i C/Linux."
+<Layout
+  titleEn="Writing"
+  titleSv="Texter"
+  descriptionEn="Notes on systems, hardware, Linux, and training."
+  descriptionSv="Anteckningar om system, hårdvara, Linux och träning."
 >
   <Header />
 
-  <!-- Global terminal on subpages (opens on header button click) -->
   <InteractiveTerminal isSubpage={true} />
 
-  <main id="main-content" tabindex="-1" class="w-full py-4 space-y-8 outline-none">
-    <!-- Breadcrumb & Top Header -->
-    <div class="border-b border-[#30363d] pb-6">
-      <div class="flex items-center gap-2 text-xs font-mono text-[#8b949e] mb-3">
-        <a href="/" class="hover:text-[#10b981] transition-colors" data-i18n="thoughts_breadcrumb_home">[~/home]</a>
-        <span>/</span>
-        <span class="text-[#e6edf3]" data-i18n="thoughts_breadcrumb_current">thoughts</span>
+  <main id="main-content" tabindex="-1" class="w-full py-4 space-y-8 outline-none" style="--page-accent:#f59e0b;">
+    <div class="pb-5 border-b border-[#30363d]">
+      <nav class="flex items-center gap-2 text-[11px] text-[#8b949e] mb-4" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-[#e6edf3] transition-colors" data-i18n="thoughts_breadcrumb_home">Home</a>
+        <span aria-hidden="true">/</span>
+        <span class="text-[#e6edf3]" data-i18n="thoughts_breadcrumb_current">Writing</span>
+      </nav>
+
+      <h1 class="text-2xl sm:text-3xl font-semibold text-[#e6edf3] tracking-tight">
+        <span class="text-[#f59e0b] font-bold mr-1.5">#</span><span data-i18n="thoughts_title">Writing</span>
+      </h1>
+      <p class="mt-1 max-w-[60ch] font-serif text-[18px] leading-relaxed text-[#b0bac4]" data-i18n="thoughts_subtitle">
+        Notes on systems, hardware, Linux, and training.
+      </p>
+      <p class="lang-sv-only mt-2 text-[11px] text-[#8b949e]" data-i18n="thoughts_archive_lang_note">
+        (Articles and notes are published in English)
+      </p>
+    </div>
+
+    <div class="space-y-4">
+      <div class="flex flex-wrap items-center gap-2" id="category-cards-container">
+        {activeCategories.map((cat) => (
+          <button
+            type="button"
+            class={`cat-toggle-card ${cat.className} px-2.5 py-1.5 min-h-[32px] rounded border border-[#30363d] bg-[#161b22] text-[11px] cursor-pointer transition-colors select-none`}
+            data-cat={cat.key}
+            aria-pressed="false"
+          >
+            <span class="font-semibold cat-label" data-i18n={cat.labelKey}>{cat.label}</span>
+            <span class="ml-1.5 text-[#8b949e]">{counts[cat.key]}</span>
+          </button>
+        ))}
+        <button
+          type="button"
+          id="btn-reset-categories"
+          class="hidden text-[11px] text-[#8b949e] hover:text-[#e6edf3] transition-colors px-1 py-1 cursor-pointer"
+          data-i18n="thoughts_reset_filter"
+        >
+          Show all
+        </button>
       </div>
 
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-        <div>
-          <h1 class="text-xl sm:text-3xl font-bold font-mono text-[#e6edf3] tracking-tight" data-i18n="thoughts_title">
-            Thoughts, Guides &amp; Notes
-          </h1>
-          <p class="text-xs sm:text-sm text-[#8b949e] mt-1 font-mono" data-i18n="thoughts_subtitle">
-            A text-first digital garden. Click one or more cards below to filter categories.
-          </p>
-          <p class="lang-sv-only text-[11px] text-[#f59e0b] mt-1 font-mono flex items-center gap-1.5" data-i18n="thoughts_archive_lang_note">
-            (Inläggen i arkivet publiceras enbart på engelska)
-          </p>
-        </div>
+      <label class="relative block">
+        <span class="sr-only">Search writing</span>
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8b949e]" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <path d="M10.68 11.74a6 6 0 0 1-7.922-8.982 6 6 0 0 1 8.982 7.922l3.04 3.04a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215ZM11.5 7a4.5 4.5 0 1 0-9 0 4.5 4.5 0 0 0 9 0Z"></path>
+        </svg>
+        <input
+          type="text"
+          id="thought-search-input"
+          data-i18n-placeholder="thoughts_search_placeholder"
+          placeholder="Search writing"
+          class="w-full bg-[#161b22] text-[#e6edf3] text-xs pl-9 pr-4 py-2.5 min-h-[38px] rounded border border-[#30363d] focus:outline-none focus:border-[#10b981] placeholder-[#8b949e]/60 font-mono transition-colors"
+        />
+      </label>
 
-        <!-- Antal tillgängliga inlägg -->
-        <div class="flex items-center gap-3 text-xs font-mono self-start sm:self-auto">
-          <span class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981] font-mono text-xs">
-            <span id="thought-count-badge">{sortedThoughts.length}</span> <span data-i18n="thoughts_count_badge_suffix">posts available</span>
-          </span>
-        </div>
-      </div>
-
-      <!-- Interactive Multi-Select Category Cards -->
-      <div class="mt-5 sm:mt-6 pt-4 sm:pt-5 border-t border-[#30363d]/60 space-y-3">
-        <div class="flex items-center justify-between text-xs font-mono">
-          <span class="text-[#8b949e] text-[11px] uppercase tracking-wider font-semibold" data-i18n="thoughts_filter_instructions">
-            Select categories to display:
-          </span>
-          <button 
-            type="button" 
-            id="btn-reset-categories" 
-            class="hidden text-[11px] text-[#38bdf8] hover:text-[#10b981] hover:underline cursor-pointer transition-colors"
-            data-i18n="thoughts_reset_filter"
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-[11px]">
+        <div class="flex flex-wrap items-center gap-1.5" id="blog-tag-bar">
+          <span class="text-[#8b949e] mr-0.5" data-i18n="thoughts_tag_filter_label">Tags</span>
+          <button
+            type="button"
+            class="tag-filter-btn px-2 py-1 min-h-[28px] rounded border border-[#30363d] bg-[#161b22] text-[#8b949e] hover:text-[#e6edf3] transition-colors cursor-pointer"
+            data-tag="all"
+            aria-pressed="true"
+            data-i18n="thoughts_tag_all"
           >
-            [Show all categories]
+            All
           </button>
-        </div>
-
-        <div class="grid grid-cols-3 gap-2 sm:gap-3 text-xs font-mono" id="category-cards-container">
-          <!-- Card 1: TANKE -->
-          <button 
-            type="button" 
-            class="cat-toggle-card halo-amber text-left p-2.5 sm:p-3.5 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#f59e0b]/80 hover:bg-[#1f242c] active:scale-[0.99] transition-all cursor-pointer group flex flex-col justify-between gap-1.5 sm:gap-2.5 select-none"
-            data-cat="tanke"
-            aria-pressed="false"
-          >
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-1">
-              <span class="text-[#f59e0b] font-bold text-[11px] sm:text-xs tracking-wide" data-i18n="thoughts_cat_tanke_badge">[THOUGHT]</span>
-              <span class="text-[10px] px-1.5 sm:px-2 py-0.5 rounded bg-[#0d1117] border border-[#30363d] text-[#8b949e] cat-count w-fit">
-                {countTankar}<span class="hidden sm:inline"> <span data-i18n="thoughts_count_suffix">posts</span></span>
-              </span>
-            </div>
-            <p class="hidden sm:block text-[#8b949e] text-[11px] leading-relaxed group-hover:text-[#e6edf3] transition-colors" data-i18n="thoughts_cat_tanke_desc">
-              Deeper reflections, personal philosophy on swimming, studies, and engineering.
-            </p>
-            <div class="flex items-center justify-between text-[10px] text-[#8b949e] pt-1 sm:pt-1.5 border-t border-[#30363d]/40 w-full">
-              <span class="cat-status-text hidden sm:inline" data-i18n="thoughts_card_click_to_filter">Click to filter</span>
-              <span class="text-[9px] text-[#8b949e] sm:hidden uppercase tracking-wider">Filter</span>
-              <span class="cat-indicator-dot w-2 h-2 rounded-full border border-[#8b949e] ml-auto sm:ml-0"></span>
-            </div>
-          </button>
-
-          <!-- Card 2: GUIDE -->
-          <button 
-            type="button" 
-            class="cat-toggle-card halo-cyan text-left p-2.5 sm:p-3.5 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#38bdf8]/80 hover:bg-[#1f242c] active:scale-[0.99] transition-all cursor-pointer group flex flex-col justify-between gap-1.5 sm:gap-2.5 select-none"
-            data-cat="guide"
-            aria-pressed="false"
-          >
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-1">
-              <span class="text-[#38bdf8] font-bold text-[11px] sm:text-xs tracking-wide" data-i18n="thoughts_cat_guide_badge">[GUIDE]</span>
-              <span class="text-[10px] px-1.5 sm:px-2 py-0.5 rounded bg-[#0d1117] border border-[#30363d] text-[#8b949e] cat-count w-fit">
-                {countGuider}<span class="hidden sm:inline"> <span data-i18n="thoughts_count_suffix">posts</span></span>
-              </span>
-            </div>
-            <p class="hidden sm:block text-[#8b949e] text-[11px] leading-relaxed group-hover:text-[#e6edf3] transition-colors" data-i18n="thoughts_cat_guide_desc">
-              Practical tutorials, server configurations, and lab walkthroughs.
-            </p>
-            <div class="flex items-center justify-between text-[10px] text-[#8b949e] pt-1 sm:pt-1.5 border-t border-[#30363d]/40 w-full">
-              <span class="cat-status-text hidden sm:inline" data-i18n="thoughts_card_click_to_filter">Click to filter</span>
-              <span class="text-[9px] text-[#8b949e] sm:hidden uppercase tracking-wider">Filter</span>
-              <span class="cat-indicator-dot w-2 h-2 rounded-full border border-[#8b949e] ml-auto sm:ml-0"></span>
-            </div>
-          </button>
-
-          <!-- Card 3: ANTECKNING -->
-          <button 
-            type="button" 
-            class="cat-toggle-card halo-emerald text-left p-2.5 sm:p-3.5 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#10b981]/80 hover:bg-[#1f242c] active:scale-[0.99] transition-all cursor-pointer group flex flex-col justify-between gap-1.5 sm:gap-2.5 select-none"
-            data-cat="anteckning"
-            aria-pressed="false"
-          >
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-1">
-              <span class="text-[#10b981] font-bold text-[11px] sm:text-xs tracking-wide" data-i18n="thoughts_cat_anteckning_badge">[NOTE]</span>
-              <span class="text-[10px] px-1.5 sm:px-2 py-0.5 rounded bg-[#0d1117] border border-[#30363d] text-[#8b949e] cat-count w-fit">
-                {countAnteckningar}<span class="hidden sm:inline"> <span data-i18n="thoughts_count_suffix">posts</span></span>
-              </span>
-            </div>
-            <p class="hidden sm:block text-[#8b949e] text-[11px] leading-relaxed group-hover:text-[#e6edf3] transition-colors" data-i18n="thoughts_cat_anteckning_desc">
-              Quick observations, cheat-sheets, and debugging logs.
-            </p>
-            <div class="flex items-center justify-between text-[10px] text-[#8b949e] pt-1 sm:pt-1.5 border-t border-[#30363d]/40 w-full">
-              <span class="cat-status-text hidden sm:inline" data-i18n="thoughts_card_click_to_filter">Click to filter</span>
-              <span class="text-[9px] text-[#8b949e] sm:hidden uppercase tracking-wider">Filter</span>
-              <span class="cat-indicator-dot w-2 h-2 rounded-full border border-[#8b949e] ml-auto sm:ml-0"></span>
-            </div>
-          </button>
-        </div>
-
-        <!-- Live Search Input -->
-        <div class="relative pt-2">
-          <div class="absolute inset-y-0 left-0 pl-3 pt-2 flex items-center pointer-events-none gap-1.5 text-xs font-mono text-[#8b949e]">
-            <svg class="w-4 h-4 text-[#10b981] flex-shrink-0" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path d="M10.68 11.74a6 6 0 0 1-7.922-8.982 6 6 0 0 1 8.982 7.922l3.04 3.04a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215ZM11.5 7a4.5 4.5 0 1 0-9 0 4.5 4.5 0 0 0 9 0Z"></path>
-            </svg>
-            <span class="font-semibold text-[#8b949e]">grep:</span>
-          </div>
-          <input 
-            type="text" 
-            id="thought-search-input"
-            data-i18n-placeholder="thoughts_search_placeholder"
-            placeholder="Search thoughts, tags, or content..." 
-            class="w-full bg-[#161b22] text-[#e6edf3] text-xs pl-[82px] sm:pl-20 pr-4 py-2 min-h-[38px] sm:min-h-auto rounded-lg border border-[#30363d] focus:outline-none focus:border-[#10b981] placeholder-[#8b949e]/60 font-mono transition-colors"
-          />
-        </div>
-
-        <!-- Tag Filters & Sortering -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs font-mono pt-1">
-          <!-- Tag Filters -->
-          <div class="flex flex-wrap items-center gap-1.5" id="blog-tag-bar">
-            <span class="text-[#8b949e] text-[11px] mr-1" data-i18n="thoughts_tag_filter_label">Tag filter:</span>
-            <button 
-              type="button" 
-              class="tag-filter-btn active px-2.5 py-1 min-h-[30px] sm:min-h-auto rounded bg-[#10b981] text-[#0d1117] font-semibold text-[11px] border border-[#10b981] transition-all cursor-pointer flex items-center"
-              data-tag="all"
-              data-i18n="thoughts_tag_all"
+          {allTags.map((tag) => (
+            <button
+              type="button"
+              class="tag-filter-btn px-2 py-1 min-h-[28px] rounded border border-[#30363d] bg-[#161b22] text-[#8b949e] hover:text-[#e6edf3] transition-colors cursor-pointer"
+              data-tag={tag.toLowerCase()}
             >
-              All
+              {tag}
             </button>
-            {allTags.map((tag) => (
-              <button 
-                type="button" 
-                class="tag-filter-btn px-2.5 py-1 min-h-[30px] sm:min-h-auto rounded bg-[#161b22] text-[#8b949e] text-[11px] border border-[#30363d] hover:text-[#e6edf3] hover:bg-[#1f242c] hover:border-[#484f58] transition-all cursor-pointer flex items-center"
-                data-tag={tag.toLowerCase()}
-              >
-                #{tag}
-              </button>
-            ))}
-          </div>
+          ))}
+        </div>
 
-          <!-- Sortering flyttad hit till höger om taggarna -->
-          <div class="flex items-center gap-2 flex-shrink-0 self-start sm:self-auto">
-            <span class="text-[#8b949e] text-[11px]" data-i18n="thoughts_sort_label">Sort:</span>
-            <div class="inline-flex rounded-lg p-0.5 bg-[#0d1117] border border-[#30363d]" id="sort-controls">
-              <button 
-                type="button" 
-                id="btn-sort-newest" 
-                class="sort-btn active px-3 py-1.5 min-h-[32px] sm:min-h-auto rounded text-[11px] font-semibold bg-[#161b22] text-[#e6edf3] border border-[#30363d] cursor-pointer transition-all flex items-center shadow-sm"
-                data-order="desc"
-                data-i18n-title="thoughts_sort_newest_title"
-                title="Sort by newest publication date first"
-              >
-                <span data-i18n="thoughts_sort_newest">Newest ↓</span>
-              </button>
-              <button 
-                type="button" 
-                id="btn-sort-oldest" 
-                class="sort-btn px-3 py-1.5 min-h-[32px] sm:min-h-auto rounded text-[11px] text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#1f242c] cursor-pointer transition-all flex items-center"
-                data-order="asc"
-                data-i18n-title="thoughts_sort_oldest_title"
-                title="Sort by oldest publication date first"
-              >
-                <span data-i18n="thoughts_sort_oldest">Oldest ↑</span>
-              </button>
-            </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <span class="text-[#8b949e]" data-i18n="thoughts_sort_label">Sort</span>
+          <div class="inline-flex rounded border border-[#30363d] overflow-hidden" id="sort-controls">
+            <button
+              type="button"
+              id="btn-sort-newest"
+              class="sort-btn px-2.5 py-1 min-h-[28px] text-[#e6edf3] bg-[#1b212a] cursor-pointer transition-colors"
+              data-order="desc"
+              aria-pressed="true"
+              data-i18n="thoughts_sort_newest"
+            >
+              Newest
+            </button>
+            <button
+              type="button"
+              id="btn-sort-oldest"
+              class="sort-btn px-2.5 py-1 min-h-[28px] text-[#8b949e] bg-[#161b22] cursor-pointer transition-colors"
+              data-order="asc"
+              aria-pressed="false"
+              data-i18n="thoughts_sort_oldest"
+            >
+              Oldest
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Articles Digital Garden / Log List -->
     {sortedThoughts.length > 0 ? (
-      <div class="space-y-4" id="thoughts-list">
-      {sortedThoughts.map((post) => {
-        const formattedDate = post.data.pubDate.toISOString().slice(0, 10);
-        const rawCategory = post.data.category || 'tanke';
-        const category = (rawCategory === 'thought') ? 'tanke' : ((rawCategory === 'note') ? 'anteckning' : ((rawCategory === 'idé') ? 'idea' : rawCategory));
-        const timestamp = post.data.pubDate.getTime();
-        const reading = calculateReadingTime(post.body || '');
+      <div class="border-t border-[#30363d]" id="thoughts-list">
+        {sortedThoughts.map((post) => {
+          const formattedDate = post.data.pubDate.toISOString().slice(0, 10);
+          const category = normalizeCategory(post.data.category || 'tanke');
+          const cat = categoryDefs.find((c) => c.key === category) || categoryDefs[0];
+          const timestamp = post.data.pubDate.getTime();
+          const reading = calculateReadingTime(post.body || '');
 
-        // Dynamisk badge-styling och hover-färger per kategori
-        let catBadgeClass = 'text-[#f59e0b] border-[#f59e0b]/40 bg-[#f59e0b]/10';
-        let catBadgeKey = 'thoughts_cat_tanke_badge';
-        let catLabel = '[THOUGHT]';
-        let catCardHoverBorder = 'hover:border-[#f59e0b]/80';
-        let catHoverText = 'group-hover:text-[#f59e0b]';
-        let catQuoteBorder = 'group-hover:border-[#f59e0b]';
-        let catHaloClass = 'halo-amber';
-
-        if (category === 'guide') {
-          catBadgeClass = 'text-[#38bdf8] border-[#38bdf8]/40 bg-[#38bdf8]/10';
-          catBadgeKey = 'thoughts_cat_guide_badge';
-          catLabel = '[GUIDE]';
-          catCardHoverBorder = 'hover:border-[#38bdf8]/80';
-          catHoverText = 'group-hover:text-[#38bdf8]';
-          catQuoteBorder = 'group-hover:border-[#38bdf8]';
-          catHaloClass = 'halo-cyan';
-        } else if (category === 'anteckning') {
-          catBadgeClass = 'text-[#10b981] border-[#10b981]/40 bg-[#10b981]/10';
-          catBadgeKey = 'thoughts_cat_anteckning_badge';
-          catLabel = '[NOTE]';
-          catCardHoverBorder = 'hover:border-[#10b981]/80';
-          catHoverText = 'group-hover:text-[#10b981]';
-          catQuoteBorder = 'group-hover:border-[#10b981]';
-          catHaloClass = 'halo-emerald';
-        } else if (category === 'idea') {
-          catBadgeClass = 'text-[#a78bfa] border-[#a78bfa]/40 bg-[#a78bfa]/10';
-          catBadgeKey = 'thoughts_cat_idea_badge';
-          catLabel = '[IDEA]';
-          catCardHoverBorder = 'hover:border-[#a78bfa]/80';
-          catHoverText = 'group-hover:text-[#a78bfa]';
-          catQuoteBorder = 'group-hover:border-[#a78bfa]';
-          catHaloClass = 'halo-purple';
-        }
-
-        return (
-          <article 
-            class={`thought-card ${catHaloClass} rounded-lg bg-[#161b22] border border-[#30363d] ${catCardHoverBorder} hover:bg-[#1f242c] transition-all p-5 space-y-3 group`}
-            data-category={category}
-            data-tags={(post.data.tags || []).join(',').toLowerCase()}
-            data-title={post.data.title.toLowerCase()}
-            data-desc={(post.data.description || '').toLowerCase()}
-            data-timestamp={timestamp}
-          >
-            <!-- Meta row -->
-            <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-[#8b949e]">
-              <div class="flex items-center gap-2">
-                <span class={`text-[11px] font-bold px-2 py-0.5 rounded border ${catBadgeClass}`} data-i18n={catBadgeKey}>
-                  {catLabel}
-                </span>
-                <span class="text-xs text-[#8b949e]">
-                  {formattedDate}
-                </span>
-                <span class="text-[#30363d]">•</span>
-                <span 
-                  class="text-[11px] text-[#8b949e] post-reading-time" 
-                  data-reading-en={reading.textEn}
-                  data-reading-sv={reading.textSv}
-                >
+          return (
+            <article
+              class={`thought-card ${cat.className} border-b border-[#30363d] px-2 sm:px-3 py-5 group`}
+              data-category={category}
+              data-tags={(post.data.tags || []).join(',').toLowerCase()}
+              data-title={post.data.title.toLowerCase()}
+              data-desc={(post.data.description || '').toLowerCase()}
+              data-timestamp={timestamp}
+            >
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#8b949e]">
+                <a
+                  href={`/thoughts?category=${cat.key}`}
+                  class={`${cat.className} cat-label font-semibold hover:underline underline-offset-4`}
+                  data-filter-category-link={cat.key}
+                  data-i18n={cat.labelKey}
+                >{cat.label}</a>
+                <time datetime={formattedDate}>{formattedDate}</time>
+                <span class="post-reading-time" data-reading-en={reading.textEn} data-reading-sv={reading.textSv}>
                   {reading.textEn}
                 </span>
+                <div class="flex flex-wrap items-center gap-1.5 sm:ml-auto">
+                  {(post.data.tags || []).map((tag) => (
+                    <a
+                      href={`/thoughts?tag=${encodeURIComponent(tag.toLowerCase())}`}
+                      class="text-[10px] text-[#8b949e] bg-[#161b22] border border-[#30363d] px-1.5 py-0.5 rounded hover:text-[#e6edf3] hover:border-[#484f58] transition-colors"
+                      data-filter-tag-link={tag.toLowerCase()}
+                    >{tag}</a>
+                  ))}
+                  {post.data.pdfUrl && (
+                    <span class="text-[10px] text-[#4fbf8b] border border-[#4fbf8b]/40 px-1.5 py-0.5 rounded" title={post.data.pdfName || 'Companion PDF'}>
+                      PDF
+                    </span>
+                  )}
+                </div>
               </div>
 
-              <!-- Tags -->
-              <div class="flex items-center gap-1.5 flex-wrap">
-                {(post.data.tags || []).map((tag) => (
-                  <span class={`text-[10px] px-1.5 py-0.5 rounded bg-[#0d1117] border border-[#30363d] text-[#8b949e] ${catHoverText} transition-colors`}>
-                    #{tag}
-                  </span>
-                ))}
-                {post.data.pdfUrl && (
-                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-[#10b981]/10 border border-[#10b981]/40 text-[#10b981] font-mono flex items-center gap-0.5 font-semibold" title={post.data.pdfName || 'Companion PDF available'}>
-                    <span>↓</span>
-                    <span>PDF</span>
-                  </span>
-                )}
-              </div>
-            </div>
+              <h2 class="mt-2 text-base sm:text-lg font-semibold text-[#e6edf3]">
+                <a href={`/thoughts/${post.id}`} class="text-[#e6edf3] hover:text-[var(--cat)] hover:underline underline-offset-4 transition-colors focus-visible:outline-none">
+                  {post.data.title}
+                </a>
+              </h2>
 
-            <!-- Title -->
-            <h2 class={`text-base sm:text-lg font-bold text-[#e6edf3] ${catHoverText} transition-colors`}>
-              <a href={`/thoughts/${post.id}`} class="focus-visible:outline-none flex items-start justify-between gap-3">
-                <span class="flex-1">{post.data.title}</span>
-                <span class={`text-xs text-[#8b949e] ${catHoverText} group-hover:translate-x-1 transition-transform shrink-0 pt-0.5 pr-1 inline-block font-mono`} aria-hidden="true">→</span>
-              </a>
-            </h2>
+              {post.data.description && (
+                <p class="mt-1 max-w-[62ch] font-serif text-[16px] leading-relaxed text-[#b0bac4]">
+                  {post.data.description}
+                </p>
+              )}
+            </article>
+          );
+        })}
 
-            <!-- Editorial Excerpt Quote -->
-            {post.data.description && (
-              <blockquote class={`text-xs sm:text-sm text-[#8b949e] border-l-2 border-[#30363d] ${catQuoteBorder} pl-3.5 italic leading-relaxed py-0.5 font-mono transition-colors`}>
-                "{post.data.description}"
-              </blockquote>
-            )}
-
-            <!-- Footer link -->
-            <div class="pt-2 border-t border-[#30363d]/40 flex items-center justify-between text-xs font-mono">
-              <a 
-                href={`/thoughts/${post.id}`} 
-                class={`hover:underline flex items-center gap-1 ${catHoverText} text-[#8b949e] transition-colors`}
-              >
-                <span data-i18n="thoughts_open_full">[Open full text →]</span>
-              </a>
-              <span class="text-[11px] text-[#8b949e]">slug: {post.id}</span>
-            </div>
-          </article>
-        );
-      })}
-
-      <div id="no-articles-msg" class="py-12 text-center text-xs font-mono text-[#8b949e] hidden" data-i18n="thoughts_no_match">
-        No notes or articles match your search or filter.
+        <p id="no-articles-msg" class="py-10 text-sm text-[#8b949e] hidden" data-i18n="thoughts_no_match">
+          Nothing matches that search.
+        </p>
       </div>
-    </div>
     ) : (
-      <div class="rounded-lg bg-[#161b22] border border-[#30363d] p-8 sm:p-12 text-center text-xs font-mono text-[#8b949e] space-y-2">
-        <div class="text-[#f59e0b] font-bold text-sm" data-i18n="thoughts_empty_title">[STAGING // POST ARCHIVE]</div>
-        <p data-i18n="thoughts_empty_desc">Notes and articles are currently being staged. New posts incoming.</p>
-      </div>
+      <p class="py-10 text-sm text-[#8b949e]" data-i18n="thoughts_empty_desc">
+        No writing published yet.
+      </p>
     )}
 
-    <!-- Bottom Return Nav -->
-    <div class="pt-8 border-t border-[#30363d] flex items-center justify-between text-xs font-mono text-[#8b949e]">
-      <a href="/" class="hover:text-[#10b981] transition-colors flex items-center gap-1.5">
-        <span>←</span>
-        <span data-i18n="thoughts_back_home">[Back to the cockpit]</span>
-      </a>
-      <span class="hidden sm:inline">gulo // thoughts archive</span>
+    <div class="pt-6 border-t border-[#30363d] flex items-center justify-between text-xs text-[#8b949e]">
+      <a href="/" class="hover:text-[#e6edf3] transition-colors" data-i18n="thoughts_back_home">Back home</a>
+      <span class="hidden sm:inline">Gustav Löfqvist</span>
     </div>
   </main>
 
@@ -364,97 +236,54 @@ const allTags = Array.from(
 </Layout>
 
 <script>
-  function initBlogSystem() {
+  function initWritingArchive() {
     const toggleCards = Array.from(document.querySelectorAll<HTMLButtonElement>('.cat-toggle-card'));
     const btnReset = document.getElementById('btn-reset-categories');
-    const tagBtns = document.querySelectorAll('.tag-filter-btn');
+    const tagBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('.tag-filter-btn'));
     const searchInput = document.getElementById('thought-search-input') as HTMLInputElement | null;
     const listContainer = document.getElementById('thoughts-list');
     const items = Array.from(document.querySelectorAll<HTMLElement>('.thought-card'));
     const noMsg = document.getElementById('no-articles-msg');
-    const countBadge = document.getElementById('thought-count-badge');
     const btnSortNewest = document.getElementById('btn-sort-newest');
     const btnSortOldest = document.getElementById('btn-sort-oldest');
+    const filterCategoryLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-filter-category-link]'));
+    const filterTagLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-filter-tag-link]'));
 
-    // Mängd av aktivt valda kategorier: Set<'tanke' | 'guide' | 'anteckning'>
-    // Regel: 0 valda = visa alla. 3 valda = visa alla. 1 eller 2 valda = visa bara de valda!
     const selectedCategories = new Set<string>();
+    const categoryCount = toggleCards.length;
 
     let currentTag = 'all';
     let searchQuery = '';
-    let currentSort = 'desc'; // 'desc' = nyast först, 'asc' = äldst först
+    let currentSort = 'desc';
 
-    function updateCardVisuals() {
-      const isFiltered = selectedCategories.size > 0 && selectedCategories.size < 3;
-      if (btnReset) {
-        btnReset.classList.toggle('hidden', !isFiltered);
-      }
+    function isFiltered() {
+      return selectedCategories.size > 0 && selectedCategories.size < categoryCount;
+    }
 
-      const isSv = (document.documentElement.lang || '').startsWith('sv');
-      const defaultText = isSv ? 'Klicka för att filtrera' : 'Click to filter';
-      const activeText = isSv ? 'Aktivt filter ✓' : 'Active filter ✓';
-
+    function updateFilterVisuals() {
+      if (btnReset) btnReset.classList.toggle('hidden', !isFiltered());
       toggleCards.forEach((card) => {
         const cat = card.getAttribute('data-cat') || '';
-        const isSelected = selectedCategories.has(cat);
-        card.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
-
-        const dot = card.querySelector('.cat-indicator-dot');
-        const statusText = card.querySelector('.cat-status-text');
-
-        // Återställ basklasser
-        card.classList.remove(
-          'ring-1', 'ring-[#f59e0b]', 'border-[#f59e0b]', 'bg-[#f59e0b]/10', 'bg-[#f59e0b]/20',
-          'ring-[#38bdf8]', 'border-[#38bdf8]', 'bg-[#38bdf8]/10', 'bg-[#38bdf8]/20',
-          'ring-[#10b981]', 'border-[#10b981]', 'bg-[#10b981]/10', 'bg-[#10b981]/20'
-        );
-        card.classList.add('bg-[#161b22]', 'border-[#30363d]', 'hover:bg-[#1f242c]');
-
-        if (dot) {
-          dot.classList.remove('bg-[#f59e0b]', 'border-[#f59e0b]', 'bg-[#38bdf8]', 'border-[#38bdf8]', 'bg-[#10b981]', 'border-[#10b981]');
-          dot.classList.add('border-[#8b949e]');
-        }
-        if (statusText) {
-          statusText.classList.remove('text-[#f59e0b]', 'text-[#38bdf8]', 'text-[#10b981]', 'font-semibold');
-          statusText.textContent = defaultText;
-        }
-
-        if (isSelected) {
-          card.classList.remove('bg-[#161b22]', 'border-[#30363d]', 'hover:bg-[#1f242c]');
-          if (cat === 'tanke') {
-            card.classList.add('ring-1', 'ring-[#f59e0b]', 'border-[#f59e0b]', 'bg-[#f59e0b]/20');
-            if (dot) { dot.classList.remove('border-[#8b949e]'); dot.classList.add('bg-[#f59e0b]', 'border-[#f59e0b]'); }
-            if (statusText) { statusText.classList.add('text-[#f59e0b]', 'font-semibold'); statusText.textContent = activeText; }
-          } else if (cat === 'guide') {
-            card.classList.add('ring-1', 'ring-[#38bdf8]', 'border-[#38bdf8]', 'bg-[#38bdf8]/20');
-            if (dot) { dot.classList.remove('border-[#8b949e]'); dot.classList.add('bg-[#38bdf8]', 'border-[#38bdf8]'); }
-            if (statusText) { statusText.classList.add('text-[#38bdf8]', 'font-semibold'); statusText.textContent = activeText; }
-          } else if (cat === 'anteckning') {
-            card.classList.add('ring-1', 'ring-[#10b981]', 'border-[#10b981]', 'bg-[#10b981]/20');
-            if (dot) { dot.classList.remove('border-[#8b949e]'); dot.classList.add('bg-[#10b981]', 'border-[#10b981]'); }
-            if (statusText) { statusText.classList.add('text-[#10b981]', 'font-semibold'); statusText.textContent = activeText; }
-          }
-        }
+        card.setAttribute('aria-pressed', selectedCategories.has(cat) ? 'true' : 'false');
       });
     }
 
     function applyFilterAndSort() {
-      const isFiltered = selectedCategories.size > 0 && selectedCategories.size < 3;
-
+      const filtered = isFiltered();
       let visibleCount = 0;
+
       items.forEach((item) => {
         const cat = item.getAttribute('data-category') || '';
         const tags = (item.getAttribute('data-tags') || '').split(',');
         const title = item.getAttribute('data-title') || '';
         const desc = item.getAttribute('data-desc') || '';
 
-        // Kategori-match: om 0 eller 3 är valda visas alla. Om 1 eller 2 valda visas endast de.
-        const catMatches = !isFiltered || selectedCategories.has(cat);
+        const catMatches = !filtered || selectedCategories.has(cat);
         const tagMatches = currentTag === 'all' || tags.includes(currentTag);
-        const searchMatches = 
-          !searchQuery || 
-          title.includes(searchQuery) || 
-          desc.includes(searchQuery) || 
+        const searchMatches =
+          !searchQuery ||
+          title.includes(searchQuery) ||
+          desc.includes(searchQuery) ||
           cat.includes(searchQuery) ||
           tags.some((t) => t.includes(searchQuery));
 
@@ -463,7 +292,6 @@ const allTags = Array.from(
         if (isMatch) visibleCount++;
       });
 
-      // Sortera i DOM
       if (listContainer) {
         const sortedItems = [...items].sort((a, b) => {
           const tA = Number(a.getAttribute('data-timestamp') || 0);
@@ -471,19 +299,30 @@ const allTags = Array.from(
           return currentSort === 'desc' ? tB - tA : tA - tB;
         });
 
-        sortedItems.forEach((el) => {
-          listContainer.appendChild(el);
-        });
-
-        // Säkerställ att no-articles-msg ligger sist i listan
+        sortedItems.forEach((el) => listContainer.appendChild(el));
         if (noMsg) listContainer.appendChild(noMsg);
       }
 
       if (noMsg) noMsg.classList.toggle('hidden', visibleCount > 0);
-      if (countBadge) countBadge.textContent = String(visibleCount);
     }
 
-    // Klick på interaktiva kategori-kort
+    function syncUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const cats = Array.from(selectedCategories);
+      if (cats.length > 0 && cats.length < categoryCount) {
+        params.set('category', cats.join(','));
+      } else {
+        params.delete('category');
+      }
+      if (currentTag !== 'all') {
+        params.set('tag', currentTag);
+      } else {
+        params.delete('tag');
+      }
+      const query = params.toString();
+      history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}`);
+    }
+
     toggleCards.forEach((card) => {
       card.addEventListener('click', () => {
         const cat = card.getAttribute('data-cat') || '';
@@ -492,83 +331,121 @@ const allTags = Array.from(
         } else {
           selectedCategories.add(cat);
         }
-        updateCardVisuals();
+        updateFilterVisuals();
         applyFilterAndSort();
+        syncUrl();
       });
     });
 
-    // Återställ till alla kategorier
     btnReset?.addEventListener('click', () => {
+      const resetHadFocus = document.activeElement === btnReset;
       selectedCategories.clear();
-      updateCardVisuals();
+      updateFilterVisuals();
       applyFilterAndSort();
+      syncUrl();
+      if (resetHadFocus) toggleCards[0]?.focus();
     });
 
-    // Tagg-knappar
     tagBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
         currentTag = btn.getAttribute('data-tag') || 'all';
-
         tagBtns.forEach((b) => {
-          b.classList.remove('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]');
-          b.classList.add('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]');
+          b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
         });
-
-        btn.classList.remove('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]');
-        btn.classList.add('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]');
-
         applyFilterAndSort();
+        syncUrl();
       });
     });
 
-    // Live sökning
+    filterCategoryLinks.forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        const cat = link.getAttribute('data-filter-category-link') || '';
+        if (!cat) return;
+        selectedCategories.clear();
+        selectedCategories.add(cat);
+        updateFilterVisuals();
+        applyFilterAndSort();
+        syncUrl();
+        const firstVisible = items.find((item) => item.style.display !== 'none');
+        const target = firstVisible?.querySelector<HTMLAnchorElement>('h2 a') ?? searchInput ?? toggleCards[0];
+        target?.focus();
+      });
+    });
+
+    filterTagLinks.forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        const tag = link.getAttribute('data-filter-tag-link') || 'all';
+        currentTag = tag;
+        tagBtns.forEach((b) => {
+          b.setAttribute('aria-pressed', b.getAttribute('data-tag') === tag ? 'true' : 'false');
+        });
+        applyFilterAndSort();
+        syncUrl();
+        const firstVisible = items.find((item) => item.style.display !== 'none');
+        const target = firstVisible?.querySelector<HTMLAnchorElement>('h2 a') ?? searchInput ?? tagBtns[0];
+        target?.focus();
+      });
+    });
+
     searchInput?.addEventListener('input', () => {
       searchQuery = (searchInput.value || '').trim().toLowerCase();
       applyFilterAndSort();
     });
 
-    // Datum-sortering
-    btnSortNewest?.addEventListener('click', () => {
-      if (currentSort === 'desc') return;
-      currentSort = 'desc';
-      btnSortNewest.classList.add('active', 'bg-[#161b22]', 'text-[#e6edf3]', 'border', 'border-[#30363d]', 'font-semibold');
-      btnSortNewest.classList.remove('text-[#8b949e]');
-      btnSortOldest?.classList.remove('active', 'bg-[#161b22]', 'text-[#e6edf3]', 'border', 'border-[#30363d]', 'font-semibold');
-      btnSortOldest?.classList.add('text-[#8b949e]');
+    function setSort(order: 'desc' | 'asc') {
+      currentSort = order;
+      btnSortNewest?.setAttribute('aria-pressed', order === 'desc' ? 'true' : 'false');
+      btnSortOldest?.setAttribute('aria-pressed', order === 'asc' ? 'true' : 'false');
       applyFilterAndSort();
-    });
+    }
 
-    btnSortOldest?.addEventListener('click', () => {
-      if (currentSort === 'asc') return;
-      currentSort = 'asc';
-      btnSortOldest.classList.add('active', 'bg-[#161b22]', 'text-[#e6edf3]', 'border', 'border-[#30363d]', 'font-semibold');
-      btnSortOldest.classList.remove('text-[#8b949e]');
-      btnSortNewest?.classList.remove('active', 'bg-[#161b22]', 'text-[#e6edf3]', 'border', 'border-[#30363d]', 'font-semibold');
-      btnSortNewest?.classList.add('text-[#8b949e]');
-      applyFilterAndSort();
-    });
+    btnSortNewest?.addEventListener('click', () => setSort('desc'));
+    btnSortOldest?.addEventListener('click', () => setSort('asc'));
 
     function updateReadingTimes() {
-      const isSv = (document.documentElement.lang || '').startsWith('sv') || localStorage.getItem('site_lang') === 'sv';
+      const isSv = (document.documentElement.lang || '').startsWith('sv');
       document.querySelectorAll<HTMLElement>('.post-reading-time').forEach((el) => {
         const text = isSv ? el.getAttribute('data-reading-sv') : el.getAttribute('data-reading-en');
         if (text) el.textContent = text;
       });
     }
 
+    const initialParams = new URLSearchParams(window.location.search);
+    const initialCategory = initialParams.get('category');
+    if (initialCategory) {
+      initialCategory.split(',').map((value) => value.trim()).filter(Boolean).forEach((cat) => {
+        if (toggleCards.some((card) => card.getAttribute('data-cat') === cat)) {
+          selectedCategories.add(cat);
+        }
+      });
+    }
+    const initialTag = initialParams.get('tag');
+    if (initialTag) {
+      const tag = initialTag.toLowerCase();
+      const tagButton = tagBtns.find((button) => button.getAttribute('data-tag') === tag);
+      if (tagButton) {
+        currentTag = tag;
+        tagBtns.forEach((button) => {
+          button.setAttribute('aria-pressed', button === tagButton ? 'true' : 'false');
+        });
+      }
+    }
+    updateFilterVisuals();
+    applyFilterAndSort();
+
     updateReadingTimes();
 
-    // Reactive update on language change
     window.addEventListener('lang-change', () => {
-      updateCardVisuals();
       updateReadingTimes();
       applyFilterAndSort();
     });
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initBlogSystem);
+    document.addEventListener('DOMContentLoaded', initWritingArchive);
   } else {
-    initBlogSystem();
+    initWritingArchive();
   }
 </script>

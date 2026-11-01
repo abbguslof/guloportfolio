@@ -1,8 +1,8 @@
 {
   "user": "gulo",
   "host": "chalmers-station",
-  "badge": "CHALMERS // D-24",
-  "tagline": "swimmer • sysdev",
+  "badge": "Chalmers D-24",
+  "tagline": "swimmer, sysdev",
   "specs": [
     {
       "key": "Author",
@@ -25,13 +25,8 @@
       "color": "sky"
     },
     {
-      "key": "Uptime",
-      "value": "42 days, 8 hours, 14 mins",
-      "color": "sky"
-    },
-    {
       "key": "Shell",
-      "value": "bash 5.2 / zsh 5.9 • alacritty",
+      "value": "bash 5.2 / zsh 5.9, alacritty",
       "color": "sky"
     },
     {
@@ -46,19 +41,13 @@
     },
     {
       "key": "Swimming",
-      "value": "MASS & Growth Objective // Åbybadet & GoCo (Sprint free/fly)",
+      "value": "MASS & Growth Objective, sprint free/fly",
       "color": "emerald"
     },
     {
       "key": "Homelab",
-      "value": "Proxmox VE, Raspberry Pi, Web & MC clusters",
+      "value": "Proxmox VE and a Raspberry Pi cluster",
       "color": "emerald"
-    },
-    {
-      "key": "Status",
-      "value": "[ONLINE] Studying & Sprint training",
-      "color": "amber",
-      "online": true
     }
   ]
 }

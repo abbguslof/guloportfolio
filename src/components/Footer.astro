@@ -1,309 +1,61 @@
 ---
-// Footer.astro - TUI System Diagnostics, Real-time Telemetry & Matrix Links
-import { SITE_LAUNCH_DATE, calculateUptime } from '../data/telemetry';
-const initialUptime = calculateUptime();
+// Footer.astro - Site footer
+const year = new Date().getFullYear();
 ---
 
-<footer class="mt-12 sm:mt-16 pt-6 sm:pt-8 pb-10 sm:pb-12 border-t border-[#30363d] text-xs font-mono text-[#8b949e]">
-  <div class="space-y-6">
-    <!-- Status Diagnostic Grid -->
-    <div class="p-3.5 sm:p-4 rounded-lg bg-[#161b22] border border-[#30363d] space-y-3">
-      <div class="flex flex-wrap sm:flex-nowrap items-center justify-between gap-1 pb-2 border-b border-[#30363d]/60 text-[11px]">
-        <div class="flex items-center gap-2">
-          <span id="footer-sys-dot" class="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse shrink-0"></span>
-          <span class="text-[#e6edf3] font-semibold text-[10px] sm:text-[11px]" data-i18n="footer_diagnostics">SYSTEM DIAGNOSTICS &amp; TELEMETRY</span>
-        </div>
-        <span id="footer-sys-status" class="text-[#10b981] font-semibold text-[10px] sm:text-[11px]" data-i18n="footer_nominal">ALL_SYSTEMS_NOMINAL</span>
-      </div>
-
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 text-[11px]">
-        <div class="min-w-0">
-          <span class="block text-[#8b949e] text-[10px] sm:text-[11px]" data-i18n="footer_location_label">LOCATION:</span>
-          <span class="text-[#e6edf3] block truncate" title="Gothenburg, SE CET">
-            <span data-i18n="footer_location_val">Gothenburg, SE</span> • <span id="footer-clock" class="text-[#38bdf8]">--:--:--</span>
-          </span>
-        </div>
-        <div class="min-w-0">
-          <span class="block text-[#8b949e] text-[10px] sm:text-[11px]" data-i18n="footer_ping_label">NETWORK PING:</span>
-          <span id="footer-ping-val" class="text-[#38bdf8] block truncate">~12ms</span>
-        </div>
-        <div class="min-w-0">
-          <span class="block text-[#8b949e] text-[10px] sm:text-[11px]" data-i18n="footer_engine_label">ENGINE:</span>
-          <span class="text-[#a78bfa] block truncate" data-i18n="footer_engine_val"><a href="https://astro.build" target="_blank" rel="noopener noreferrer" class="hover:underline hover:text-[#e6edf3]">Astro</a> 7 (SSG) + TUI</span>
-        </div>
-        <div class="min-w-0">
-          <span class="block text-[#8b949e] text-[10px] sm:text-[11px]" data-i18n="footer_uptime_label">HOST UPTIME:</span>
-          <span id="footer-uptime-val" class="text-[#10b981] font-semibold block truncate" data-launch-epoch={SITE_LAUNCH_DATE}>{initialUptime.short}</span>
-        </div>
-      </div>
+<footer class="mt-14 sm:mt-20 pt-6 pb-10 sm:pb-12 border-t border-[#30363d] text-xs text-[#8b949e]">
+  <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
+    <div class="space-y-1.5">
+      <p class="text-[#e6edf3]">Gustav Löfqvist</p>
+      <p>
+        Gothenburg, <time id="footer-clock" datetime="">--:--</time>
+      </p>
+      <p class="text-[11px]" data-i18n="footer_built">Built with <a href="https://astro.build" target="_blank" rel="noopener noreferrer" class="text-[#8b949e] underline decoration-[#30363d] underline-offset-2 hover:text-[#e6edf3] hover:decoration-[#8b949e]">Astro</a>. The source is on <a href="https://github.com/abbguslof" target="_blank" rel="noopener noreferrer" class="text-[#8b949e] underline decoration-[#30363d] underline-offset-2 hover:text-[#e6edf3] hover:decoration-[#8b949e]">GitHub</a>.</p>
     </div>
 
-    <!-- Navigation & Social Links -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 pt-1 sm:pt-2">
-      <div class="flex flex-wrap items-center gap-x-3.5 sm:gap-x-4 gap-y-1.5 sm:gap-y-2 text-[11px] sm:text-xs">
-        <div class="flex items-center gap-2 sm:gap-3">
-          <a 
-            href="/projects" 
-            class="hover:text-[#e6edf3] hover:underline transition-colors py-0.5 inline-flex items-center text-[#e6edf3]/90 hover:text-[#10b981]"
-            data-i18n="footer_link_portfolio"
-          >
-            [portfolio]
-          </a>
-          <a 
-            href="/thoughts" 
-            class="hover:text-[#e6edf3] hover:underline transition-colors py-0.5 inline-flex items-center text-[#e6edf3]/90 hover:text-[#10b981]"
-            data-i18n="footer_link_blog"
-          >
-            [blog]
-          </a>
-          <a 
-            href="/files" 
-            class="hover:text-[#e6edf3] hover:underline transition-colors py-0.5 inline-flex items-center text-[#e6edf3]/90 hover:text-[#10b981]"
-            data-i18n="footer_link_files"
-          >
-            [files]
-          </a>
-        </div>
-        <span class="text-[#30363d] hidden sm:inline">•</span>
-        <div class="flex items-center gap-2.5 sm:gap-3">
-          <a 
-            href="https://github.com/abbguslof" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            class="hover:text-[#e6edf3] hover:underline transition-colors py-0.5 inline-flex items-center gap-0.5"
-          >
-            <span>github</span><span class="text-[9px] sm:text-[10px]">↗</span>
-          </a>
-          <a 
-            href="mailto:gurra@gulo.se" 
-            class="hover:text-[#e6edf3] hover:underline transition-colors py-0.5 inline-flex items-center gap-0.5"
-          >
-            <span>email</span><span class="text-[9px] sm:text-[10px]">↗</span>
-          </a>
-          <a 
-            href="https://chalmers.se" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            class="hover:text-[#38bdf8] hover:underline transition-colors py-0.5 inline-flex items-center gap-0.5"
-          >
-            <span>chalmers.se</span><span class="text-[9px] sm:text-[10px]">↗</span>
-          </a>
-        </div>
-      </div>
+    <nav class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] sm:text-xs" aria-label="Footer navigation">
+      <a href="/#about" id="footer-about-link" class="hover:text-[#e6edf3] transition-colors" data-i18n="footer_link_about">about</a>
+      <a href="/projects" class="hover:text-[#e6edf3] transition-colors" data-i18n="footer_link_portfolio">projects</a>
+      <a href="/thoughts" class="hover:text-[#e6edf3] transition-colors" data-i18n="footer_link_blog">writing</a>
+      <a href="/files" class="hover:text-[#e6edf3] transition-colors" data-i18n="footer_link_files">files</a>
+      <a href="https://github.com/abbguslof" target="_blank" rel="noopener noreferrer" class="hover:text-[#e6edf3] transition-colors">github<span class="text-[9px]">↗</span></a>
+      <a href="mailto:gurra@gulo.se" class="hover:text-[#e6edf3] transition-colors">email</a>
+      <a href="https://chalmers.se" target="_blank" rel="noopener noreferrer" class="hover:text-[#e6edf3] transition-colors">chalmers.se<span class="text-[9px]">↗</span></a>
+    </nav>
+  </div>
 
-      <div class="text-[10px] sm:text-[11px] text-[#8b949e] pt-1.5 sm:pt-0">
-        <span data-i18n="footer_copyleft">copyleft // built for curiosity &amp; playground</span>
-      </div>
-    </div>
+  <div class="mt-5 pt-3 border-t border-[#30363d]/60 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 text-[10px] text-[#8b949e]/70">
+    <span>© {year} Gustav Löfqvist</span>
+    <span data-i18n="footer_build" data-i18n-count={new Date().toISOString().slice(0, 10)}>Last build: {new Date().toISOString().slice(0, 10)}</span>
   </div>
 </footer>
 
-<style>
-  #footer-uptime-val.is-offline {
-    color: #f85149 !important;
-  }
-  #footer-uptime-val.is-online {
-    color: #10b981 !important;
-  }
-</style>
-
 <script>
-  function initFooterTelemetry() {
-    const sysDot = document.getElementById('footer-sys-dot');
-    const sysStatus = document.getElementById('footer-sys-status');
-    const clockEl = document.getElementById('footer-clock');
-    const pingEl = document.getElementById('footer-ping-val');
-    const uptimeEl = document.getElementById('footer-uptime-val');
+  const aboutLink = document.getElementById('footer-about-link');
+  aboutLink?.addEventListener('click', (event) => {
+    if (window.location.pathname === '/' || window.location.pathname === '') {
+      event.preventDefault();
+      if (window.location.hash !== '#about') {
+        history.replaceState(null, '', '#about');
+      }
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    }
+  });
 
-    // 1. Ticking Local Gothenburg Clock (Europe/Stockholm)
-    const timeFormatter = new Intl.DateTimeFormat('en-GB', {
+  const clock = document.getElementById('footer-clock');
+  if (clock) {
+    const formatter = new Intl.DateTimeFormat('en-GB', {
       timeZone: 'Europe/Stockholm',
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit',
       hour12: false,
     });
-
-    function updateClock() {
-      if (clockEl) {
-        clockEl.textContent = `${timeFormatter.format(new Date())} CET`;
-      }
-    }
-
-    // 2. Dynamic Live Host Uptime calculated from deployment station epoch
-    const launchStr = uptimeEl?.getAttribute('data-launch-epoch') || '2026-01-01T00:00:00Z';
-    const STATION_EPOCH = new Date(launchStr).getTime();
-    let isStationOnline = typeof (window as any)?.__siteIsOnline === 'boolean' 
-      ? (window as any).__siteIsOnline 
-      : navigator.onLine;
-    let offlineDowntimeMs = 0;
-    let wentOfflineTimestamp: number | null = isStationOnline ? null : Date.now();
-
-    function updateUptime() {
-      if (!uptimeEl) return;
-      const now = Date.now();
-      const effectiveNow = (wentOfflineTimestamp !== null ? wentOfflineTimestamp : now) - offlineDowntimeMs;
-      const diffMs = Math.max(0, effectiveNow - STATION_EPOCH);
-
-      const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diffMs / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diffMs / (1000 * 60)) % 60);
-      const seconds = Math.floor((diffMs / 1000) % 60);
-
-      uptimeEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-      uptimeEl.style.setProperty('color', isStationOnline ? '#10b981' : '#f85149', 'important');
-    }
-
-    // 3. Real RTT Network Ping measurement (zero additional network requests)
-    function measureInitialPing() {
-      const navEntries = performance.getEntriesByType && performance.getEntriesByType('navigation');
-      if (navEntries && navEntries[0]) {
-        const nav = navEntries[0] as PerformanceNavigationTiming;
-        const rtt = Math.round(nav.responseEnd - nav.requestStart);
-        if (rtt > 0 && rtt < 1000 && pingEl) {
-          pingEl.textContent = `${rtt}ms`;
-        }
-      }
-    }
-
-    // Update ping from Header probe events
-    window.addEventListener('network-ping', ((e: CustomEvent) => {
-      if (!pingEl) return;
-      const { latency, isOnline } = e.detail || {};
-      if (isOnline && typeof latency === 'number') {
-        pingEl.textContent = `${latency}ms`;
-        pingEl.className = 'text-[#38bdf8] block truncate';
-      } else if (!isOnline) {
-        pingEl.textContent = 'DISCONNECTED';
-        pingEl.className = 'text-[#f85149] font-semibold block truncate';
-      }
-    }) as EventListener);
-
-    function applyOnlineStatusUI(online: boolean) {
-      if (sysDot) {
-        sysDot.className = online 
-          ? 'w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse is-online-bg'
-          : 'w-2.5 h-2.5 rounded-full bg-[#f85149] is-offline-bg';
-        sysDot.style.backgroundColor = online ? '#10b981' : '#f85149';
-      }
-      if (sysStatus) {
-        sysStatus.className = online 
-          ? 'text-[#10b981] font-semibold is-online-text'
-          : 'text-[#f85149] font-semibold is-offline-text';
-        sysStatus.textContent = online 
-          ? 'ALL_SYSTEMS_NOMINAL' 
-          : 'SYS_OFFLINE_DEGRADED';
-        sysStatus.style.color = online ? '#10b981' : '#f85149';
-      }
-      if (clockEl) {
-        clockEl.className = online 
-          ? 'text-[#38bdf8]' 
-          : 'text-[#f85149] font-semibold is-offline-text';
-        clockEl.style.color = online ? '#38bdf8' : '#f85149';
-      }
-      if (uptimeEl) {
-        if (online) {
-          uptimeEl.classList.remove('is-offline', 'is-offline-text');
-          uptimeEl.classList.add('is-online', 'is-online-text');
-          uptimeEl.style.setProperty('color', '#10b981', 'important');
-        } else {
-          uptimeEl.classList.remove('is-online', 'is-online-text');
-          uptimeEl.classList.add('is-offline', 'is-offline-text');
-          uptimeEl.style.setProperty('color', '#f85149', 'important');
-        }
-      }
-      if (pingEl && !online) {
-        pingEl.className = 'text-[#f85149] font-semibold block truncate is-offline-text';
-        pingEl.style.color = '#f85149';
-        pingEl.textContent = 'DISCONNECTED';
-      } else if (pingEl && online) {
-        pingEl.style.color = '#38bdf8';
-      }
-    }
-
-    // Direct browser offline/online event listeners
-    window.addEventListener('offline', () => {
-      if (isStationOnline) {
-        wentOfflineTimestamp = Date.now();
-      }
-      isStationOnline = false;
-      applyOnlineStatusUI(false);
-      updateUptime();
-    });
-
-    window.addEventListener('online', () => {
-      if (wentOfflineTimestamp !== null) {
-        offlineDowntimeMs += (Date.now() - wentOfflineTimestamp);
-        wentOfflineTimestamp = null;
-      }
-      isStationOnline = true;
-      applyOnlineStatusUI(true);
-      updateClock();
-      updateUptime();
-    });
-
-    // Update telemetry state and freeze/resume time tickers when connection drops or recovers
-    window.addEventListener('connection-state-change', ((e: CustomEvent) => {
-      const nowOnline = e.detail?.isOnline ?? true;
-      if (isStationOnline !== nowOnline) {
-        if (!nowOnline) {
-          wentOfflineTimestamp = Date.now();
-        } else {
-          if (wentOfflineTimestamp !== null) {
-            offlineDowntimeMs += (Date.now() - wentOfflineTimestamp);
-            wentOfflineTimestamp = null;
-          }
-        }
-      }
-      isStationOnline = nowOnline;
-      applyOnlineStatusUI(isStationOnline);
-
-      if (isStationOnline) {
-        updateClock();
-        updateUptime();
-      } else {
-        updateUptime();
-      }
-    }) as EventListener);
-
-    // Initial sync
-    updateClock();
-    updateUptime();
-    measureInitialPing();
-    applyOnlineStatusUI(isStationOnline);
-
-    // Loop ticker with tab-switch pause to save battery and CPU.
-    // Both clock and uptime freeze and turn red when offline
-    function tick() {
-      if (isStationOnline) {
-        updateClock();
-        updateUptime();
-      }
-    }
-
-    let tickerInterval: number | null = window.setInterval(tick, 1000);
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        updateClock();
-        if (isStationOnline) {
-          updateUptime();
-        }
-        if (tickerInterval === null) {
-          tickerInterval = window.setInterval(tick, 1000);
-        }
-      } else {
-        if (tickerInterval !== null) {
-          clearInterval(tickerInterval);
-          tickerInterval = null;
-        }
-      }
-    });
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initFooterTelemetry);
-  } else {
-    initFooterTelemetry();
+    const tick = () => {
+      const now = new Date();
+      clock.textContent = formatter.format(now);
+      clock.setAttribute('datetime', now.toISOString());
+    };
+    tick();
+    window.setInterval(tick, 30000);
   }
 </script>

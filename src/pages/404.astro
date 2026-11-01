@@ -7,10 +7,10 @@ import Footer from '../components/Footer.astro';
 ---
 
 <Layout 
-  titleEn="404: Command Not Found // gulo" 
-  titleSv="404: Kommandot hittades inte // gulo"
-  descriptionEn="The requested route does not exist on this station. Return to the cockpit or explore projects, thoughts and files."
-  descriptionSv="Den efterfrågade adressen finns inte på denna station. Återvänd till cockpiten eller utforska projekt, tankar och filer."
+  titleEn="Page not found"
+  titleSv="Sidan hittades inte"
+  descriptionEn="That page does not exist. Go home, or browse projects, writing, and files."
+  descriptionSv="Den sidan finns inte. Gå hem eller bläddra bland projekt, texter och filer."
 >
   <Header />
 
@@ -18,7 +18,7 @@ import Footer from '../components/Footer.astro';
     <!-- Breadcrumb -->
     <div class="border-b border-[#30363d] pb-4">
       <div class="flex items-center gap-2 text-xs text-[#8b949e]">
-        <a href="/" class="hover:text-[#10b981] transition-colors" data-i18n="projects_breadcrumb_home">[~/home]</a>
+        <a href="/" class="hover:text-[#e6edf3] transition-colors">Home</a>
         <span>/</span>
         <span class="text-[#f85149]">404</span>
       </div>

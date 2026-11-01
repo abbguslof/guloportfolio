@@ -1,4 +1,4 @@
-// src/scripts/keyboard-nav.ts - Global cockpit keyboard navigation
+// src/scripts/keyboard-nav.ts - Global keyboard navigation
 // Supports Tab, Shift+Tab, Enter, Space, Escape, and Arrow keys across all pages and browsers
 
 export function initKeyboardNav(): void {
@@ -29,7 +29,12 @@ export function initKeyboardNav(): void {
       '.tag-filter-btn'
     ].join(', ');
 
-    const nodes = Array.from(document.querySelectorAll<HTMLElement>(selector));
+    let nodes = Array.from(document.querySelectorAll<HTMLElement>(selector));
+
+    const terminalWindow = document.getElementById('terminal-window');
+    if (document.body.classList.contains('terminal-fullscreen') && terminalWindow) {
+      nodes = nodes.filter((el) => terminalWindow.contains(el));
+    }
 
     return nodes.filter((el) => {
       // Exclude hidden elements or elements marked tabindex="-1"
@@ -65,7 +70,7 @@ export function initKeyboardNav(): void {
         'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"], .cat-toggle-card, .proj-filter-btn, .file-cat-btn, .file-card-header'
       )).filter((el) => {
         if (el.getAttribute('tabindex') === '-1') return false;
-        if (el.closest('#terminal-window')) return false;
+        if (el.closest('#terminal-window') || el.closest('#terminal-section')) return false;
         if (el.closest('.hidden')) return false;
         if (el.classList.contains('sr-only')) return false;
         if (el.offsetParent === null) return false;
@@ -329,6 +334,34 @@ export function initKeyboardNav(): void {
       }
     }
 
+    // D2. Writing tag filters (.tag-filter-btn)
+    if (active.classList.contains('tag-filter-btn')) {
+      const tags = Array.from(document.querySelectorAll<HTMLButtonElement>('.tag-filter-btn')).filter(
+        (button) => button.offsetParent !== null
+      );
+      const idx = tags.indexOf(active as HTMLButtonElement);
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        if (idx !== -1 && tags.length > 1) {
+          e.preventDefault();
+          const targetIndex = e.key === 'ArrowRight'
+            ? (idx + 1) % tags.length
+            : (idx - 1 + tags.length) % tags.length;
+          tags[targetIndex].focus();
+          return;
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const searchInput = document.getElementById('thought-search-input');
+        if (searchInput) searchInput.focus();
+        return;
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const firstArticle = document.querySelector<HTMLAnchorElement>('.thought-card:not(.hidden) h2 a');
+        if (firstArticle) firstArticle.focus();
+        return;
+      }
+    }
+
     // E. Files cards (.file-card-header)
     if (active.classList.contains('file-card-header')) {
       const headers = Array.from(document.querySelectorAll<HTMLElement>('.file-card:not(.hidden) .file-card-header')).filter(
@@ -351,10 +384,12 @@ export function initKeyboardNav(): void {
     }
 
     // F. Thoughts list items / cards (.thought-card or .thought-item)
-    const thoughtLink = active.closest<HTMLAnchorElement>('.thought-card h2 a, a.thought-item');
+    const thoughtContainer = active.closest<HTMLElement>('.thought-card, .thought-item');
+    const thoughtLink = thoughtContainer?.querySelector<HTMLAnchorElement>('h2 a, .thought-title-link')
+      ?? active.closest<HTMLAnchorElement>('.thought-card h2 a, .thought-item .thought-title-link');
     if (thoughtLink && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
       const allThoughtLinks = Array.from(
-        document.querySelectorAll<HTMLAnchorElement>('.thought-card:not(.hidden) h2 a, a.thought-item:not(.hidden)')
+        document.querySelectorAll<HTMLAnchorElement>('.thought-card:not(.hidden) h2 a, .thought-item:not(.hidden) .thought-title-link')
       ).filter((a) => a.offsetParent !== null);
       const idx = allThoughtLinks.indexOf(thoughtLink);
       if (idx !== -1 && allThoughtLinks.length > 1) {

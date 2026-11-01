@@ -47,36 +47,36 @@ export const statusPresets: Record<PresetKey, StatusProfile> = {
   regular: {
     name: 'Regular Semester / Normal läsperiod',
     badge: {
-      sv: '[ONLINE] Läsperiod & Simning',
-      en: '[ONLINE] Semester & Swimming',
+      sv: 'Läsperiod & Simning',
+      en: 'Semester & Swimming',
     },
     activity: {
-      sv: 'Civilingenjör Datateknik (åk 2) på Chalmers (EDIT-huset, RIU-student). Tränar 5-6 simpass och 3 gympass i veckan.',
-      en: 'M.Sc. Computer Science & Engineering (Year 2) at Chalmers (EDIT building, RIU student). 5+ swim & 3 gym sessions/week.',
+      sv: 'Civilingenjör Datateknik på Chalmers, årskurs två, EDIT-huset, RIU-student. Fem simpass och tre gympass de flesta veckor.',
+      en: 'Computer Science and Engineering at Chalmers, year two, EDIT building, RIU student. Five swim sessions and three gym sessions most weeks.',
     },
     focus: {
-      sv: 'Datateknik, nätverkssäkerhet, Linux (Omarchy/Arch) & sprintsimning på Åbybadet/GoCo.',
-      en: 'Computer engineering, network security, Linux (Omarchy/Arch) & sprint swimming at Åbybadet/GoCo.',
+      sv: 'System, nätverkssäkerhet, Linux och sprintsimning på Åbybadet och GoCo.',
+      en: 'Systems, network security, Linux, and sprint swimming at Åbybadet and GoCo.',
     },
     mood: {
-      sv: '☕ Kaffe, Neovim-keybindings, och Proxmox-arkitektur.',
-      en: '☕ Coffee, Neovim keybindings, and Proxmox architecture.',
+      sv: 'Kaffe, Neovim-keybindings, och Proxmox-arkitektur.',
+      en: 'Coffee, Neovim keybindings, and Proxmox architecture.',
     },
     homelab: {
-      sv: '🟢 Proxmox server, Raspberry Pi-enheter och självhostade tjänster online.',
-      en: '🟢 Proxmox server, Raspberry Pi cluster, and self-hosted services online.',
+      sv: 'Proxmox-server, Raspberry Pi-enheter och självhostade tjänster.',
+      en: 'Proxmox server, Raspberry Pi cluster, and self-hosted services.',
     },
     availability: {
-      sv: 'Öppen för sommarjobb 2027, praktik & examensarbete (just nu mest playground).',
-      en: 'Open for summer 2027 internships, thesis & technical projects (currently playground).',
+      sv: 'Öppen för sommarjobb 2027, praktik och examensarbete.',
+      en: 'Open to summer 2027 internships, thesis work, and technical projects.',
     },
   },
 
   exam: {
     name: 'Exam Week / Tentavecka',
     badge: {
-      sv: '[⚠ TENTOR] Tentamensperiod & Plugg',
-      en: '[⚠ FINALS] Finals Week & Deep Focus',
+      sv: 'Tentor Tentamensperiod & Plugg',
+      en: 'Finals Finals Week & Deep Focus',
     },
     activity: {
       sv: 'Tentamensperiod på Chalmers! Repeterar teorifrågor, algoritmer och datateknik.',
@@ -87,12 +87,12 @@ export const statusPresets: Record<PresetKey, StatusProfile> = {
       en: 'Exam preparation & problem solving in the EDIT building. Response times may be slightly delayed.',
     },
     mood: {
-      sv: '📚 Svart kaffe, whiteboard-pennor och öronproppar.',
-      en: '📚 Black coffee, whiteboard markers, and earplugs.',
+      sv: 'Svart kaffe, whiteboard-pennor och öronproppar.',
+      en: 'Black coffee, whiteboard markers, and earplugs.',
     },
     homelab: {
-      sv: '🟡 Serverarkitektur i underhållsläge / automatisk backup aktiv.',
-      en: '🟡 Server architecture in maintenance mode / automated backups active.',
+      sv: 'Serverarkitektur i underhållsläge / automatisk backup aktiv.',
+      en: 'Server architecture in maintenance mode / automated backups active.',
     },
     availability: {
       sv: 'Begränsad tillgänglighet fram till tentaperiodens slut.',
@@ -103,8 +103,8 @@ export const statusPresets: Record<PresetKey, StatusProfile> = {
   camp: {
     name: 'Swim Training Camp / Träningsläger',
     badge: {
-      sv: '[🏊 SIMLÄGER] Elitträningsläger i Turkiet',
-      en: '[🏊 SWIM CAMP] Elite Training Camp in Turkey',
+      sv: 'Simläger Elitträningsläger i Turkiet',
+      en: 'Swim Camp Elite Training Camp in Turkey',
     },
     activity: {
       sv: 'Intensivt elitträningsläger med Growth Objective (GO). Dubbla simpass och sprintoptimering.',
@@ -115,12 +115,12 @@ export const statusPresets: Record<PresetKey, StatusProfile> = {
       en: '50m/100m freestyle and butterfly, start mechanics, and athletic recovery.',
     },
     mood: {
-      sv: '🏊 Klorlukt, havregrynsgröt och tidiga morgonpass.',
-      en: '🏊 Chlorine scent, oatmeal bowls, and early morning practices.',
+      sv: 'Klorlukt, havregrynsgröt och tidiga morgonpass.',
+      en: 'Chlorine scent, oatmeal bowls, and early morning practices.',
     },
     homelab: {
-      sv: '🟢 Homelab körs autonomt med övervakning över WireGuard.',
-      en: '🟢 Homelab running autonomously with WireGuard monitoring.',
+      sv: 'Homelab körs autonomt med övervakning över WireGuard.',
+      en: 'Homelab running autonomously with WireGuard monitoring.',
     },
     availability: {
       sv: 'Nås säkrast på kvällstid efter dagens träningspass.',
@@ -131,8 +131,8 @@ export const statusPresets: Record<PresetKey, StatusProfile> = {
   swim: {
     name: 'National Championships / Svenska Mästerskapen',
     badge: {
-      sv: '[🏊 SM-VECKA] Svenska Mästerskapen',
-      en: '[🏊 NATIONALS] Swedish Championships',
+      sv: 'Svenska mästerskapen',
+      en: 'Swedish Championships',
     },
     activity: {
       sv: 'Tävlar på SM för Mölndals Allmänna Simsällskap (MASS) & Growth Objective (GO).',
@@ -147,8 +147,8 @@ export const statusPresets: Record<PresetKey, StatusProfile> = {
       en: '⚡ Full race focus, sprint speed, and team spirit.',
     },
     homelab: {
-      sv: '🟢 Servrar och driftsatta tjänster rullar stabilt i bakgrunden.',
-      en: '🟢 Servers and deployed services humming stably in the background.',
+      sv: 'Servrar och driftsatta tjänster rullar stabilt i bakgrunden.',
+      en: 'Servers and deployed services humming stably in the background.',
     },
     availability: {
       sv: 'Fokus på tävlingspassen. Svarar på mejl mellan tävlingspassen.',
@@ -175,8 +175,8 @@ export const statusPresets: Record<PresetKey, StatusProfile> = {
       en: '💻 Lo-fi beats, Alacritty terminal windows, and git commits.',
     },
     homelab: {
-      sv: '🚀 Nya containrar och tjänster driftsätts på Proxmox-klustret.',
-      en: '🚀 Deploying new containers and services on the Proxmox cluster.',
+      sv: 'Nya containrar och tjänster driftsätts på Proxmox-klustret.',
+      en: 'Deploying new containers and services on the Proxmox cluster.',
     },
     availability: {
       sv: 'Aktiv på GitHub!',
@@ -203,8 +203,8 @@ export const statusPresets: Record<PresetKey, StatusProfile> = {
       en: '🌲 Fresh air, nature, and offline mode.',
     },
     homelab: {
-      sv: '🟢 Homelab körs i lågenergiläge med automatiska larm.',
-      en: '🟢 Homelab running low-power baseline with automatic alerts.',
+      sv: 'Homelab körs i lågenergiläge med automatiska larm.',
+      en: 'Homelab running low-power baseline with automatic alerts.',
     },
     availability: {
       sv: 'Svarar sporadiskt på e-post (gurra@gulo.se).',
@@ -246,8 +246,8 @@ export function getActiveStatus(targetDate: Date = new Date()): ActiveStatusResu
     user: 'gulo',
     host: 'chalmers-station',
     location: {
-      sv: 'Göteborg // Chalmers EDIT & Åbybadet / GoCo',
-      en: 'Gothenburg, Sweden // Chalmers EDIT & Åbybadet / GoCo',
+      sv: 'Göteborg, Sverige',
+      en: 'Gothenburg, Sweden',
     },
     activity: currentEvent ? currentEvent.description : profile.activity,
     focus: profile.focus,

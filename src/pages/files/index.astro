@@ -34,44 +34,34 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
 ---
 
 <Layout 
-  titleEn="File Sharing & Resources // gulo" 
-  titleSv="Fildelning & Resurser // gulo"
-  descriptionEn="Downloadable scripts, resume, Minecraft server packages, dotfiles, and configurations with usage guides."
-  descriptionSv="Nedladdningsbara skript, CV, Minecraft-serverpaket, dotfiles och konfigurationer med användarguider."
+  titleEn="Files"
+  titleSv="Filer"
+  descriptionEn="Scripts, configurations, and other things worth downloading."
+  descriptionSv="Skript, konfigurationer och annat värt att ladda ner."
 >
   <Header />
 
   <!-- Global terminal container on subpages (starts hidden, opens via header) -->
   <InteractiveTerminal isSubpage={true} />
 
-  <main id="main-content" tabindex="-1" class="w-full py-4 space-y-8 font-mono outline-none">
+  <main id="main-content" tabindex="-1" class="w-full py-4 space-y-8 font-mono outline-none" style="--page-accent:#38bdf8;">
     <!-- Breadcrumb & Top Header -->
     <div class="border-b border-[#30363d] pb-6">
-      <div class="flex items-center gap-2 text-xs text-[#8b949e] mb-3">
-        <a href="/" class="hover:text-[#10b981] transition-colors" data-i18n="files_breadcrumb_home">[~/home]</a>
-        <span>/</span>
-        <span class="text-[#e6edf3]" data-i18n="files_breadcrumb_current">files</span>
-      </div>
+      <nav class="flex items-center gap-2 text-[11px] text-[#8b949e] mb-4" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-[#e6edf3] transition-colors" data-i18n="files_breadcrumb_home">Home</a>
+        <span aria-hidden="true">/</span>
+        <span class="text-[#e6edf3]" data-i18n="files_breadcrumb_current">Files</span>
+      </nav>
 
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-        <div>
-          <h1 class="text-xl sm:text-3xl font-bold text-[#e6edf3] tracking-tight" data-i18n="files_title">
-            File Sharing &amp; Resources
-          </h1>
-          <p class="text-xs sm:text-sm text-[#8b949e] mt-1" data-i18n="files_subtitle">
-            Optimized modpacks, Linux scripts, resume, and dotfiles. Click any resource for usage guide and linked projects.
-          </p>
-        </div>
-
-        <div class="flex items-center gap-3 text-xs text-[#8b949e] self-start sm:self-auto">
-          <span class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981]">
-            <span id="file-count-badge">{downloads.length}</span> <span data-i18n="files_count_suffix">files available</span>
-          </span>
-        </div>
-      </div>
+      <h1 class="text-2xl sm:text-3xl font-semibold text-[#e6edf3] tracking-tight">
+        <span class="text-[#38bdf8] font-bold mr-1.5">#</span><span data-i18n="files_title">Files</span>
+      </h1>
+      <p class="mt-1 max-w-[60ch] font-serif text-[18px] leading-relaxed text-[#b0bac4]" data-i18n="files_subtitle">
+        Scripts, configurations, and other things worth downloading.
+      </p>
 
       <!-- Search & Filters Bar -->
-      <div class="mt-5 sm:mt-6 pt-4 border-t border-[#30363d]/60 space-y-3.5 sm:space-y-4">
+      <div class={downloads.length > 0 ? "mt-5 sm:mt-6 pt-4 border-t border-[#30363d]/60 space-y-3.5 sm:space-y-4" : "hidden"}>
         <!-- Live Search Bar -->
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none gap-1.5 text-xs font-mono text-[#8b949e]">
@@ -99,12 +89,12 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
                 type="button" 
                 class={`file-cat-btn px-3 py-1.5 sm:py-1 min-h-[34px] sm:min-h-auto rounded border transition-all cursor-pointer flex items-center ${
                   i === 0 
-                    ? 'active bg-[#10b981] text-[#0d1117] font-semibold border-[#10b981] shadow-sm' 
+                    ? 'active bg-[#1b212a] text-[#e6edf3] font-semibold border-[#10b981] shadow-sm'
                     : 'bg-[#161b22] text-[#8b949e] border-[#30363d] hover:text-[#e6edf3] hover:bg-[#1f242c] hover:border-[#484f58]'
                 }`}
                 data-cat={i === 0 ? 'all' : cat.toLowerCase()}
               >
-                {i === 0 ? <span data-i18n="files_filter_all">[{cat === 'Alla' ? 'All' : cat}]</span> : `[${cat}]`}
+                {i === 0 ? <span data-i18n="files_filter_all">{cat === 'Alla' ? 'All' : cat}</span> : `[${cat}]`}
               </button>
             ))}
           </div>
@@ -317,19 +307,18 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
       </div>
     </div>
     ) : (
-      <div class="rounded-lg bg-[#161b22] border border-[#30363d] p-8 sm:p-12 text-center text-xs font-mono text-[#8b949e] space-y-2">
-        <div class="text-[#10b981] font-bold text-sm" data-i18n="files_empty_title">[STAGING // FILE ARCHIVE]</div>
-        <p data-i18n="files_empty_desc">Downloadable resources and configs are being updated. Available shortly.</p>
+      <div class="py-8 max-w-[60ch]">
+        <p class="font-serif text-[17px] leading-relaxed text-[#b0bac4]" data-i18n="files_empty_desc">Nothing published for download yet.</p>
       </div>
     )}
 
     <!-- Return Nav -->
     <div class="pt-8 border-t border-[#30363d] flex items-center justify-between text-xs text-[#8b949e]">
-      <a href="/" class="hover:text-[#10b981] transition-colors flex items-center gap-1.5">
+      <a href="/" class="hover:text-[#e6edf3] transition-colors flex items-center gap-1.5">
         <span>←</span>
-        <span data-i18n="projects_back_home">[Back to the cockpit]</span>
+        <span data-i18n="projects_back_home">Back home</span>
       </a>
-      <span class="hidden sm:inline">gulo // file archives</span>
+      <span class="hidden sm:inline">Gustav Löfqvist</span>
     </div>
   </main>
 
@@ -407,12 +396,12 @@ const categories = ['Alla', ...Array.from(new Set(downloads.map((d) => d.categor
         currentCat = btn.getAttribute('data-cat') || 'all';
 
         catBtns.forEach((b) => {
-          b.classList.remove('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]', 'shadow-sm');
+          b.classList.remove('bg-[#1b212a]', 'text-[#e6edf3]', 'font-semibold', 'border-[#10b981]', 'shadow-sm');
           b.classList.add('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]', 'hover:text-[#e6edf3]', 'hover:bg-[#1f242c]', 'hover:border-[#484f58]');
         });
 
         btn.classList.remove('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]', 'hover:text-[#e6edf3]', 'hover:bg-[#1f242c]', 'hover:border-[#484f58]');
-        btn.classList.add('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]', 'shadow-sm');
+        btn.classList.add('bg-[#1b212a]', 'text-[#e6edf3]', 'font-semibold', 'border-[#10b981]', 'shadow-sm');
 
         filterAndSort();
       });

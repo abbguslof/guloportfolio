@@ -1,8 +1,7 @@
 // src/scripts/terminal/i18n.ts - Centralized Internationalization & Terminal Texts
 import type { LangCode } from './types';
-import { getActiveStatus, type ActiveStatusResult } from '../../data/status';
+import { getActiveStatus } from '../../data/status';
 import { getUpcomingEvents, getCurrentEvent } from '../../data/schedule';
-import { calculateUptime, isSiteOnline } from '../../data/telemetry';
 import fastfetchSv from '../../data/terminal/sv/fastfetch.json';
 import fastfetchEn from '../../data/terminal/en/fastfetch.json';
 
@@ -19,99 +18,97 @@ export function getSiteLang(): LangCode {
  * Standard Focused Help: only shows essential, actual primary commands
  */
 export function getStandardHelpHtml(lang: LangCode): string {
-  if (lang === 'sv') {
-    return `
-<div class="text-[#e6edf3] space-y-2 font-mono">
-  <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">BASH KOMMANDOTOLK // AKTUELLA KOMMANDON</div>
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-xs">
-    <div>
-      <div class="text-[#38bdf8] font-bold mb-1">Information &amp; Studier:</div>
-      <div><span class="text-[#10b981] font-semibold">bio / about</span> : Komplett profil, CV &amp; översikt</div>
-      <div><span class="text-[#10b981] font-semibold">status</span> : Live-status, homelab &amp; tillgänglighet</div>
-      <div><span class="text-[#10b981] font-semibold">schedule / tentor</span> : Chalmers tentaveckor &amp; planering</div>
-      <div><span class="text-[#10b981] font-semibold">school / study</span> : Chalmers-studier, kurser &amp; RIU</div>
-      <div><span class="text-[#10b981] font-semibold">swim</span> : Simningspass &amp; träningstider</div>
-      <div><span class="text-[#10b981] font-semibold">whoami</span> : Information om mig &amp; bakgrund</div>
-      <div><span class="text-[#10b981] font-semibold">contact</span> : Kontaktvägar &amp; sociala medier</div>
-      <div><span class="text-[#10b981] font-semibold">msg &lt;text&gt;</span> : Skicka en hälsning till Gustavs inkorg 📬</div>
-    </div>
-    <div>
-      <div class="text-[#38bdf8] font-bold mb-1">Navigering &amp; Webb:</div>
-      <div><span class="text-[#10b981] font-semibold">home / hem</span> : Gå till startsidan (cockpiten)</div>
-      <div><span class="text-[#10b981] font-semibold">projects / homelab</span> : Öppna portföljsidan</div>
-      <div><span class="text-[#10b981] font-semibold">thoughts / blog</span> : Öppna blogg/anteckningar</div>
-      <div><span class="text-[#10b981] font-semibold">files</span> : Öppna filarkivet</div>
-      <div><span class="text-[#10b981] font-semibold">lang [sv|en]</span> : Byt språk direkt (svenska/engelska)</div>
-      <div><span class="text-[#10b981] font-semibold">theme / bg &lt;stil&gt;</span> : Växla visuell bakgrundseffekt</div>
-    </div>
-  </div>
+  const isSv = lang === 'sv';
 
-  <div class="text-xs pt-1 border-t border-[#30363d]/60">
-    <div class="text-[#38bdf8] font-bold mb-1">Filsystem &amp; Verktyg:</div>
-    <div class="text-[#8b949e] flex flex-wrap gap-x-4 gap-y-1">
-      <span><strong class="text-[#10b981]">ls [-la]</strong> lista filer</span>
-      <span><strong class="text-[#10b981]">cd &lt;mapp&gt;</strong> byt katalog</span>
-      <span><strong class="text-[#10b981]">cat &lt;fil&gt;</strong> visa filinnehåll</span>
-      <span><strong class="text-[#10b981]">grep &lt;mönster&gt; [fil]</strong> sök text</span>
-      <span><strong class="text-[#10b981]">nvim [fil] / vim</strong> texteditor</span>
-      <span><strong class="text-[#10b981]">wget &lt;fil&gt;</strong> ladda ned från files/</span>
-      <span><strong class="text-[#10b981]">open &lt;mål&gt;</strong> öppna sida/fil</span>
-      <span><strong class="text-[#10b981]">clear</strong> rensa skärmen</span>
-      <span><strong class="text-[#10b981]">exit</strong> stäng fönstret</span>
-    </div>
-  </div>
+  const groups = isSv
+    ? [
+        { title: 'Om', rows: [
+          ['bio', 'profil och bakgrund'],
+          ['school', 'Chalmers och kurser'],
+          ['swim', 'träning och resultat'],
+          ['status', 'aktuellt fokus och tillgänglighet'],
+          ['contact', 'e-post och länkar'],
+        ]},
+        { title: 'Läs', rows: [
+          ['projects', 'projektarkivet'],
+          ['writing', 'texter och anteckningar'],
+          ['files', 'nedladdningar'],
+        ]},
+        { title: 'Sidan', rows: [
+          ['home', 'tillbaka till startsidan'],
+          ['lang [sv|en]', 'byt språk'],
+          ['bg [stil]', 'bakgrundseffekt'],
+        ]},
+        { title: 'Filer', rows: [
+          ['ls [-la]', 'lista filer'],
+          ['cd <mapp>', 'byt katalog'],
+          ['cat <fil>', 'läs en fil'],
+          ['grep <mönster>', 'sök text'],
+          ['nvim [fil]', 'textredigerare'],
+          ['wget <fil>', 'ladda ner'],
+          ['open <mål>', 'öppna en sida'],
+          ['clear', 'rensa skärmen'],
+          ['exit', 'stäng terminalen'],
+        ]},
+      ]
+    : [
+        { title: 'About', rows: [
+          ['bio', 'profile and background'],
+          ['school', 'Chalmers and coursework'],
+          ['swim', 'training and results'],
+          ['status', 'current focus and availability'],
+          ['contact', 'email and links'],
+        ]},
+        { title: 'Read', rows: [
+          ['projects', 'project archive'],
+          ['writing', 'notes and articles'],
+          ['files', 'downloads'],
+        ]},
+        { title: 'Site', rows: [
+          ['home', 'back to the start'],
+          ['lang [en|sv]', 'switch language'],
+          ['bg [style]', 'background effect'],
+        ]},
+        { title: 'Files', rows: [
+          ['ls [-la]', 'list files'],
+          ['cd <dir>', 'change directory'],
+          ['cat <file>', 'read a file'],
+          ['grep <pattern>', 'search text'],
+          ['nvim [file]', 'text editor'],
+          ['wget <file>', 'download a file'],
+          ['open <target>', 'open a page'],
+          ['clear', 'clear the screen'],
+          ['exit', 'close the terminal'],
+        ]},
+      ];
 
-  <div class="text-[11px] text-[#38bdf8] bg-[#0d1117] p-2 rounded border border-[#30363d] flex items-center justify-between">
-    <span>💡 Skriv <code class="text-[#10b981] font-bold">help --extended</code> (eller <code class="text-[#10b981]">help -e</code>) för git, miniräknare, spel &amp; verktyg</span>
-    <span class="text-[#8b949e]">[Tab för autokomplettering]</span>
-  </div>
-</div>`;
-  }
+  const esc = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  const renderGroups = (items: typeof groups) => items.map((group) => `
+    <div>
+      <div class="text-[#38bdf8] font-semibold mb-1">${esc(group.title)}</div>
+      <div class="grid grid-cols-[132px_1fr] gap-x-3 gap-y-1">
+        ${group.rows.map(([cmd, desc]) => `<span class="text-[#10b981]">${esc(cmd)}</span><span class="text-[#8b949e]">${esc(desc)}</span>`).join('')}
+      </div>
+    </div>`).join('');
+
+  const groupsHtmlLeft = renderGroups(groups.slice(0, 3));
+  const groupsHtmlRight = renderGroups(groups.slice(3));
 
   return `
-<div class="text-[#e6edf3] space-y-2 font-mono">
-  <div class="text-[#10b981] font-bold border-b border-[#30363d] pb-1">BASH INTERPRETER // ESSENTIAL COMMANDS</div>
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-xs">
-    <div>
-      <div class="text-[#38bdf8] font-bold mb-1">Information &amp; Academics:</div>
-      <div><span class="text-[#10b981] font-semibold">bio / about</span> : Complete profile, CV &amp; overview</div>
-      <div><span class="text-[#10b981] font-semibold">status</span> : Live status, homelab &amp; availability</div>
-      <div><span class="text-[#10b981] font-semibold">schedule / exams</span> : Chalmers finals &amp; exam calendar</div>
-      <div><span class="text-[#10b981] font-semibold">school / study</span> : Chalmers coursework, focus &amp; RIU</div>
-      <div><span class="text-[#10b981] font-semibold">swim</span> : Swim routines &amp; training stats</div>
-      <div><span class="text-[#10b981] font-semibold">whoami</span> : Background &amp; profile overview</div>
-      <div><span class="text-[#10b981] font-semibold">contact</span> : Contact info &amp; social handles</div>
-      <div><span class="text-[#10b981] font-semibold">msg &lt;text&gt;</span> : Send a note to Gustav's inbox 📬</div>
-    </div>
-    <div>
-      <div class="text-[#38bdf8] font-bold mb-1">Navigation &amp; Web:</div>
-      <div><span class="text-[#10b981] font-semibold">home / hem</span> : Navigate to homepage (cockpit)</div>
-      <div><span class="text-[#10b981] font-semibold">projects / homelab</span> : Portfolio showcase</div>
-      <div><span class="text-[#10b981] font-semibold">thoughts / blog</span> : Blog &amp; research notes</div>
-      <div><span class="text-[#10b981] font-semibold">files</span> : Downloads &amp; dotfiles</div>
-      <div><span class="text-[#10b981] font-semibold">lang [en|sv]</span> : Switch language (English/Swedish)</div>
-      <div><span class="text-[#10b981] font-semibold">theme / bg &lt;style&gt;</span> : Switch ambient visual effect</div>
-    </div>
+<div class="text-[#e6edf3] space-y-3 text-xs font-mono">
+  <div class="flex flex-wrap items-baseline justify-between gap-2 border-b border-[#30363d] pb-1">
+    <span class="text-[#10b981] font-bold text-sm"># ${isSv ? 'Kommandon' : 'Commands'}</span>
+    <span class="text-[10px] text-[#8b949e]">${isSv ? 'Tab-komplettering fungerar' : 'Tab completion works'}</span>
   </div>
 
-  <div class="text-xs pt-1 border-t border-[#30363d]/60">
-    <div class="text-[#38bdf8] font-bold mb-1">Filesystem &amp; Utilities:</div>
-    <div class="text-[#8b949e] flex flex-wrap gap-x-4 gap-y-1">
-      <span><strong class="text-[#10b981]">ls [-la]</strong> list files</span>
-      <span><strong class="text-[#10b981]">cd &lt;dir&gt;</strong> change directory</span>
-      <span><strong class="text-[#10b981]">cat &lt;file&gt;</strong> view file contents</span>
-      <span><strong class="text-[#10b981]">grep &lt;pattern&gt; [file]</strong> search text</span>
-      <span><strong class="text-[#10b981]">nvim [file] / vim</strong> text editor</span>
-      <span><strong class="text-[#10b981]">wget &lt;file&gt;</strong> download from files/</span>
-      <span><strong class="text-[#10b981]">open &lt;target&gt;</strong> open file or page</span>
-      <span><strong class="text-[#10b981]">clear</strong> clear screen</span>
-      <span><strong class="text-[#10b981]">exit</strong> close window</span>
-    </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-4">
+    <div class="space-y-3">${groupsHtmlLeft}</div>
+    <div class="space-y-3">${groupsHtmlRight}</div>
   </div>
 
-  <div class="text-[11px] text-[#38bdf8] bg-[#0d1117] p-2 rounded border border-[#30363d] flex items-center justify-between">
-    <span>💡 Type <code class="text-[#10b981] font-bold">help --extended</code> (or <code class="text-[#10b981]">help -e</code>) for git, calculator, games &amp; tools</span>
-    <span class="text-[#8b949e]">[Press Tab to auto-complete]</span>
+  <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/50 pt-2">
+    [help -e] ${isSv ? 'git, miniräknare och spel' : 'git, calculator, and games'} &nbsp; [Tab] ${isSv ? 'komplettera' : 'complete'}
   </div>
 </div>`;
 }
@@ -132,11 +129,11 @@ export function getExtendedHelpHtml(lang: LangCode): string {
     <!-- Kolumn 1: Profil, Webb, Språk, Fönster -->
     <div class="space-y-3">
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">📄 Information, Profil &amp; Studier:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">Information, Profil &amp; Studier:</div>
         <div class="space-y-0.5 text-[#8b949e]">
           <div><code class="text-[#10b981]">bio</code>, <code class="text-[#10b981]">about</code>, <code class="text-[#10b981]">tldr</code> : Biografi, personlig bakgrund &amp; översikt</div>
           <div><code class="text-[#10b981]">cv</code>, <code class="text-[#10b981]">resume</code>, <code class="text-[#10b981]">recruit</code> : Utbildning, tekniska färdigheter &amp; meriter</div>
-          <div><code class="text-[#10b981]">status</code> : Live-status för homelab, studier &amp; tillgänglighet</div>
+          <div><code class="text-[#10b981]">status</code> : Aktuell status, homelab och tillgänglighet</div>
           <div><code class="text-[#10b981]">schedule</code>, <code class="text-[#10b981]">tentor</code> : Chalmers tentaveckor &amp; träningsläger</div>
           <div><code class="text-[#10b981]">school</code>, <code class="text-[#10b981]">study</code>, <code class="text-[#10b981]">education</code> : Civilingenjör Datateknik @ Chalmers (D-24)</div>
           <div><code class="text-[#10b981]">swim</code> : Tävlingssimning för MASS &amp; Growth Objective</div>
@@ -146,9 +143,9 @@ export function getExtendedHelpHtml(lang: LangCode): string {
       </div>
 
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">🌐 Webb, Navigering &amp; Språkväxling:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">Webb, Navigering &amp; Språkväxling:</div>
         <div class="space-y-0.5 text-[#8b949e]">
-          <div><code class="text-[#10b981]">home</code>, <code class="text-[#10b981]">hem</code> : Återvänd till cockpiten / startsidan (/)</div>
+          <div><code class="text-[#10b981]">home</code>, <code class="text-[#10b981]">hem</code> : Återvänd till startsidan (/)</div>
           <div><code class="text-[#10b981]">projects</code>, <code class="text-[#10b981]">homelab</code> : Portfölj med projekt, labbar &amp; servrar</div>
           <div><code class="text-[#10b981]">thoughts</code>, <code class="text-[#10b981]">blog</code> : Tankar, guider &amp; tekniska anteckningar</div>
           <div><code class="text-[#10b981]">files</code> : Filarkiv, skript, CV &amp; dotfiles</div>
@@ -167,7 +164,7 @@ export function getExtendedHelpHtml(lang: LangCode): string {
           <div><code class="text-[#10b981]">history</code> : Visa de senaste 25 kommandona</div>
           <div><code class="text-[#10b981]">clear</code>, <code class="text-[#10b981]">cls</code> : Rensa terminalskärmen</div>
           <div><code class="text-[#10b981]">reset</code> : Återställ alla inställningar, språk (EN), historik &amp; notiser till standard</div>
-          <div><code class="text-[#10b981]">exit</code>, <code class="text-[#10b981]">close</code> : Stäng terminalfönstret (eller klicka på [✕])</div>
+          <div><code class="text-[#10b981]">exit</code>, <code class="text-[#10b981]">close</code> : Stäng terminalfönstret (eller klicka på [x])</div>
           <div><code class="text-[#10b981]">Esc</code> : Avsluta fullskärmsläge</div>
         </div>
       </div>
@@ -176,7 +173,7 @@ export function getExtendedHelpHtml(lang: LangCode): string {
     <!-- Kolumn 2: Filsystem, Verktyg, Git, Grafik -->
     <div class="space-y-3">
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">📁 Filsystem &amp; Editor:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">Filsystem &amp; Editor:</div>
         <div class="space-y-0.5 text-[#8b949e]">
           <div><code class="text-[#10b981]">ls [-la] [mapp]</code> : Lista filer, storlek och rättigheter</div>
           <div><code class="text-[#10b981]">cd &lt;katalog&gt;</code> : Navigera (<code class="text-[#e6edf3]">cd projects</code>, <code class="text-[#e6edf3]">cd ..</code>, <code class="text-[#e6edf3]">cd ~</code>)</div>
@@ -189,23 +186,22 @@ export function getExtendedHelpHtml(lang: LangCode): string {
       </div>
 
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">🧮 Miniräknare, Skript &amp; Spel:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">Miniräknare, Skript &amp; Spel:</div>
         <div class="space-y-0.5 text-[#8b949e]">
           <div><code class="text-[#10b981]">calc &lt;uttryck&gt;</code> : Matematik (stödjer <code class="text-[#e6edf3]">2^8</code>, <code class="text-[#e6edf3]">2²</code>, <code class="text-[#e6edf3]">sqrt(256)</code>, <code class="text-[#e6edf3]">sin(pi/2)</code>)</div>
           <div><code class="text-[#10b981]">guess [&lt;tal&gt;]</code> : Interaktivt gissningsspel (1-100) med poängräkning</div>
           <div><code class="text-[#10b981]">./helloworld.sh</code> : Kör det virtuella välkomstskriptet</div>
           <div><code class="text-[#10b981]">hello / hej / tjena</code> : Hälsningsfraser</div>
-          <div><code class="text-[#10b981]">msg &lt;meddelande&gt;</code> : Skicka en hälsning till Gustavs inkorg 📬 (alias: say, message)</div>
+          <div><code class="text-[#10b981]">msg &lt;meddelande&gt;</code> : Skicka en hälsning till Gustavs inkorg (alias: say, message)</div>
         </div>
       </div>
 
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">🐙 Git, Diagnostik &amp; Bakgrundseffekter:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">Git, Diagnostik &amp; Bakgrundseffekter:</div>
         <div class="space-y-0.5 text-[#8b949e]">
           <div><code class="text-[#10b981]">git [status|log|branch|diff|remote|push]</code> : Simulerad Git</div>
-          <div><code class="text-[#10b981]">fastfetch</code>, <code class="text-[#10b981]">neofetch</code> : Specar, uptime &amp; Chafa ASCII-logo</div>
-          <div><code class="text-[#10b981]">stats</code>, <code class="text-[#10b981]">btop</code> : System-, tränings- och nätverksmonitor</div>
-          <div><code class="text-[#10b981]">uptime</code>, <code class="text-[#10b981]">uname -a</code>, <code class="text-[#10b981]">hostname</code> : Driftinfo</div>
+          <div><code class="text-[#10b981]">fastfetch</code>, <code class="text-[#10b981]">neofetch</code> : Maskinvaruspecifikationer och ASCII-avatar</div>
+          <div><code class="text-[#10b981]">uptime</code>, <code class="text-[#10b981]">uname -a</code>, <code class="text-[#10b981]">hostname</code> : Host information</div>
           <div><code class="text-[#10b981]">bg &lt;stil&gt;</code> : Ändra bakgrund (standard, topo, dither, ascii, dots, pixel, shimmer, off)</div>
         </div>
       </div>
@@ -213,8 +209,8 @@ export function getExtendedHelpHtml(lang: LangCode): string {
   </div>
 
   <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/60 pt-2 flex flex-wrap items-center justify-between gap-2">
-    <span>💡 Skriv <code class="text-[#10b981]">help</code> för kompakt lista.</span>
-    <span>💡 Tryck <code class="text-[#10b981]">Tab</code> för autokomplettering av alla kommandon och filer.</span>
+    <span>Skriv <code class="text-[#10b981]">help</code> för kompakt lista.</span>
+    <span>Tryck <code class="text-[#10b981]">Tab</code> för autokomplettering av alla kommandon och filer.</span>
   </div>
 </div>`;
   }
@@ -230,7 +226,7 @@ export function getExtendedHelpHtml(lang: LangCode): string {
     <!-- Col 1: Bio, Web, Language, Window Controls -->
     <div class="space-y-3">
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">📄 Information, Bio &amp; Academics:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">Information, Bio &amp; Academics:</div>
         <div class="space-y-0.5 text-[#8b949e]">
           <div><code class="text-[#10b981]">bio</code>, <code class="text-[#10b981]">about</code>, <code class="text-[#10b981]">tldr</code> : Biography, background &amp; executive overview</div>
           <div><code class="text-[#10b981]">cv</code>, <code class="text-[#10b981]">resume</code>, <code class="text-[#10b981]">recruit</code> : Education, technical skillsets &amp; experience</div>
@@ -244,9 +240,9 @@ export function getExtendedHelpHtml(lang: LangCode): string {
       </div>
 
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">🌐 Web, Navigation &amp; Language Switcher:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">Web, Navigation &amp; Language Switcher:</div>
         <div class="space-y-0.5 text-[#8b949e]">
-          <div><code class="text-[#10b981]">home</code>, <code class="text-[#10b981]">hem</code> : Return to the cockpit / homepage (/)</div>
+          <div><code class="text-[#10b981]">home</code>, <code class="text-[#10b981]">hem</code> : Return to the homepage (/)</div>
           <div><code class="text-[#10b981]">projects</code>, <code class="text-[#10b981]">homelab</code> : Showcase of coursework, homelab &amp; code</div>
           <div><code class="text-[#10b981]">thoughts</code>, <code class="text-[#10b981]">blog</code> : Digital garden notes, guides &amp; articles</div>
           <div><code class="text-[#10b981]">files</code> : Downloadable packages, resume, dotfiles &amp; scripts</div>
@@ -265,7 +261,7 @@ export function getExtendedHelpHtml(lang: LangCode): string {
           <div><code class="text-[#10b981]">history</code> : View previous 25 executed commands</div>
           <div><code class="text-[#10b981]">clear</code>, <code class="text-[#10b981]">cls</code> : Clear terminal output window</div>
           <div><code class="text-[#10b981]">reset</code> : Restore all preferences, language (EN), history &amp; notices to defaults</div>
-          <div><code class="text-[#10b981]">exit</code>, <code class="text-[#10b981]">close</code> : Close terminal window (or click [✕])</div>
+          <div><code class="text-[#10b981]">exit</code>, <code class="text-[#10b981]">close</code> : Close terminal window (or click [x])</div>
           <div><code class="text-[#10b981]">Esc</code> : Exit fullscreen mode</div>
         </div>
       </div>
@@ -274,7 +270,7 @@ export function getExtendedHelpHtml(lang: LangCode): string {
     <!-- Col 2: Filesystem, Tools, Git, Diagnostics -->
     <div class="space-y-3">
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">📁 Filesystem &amp; Editor:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">Filesystem &amp; Editor:</div>
         <div class="space-y-0.5 text-[#8b949e]">
           <div><code class="text-[#10b981]">ls [-la] [dir]</code> : List files, file sizes and permissions</div>
           <div><code class="text-[#10b981]">cd &lt;dir&gt;</code> : Navigate directories (<code class="text-[#e6edf3]">cd projects</code>, <code class="text-[#e6edf3]">cd ..</code>, <code class="text-[#e6edf3]">cd ~</code>)</div>
@@ -287,23 +283,22 @@ export function getExtendedHelpHtml(lang: LangCode): string {
       </div>
 
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">🧮 Calculator, Scripting &amp; Minigames:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">Calculator, Scripting &amp; Minigames:</div>
         <div class="space-y-0.5 text-[#8b949e]">
           <div><code class="text-[#10b981]">calc &lt;expr&gt;</code> : Math evaluator (supports <code class="text-[#e6edf3]">2^8</code>, <code class="text-[#e6edf3]">2²</code>, <code class="text-[#e6edf3]">sqrt(256)</code>, <code class="text-[#e6edf3]">sin(pi/2)</code>)</div>
           <div><code class="text-[#10b981]">guess [&lt;num&gt;]</code> : Interactive number guessing game (1-100) with score tracking</div>
           <div><code class="text-[#10b981]">./helloworld.sh</code> : Execute the virtual shell script</div>
           <div><code class="text-[#10b981]">hello / hi / hey</code> : Friendly greetings</div>
-          <div><code class="text-[#10b981]">msg &lt;message&gt;</code> : Send a note straight to Gustav's inbox 📬 (alias: say, message)</div>
+          <div><code class="text-[#10b981]">msg &lt;message&gt;</code> : Send a note straight to Gustav's inbox (alias: say, message)</div>
         </div>
       </div>
 
       <div>
-        <div class="text-[#38bdf8] font-bold mb-1">🐙 Git, Diagnostics &amp; Ambient Visuals:</div>
+        <div class="text-[#38bdf8] font-bold mb-1">Git, Diagnostics &amp; Ambient Visuals:</div>
         <div class="space-y-0.5 text-[#8b949e]">
           <div><code class="text-[#10b981]">git [status|log|branch|diff|remote|push]</code> : Simulated Git toolkit</div>
-          <div><code class="text-[#10b981]">fastfetch</code>, <code class="text-[#10b981]">neofetch</code> : Machine specs, uptime &amp; Chafa ASCII portrait</div>
-          <div><code class="text-[#10b981]">stats</code>, <code class="text-[#10b981]">btop</code> : TUI monitor for system, training &amp; network</div>
-          <div><code class="text-[#10b981]">uptime</code>, <code class="text-[#10b981]">uname -a</code>, <code class="text-[#10b981]">hostname</code> : Telemetry &amp; host stats</div>
+          <div><code class="text-[#10b981]">fastfetch</code>, <code class="text-[#10b981]">neofetch</code> : Machine specs and ASCII avatar</div>
+          <div><code class="text-[#10b981]">uptime</code>, <code class="text-[#10b981]">uname -a</code>, <code class="text-[#10b981]">hostname</code> : Host information</div>
           <div><code class="text-[#10b981]">bg &lt;style&gt;</code> : Set background (standard, topo, dither, ascii, dots, pixel, shimmer, off)</div>
         </div>
       </div>
@@ -311,8 +306,8 @@ export function getExtendedHelpHtml(lang: LangCode): string {
   </div>
 
   <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/60 pt-2 flex flex-wrap items-center justify-between gap-2">
-    <span>💡 Type <code class="text-[#10b981]">help</code> for the compact list.</span>
-    <span>💡 Press <code class="text-[#10b981]">Tab</code> to autocomplete all commands, flags and filenames.</span>
+    <span>Type <code class="text-[#10b981]">help</code> for the compact list.</span>
+    <span>Press <code class="text-[#10b981]">Tab</code> to autocomplete all commands, flags and filenames.</span>
   </div>
 </div>`;
 }
@@ -323,17 +318,17 @@ export function getExtendedHelpHtml(lang: LangCode): string {
 export function getGreetingResponse(word: string, lang: LangCode): string {
   if (lang === 'sv') {
     const greetings = [
-      `Tjena! 👋 Välkommen till min terminal och digitala trädgård. Skriv <code class="text-[#10b981]">help</code> för att se vad du kan göra, eller <code class="text-[#38bdf8]">cat whoami.md</code> för att läsa om mig!`,
+      `Hej. Välkommen till min terminal och texter. Skriv <code class="text-[#10b981]">help</code> för att se vad du kan göra, eller <code class="text-[#38bdf8]">cat whoami.md</code> för att läsa om mig!`,
       `Hej där! Kul att du hittade hit till terminalen. Testa att köra <code class="text-[#10b981]">./helloworld.sh</code> eller öppna något i <code class="text-[#38bdf8]">nvim whoami.md</code>!`,
-      `Hallå! 🏊‍♂️ Hoppas du gillar cockpiten. Skriv <code class="text-[#10b981]">school</code> för att läsa om mina Chalmers-studier eller <code class="text-[#38bdf8]">status</code> för live-info.`
+      `Hej. Hoppas du gillar sidan. Skriv <code class="text-[#10b981]">school</code> för att läsa om mina Chalmers-studier eller <code class="text-[#38bdf8]">status</code> för live-info.`
     ];
     return `<div class="text-[#10b981] text-xs font-mono">${greetings[Math.floor(Math.random() * greetings.length)]}</div>`;
   }
 
   const greetings = [
-    `Hello! 👋 Welcome to my terminal and digital garden. Type <code class="text-[#10b981]">help</code> to explore commands, or <code class="text-[#38bdf8]">cat whoami.md</code> to learn more about me!`,
+    `Hello. Welcome to my terminal and writing archive. Type <code class="text-[#10b981]">help</code> to explore commands, or <code class="text-[#38bdf8]">cat whoami.md</code> to learn more about me!`,
     `Hey there! Great to see you in the terminal. Try running <code class="text-[#10b981]">./helloworld.sh</code> or explore files with <code class="text-[#38bdf8]">nvim whoami.md</code>!`,
-    `Hi! 🏊‍♂️ Welcome to my personal cockpit. Type <code class="text-[#10b981]">school</code> to read about Chalmers CS or <code class="text-[#38bdf8]">status</code> for live updates.`
+    `Hi. Welcome to my site. Type <code class="text-[#10b981]">school</code> to read about Chalmers CS or <code class="text-[#38bdf8]">status</code> for live updates.`
   ];
   return `<div class="text-[#10b981] text-xs font-mono">${greetings[Math.floor(Math.random() * greetings.length)]}</div>`;
 }
@@ -346,7 +341,7 @@ export function getSecretOutput(lang: LangCode): string {
     return `
 <div class="text-[#e6edf3] space-y-2 font-mono text-xs p-3 rounded bg-[#0d1117] border border-[#a78bfa]/50">
   <div class="text-[#a78bfa] font-bold flex items-center gap-2 border-b border-[#30363d] pb-1">
-    <span>🗝️</span>
+    <span></span>
     <span>TERMINAL CORE // RESTRICTED ACCESS</span>
   </div>
   <div class="space-y-1.5 text-[#8b949e]">
@@ -364,7 +359,7 @@ export function getSecretOutput(lang: LangCode): string {
   return `
 <div class="text-[#e6edf3] space-y-2 font-mono text-xs p-3 rounded bg-[#0d1117] border border-[#a78bfa]/50">
   <div class="text-[#a78bfa] font-bold flex items-center gap-2 border-b border-[#30363d] pb-1">
-    <span>🗝️</span>
+    <span></span>
     <span>TERMINAL CORE // RESTRICTED ACCESS</span>
   </div>
   <div class="space-y-1.5 text-[#8b949e]">
@@ -387,14 +382,14 @@ export function getOsOpinionOutput(lang: LangCode): string {
     return `
 <div class="text-[#e6edf3] space-y-2 font-mono text-xs p-3 rounded bg-[#0d1117] border border-[#a78bfa]/50">
   <div class="text-[#a78bfa] font-bold flex items-center gap-2 border-b border-[#30363d] pb-1">
-    <span>🐧</span>
+    <span></span>
     <span>LINUX vs WINDOWS // ÄRLIG ÅSIKT</span>
   </div>
   <div class="space-y-1.5 text-[#8b949e]">
     <p>Linux är <span class="text-[#10b981] font-bold">friheten</span> att förstå exakt vad din dator gör. Inget telemetri-nonsens, inga uppdateringar som startar om mitt i ett prov.</p>
     <p>Windows är som att hyra en lägenhet där hyresvärden <span class="text-[#f85149]">byter lås varannan vecka</span>, installerar nya gardiner du inte bad om, och ibland bara... startar om allt medan du sover.</p>
     <p>Men — ärligt? Ibland vid 3 på natten när <span class="text-[#f59e0b]">nvidia-drivrutinerna vägrar</span> samarbeta, PulseAudio bestämmer sig för att byta till hörlurarna i ett annat rum, och WiFi-kortet kräver en kernel-patch kompilerad under fullmåne... då undrar man ibland.</p>
-    <p class="text-[#10b981] font-bold">Men sedan startar man om i 0.8 sekunder utan att bli tillfrågad om Outlook, OneDrive, Copilot och Edge. Och då vet man att det var värt det. 🐧</p>
+    <p class="text-[#10b981] font-bold">Men sedan startar man om i 0.8 sekunder utan att bli tillfrågad om Outlook, OneDrive, Copilot och Edge. Och då vet man att det var värt det. </p>
   </div>
   <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/40 pt-1">
     <span class="text-[#38bdf8]">BTW, I use</span> <span class="text-[#10b981] font-bold">Omarchy (Arch Linux + Hyprland).</span>
@@ -405,14 +400,14 @@ export function getOsOpinionOutput(lang: LangCode): string {
   return `
 <div class="text-[#e6edf3] space-y-2 font-mono text-xs p-3 rounded bg-[#0d1117] border border-[#a78bfa]/50">
   <div class="text-[#a78bfa] font-bold flex items-center gap-2 border-b border-[#30363d] pb-1">
-    <span>🐧</span>
+    <span></span>
     <span>LINUX vs WINDOWS // HONEST TAKE</span>
   </div>
   <div class="space-y-1.5 text-[#8b949e]">
     <p>Linux is the <span class="text-[#10b981] font-bold">freedom</span> to understand exactly what your machine is doing. No telemetry nonsense, no updates that reboot mid-exam.</p>
     <p>Windows is like renting an apartment where the landlord <span class="text-[#f85149]">changes the locks every other week</span>, installs curtains you didn't ask for, and occasionally just... reboots everything while you sleep.</p>
     <p>But — honestly? Sometimes at 3 AM when <span class="text-[#f59e0b]">nvidia drivers refuse</span> to cooperate, PulseAudio decides to route sound to headphones in another room, and the WiFi card requires a kernel patch compiled under a full moon... you wonder.</p>
-    <p class="text-[#10b981] font-bold">But then you reboot in 0.8 seconds without being asked about Outlook, OneDrive, Copilot and Edge. And you know it was worth it. 🐧</p>
+    <p class="text-[#10b981] font-bold">But then you reboot in 0.8 seconds without being asked about Outlook, OneDrive, Copilot and Edge. And you know it was worth it. </p>
   </div>
   <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/40 pt-1">
     <span class="text-[#38bdf8]">BTW, I use</span> <span class="text-[#10b981] font-bold">Omarchy (Arch Linux + Hyprland).</span>
@@ -426,76 +421,38 @@ export function getOsOpinionOutput(lang: LangCode): string {
 export function getStatusOutput(lang: LangCode): string {
   const isSv = lang === 'sv';
   const status = getActiveStatus();
-  const uptime = calculateUptime();
-  const isOnline = isSiteOnline();
   const eventBanner = status.activeEvent ? `
     <div class="p-2 rounded bg-[#f59e0b]/10 border border-[#f59e0b]/40 text-[#f59e0b] flex items-center justify-between text-[11px]">
-      <span class="font-bold flex items-center gap-1.5">
-        <span>⚠</span>
-        <span>${isSv ? 'SCHEMALAGT EVENT AKTIVT:' : 'SCHEDULED EVENT ACTIVE:'} ${status.activeEvent.name[lang]}</span>
-      </span>
-      <span class="text-[#8b949e]">${status.activeEvent.startDate} → ${status.activeEvent.endDate}</span>
+      <span class="font-bold">${isSv ? 'Schemalagt event:' : 'Scheduled event:'} ${status.activeEvent.name[lang]}</span>
+      <span class="text-[#8b949e]">${status.activeEvent.startDate} – ${status.activeEvent.endDate}</span>
     </div>
   ` : '';
 
-  const statusBadge = !isOnline
-    ? `<span class="text-[10px] px-1.5 py-0.2 rounded border border-[#f85149] text-[#f85149]" style="color: #f85149 !important; border-color: #f85149 !important;">[OFFLINE]</span>`
-    : `<span class="text-[10px] px-1.5 py-0.2 rounded border ${status.activeEvent ? 'border-[#f59e0b] text-[#f59e0b]' : 'border-[#10b981] text-[#10b981]'}">${status.badge[lang].replace(/\[●\s*/g, '[')}</span>`;
+  const row = (label: string, value: string, cls = 'text-[#e6edf3]') => `
+    <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-x-2">
+      <span class="text-[#8b949e]">${label}</span>
+      <span class="${cls}">${value}</span>
+    </div>`;
 
   return `
-<div class="p-3.5 rounded bg-[#0d1117] border border-[#38bdf8]/50 text-xs font-mono space-y-2.5 max-w-2xl">
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-[#30363d] pb-2 gap-1.5">
-    <div class="flex items-center gap-2">
-      <span class="w-2 h-2 rounded-full ${!isOnline ? 'bg-[#f85149]' : (status.activeEvent ? 'bg-[#f59e0b] animate-pulse' : 'bg-[#10b981] animate-pulse')}" style="${!isOnline ? 'background-color: #f85149 !important;' : ''}"></span>
-      <span class="text-[#38bdf8] font-bold">STATUS // ${status.user}@${status.host}</span>
-      ${statusBadge}
-    </div>
-    <span class="text-[10px] text-[#8b949e]">${isSv ? 'Senast uppdaterad:' : 'Last updated:'} ${status.lastUpdated}</span>
+<div class="p-3.5 rounded bg-[#0d1117] border border-[#30363d] text-xs font-mono space-y-2.5 max-w-2xl">
+  <div class="flex items-center justify-between border-b border-[#30363d] pb-2 gap-1.5">
+    <span class="text-[#10b981] font-bold">#</span> <span class="text-[#e6edf3] font-bold">${status.user}@${status.host}</span>
+    <span class="text-[10px] text-[#8b949e]">${status.lastUpdated}</span>
   </div>
 
   ${eventBanner}
 
-  <div class="space-y-1.5 pt-0.5 text-[#e6edf3]">
-    <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-x-2">
-      <span class="text-[#8b949e]">${isSv ? 'Drifttid:' : 'Host Uptime:'}</span>
-      <span class="${isOnline ? 'text-[#10b981]' : 'text-[#f85149]'} font-semibold" style="${!isOnline ? 'color: #f85149 !important;' : ''}">${isSv ? uptime.formattedSv : uptime.formattedEn}${!isOnline ? ` <span class="text-[#8b949e] text-[10px]">(${isSv ? 'fryst under offline' : 'frozen while offline'})</span>` : ''}</span>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-x-2">
-      <span class="text-[#8b949e]">${isSv ? 'Nätverk:' : 'Network:'}</span>
-      <span class="${isOnline ? 'text-[#38bdf8]' : 'text-[#f85149] font-bold'}" style="${!isOnline ? 'color: #f85149 !important;' : ''}">${isOnline ? (isSv ? 'Ansluten // Aktiv telemetri' : 'Connected // Live telemetry') : (isSv ? '[OFFLINE] Ej ansluten till nätverk' : '[OFFLINE] Disconnected from network')}</span>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-x-2">
-      <span class="text-[#8b949e]">${isSv ? 'Plats:' : 'Location:'}</span>
-      <span class="text-[#38bdf8]">${status.location[lang]}</span>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-x-2">
-      <span class="text-[#8b949e]">${isSv ? 'Aktivitet:' : 'Activity:'}</span>
-      <span>${status.activity[lang]}</span>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-x-2">
-      <span class="text-[#8b949e]">${isSv ? 'Fokus:' : 'Focus:'}</span>
-      <span class="text-[#10b981] font-medium">${status.focus[lang]}</span>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-x-2">
-      <span class="text-[#8b949e]">${isSv ? 'Stämning:' : 'Mood:'}</span>
-      <span>${status.mood[lang]}</span>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-x-2">
-      <span class="text-[#8b949e]">${isSv ? 'Homelab:' : 'Homelab:'}</span>
-      <span class="text-[#f59e0b]">${status.homelab[lang]}</span>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-x-2">
-      <span class="text-[#8b949e]">${isSv ? 'Tillgänglig:' : 'Available:'}</span>
-      <span class="text-[#a78bfa]">${status.availability[lang]}</span>
-    </div>
+  <div class="space-y-1.5 pt-0.5">
+    ${row(isSv ? 'Plats' : 'Location', status.location[lang])}
+    ${row(isSv ? 'Aktivitet' : 'Activity', status.activity[lang])}
+    ${row(isSv ? 'Fokus' : 'Focus', status.focus[lang])}
+    ${row(isSv ? 'Homelab' : 'Homelab', status.homelab[lang])}
+    ${row(isSv ? 'Tillgänglig' : 'Available', status.availability[lang])}
   </div>
 
-  <div class="text-[10px] text-[#8b949e] border-t border-[#30363d]/40 pt-1.5 flex flex-wrap items-center justify-between gap-2">
-    <span class="flex items-center gap-1.5">
-      <span class="w-1.5 h-1.5 rounded-full ${!isOnline ? 'bg-[#f85149]' : status.activeEvent ? 'bg-[#f59e0b]' : 'bg-[#10b981]'}"></span>
-      <span>${isSv ? `Läge: ${status.isAutoScheduled ? 'Auto-kalender aktiv' : 'Manuell profil'}` : `Mode: ${status.isAutoScheduled ? 'Auto-schedule active' : 'Manual profile'}`} (${status.mode})</span>
-    </span>
-    <span class="text-[#38bdf8]">${isSv ? "Kör 'schedule' för tentaveckor" : "Type 'schedule' for finals calendar"}</span>
+  <div class="text-[10px] text-[#8b949e] border-t border-[#30363d]/40 pt-1.5">
+    ${isSv ? "Skriv 'schedule' för kommande tentor och läger." : "Type 'schedule' for upcoming exams and camps."}
   </div>
 </div>`;
 }
@@ -510,40 +467,42 @@ export function getScheduleOutput(lang: LangCode): string {
 
   const eventsHtml = upcoming.map((ev) => {
     const isOngoing = current?.id === ev.id;
-    const border = isOngoing ? 'border-[#f59e0b] bg-[#f59e0b]/5' : 'border-[#30363d] bg-[#0d1117]';
-    const tagColor = ev.statusPreset === 'exam' ? 'text-[#f59e0b]' : ev.statusPreset === 'camp' ? 'text-[#38bdf8]' : 'text-[#10b981]';
+    const color = ev.statusPreset === 'exam'
+      ? '#e0a43a'
+      : ev.statusPreset === 'swim'
+        ? '#56b6e8'
+        : ev.statusPreset === 'camp'
+          ? '#4fbf8b'
+          : ev.statusPreset === 'vacation'
+            ? '#b39ae8'
+            : '#484f58';
 
     return `
-      <div class="p-2.5 rounded border ${border} space-y-1 font-mono text-xs">
-        <div class="flex flex-wrap items-center justify-between gap-1">
-          <div class="flex items-center gap-2">
-            <span class="${tagColor} font-bold">[${ev.badge[lang]}]</span>
-            <span class="text-[#e6edf3] font-semibold">${ev.name[lang]}</span>
-          </div>
-          <span class="text-[11px] text-[#8b949e]">${ev.startDate} → ${ev.endDate}${isOngoing ? ` <span class="text-[#f59e0b] font-bold">(${isSv ? 'PÅGÅR NU' : 'NOW ACTIVE'})</span>` : ''}</span>
+      <div class="border-l-2 pl-3 py-1.5" style="border-color:${color}">
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <span class="text-[#e6edf3] font-semibold">
+            ${ev.name[lang]}
+            <span class="text-[10px] font-normal" style="color:${color}">[${ev.badge[lang]}]</span>
+          </span>
+          <span class="text-[10px] text-[#8b949e]">${ev.startDate} – ${ev.endDate}${isOngoing ? ` · ${isSv ? 'pågår' : 'now'}` : ''}</span>
         </div>
-        <p class="text-[11px] text-[#8b949e]">${ev.description[lang]}</p>
-      </div>
-    `;
+        <p class="text-[11px] text-[#a8b1bb] mt-0.5 leading-relaxed">${ev.description[lang]}</p>
+      </div>`;
   }).join('');
 
   return `
-<div class="p-3.5 rounded bg-[#0d1117] border border-[#a78bfa]/50 text-xs font-mono space-y-3 max-w-2xl">
-  <div class="flex items-center justify-between border-b border-[#30363d] pb-2">
-    <div class="flex items-center gap-2">
-      <span class="text-sm">📅</span>
-      <span class="text-[#a78bfa] font-bold">${isSv ? 'CHALMERS & AKTIVITETSSCHEMA // TENTAVECKOR & LÄGER' : 'CHALMERS & ACTIVITY SCHEDULE // EXAMS & CAMPS'}</span>
-    </div>
-    <span class="text-[10px] text-[#8b949e]">${isSv ? 'Källa: src/data/schedule.ts' : 'Source: src/data/schedule.ts'}</span>
+<div class="p-3 rounded bg-[#0d1117] border border-[#30363d] text-xs font-mono space-y-2.5 max-w-2xl">
+  <div class="flex flex-wrap items-baseline justify-between gap-2 border-b border-[#30363d] pb-1">
+    <span class="text-[#10b981] font-bold text-sm"># ${isSv ? 'Schema' : 'Schedule'}</span>
+    <span class="text-[10px] text-[#8b949e]">${isSv ? 'Datum som påverkar tillgängligheten' : 'Dates that affect availability'}</span>
   </div>
 
   <div class="space-y-2">
     ${eventsHtml}
   </div>
 
-  <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/40 pt-2 flex items-center justify-between">
-    <span>💡 ${isSv ? 'Kommandot \'status\' slår om automatiskt under dessa datum.' : '\'status\' automatically reflects these dates.'}</span>
-    <span class="text-[#10b981] font-bold">[AUTO-SYNC]</span>
+  <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/50 pt-2">
+    <span class="text-[#10b981]">[status]</span> ${isSv ? 'speglar aktuellt datum' : 'reflects the current date'}
   </div>
 </div>`;
 }
@@ -553,76 +512,25 @@ export function getScheduleOutput(lang: LangCode): string {
  */
 export function getFastfetchOutput(lang: LangCode): string {
   const data = lang === 'sv' ? fastfetchSv : fastfetchEn;
-  const uptime = calculateUptime();
-  const status = getActiveStatus();
-  const isOnline = isSiteOnline();
 
   const specsRows = data.specs.map((item: any) => {
-    let key = item.key;
-    let val = item.value;
-    let color = item.color;
-    let isOnlineItem = item.online;
-
-    if (key === 'Uptime' || key === 'Drifttid') {
-      val = lang === 'sv' ? uptime.formattedSv : uptime.formattedEn;
-    }
-    const isStatusRow = (key || '').toLowerCase() === 'status';
-
-    if (isStatusRow) {
-      if (!isOnline) {
-        val = lang === 'sv' ? '[OFFLINE] Ej ansluten till nätverk' : '[OFFLINE] Disconnected from network';
-        isOnlineItem = false;
-      } else {
-        val = (status.badge[lang] || val).replace(/\[●\s*/g, '[');
-        color = status.activeEvent ? 'amber' : 'emerald';
-        isOnlineItem = true;
-      }
-    }
-
-    let keyStyle = '';
-    let valStyle = '';
-
-    if (isStatusRow && !isOnline) {
-      keyStyle = 'color: #f85149 !important;';
-      valStyle = 'color: #f85149 !important;';
-    } else if (color === 'emerald') {
-      keyStyle = 'color: #10b981;';
-    } else if (color === 'amber') {
-      keyStyle = 'color: #f59e0b;';
-    } else {
-      keyStyle = 'color: #38bdf8;';
-    }
-
-    const valHtml = isOnlineItem
-      ? `<span class="text-[#10b981] font-medium flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-ping"></span>${val}</span>`
-      : (isStatusRow
-        ? `<span class="font-medium flex items-center gap-1.5" style="${valStyle}"><span class="w-1.5 h-1.5 rounded-full bg-[#f85149]" style="background-color: #f85149 !important;"></span>${val}</span>`
-        : `<span class="text-[#e6edf3]">${val}</span>`);
+    const color = item.color === 'emerald' ? '#10b981' : item.color === 'amber' ? '#f59e0b' : '#38bdf8';
     return `
-      <div class="grid grid-cols-[100px_1fr] sm:grid-cols-[110px_1fr] gap-x-2">
-        <span class="font-semibold" style="${keyStyle}">${key}:</span>
-        ${valHtml}
+      <div class="grid grid-cols-[104px_1fr] gap-x-2">
+        <span class="font-semibold" style="color:${color}">${item.key}</span>
+        <span class="text-[#e6edf3]">${item.value}</span>
       </div>`;
   }).join('');
 
   return `
 <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 p-3 rounded bg-[#161b22] border border-[#30363d]/80 text-xs font-mono">
-  <!-- Fastfetch ASCII Emblem -->
   <div class="shrink-0 select-none text-[11px] sm:text-xs leading-[1.2] p-2.5 rounded bg-[#161b22] border border-[#30363d]/80 flex flex-col justify-center items-center text-center">
-    <pre class="leading-tight text-center font-mono">
-<span class="text-[#38bdf8]">     /\\_____/\\     </span>
-<span class="text-[#38bdf8]">    /</span>  <span class="text-[#e6edf3] font-bold">o</span>   <span class="text-[#e6edf3] font-bold">o</span>  <span class="text-[#38bdf8]">\\    </span>
-<span class="text-[#10b981]">   (</span> <span class="text-[#38bdf8]">==</span>  <span class="text-[#10b981] font-bold">^</span>  <span class="text-[#38bdf8]">==</span> <span class="text-[#10b981]">)   </span>
-<span class="text-[#10b981]">    )</span>   <span class="text-[#e6edf3] font-bold">GULO</span>  <span class="text-[#10b981]">)    </span>
-<span class="text-[#10b981]">   (</span>  <span class="text-[#38bdf8]">[D-24]</span>   <span class="text-[#10b981]">)   </span>
-<span class="text-[#10b981]">  (</span> <span class="text-[#38bdf8]">(  )</span>   <span class="text-[#38bdf8]">(  )</span> <span class="text-[#10b981]">)  </span>
-<span class="text-[#38bdf8]"> (__(__)___(__)__) </span>
-    </pre>
-    <div class="mt-1.5 text-[10px] font-bold text-[#10b981] tracking-wider uppercase">${data.badge}</div>
+        <img src="/images/logosmall.svg" alt="GULO" class="w-20 h-20 sm:w-24 sm:h-24 object-contain opacity-90" style="filter: invert(1);" />
+
+    <div class="mt-1.5 text-[10px] font-semibold text-[#10b981]">${data.badge}</div>
     <div class="text-[9px] text-[#8b949e]">${data.tagline}</div>
   </div>
 
-  <!-- Specs -->
   <div class="flex-1 min-w-0 space-y-1">
     <div>
       <span class="text-[#10b981] font-bold">${data.user}</span><span class="text-[#8b949e]">@</span><span class="text-[#38bdf8] font-bold">${data.host}</span>
@@ -633,16 +541,6 @@ export function getFastfetchOutput(lang: LangCode): string {
     <div class="space-y-0.5 pt-0.5 text-xs">
       ${specsRows}
     </div>
-    <div class="pt-2 flex items-center gap-1.5">
-      <span class="w-3.5 h-2 rounded-xs bg-[#0d1117] border border-[#30363d]"></span>
-      <span class="w-3.5 h-2 rounded-xs bg-[#f85149]"></span>
-      <span class="w-3.5 h-2 rounded-xs bg-[#10b981]"></span>
-      <span class="w-3.5 h-2 rounded-xs bg-[#f59e0b]"></span>
-      <span class="w-3.5 h-2 rounded-xs bg-[#38bdf8]"></span>
-      <span class="w-3.5 h-2 rounded-xs bg-[#a78bfa]"></span>
-      <span class="w-3.5 h-2 rounded-xs bg-[#56d364]"></span>
-      <span class="w-3.5 h-2 rounded-xs bg-[#e6edf3]"></span>
-    </div>
   </div>
 </div>`;
 }
@@ -652,91 +550,46 @@ export function getFastfetchOutput(lang: LangCode): string {
  */
 export function getBioOutput(lang: LangCode): string {
   const isSv = lang === 'sv';
-  return isSv
-    ? `
-<div class="p-3.5 rounded bg-[#0d1117] border border-[#10b981]/50 text-xs font-mono space-y-2.5 max-w-2xl">
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-[#30363d] pb-2 gap-1.5">
-    <div class="flex items-center gap-2">
-      <span class="w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
-      <span class="text-[#10b981] font-bold text-sm">GULO // BIOGRAFI &amp; ÖVERSIKT</span>
-    </div>
-    <span class="text-[10px] text-[#38bdf8] bg-[#161b22] px-2 py-0.5 rounded border border-[#30363d]">Chalmers Datateknik D-24</span>
+
+  const rows = isSv
+    ? [
+        ['Studier', '#56b6e8', 'Civilingenjör Datateknik på Chalmers, årskurs två, EDIT-huset, RIU-student.'],
+        ['Simning', '#4fbf8b', 'Sprint frisim och fjäril för MASS och Growth Objective, på Åbybadet och GoCo.'],
+        ['Linux', '#38bdf8', 'Arch med Hyprland, Neovim och Alacritty på mina egna maskiner.'],
+        ['Homelab', '#e0a43a', 'Proxmox-server och ett Raspberry Pi-kluster med webbplatser, spelservrar och interna verktyg.'],
+        ['Utanför', '#b39ae8', 'Vandring, klättring, cykling, discgolf, golf och foto/video med en Sony ZV-E10.'],
+      ]
+    : [
+        ['Studies', '#56b6e8', 'Computer Science and Engineering at Chalmers, year two, EDIT building, RIU student.'],
+        ['Swimming', '#4fbf8b', 'Sprint freestyle and butterfly for MASS and Growth Objective, at Åbybadet and GoCo.'],
+        ['Linux', '#38bdf8', 'Arch with Hyprland, Neovim, and Alacritty on my own machines.'],
+        ['Homelab', '#e0a43a', 'A Proxmox server and a Raspberry Pi cluster running websites, game servers, and internal tools.'],
+        ['Outside', '#b39ae8', 'Hiking, climbing, cycling, discgolf, golf, and photo/video on a Sony ZV-E10.'],
+      ];
+
+  const rowsHtml = rows.map(([label, color, value]) => `
+    <span class="font-semibold" style="color:${color}">${label}</span><span class="text-[#c9d1d9]">${value}</span>`).join('');
+
+  return `
+<div class="p-3 rounded bg-[#0d1117] border border-[#30363d] text-xs font-mono space-y-2.5 max-w-2xl">
+  <div class="flex flex-wrap items-baseline justify-between gap-2 border-b border-[#30363d] pb-1">
+    <span class="text-[#10b981] font-bold text-sm"># Gustav Löfqvist</span>
+    <span class="text-[10px] text-[#8b949e]">${isSv ? 'Chalmers D-24' : 'Chalmers D-24'}</span>
   </div>
 
-  <div class="space-y-2 text-[#e6edf3] leading-relaxed">
-    <p>
-      Hej! Jag är <span class="text-[#10b981] font-semibold">Gulo</span> — civilingenjörsstudent i Datateknik på Chalmers, tävlingssimmare och entusiast inom operativsystem, systemprogrammering och homelab-arkitektur.
-    </p>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-1 text-[#8b949e]">
-      <div class="p-2 rounded bg-[#161b22] border border-[#30363d]">
-        <div class="text-[#38bdf8] font-bold mb-0.5">🎓 Chalmers Studier</div>
-        <div>Civilingenjör Datateknik (åk 2, EDIT-huset, RIU-elitidrottare). Fokus på systemarkitektur, algoritmer och programutveckling.</div>
-      </div>
-      <div class="p-2 rounded bg-[#161b22] border border-[#30363d]">
-        <div class="text-[#38bdf8] font-bold mb-0.5">🏊‍♂️ Simning &amp; Disciplin</div>
-        <div>Elitsprintsimmare för MASS &amp; Growth Objective (Åbybadet &amp; GoCo, 5+ simpass, 3 gympass/v). SM-medaljör.</div>
-      </div>
-      <div class="p-2 rounded bg-[#161b22] border border-[#30363d]">
-        <div class="text-[#38bdf8] font-bold mb-0.5">🖥️ Homelab &amp; Driftsättning</div>
-        <div>Server-PC med Proxmox VE, Raspberry Pi-kluster. Driftsätter webbplatser, Minecraft-kluster och interna tjänster.</div>
-      </div>
-      <div class="p-2 rounded bg-[#161b22] border border-[#30363d]">
-        <div class="text-[#38bdf8] font-bold mb-0.5">🌲 Friluftsliv &amp; Media</div>
-        <div>Vandring, klättring, discgolf, foto &amp; video med Sony ZV-E10, samt Omarchy (Arch + Hyprland).</div>
-      </div>
-    </div>
+  <p class="text-[#c9d1d9] leading-relaxed">
+    ${isSv ? 'Jag läser datateknik på Chalmers, simmar sprint frisim och driver ett homelab i Göteborg.' : 'I study computer science at Chalmers, swim sprint freestyle, and run a homelab in Gothenburg.'}
+  </p>
+
+  <div class="grid grid-cols-[84px_1fr] sm:grid-cols-[96px_1fr] gap-x-3 gap-y-1 text-[11px]">
+    ${rowsHtml}
   </div>
 
-  <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/60 pt-2 flex flex-wrap gap-x-3 gap-y-1">
-    <span>💡 Relaterat:</span>
-    <span class="text-[#10b981] font-semibold">cv / resume</span>
-    <span class="text-[#38bdf8] font-semibold">stats / btop</span>
-    <span class="text-[#e6edf3]">school</span>
-    <span class="text-[#e6edf3]">swim</span>
-    <span class="text-[#e6edf3]">contact</span>
-  </div>
-</div>`
-    : `
-<div class="p-3.5 rounded bg-[#0d1117] border border-[#10b981]/50 text-xs font-mono space-y-2.5 max-w-2xl">
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-[#30363d] pb-2 gap-1.5">
-    <div class="flex items-center gap-2">
-      <span class="w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
-      <span class="text-[#10b981] font-bold text-sm">GULO // BIOGRAPHY &amp; PROFILE</span>
-    </div>
-    <span class="text-[10px] text-[#38bdf8] bg-[#161b22] px-2 py-0.5 rounded border border-[#30363d]">Chalmers CS D-24</span>
-  </div>
-
-  <div class="space-y-2 text-[#e6edf3] leading-relaxed">
-    <p>
-      Hi! I'm <span class="text-[#10b981] font-semibold">Gulo</span> — a Computer Science &amp; Engineering student at Chalmers University of Technology, competitive swimmer, and low-level systems &amp; homelab builder.
-    </p>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-1 text-[#8b949e]">
-      <div class="p-2 rounded bg-[#161b22] border border-[#30363d]">
-        <div class="text-[#38bdf8] font-bold mb-0.5">🎓 Chalmers Academics</div>
-        <div>M.Sc. Computer Science (Year 2, EDIT building, RIU elite athlete). Focus on systems architecture, algorithms, and development.</div>
-      </div>
-      <div class="p-2 rounded bg-[#161b22] border border-[#30363d]">
-        <div class="text-[#38bdf8] font-bold mb-0.5">🏊‍♂️ Sprint Swimming</div>
-        <div>Elite sprint swimmer for MASS &amp; Growth Objective (Åbybadet &amp; GoCo, 5+ swim &amp; 3 gym sessions/wk). SM medalist.</div>
-      </div>
-      <div class="p-2 rounded bg-[#161b22] border border-[#30363d]">
-        <div class="text-[#38bdf8] font-bold mb-0.5">🖥️ Homelab &amp; Deployment</div>
-        <div>Proxmox VE server, Raspberry Pi cluster. Deploying websites, Minecraft clusters, and internal services.</div>
-      </div>
-      <div class="p-2 rounded bg-[#161b22] border border-[#30363d]">
-        <div class="text-[#38bdf8] font-bold mb-0.5">🌲 Outdoors &amp; Media</div>
-        <div>Hiking, climbing, cycling, discgolf, Sony ZV-E10 photo/video, and Omarchy (Arch + Hyprland).</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/60 pt-2 flex flex-wrap gap-x-3 gap-y-1">
-    <span>💡 Related:</span>
-    <span class="text-[#10b981] font-semibold">cv / resume</span>
-    <span class="text-[#38bdf8] font-semibold">stats / btop</span>
-    <span class="text-[#e6edf3]">school</span>
-    <span class="text-[#e6edf3]">swim</span>
-    <span class="text-[#e6edf3]">contact</span>
+  <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/50 pt-2">
+    <span class="text-[#10b981]">[cv]</span> ${isSv ? 'hela tidslinjen' : 'full timeline'}
+    &nbsp; <span class="text-[#10b981]">[school]</span> ${isSv ? 'Chalmers' : 'Chalmers'}
+    &nbsp; <span class="text-[#10b981]">[swim]</span> ${isSv ? 'träning' : 'training'}
+    &nbsp; <span class="text-[#10b981]">[contact]</span> ${isSv ? 'e-post' : 'email'}
   </div>
 </div>`;
 }
@@ -746,208 +599,57 @@ export function getBioOutput(lang: LangCode): string {
  */
 export function getCvOutput(lang: LangCode): string {
   const isSv = lang === 'sv';
-  return isSv
-    ? `
-<div class="p-3.5 rounded bg-[#0d1117] border border-[#38bdf8]/50 text-xs font-mono space-y-3 max-w-2xl">
-  <div class="flex items-center justify-between border-b border-[#30363d] pb-2">
+
+  const section = (title: string, body: string) => `
     <div>
-      <span class="text-[#38bdf8] font-bold text-sm">MERITFÖRTECKNING // CV &amp; KOMPETENSER</span>
-      <div class="text-[#8b949e] text-[10px]">Chalmers Datateknik • Civilingenjör</div>
-    </div>
-    <span class="text-[#10b981] font-bold text-xs">[AKTIV SÖKANDE // RECRUIT]</span>
-  </div>
+      <div class="text-[#e6edf3] font-semibold mb-1">${title}</div>
+      <div class="space-y-1 text-[11px] text-[#a8b1bb] leading-relaxed">${body}</div>
+    </div>`;
 
-  <div class="space-y-2.5 text-[#e6edf3]">
-    <div>
-      <div class="text-[#10b981] font-bold text-xs">🎓 Utbildning &amp; Bakgrund</div>
-      <div class="pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] space-y-1 mt-0.5">
-        <div><span class="text-[#e6edf3] font-semibold">Chalmers tekniska högskola (2024 – 2029)</span>: Civilingenjör i Datateknik (300 HP), åk 2. Antagen RIU-elitidrottare.</div>
-        <div><span class="text-[#e6edf3] font-semibold">Wheeling University, USA (2023 – 2024)</span>: Business Management &amp; NCAA D2-simning på fullt stipendium. Dean's List, Conference Champion &amp; Freshman of the Year.</div>
-        <div><span class="text-[#e6edf3] font-semibold">Mälardalens universitet, Västerås (Okt 2022 – Dec 2023)</span>: Datavetenskapliga kurser i Python, Linux &amp; Nätverkssäkerhet.</div>
-        <div><span class="text-[#e6edf3] font-semibold">Hitachigymnasiet (2020 – 2023)</span>: Spetsteknik Smarta system &amp; AI.</div>
-      </div>
-    </div>
+  const item = (title: string, detail: string) =>
+    `<div><span class="text-[#e6edf3]">${title}</span> ${detail}</div>`;
 
-    <div>
-      <div class="text-[#10b981] font-bold text-xs">🛠️ Tekniska Kärnkompetenser</div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] mt-0.5">
-        <div><span class="text-[#38bdf8]">Programmering:</span> Python, C, Java, JavaScript m.fl.</div>
-        <div><span class="text-[#38bdf8]">Infrastruktur:</span> Proxmox VE, Linux (Arch, Debian), Docker, WireGuard</div>
-        <div><span class="text-[#38bdf8]">Verktyg:</span> Git, Neovim, Alacritty, REST APIs, CI/CD</div>
-        <div><span class="text-[#38bdf8]">System:</span> Omarchy (Arch + Hyprland), macOS, Windows</div>
-      </div>
-    </div>
+  const education = isSv
+    ? item('Chalmers tekniska högskola, 2024–2029', 'Civilingenjör Datateknik, årskurs två. RIU-elitidrottare.') +
+      item('Wheeling University, 2023–2024', 'Business Management och NCAA D2-simning. Dean\'s List, Conference Champion och Freshman of the Year.') +
+      item('Mälardalens universitet, 2022–2023', 'Datavetenskap: Python, Linux och nätverkssäkerhet.') +
+      item('Hitachigymnasiet, 2020–2023', 'Smarta system och AI.')
+    : item('Chalmers University of Technology, 2024–2029', 'M.Sc. Computer Science and Engineering, year two. RIU elite athlete.') +
+      item('Wheeling University, 2023–2024', 'Business Management and NCAA D2 swimming. Dean\'s List, Conference Champion, Freshman of the Year.') +
+      item('Mälardalen University, 2022–2023', 'Computer science: Python, Linux, and network security.') +
+      item('Hitachigymnasiet, 2020–2023', 'Smart systems and AI.');
 
-    <div>
-      <div class="text-[#10b981] font-bold text-xs">🚀 Driftsättning &amp; Homelab</div>
-      <div class="pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] space-y-1 mt-0.5">
-        <div><span class="text-[#e6edf3] font-semibold">Självhostad infrastruktur:</span> Dedikerad serverdator med Proxmox VE samt Raspberry Pi-kluster. Driftsätter, underhåller och hanterar kontinuerligt ett brett utbud av tjänster – däribland webbplatser, Minecraft-kluster (Velocity &amp; PaperMC), interna verktyg och automatiserade schemalagda backuper.</div>
-      </div>
-    </div>
+  const technical = isSv
+    ? item('Programmering:', 'Python, C, Java, JavaScript.') +
+      item('Infrastruktur:', 'Proxmox VE, Linux (Arch, Debian), Docker, WireGuard.') +
+      item('Verktyg:', 'Git, Neovim, REST APIs, CI/CD.')
+    : item('Languages:', 'Python, C, Java, JavaScript.') +
+      item('Infrastructure:', 'Proxmox VE, Linux (Arch, Debian), Docker, WireGuard.') +
+      item('Tooling:', 'Git, Neovim, REST APIs, CI/CD.');
 
-    <div>
-      <div class="text-[#10b981] font-bold text-xs">💡 Personliga Styrkor &amp; Lärande</div>
-      <div class="pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] mt-0.5">
-        Drivs av ständig utveckling, nyfikenhet och problemlösning. Har en stor passion för att lära mig nya saker och är mycket snabb och skicklig på att ta till mig ny information och behärska ny teknik.
-      </div>
-    </div>
+  const homelab = isSv
+    ? 'Proxmox-server och Raspberry Pi-kluster. Där kör webbplatser, Minecraft (Velocity och PaperMC), interna verktyg och schemalagda backuper.'
+    : 'A Proxmox server and Raspberry Pi cluster running websites, Minecraft (Velocity and PaperMC), internal tools, and scheduled backups.';
 
-    <div>
-      <div class="text-[#10b981] font-bold text-xs">🏊 Idrottsmeriter &amp; Ledarskap</div>
-      <div class="pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] mt-0.5">
-        Elitsprintsimmare för MASS &amp; Growth Objective (Åbybadet/GoCo). SM-silver 4x50m frisim 2025, Student-SM guld 50m frisim 2026. 5+ simpass och 3 gympass per vecka.
-      </div>
-    </div>
-  </div>
+  const athletics = isSv
+    ? 'Sprintsimmare för MASS och Growth Objective. SM-silver 4x50 m frisim 2025 och Student-SM-guld 50 m frisim 2026. Fem simpass och tre gympass i veckan.'
+    : 'Sprint swimmer for MASS and Growth Objective. SM silver in the 4x50 m freestyle (2025) and Student-SM gold in the 50 m freestyle (2026). Five swim and three gym sessions each week.';
 
-  <div class="text-[10px] text-[#8b949e] border-t border-[#30363d]/40 pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
-    <div>📄 <span class="text-[#e6edf3]">Komplett formellt CV fås via mejl:</span> <a href="mailto:gurra@gulo.se" class="text-[#38bdf8] underline hover:text-[#7dd3fc]">gurra@gulo.se</a></div>
-    <div class="flex items-center gap-3">
-      <span>GitHub: <a href="https://github.com/abbguslof" target="_blank" rel="noopener noreferrer" class="text-[#e6edf3] hover:text-[#38bdf8]">github.com/abbguslof</a></span>
-      <span class="text-[#38bdf8]">Kommando: 'contact'</span>
-    </div>
-  </div>
-</div>`
-    : `
-<div class="p-3.5 rounded bg-[#0d1117] border border-[#38bdf8]/50 text-xs font-mono space-y-3 max-w-2xl">
-  <div class="flex items-center justify-between border-b border-[#30363d] pb-2">
-    <div>
-      <span class="text-[#38bdf8] font-bold text-sm">RESUME // SKILLS &amp; EXPERIENCE</span>
-      <div class="text-[#8b949e] text-[10px]">Chalmers CS • M.Sc. Candidate</div>
-    </div>
-    <span class="text-[#10b981] font-bold text-xs">[ACTIVE CANDIDATE // RECRUIT]</span>
-  </div>
-
-  <div class="space-y-2.5 text-[#e6edf3]">
-    <div>
-      <div class="text-[#10b981] font-bold text-xs">🎓 Education &amp; Background</div>
-      <div class="pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] space-y-1 mt-0.5">
-        <div><span class="text-[#e6edf3] font-semibold">Chalmers University of Technology (2024 – 2029)</span>: M.Sc. in Computer Science &amp; Engineering (300 ECTS), Year 2. Accepted RIU elite athlete student.</div>
-        <div><span class="text-[#e6edf3] font-semibold">Wheeling University, USA (2023 – 2024)</span>: Business Management &amp; NCAA D2 swimming on full athletic scholarship. Dean's List, Conference Champion &amp; Freshman of the Year.</div>
-        <div><span class="text-[#e6edf3] font-semibold">Mälardalen University, Västerås (Oct 2022 – Dec 2023)</span>: Computer Science coursework in Python, Linux &amp; Network Security.</div>
-        <div><span class="text-[#e6edf3] font-semibold">Hitachigymnasiet (2020 – 2023)</span>: Smart Systems &amp; AI specialization.</div>
-      </div>
-    </div>
-
-    <div>
-      <div class="text-[#10b981] font-bold text-xs">🛠️ Technical Competencies</div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] mt-0.5">
-        <div><span class="text-[#38bdf8]">Languages:</span> Python, C, Java, JavaScript, and more</div>
-        <div><span class="text-[#38bdf8]">Infrastructure:</span> Proxmox VE, Linux (Arch, Debian), Docker, WireGuard</div>
-        <div><span class="text-[#38bdf8]">Tooling:</span> Git, Neovim, Alacritty, REST APIs, CI/CD</div>
-        <div><span class="text-[#38bdf8]">Operating Systems:</span> Omarchy (Arch + Hyprland), macOS, Windows</div>
-      </div>
-    </div>
-
-    <div>
-      <div class="text-[#10b981] font-bold text-xs">🚀 Deployment &amp; Homelab</div>
-      <div class="pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] space-y-1 mt-0.5">
-        <div><span class="text-[#e6edf3] font-semibold">Self-hosted Infrastructure:</span> Dedicated server PC with Proxmox VE and Raspberry Pi cluster. Continuously deploying, maintaining, and managing a variety of services – including websites, Minecraft clusters (Velocity &amp; PaperMC), internal tooling, and automated backup pipelines.</div>
-      </div>
-    </div>
-
-    <div>
-      <div class="text-[#10b981] font-bold text-xs">💡 Mindset &amp; Rapid Learning</div>
-      <div class="pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] mt-0.5">
-        Driven by continuous learning, curiosity, and hands-on problem solving. Passionate about learning new things with proven ability to quickly absorb complex information and master new technologies.
-      </div>
-    </div>
-
-    <div>
-      <div class="text-[#10b981] font-bold text-xs">🏊 Athletics &amp; Work Ethic</div>
-      <div class="pl-2 border-l border-[#30363d] text-[11px] text-[#8b949e] mt-0.5">
-        Competitive sprint swimmer for MASS &amp; Growth Objective (Åbybadet/GoCo). SM Silver 4x50m free 2025, Student-SM Gold 50m free 2026. 5+ swim and 3 gym sessions weekly.
-      </div>
-    </div>
-  </div>
-
-  <div class="text-[10px] text-[#8b949e] border-t border-[#30363d]/40 pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
-    <div>📄 <span class="text-[#e6edf3]">Complete formal CV available via email:</span> <a href="mailto:gurra@gulo.se" class="text-[#38bdf8] underline hover:text-[#7dd3fc]">gurra@gulo.se</a></div>
-    <div class="flex items-center gap-3">
-      <span>GitHub: <a href="https://github.com/abbguslof" target="_blank" rel="noopener noreferrer" class="text-[#e6edf3] hover:text-[#38bdf8]">github.com/abbguslof</a></span>
-      <span class="text-[#38bdf8]">Command: 'contact'</span>
-    </div>
-  </div>
-</div>`;
-}
-
-/**
- * Stats / btop / htop monitor output: visual process and life-stats dashboard
- */
-export function getStatsMonitorOutput(lang: LangCode): string {
-  const isSv = lang === 'sv';
   return `
-<div class="p-3 rounded bg-[#0d1117] border border-[#a78bfa]/50 text-xs font-mono space-y-2 max-w-xl select-none">
-  <!-- Header / Titlebar -->
-  <div class="flex items-center justify-between border-b border-[#30363d] pb-1.5 text-[11px]">
-    <div class="flex items-center gap-2">
-      <span class="px-1.5 py-0.5 rounded bg-[#a78bfa] text-[#0d1117] font-bold text-[10px]">BTOP++</span>
-      <span class="text-[#e6edf3] font-semibold">gulo-station :: sysmon &amp; athletic stats</span>
-    </div>
-    <span class="text-[#10b981] text-[10px] font-bold">RATE: 1.0s</span>
+<div class="p-3.5 rounded bg-[#0d1117] border border-[#30363d] text-xs font-mono space-y-3 max-w-2xl">
+  <div class="flex flex-wrap items-baseline justify-between gap-2 border-b border-[#30363d] pb-2">
+    <span class="text-[#10b981] font-bold text-sm"># ${isSv ? 'Meritförteckning' : 'Curriculum vitae'}</span>
+    <span class="text-[10px] text-[#8b949e]">Gustav Löfqvist, Chalmers D-24</span>
   </div>
 
-  <!-- Resource Bars -->
-  <div class="space-y-1.5 text-[11px]">
-    <!-- CPU -->
-    <div>
-      <div class="flex justify-between text-[#8b949e] mb-0.5">
-        <span class="text-[#38bdf8] font-bold">CPU [Ryzen 7 7800X3D]</span>
-        <span class="text-[#10b981]">18% (4.85 GHz)</span>
-      </div>
-      <div class="h-2 w-full bg-[#161b22] rounded overflow-hidden flex border border-[#30363d]">
-        <div class="bg-[#10b981] h-full" style="width: 18%"></div>
-      </div>
-    </div>
+  ${section(isSv ? 'Utbildning' : 'Education', education)}
+  ${section(isSv ? 'Teknik' : 'Technical', technical)}
+  ${section('Homelab', homelab)}
+  ${section(isSv ? 'Simning' : 'Swimming', athletics)}
 
-    <!-- MEM -->
-    <div>
-      <div class="flex justify-between text-[#8b949e] mb-0.5">
-        <span class="text-[#38bdf8] font-bold">MEM [32 GiB DDR5-6000]</span>
-        <span class="text-[#f59e0b]">6.4 GiB / 32 GiB (20%)</span>
-      </div>
-      <div class="h-2 w-full bg-[#161b22] rounded overflow-hidden flex border border-[#30363d]">
-        <div class="bg-[#f59e0b] h-full" style="width: 20%"></div>
-      </div>
-    </div>
-
-    <!-- Chalmers Progress -->
-    <div>
-      <div class="flex justify-between text-[#8b949e] mb-0.5">
-        <span class="text-[#a78bfa] font-bold">${isSv ? 'CHALMERS HP (Civilingenjör)' : 'CHALMERS ECTS (M.Sc. CS)'}</span>
-        <span class="text-[#a78bfa]">75 / 300 HP (25%)</span>
-      </div>
-      <div class="h-2 w-full bg-[#161b22] rounded overflow-hidden flex border border-[#30363d]">
-        <div class="bg-[#a78bfa] h-full" style="width: 25%"></div>
-      </div>
-    </div>
-
-    <!-- Swim Weekly Volume -->
-    <div>
-      <div class="flex justify-between text-[#8b949e] mb-0.5">
-        <span class="text-[#38bdf8] font-bold">${isSv ? 'SIMNING VOLYM (Åbybadet 50m / GoCo)' : 'SWIMMING VOLUME (Åbybadet &amp; GoCo 50m)'}</span>
-        <span class="text-[#38bdf8]">22.5 km / 25 km mål (90%)</span>
-      </div>
-      <div class="h-2 w-full bg-[#161b22] rounded overflow-hidden flex border border-[#30363d]">
-        <div class="bg-[#38bdf8] h-full" style="width: 90%"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Active Processes / Services -->
-  <div class="pt-1 border-t border-[#30363d]/60 text-[10px] text-[#8b949e] space-y-0.5">
-    <div class="flex justify-between">
-      <span>SERVICE: papermc.service (PID 1420)</span>
-      <span class="text-[#10b981]">ACTIVE [0.4% CPU, 4.2G RAM]</span>
-    </div>
-    <div class="flex justify-between">
-      <span>SERVICE: wg-quick@wg0.service</span>
-      <span class="text-[#10b981]">CONNECTED [mesh wireguard]</span>
-    </div>
-    <div class="flex justify-between">
-      <span>SERVICE: docker.service (containers: 4)</span>
-      <span class="text-[#10b981]">RUNNING</span>
-    </div>
+  <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/50 pt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+    <span>${isSv ? 'Fullständigt CV via e-post:' : 'Full CV by email:'} <a href="mailto:gurra@gulo.se" class="text-[#e6edf3] underline decoration-[#484f58] underline-offset-2 hover:text-[#10b981]">gurra@gulo.se</a></span>
+    <span><span class="text-[#10b981]">[contact]</span> ${isSv ? 'för länkar' : 'for links'}</span>
   </div>
 </div>`;
 }

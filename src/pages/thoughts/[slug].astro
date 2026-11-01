@@ -27,25 +27,29 @@ const linkedDownloads = allDownloads.filter((d) =>
   ((d.data.tags || []).length > 0 && post.data.tags.some(t => (d.data.tags || []).map(x => x.toLowerCase()).includes(t.toLowerCase())))
 );
 
-let catBadgeClass = 'text-[#f59e0b] border-[#f59e0b]/40 bg-[#f59e0b]/10';
-let catBorderClass = 'border-[#f59e0b]';
+let catClass = 'cat-thought';
+let catHex = '#e0a43a';
+let catKey = 'tanke';
 let catBadgeKey = 'thoughts_cat_tanke_badge';
-let catLabel = '[THOUGHT]';
+let catLabel = '[Thought]';
 if (category === 'guide') {
-  catBadgeClass = 'text-[#38bdf8] border-[#38bdf8]/40 bg-[#38bdf8]/10';
-  catBorderClass = 'border-[#38bdf8]';
+  catClass = 'cat-guide';
+  catHex = '#56b6e8';
+  catKey = 'guide';
   catBadgeKey = 'thoughts_cat_guide_badge';
-  catLabel = '[GUIDE]';
+  catLabel = '[Guide]';
 } else if (category === 'anteckning' || category === 'note') {
-  catBadgeClass = 'text-[#10b981] border-[#10b981]/40 bg-[#10b981]/10';
-  catBorderClass = 'border-[#10b981]';
+  catClass = 'cat-note';
+  catHex = '#4fbf8b';
+  catKey = 'anteckning';
   catBadgeKey = 'thoughts_cat_anteckning_badge';
-  catLabel = '[NOTE]';
+  catLabel = '[Note]';
 } else if (category === 'idea' || category === 'idé') {
-  catBadgeClass = 'text-[#a78bfa] border-[#a78bfa]/40 bg-[#a78bfa]/10';
-  catBorderClass = 'border-[#a78bfa]';
+  catClass = 'cat-idea';
+  catHex = '#b39ae8';
+  catKey = 'idea';
   catBadgeKey = 'thoughts_cat_idea_badge';
-  catLabel = '[IDEA]';
+  catLabel = '[Idea]';
 }
 ---
 
@@ -59,37 +63,39 @@ if (category === 'guide') {
   <!-- Global terminal on subpages (opens on header button click) -->
   <InteractiveTerminal isSubpage={true} />
 
-  <main id="main-content" tabindex="-1" class="w-full py-4 space-y-8 outline-none">
-    <!-- Back button & Tags row -->
+  <main id="main-content" tabindex="-1" class={`w-full max-w-3xl mx-auto py-4 space-y-8 outline-none ${catClass}`} style={`--page-accent:${catHex}`}>
+    <!-- Breadcrumb & tags -->
     <div class="mb-5 sm:mb-8 flex flex-wrap items-center justify-between gap-2.5">
-      <a 
-        href="/thoughts" 
-        class="inline-flex items-center gap-1.5 text-xs font-mono text-[#8b949e] hover:text-[#10b981] hover:bg-[#1f242c] hover:border-[#484f58] transition-all px-3 py-1.5 min-h-[34px] sm:min-h-auto rounded bg-[#161b22] border border-[#30363d]"
-      >
-        <span data-i18n="thoughts_back_btn">← [~/thoughts]</span>
-      </a>
+      <nav class="flex flex-wrap items-center gap-2 text-[11px] text-[#8b949e]" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-[#e6edf3] transition-colors">Home</a>
+        <span aria-hidden="true">/</span>
+        <a href="/thoughts" class="text-[var(--cat)] hover:underline underline-offset-4 transition-colors">Writing</a>
+        <span aria-hidden="true">/</span>
+        <span class="truncate max-w-[44ch]">{post.id}</span>
+      </nav>
 
       <div class="flex items-center gap-1.5 flex-wrap">
         {post.data.tags.map((tag) => (
           <a 
-            href={`/thoughts`}
-            class="text-[11px] font-mono text-[#38bdf8] bg-[#161b22] px-2 py-1 min-h-[28px] sm:min-h-auto rounded border border-[#30363d] hover:bg-[#1f242c] hover:border-[#38bdf8] transition-all flex items-center"
+            href={`/thoughts?tag=${encodeURIComponent(tag.toLowerCase())}`}
+            class="text-[11px] text-[#8b949e] bg-[#161b22] px-2 py-1 min-h-[28px] sm:min-h-auto rounded border border-[#30363d] hover:text-[#e6edf3] hover:border-[#484f58] transition-colors flex items-center"
           >
-            [{tag}]
+            {tag}
           </a>
         ))}
       </div>
     </div>
 
     <!-- Article Header -->
-    <header class="pb-5 sm:pb-6 mb-6 sm:mb-8 border-b border-[#30363d]">
-      <div class="flex items-center justify-between gap-3 text-xs font-mono text-[#8b949e] mb-3 flex-wrap">
-        <div class="flex items-center gap-2 flex-wrap">
-          <span class={`text-[11px] font-bold px-2 py-0.5 rounded border ${catBadgeClass}`} data-i18n={catBadgeKey}>
-            {catLabel}
-          </span>
+    <header class={`pb-5 sm:pb-6 mb-6 sm:mb-8 border-b border-[#30363d] ${catClass}`}>
+      <div class="flex items-center justify-between gap-3 text-xs text-[#8b949e] mb-3 flex-wrap">
+        <div class="flex items-center gap-3 flex-wrap">
+          <a
+            href={`/thoughts?category=${catKey}`}
+            class="cat-label text-[11px] font-semibold hover:underline underline-offset-4"
+            data-i18n={catBadgeKey}
+          >{catLabel}</a>
           <time datetime={formattedDate} class="text-[11px] sm:text-xs">{formattedDate}</time>
-          <span>•</span>
           <span class="text-[11px] sm:text-xs">
             <span class="lang-en-only">{wordCount} words</span>
             <span class="lang-sv-only">{wordCount} ord</span>
@@ -120,47 +126,30 @@ if (category === 'guide') {
       </h1>
 
       {post.data.description && (
-        <p class={`text-xs sm:text-sm text-[#8b949e] mt-3 leading-relaxed border-l-2 ${catBorderClass} pl-3`}>
+        <p class="mt-3 max-w-[62ch] border-l-2 cat-rule pl-3 font-serif text-[17px] leading-relaxed text-[#b0bac4]">
           {post.data.description}
         </p>
       )}
     </header>
 
-    <!-- Language notice: Only displayed for Swedish users viewing English thoughts -->
-    <aside 
+    <!-- Language notice: only shown when the site is in Swedish -->
+    <p
       id="thought-lang-notice"
-      class="lang-sv-only mb-6 p-2.5 sm:px-3 sm:py-2 rounded-lg bg-[#161b22] border border-[#f59e0b]/30 text-xs font-mono text-[#8b949e] flex items-start sm:items-center justify-between gap-2.5 sm:gap-3 shadow-sm transition-all"
-      role="note"
-      aria-label="Språknotis"
-    >
-      <div class="flex items-start sm:items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
-        <span class="text-[10px] font-bold text-[#f59e0b] px-1.5 py-0.5 rounded bg-[#f59e0b]/10 border border-[#f59e0b]/30 shrink-0 mt-0.5 sm:mt-0 select-none">
-          EN
-        </span>
-        <span class="text-[11px] sm:text-xs text-[#8b949e] leading-snug sm:leading-normal break-words" data-i18n="thoughts_lang_notice_compact">
-          Tankar, guider och anteckningar publiceras bara på engelska.
-        </span>
-      </div>
-
-      <button 
-        type="button" 
-        id="btn-dismiss-thought-notice"
-        class="text-[#8b949e] hover:text-[#e6edf3] w-6 h-6 rounded hover:bg-[#30363d]/60 transition-colors cursor-pointer text-xs shrink-0 select-none flex items-center justify-center -mr-1 -mt-0.5 sm:mt-0"
-        title="Dölj notisen"
-        aria-label="Dölj notis"
-      >
-        ✕
-      </button>
-    </aside>
+      class="lang-sv-only mb-4 text-[11px] text-[#8b949e]"
+      data-i18n="thoughts_archive_lang_note"
+    >(Inläggen i arkivet publiceras enbart på engelska)</p>
 
     <!-- Article Body with Markdown Rendering -->
-    <article class="prose prose-invert max-w-none text-[#e6edf3] text-sm leading-relaxed 
-      prose-headings:text-[#e6edf3] prose-headings:font-bold prose-headings:font-mono
-      prose-h2:text-lg prose-h2:border-b prose-h2:border-[#30363d] prose-h2:pb-2 prose-h2:mt-8
-      prose-h3:text-base prose-h3:text-[#38bdf8]
-      prose-p:text-[#c9d1d9] prose-p:leading-relaxed
-      prose-blockquote:border-l-[#10b981] prose-blockquote:text-[#8b949e] prose-blockquote:italic
-      prose-a:text-[#38bdf8] prose-a:underline prose-a:hover:text-[#10b981]">
+    <article
+      class="prose prose-invert max-w-none text-[#e6edf3]
+        prose-headings:text-[#e6edf3] prose-headings:font-bold
+        prose-h2:text-lg prose-h2:border-b prose-h2:border-[#30363d] prose-h2:pb-2 prose-h2:mt-8
+        prose-h3:text-base prose-h3:text-[#a8b1bb]
+        prose-p:text-[#c9d1d9]
+        prose-blockquote:border-l-[#10b981] prose-blockquote:text-[#8b949e] prose-blockquote:italic
+        prose-a:text-[#10b981] prose-a:underline prose-a:hover:text-[#e6edf3]"
+      style={`--prose-accent:${catHex}`}
+    >
       <Content />
     </article>
 
@@ -169,7 +158,7 @@ if (category === 'guide') {
       <div class="mt-12 p-4 rounded-lg bg-[#161b22] border border-[#30363d] font-mono tui-panel">
         <div class="text-xs font-bold text-[#10b981] mb-2 flex items-center gap-2">
           <span>↓</span>
-          <span data-i18n="thoughts_downloads_title">DOWNLOADABLE RESOURCES LINKED TO THIS POST:</span>
+          <span data-i18n="thoughts_downloads_title">Files for this post</span>
         </div>
         <div class="space-y-2 pt-2 border-t border-[#30363d]/60">
           {linkedDownloads.map((dl) => (
@@ -191,50 +180,12 @@ if (category === 'guide') {
       </div>
     )}
 
-    <!-- Bottom return navigation -->
-    <div class="mt-12 pt-6 border-t border-[#30363d] flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 text-xs font-mono">
-      <div class="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4">
-        <a 
-          href="/thoughts" 
-          class="text-[#8b949e] hover:text-[#10b981] hover:underline transition-colors"
-        >
-          <span data-i18n="thoughts_back_overview">[← Return to overview]</span>
-        </a>
-        <a 
-          href="/" 
-          class="text-[#8b949e] hover:text-[#10b981] hover:underline transition-colors"
-        >
-          <span data-i18n="thoughts_back_home">[Back to the cockpit]</span>
-        </a>
-      </div>
-      <span class="text-[#8b949e] hidden sm:inline">
-        slug: {post.id}
-      </span>
+
+    <div class="mt-12 pt-6 border-t border-[#30363d] flex flex-wrap items-center justify-between gap-3 text-xs">
+      <a href="/thoughts" class="text-[var(--cat)] hover:underline underline-offset-4 transition-colors" data-i18n="thoughts_back_btn">[Back to writing]</a>
+      <a href="#" class="text-[#8b949e] hover:text-[#e6edf3] transition-colors" data-i18n="back_to_top">[Back to top]</a>
     </div>
   </main>
 
   <Footer />
 </Layout>
-
-<script>
-  function setupThoughtPage() {
-    const notice = document.getElementById('thought-lang-notice');
-    const dismissBtn = document.getElementById('btn-dismiss-thought-notice');
-
-    if (sessionStorage.getItem('dismissed_thought_lang_notice') === 'true') {
-      notice?.classList.add('hidden');
-    }
-
-    dismissBtn?.addEventListener('click', () => {
-      notice?.classList.add('hidden');
-      sessionStorage.setItem('dismissed_thought_lang_notice', 'true');
-    });
-
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupThoughtPage);
-  } else {
-    setupThoughtPage();
-  }
-</script>

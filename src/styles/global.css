@@ -1,6 +1,8 @@
 @import "@fontsource/jetbrains-mono/400.css";
 @import "@fontsource/jetbrains-mono/500.css";
 @import "@fontsource/jetbrains-mono/700.css";
+@import "@fontsource-variable/newsreader";
+@import "@fontsource-variable/newsreader/wght-italic.css";
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @config "../../tailwind.config.mjs";
@@ -22,6 +24,7 @@
 
   --font-mono: "JetBrains Mono", "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --font-sans: Inter, Geist, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Newsreader Variable", Newsreader, Georgia, Cambria, "Times New Roman", serif;
 }
 
 :root {
@@ -124,13 +127,11 @@ blockquote::selection {
 }
 
 /* ============================================================================
-   COCKPIT TRANSLUCENCY & DEPTH SYSTEM
-   Unified glassmorphic surfaces, subtle blur & depth shadows across all pages
+   PANELS
+   Flat surfaces. No glass, no colored glow. One border, one radius.
    ============================================================================ */
 .file-card,
 .cat-toggle-card,
-.thought-card,
-.thought-container,
 .project-card,
 .tui-window,
 .tui-card,
@@ -140,133 +141,46 @@ blockquote::selection {
 div.rounded-lg.bg-\[\#161b22\],
 article.rounded-lg.bg-\[\#161b22\],
 footer > div > div.rounded-lg {
-  background-color: rgba(22, 27, 34, 0.88);
-  backdrop-filter: blur(8px) saturate(120%);
-  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  background-color: #161b22;
   border: 1px solid #30363d;
-  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(255, 255, 255, 0.03);
-  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  box-shadow: none;
 }
 
-/* Interactive Card Hover Base Elevation */
 .file-card:hover,
-#terminal-closed-card:hover {
-  background-color: rgba(31, 36, 44, 0.96);
-  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.05);
-}
-
+#terminal-closed-card:hover,
 .project-card:hover,
-.thought-card:hover {
-  background-color: rgba(31, 36, 44, 0.96);
+.thought-item:hover {
+  background-color: #1b212a;
+  border-color: #484f58;
 }
 
 /* ============================================================================
-   CATEGORY OUTLINE & SELECTION SYSTEM (Projects & Thoughts)
-   Crisp, clean category-colored outlines on hover & focus — NO fuzzy glow
+   WRITING CATEGORY COLORS
+   Category color lives on the label and a thin rule only. Nothing else.
    ============================================================================ */
+.cat-thought { --cat: #e0a43a; }
+.cat-guide { --cat: #56b6e8; }
+.cat-note { --cat: #4fbf8b; }
+.cat-idea { --cat: #b39ae8; }
 
-/* Thoughts Category Outlines (Amber, Cyan, Emerald, Purple) */
-.thought-card.halo-amber:hover,
-.thought-card[data-category="tanke"]:hover,
-.thought-card[data-category="thought"]:hover {
-  border-color: #f59e0b !important;
-  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.55) !important;
-}
-
-.thought-card.halo-cyan:hover,
-.thought-card[data-category="guide"]:hover {
-  border-color: #38bdf8 !important;
-  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.55) !important;
+.cat-label {
+  color: var(--cat);
 }
 
-.thought-card.halo-emerald:hover,
-.thought-card[data-category="anteckning"]:hover,
-.thought-card[data-category="note"]:hover {
-  border-color: #10b981 !important;
-  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.55) !important;
+.cat-rule {
+  border-left-color: var(--cat);
 }
 
-.thought-card.halo-purple:hover,
-.thought-card[data-category="idea"]:hover,
-.thought-card[data-category="idé"]:hover {
-  border-color: #a78bfa !important;
-  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.55) !important;
-}
 
-/* Category Filter Toggle Cards on /thoughts */
-.cat-toggle-card[data-cat="tanke"]:hover:not([aria-pressed="true"]) {
-  border-color: #f59e0b !important;
-  background-color: rgba(245, 158, 11, 0.06) !important;
+/* ============================================================================
+   WRITING ROWS
+   The category rule is the only colored edge on a writing row.
+   ============================================================================ */
+.thought-item {
+  border-left: 2px solid transparent;
 }
-
-.cat-toggle-card[data-cat="guide"]:hover:not([aria-pressed="true"]) {
-  border-color: #38bdf8 !important;
-  background-color: rgba(56, 189, 248, 0.06) !important;
-}
-
-.cat-toggle-card[data-cat="anteckning"]:hover:not([aria-pressed="true"]) {
-  border-color: #10b981 !important;
-  background-color: rgba(16, 185, 129, 0.06) !important;
-}
-
-/* Selected state for thoughts category cards: the full thing turns into its category color */
-.cat-toggle-card[data-cat="tanke"][aria-pressed="true"] {
-  background-color: rgba(245, 158, 11, 0.22) !important;
-  border-color: #f59e0b !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45) !important;
-}
-
-.cat-toggle-card[data-cat="tanke"][aria-pressed="true"] p,
-.cat-toggle-card[data-cat="tanke"][aria-pressed="true"] .cat-status-text {
-  color: #fde68a !important;
-}
-
-.cat-toggle-card[data-cat="guide"][aria-pressed="true"] {
-  background-color: rgba(56, 189, 248, 0.22) !important;
-  border-color: #38bdf8 !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45) !important;
-}
-
-.cat-toggle-card[data-cat="guide"][aria-pressed="true"] p,
-.cat-toggle-card[data-cat="guide"][aria-pressed="true"] .cat-status-text {
-  color: #bae6fd !important;
-}
-
-.cat-toggle-card[data-cat="anteckning"][aria-pressed="true"] {
-  background-color: rgba(16, 185, 129, 0.22) !important;
-  border-color: #10b981 !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45) !important;
-}
-
-.cat-toggle-card[data-cat="anteckning"][aria-pressed="true"] p,
-.cat-toggle-card[data-cat="anteckning"][aria-pressed="true"] .cat-status-text {
-  color: #a7f3d0 !important;
-}
-
-/* Homepage Thought Rows (Dynamic category left-bar outline) */
-.thought-item.halo-amber:hover {
-  box-shadow: inset 3px 0 0 #f59e0b;
-}
-.thought-item.halo-cyan:hover {
-  box-shadow: inset 3px 0 0 #38bdf8;
-}
-.thought-item.halo-emerald:hover {
-  box-shadow: inset 3px 0 0 #10b981;
-}
-.thought-item.halo-purple:hover {
-  box-shadow: inset 3px 0 0 #a78bfa;
-}
-
-/* Projects: All projects consistently use the signature project blue (#38bdf8) */
-.project-card:hover {
-  border-color: #38bdf8 !important;
-  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.55) !important;
-}
-
-/* Default thought card hover fallback */
-.thought-card:hover {
-  border-color: #f59e0b !important;
-  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.55) !important;
+.thought-item:hover {
+  border-left-color: var(--cat, #30363d);
 }
 
 /* Form Inputs, Search Grep Bars & Select Elements (Crisp & completely opaque) */
@@ -278,7 +192,7 @@ select {
   background-color: #161b22;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  caret-color: #10b981;
+  caret-color: var(--page-accent, #10b981);
 }
 
 input[type="text"]:focus,
@@ -286,8 +200,8 @@ input[type="search"]:focus,
 input[type="email"]:focus,
 textarea:focus,
 select:focus {
-  border-color: #10b981 !important;
-  box-shadow: 0 0 0 1px #10b981, 0 0 12px rgba(16, 185, 129, 0.25) !important;
+  border-color: var(--page-accent, #10b981) !important;
+  box-shadow: 0 0 0 1px var(--page-accent, #10b981), 0 0 12px color-mix(in srgb, var(--page-accent, #10b981) 25%, transparent) !important;
 }
 
 select option {
@@ -342,30 +256,67 @@ pre.astro-code code {
 
 /* Only INLINE code (not inside pre) gets the badge style */
 .prose :not(pre)>code {
-  color: #10b981 !important;
-  background-color: rgba(22, 27, 34, 0.85) !important;
-  border: 1px solid #30363d !important;
+  color: var(--prose-accent, #10b981) !important;
+  background-color: color-mix(in srgb, var(--prose-accent, #10b981) 8%, #161b22) !important;
+  border: 1px solid color-mix(in srgb, var(--prose-accent, #10b981) 28%, #30363d) !important;
   border-radius: 0.25rem !important;
   padding: 0.15rem 0.35rem !important;
   font-size: 0.825em !important;
   font-family: var(--font-mono) !important;
 }
 
+.prose blockquote {
+  border-left-color: var(--prose-accent, #10b981) !important;
+}
+
+/* ============================================================================
+   LONG-FORM READING
+   Prose uses a text face; code, headings and interface stay mono.
+   ============================================================================ */
+.prose,
+.font-serif {
+  font-variant-numeric: lining-nums;
+  font-optical-sizing: auto;
+}
+
+.prose {
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  line-height: 1.72;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  font-family: var(--font-mono);
+  letter-spacing: -0.01em;
+}
+
+.prose code,
+.prose pre,
+.prose kbd,
+.prose samp {
+  font-family: var(--font-mono);
+}
+
 /* ============================================================================
    MARKDOWN PROSE LINKS (Interactive & Clear Hover Feedback)
    ============================================================================ */
 .prose a {
-  color: #38bdf8 !important;
+  color: var(--prose-accent, #10b981) !important;
   text-decoration: underline !important;
-  text-decoration-color: rgba(56, 189, 248, 0.45) !important;
+  text-decoration-color: color-mix(in srgb, var(--prose-accent, #10b981) 40%, transparent) !important;
   text-underline-offset: 3px !important;
   transition: color 0.15s ease, text-decoration-color 0.15s ease !important;
   cursor: pointer !important;
 }
 
 .prose a:hover {
-  color: #10b981 !important;
-  text-decoration-color: #10b981 !important;
+  color: #e6edf3 !important;
+  text-decoration-color: #e6edf3 !important;
 }
 
 
@@ -395,30 +346,21 @@ pre.astro-code code {
   background-color: #1f242c;
 }
 
-.prose pre:hover .code-copy-btn,
-pre.astro-code:hover .code-copy-btn {
+.prose .code-copy-btn:hover,
+.prose pre .code-copy-btn:hover {
+  color: var(--prose-accent, #10b981);
+  border-color: var(--prose-accent, #10b981);
+}
+
+.code-copy-btn.is-copied {
+  color: var(--prose-accent, #10b981);
+  font-weight: 700;
   opacity: 1;
 }
 
-/* Explicit Offline/Online UI state classes */
-.is-offline-text {
-  color: #f85149 !important;
-}
-
-.is-offline-border {
-  border-color: #f85149 !important;
-}
-
-.is-offline-bg {
-  background-color: #f85149 !important;
-}
-
-.is-online-text {
-  color: #10b981 !important;
-}
-
-.is-online-border {
-  border-color: #10b981 !important;
+.prose pre:hover .code-copy-btn,
+pre.astro-code:hover .code-copy-btn {
+  opacity: 1;
 }
 
 /* ============================================================================
@@ -438,9 +380,8 @@ html[data-lang="sv"] .lang-en-only {
    ACCESSIBILITY & KEYBOARD NAVIGATION (Tab / Shift+Tab / Focus-Visible)
    ============================================================================ */
 :focus-visible {
-  outline: 2px solid #10b981 !important;
-  outline-offset: 2px !important;
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.45) !important;
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
 }
 
 button:focus-visible,
@@ -448,37 +389,12 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid #10b981 !important;
-  outline-offset: 2px !important;
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
 }
 
-/* Category-aware cockpit illumination when focusing inside cards (Clean outline, NO glow) */
-.thought-card[data-category="tanke"]:has(a:focus-visible),
-.thought-card[data-category="thought"]:has(a:focus-visible),
-.thought-card.halo-amber:has(a:focus-visible) {
-  border-color: #f59e0b !important;
-}
-
-.thought-card[data-category="guide"]:has(a:focus-visible),
-.thought-card.halo-cyan:has(a:focus-visible),
-.project-card:has(a:focus-visible) {
-  border-color: #38bdf8 !important;
-}
-
-.thought-card[data-category="anteckning"]:has(a:focus-visible),
-.thought-card[data-category="note"]:has(a:focus-visible),
-.thought-card.halo-emerald:has(a:focus-visible) {
-  border-color: #10b981 !important;
-}
-
-.thought-card[data-category="idea"]:has(a:focus-visible),
-.thought-card[data-category="idé"]:has(a:focus-visible),
-.thought-card.halo-purple:has(a:focus-visible) {
-  border-color: #a78bfa !important;
-}
-
-.file-card:has(.file-card-header:focus-visible) {
-  border-color: #10b981 !important;
+main :focus-visible {
+  outline-color: var(--page-accent, #10b981) !important;
 }
 
 /* Responsive mobile table & pre overflow container protection */
@@ -514,4 +430,73 @@ select:focus-visible,
     opacity: 0.92;
     transform: scale(0.99);
   }
+}
+/* ============================================================================
+   WRITING FILTERS
+   Category color appears on the label and the selected state only.
+   ============================================================================ */
+.cat-toggle-card[data-cat="tanke"],
+.cat-toggle-card[data-cat="thought"] { --cat: #e0a43a; }
+.cat-toggle-card[data-cat="guide"] { --cat: #56b6e8; }
+.cat-toggle-card[data-cat="anteckning"],
+.cat-toggle-card[data-cat="note"] { --cat: #4fbf8b; }
+.cat-toggle-card[data-cat="idea"],
+.cat-toggle-card[data-cat="idé"] { --cat: #b39ae8; }
+
+.cat-toggle-card:hover {
+  border-color: color-mix(in srgb, var(--cat, #484f58) 55%, #30363d);
+}
+
+.cat-toggle-card[aria-pressed="true"] {
+  color: var(--cat);
+  border-color: color-mix(in srgb, var(--cat) 55%, transparent);
+  background-color: color-mix(in srgb, var(--cat) 9%, #161b22);
+}
+
+/* Writing archive state */
+.thought-card {
+  border-left: 2px solid color-mix(in srgb, var(--cat, #30363d) 70%, #30363d);
+}
+.thought-card:hover {
+  background-color: #1b212a;
+}
+
+.tag-filter-btn[aria-pressed="true"] {
+  color: #d8dee5;
+  background-color: #1b212a;
+  border-color: #8b949e;
+}
+
+.sort-btn[aria-pressed="true"] {
+  color: #e6edf3;
+  background-color: #1b212a;
+}
+.sort-btn[aria-pressed="false"] {
+  color: #8b949e;
+  background-color: #161b22;
+}
+
+/* ============================================================================
+   PAGE ENTRANCE
+   A fixed wash fades out on load. It does not create a stacking context on the
+   content, so fullscreen terminal positioning stays relative to the viewport.
+   ============================================================================ */
+#page-fade {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #0d1117;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #page-fade {
+    animation: page-fade-out 260ms ease-out forwards;
+  }
+}
+
+@keyframes page-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }

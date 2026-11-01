@@ -1,8 +1,8 @@
-# 📫 KONTAKT & LÄNKAR // GULO
+# Kontakt
 - E-post: [gurra@gulo.se](mailto:gurra@gulo.se)
-- GitHub: [github.com/abbguslof ↗](https://github.com/abbguslof)
-- LinkedIn: [linkedin.com/in/gustavlofqvist ↗](https://www.linkedin.com/in/gustavlofqvist/)
+- GitHub: [github.com/abbguslof](https://github.com/abbguslof)
+- LinkedIn: [linkedin.com/in/gustavlofqvist](https://www.linkedin.com/in/gustavlofqvist/)
 - Discord: guslof
-- Campus: EDIT-huset, Johanneberg, Göteborg
+- Campus: EDIT-huset, Johanneberg
 ---
-Hör gärna av dig angående sommarjobb, exjobb, tech eller simning!
+E-post är det bästa sättet att nå mig om sommarjobb, exjobb eller något tekniskt.

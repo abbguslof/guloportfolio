@@ -16,7 +16,10 @@
     aria-hidden="true"
   ></div>
 
-  <!-- 3. Cockpit subtle radial vignette for smooth blending into #0d1117 -->
+  <!-- 3. Readability wash: dims the lines behind the text column -->
+  <div id="bg-readability-overlay" class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,rgba(13,17,23,0.68)_0%,rgba(13,17,23,0.30)_58%,transparent_100%)]"></div>
+
+  <!-- 4. Subtle edge vignette -->
   <div id="bg-vignette-overlay" class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(13,17,23,0.52)_100%)]"></div>
 </div>
 
@@ -176,7 +179,7 @@
 
     // Standard mode is the default
     let savedMode = localStorage.getItem('site_bg_mode') as BgMode | null;
-    let currentMode: BgMode = (savedMode && ALL_MODES.includes(savedMode)) ? savedMode : 'standard';
+    let currentMode: BgMode = (savedMode && ALL_MODES.includes(savedMode)) ? savedMode : 'off';
 
     // -------------------------------------------------------------
     // OUR ORIGINAL TOPO (Smooth topographic contour elevation waves)
@@ -265,7 +268,7 @@
 
         if (stdCanvas) {
           stdCanvas.style.display = 'block';
-          stdCanvas.style.opacity = '0.88';
+          stdCanvas.style.opacity = '0.65';
         }
         if (stdRafId) cancelAnimationFrame(stdRafId);
         if (motionQuery.matches) {

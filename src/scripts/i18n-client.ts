@@ -55,13 +55,10 @@ export function applySiteLang(lang: Lang): void {
   const btnSv = document.getElementById('btn-lang-sv');
 
   if (btnEn && btnSv) {
-    if (lang === 'en') {
-      btnEn.className = 'lang-btn px-1.5 sm:px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#10b981] bg-[#0d1117] border border-[#10b981]/40 shadow-sm';
-      btnSv.className = 'lang-btn px-1.5 sm:px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#1f242c]/60';
-    } else {
-      btnSv.className = 'lang-btn px-1.5 sm:px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#10b981] bg-[#0d1117] border border-[#10b981]/40 shadow-sm';
-      btnEn.className = 'lang-btn px-1.5 sm:px-2 py-0.5 text-[10px] font-bold rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#1f242c]/60';
-    }
+    const active = 'lang-btn px-1 py-1 text-[10px] font-bold transition-colors cursor-pointer text-[#e6edf3]';
+    const inactive = 'lang-btn px-1 py-1 text-[10px] font-bold transition-colors cursor-pointer text-[#8b949e] hover:text-[#e6edf3]';
+    btnEn.className = lang === 'en' ? active : inactive;
+    btnSv.className = lang === 'sv' ? active : inactive;
   }
 
   // 5. Update document title and meta description

@@ -11,7 +11,6 @@ import {
   getFastfetchOutput,
   getBioOutput,
   getCvOutput,
-  getStatsMonitorOutput
 } from './i18n';
 import { handleGitCommand } from './git';
 import { evaluateMathExpression } from './calc';
@@ -36,7 +35,7 @@ export function getCommands(): Record<string, CommandFunction> {
         return `
 <div class="msg-pending-prompt-card text-xs font-mono space-y-2 p-2.5 sm:p-3 rounded-lg bg-[#0d1117] border border-[#10b981]/50 my-1 shadow-md">
   <div class="text-[#10b981] font-bold flex items-center gap-2">
-    <span>💡</span>
+    <span></span>
     <span>${isSv ? 'HÄLSNING / MEDDELANDE UPPTÄCKT' : 'GREETING / MESSAGE DETECTED'}</span>
   </div>
   <p class="text-[#e6edf3] text-xs leading-relaxed">
@@ -89,28 +88,24 @@ export function getCommands(): Record<string, CommandFunction> {
       if (sub === 'cv' || sub === 'resume' || sub === 'recruit') {
         return getCvOutput(ctx.lang);
       }
-      if (sub === 'stats' || sub === 'btop' || sub === 'htop' || sub === 'top') {
-        return getStatsMonitorOutput(ctx.lang);
-      }
       return getBioOutput(ctx.lang);
     },
 
     intro: (_args, ctx) => {
       const isSv = ctx.lang === 'sv';
       return `<div class="space-y-2 py-1 font-mono">
-  <div class="text-[#10b981] font-bold text-sm sm:text-base">&gt; ${isSv ? 'HEJ, JAG ÄR GUSTAV' : "HI, I'M GUSTAV"}</div>
-  <pre class="text-[#10b981] text-[9px] sm:text-[10px] leading-tight font-mono hidden sm:block select-none opacity-90">
+  <div class="text-[#10b981] font-bold text-sm sm:text-base"># Gustav Löfqvist</div>
+  <pre class="text-[#10b981] text-[9px] sm:text-[10px] leading-tight font-mono hidden sm:block select-none opacity-80">
  ██████╗ ██╗   ██╗███████╗████████╗ █████╗ ██╗   ██╗
 ██╔════╝ ██║   ██║██╔════╝╚══██╔══╝██╔══██╗██║   ██║
 ██║  ███╗██║   ██║███████╗   ██║   ███████║██║   ██║
 ██║   ██║██║   ██║╚════██║   ██║   ██╔══██║╚██╗ ██╔╝
 ╚██████╔╝╚██████╔╝███████║   ██║   ██║  ██║ ╚████╔╝ 
   </pre>
-  <div class="text-[#e6edf3] font-semibold text-xs sm:text-sm">Gustav Löfqvist // <span class="text-[#38bdf8]">gulo</span></div>
-  <div class="text-[#8b949e] text-xs">${isSv ? 'Civilingenjör Datateknik @ Chalmers Tekniska Högskola (Åk 2, EDIT-huset, RIU-elitidrottare).' : 'Second-year M.Sc. Computer Science &amp; Engineering @ Chalmers (EDIT building, accepted RIU elite athlete).'}</div>
-  <div class="text-[#8b949e] text-xs">${isSv ? 'Elitsprintsimmare för MASS &amp; Growth Objective (Åbybadet/GoCo). SM-silver 4x50m frisim.' : 'Elite sprint swimmer for MASS &amp; Growth Objective (Åbybadet/GoCo). SM Silver 4x50m freestyle.'}</div>
-  <div class="text-[#8b949e] text-xs">${isSv ? 'Tech: Python, C, Java, JavaScript, Omarchy (Arch + Hyprland) &amp; Proxmox VE homelab.' : 'Tech: Python, C, Java, JavaScript, Omarchy (Arch + Hyprland) &amp; Proxmox VE homelab.'}</div>
-  <div class="text-[11px] text-[#38bdf8] pt-1 border-t border-[#30363d]/40">${isSv ? 'Kommandon: bio, cv, school, swim, contact, status' : 'Commands: bio, cv, school, swim, contact, status'}</div>
+  <div class="text-[#e6edf3] text-xs">${isSv ? 'Datateknik på Chalmers, årskurs två, EDIT-huset.' : 'Computer Science and Engineering at Chalmers, year two, EDIT building.'}</div>
+  <div class="text-[#8b949e] text-xs">${isSv ? 'Sprint frisim och fjäril för MASS och Growth Objective.' : 'Sprint freestyle and butterfly for MASS and Growth Objective.'}</div>
+  <div class="text-[#8b949e] text-xs">${isSv ? 'Arch, Neovim, Proxmox och ett Raspberry Pi-kluster.' : 'Arch, Neovim, Proxmox, and a Raspberry Pi cluster.'}</div>
+  <div class="text-[11px] text-[#8b949e] pt-1 border-t border-[#30363d]/40">${isSv ? '[bio] [cv] [school] [swim] [contact] [status]' : '[bio] [cv] [school] [swim] [contact] [status]'}</div>
 </div>`;
     },
     boot: (args, ctx) => commands.intro(args, ctx),
@@ -120,7 +115,6 @@ export function getCommands(): Record<string, CommandFunction> {
     cv: (_args, ctx) => getCvOutput(ctx.lang),
 
     // 1e. STATS & BTOP
-    stats: (_args, ctx) => getStatsMonitorOutput(ctx.lang),
 
     // 1f. LANGUAGE SWITCHER
     lang: (args, ctx) => {
@@ -135,7 +129,7 @@ export function getCommands(): Record<string, CommandFunction> {
           return '<div class="text-[#8b949e] font-mono text-xs">Webbplatsen är redan inställd på <span class="text-[#10b981] font-bold">svenska (SV)</span>.</div>';
         }
         setSiteLang('sv');
-        return '<div class="text-[#10b981] font-mono text-xs">Språk ändrat till <span class="font-bold">svenska (SV)</span>. Hela cockpiten & webbplatsen är uppdaterad.</div>';
+        return '<div class="text-[#10b981] font-mono text-xs">Språk ändrat till <span class="font-bold">svenska (SV)</span>. Hela sidan är uppdaterad.</div>';
       }
 
       if (englishAliases.includes(target)) {
@@ -143,7 +137,7 @@ export function getCommands(): Record<string, CommandFunction> {
           return '<div class="text-[#8b949e] font-mono text-xs">Site language is already set to <span class="text-[#10b981] font-bold">English (EN)</span>.</div>';
         }
         setSiteLang('en');
-        return '<div class="text-[#10b981] font-mono text-xs">Language switched to <span class="font-bold">English (EN)</span>. Entire cockpit & site updated.</div>';
+        return '<div class="text-[#10b981] font-mono text-xs">Language switched to <span class="font-bold">English (EN)</span>. Entire site updated.</div>';
       }
 
       if (target) {
@@ -216,7 +210,7 @@ export function getCommands(): Record<string, CommandFunction> {
       if (fileNode && fileNode.type === 'file' && fileNode.content) {
         return ctx.renderMarkdownCard(fileNode.content);
       }
-      return `<div class="text-[#10b981] font-mono">gulo // Chalmers student, sprint swimmer &amp; developer</div>`;
+      return `<div class="text-[#10b981] font-mono">Gustav Löfqvist, Chalmers student and developer</div>`;
     },
     me: (args, ctx) => commands.whoami(args, ctx),
     gulo: (args, ctx) => {
@@ -251,8 +245,8 @@ export function getCommands(): Record<string, CommandFunction> {
     minecraft: (args, ctx) => commands.mc(args, ctx),
     sleep: (_args, ctx) => {
       return ctx.lang === 'sv'
-        ? `<div class="text-[#f59e0b] font-mono">Error: 404 Sleep Not Found under tentavecka 😴</div>`
-        : `<div class="text-[#f59e0b] font-mono">Error: 404 Sleep Not Found during exam week 😴</div>`;
+        ? `<div class="text-[#f59e0b] font-mono">Error: 404 Sleep Not Found under tentavecka </div>`
+        : `<div class="text-[#f59e0b] font-mono">Error: 404 Sleep Not Found during exam week </div>`;
     },
     sova: (args, ctx) => commands.sleep(args, ctx),
 
@@ -488,6 +482,10 @@ export function getCommands(): Record<string, CommandFunction> {
       }
       if (node.type === 'dir') {
         return `<div class="text-[#f85149]">cat: ${ctx.escapeHtml(filename)}: ${ctx.lang === 'sv' ? 'Är en katalog' : 'Is a directory'}</div>`;
+      }
+
+      if (filename.toLowerCase().endsWith('.md')) {
+        return ctx.renderMarkdownCard(node.content);
       }
 
       return `
@@ -742,7 +740,7 @@ ${ctx.escapeHtml(node.content)}
   <div class="p-3.5 rounded bg-[#0d1117] border border-[#f85149]/60 space-y-2">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <span class="text-[#f85149] font-bold">HTTP 404 // COMMAND_NOT_FOUND</span>
+        <span class="text-[#f85149] font-bold">404</span>
       </div>
       <span class="text-[10px] text-[#f59e0b] px-1.5 py-0.5 rounded border border-[#f59e0b]/40">ERR_NOT_FOUND</span>
     </div>
@@ -772,9 +770,9 @@ ${ctx.escapeHtml(node.content)}
       const isSv = ctx.lang === 'sv';
       const isAlreadyHome = typeof window !== 'undefined' && (window.location.pathname === '/' || window.location.pathname === '');
       if (isAlreadyHome) {
-        return `<div class="text-[#10b981] font-mono text-xs">${isSv ? 'Du är redan vid cockpiten / på startsidan (/).' : 'You are already at the cockpit / homepage (/).'}</div>`;
+        return `<div class="text-[#10b981] font-mono text-xs">${isSv ? 'Du är redan på startsidan (/).' : 'You are already on the homepage (/).'}</div>`;
       }
-      const openingMsg = `<div class="text-[#10b981] font-mono text-xs">${isSv ? 'Navigerar hem till cockpiten (/)...' : 'Navigating home to cockpit (/)...'}</div>`;
+      const openingMsg = `<div class="text-[#10b981] font-mono text-xs">${isSv ? 'Navigerar till startsidan (/)...' : 'Navigating to the homepage (/)...'}</div>`;
       ctx.navigateWithCli('/', openingMsg);
     },
 
@@ -837,8 +835,9 @@ ${ctx.escapeHtml(node.content)}
       setSiteLang('en');
       localStorage.setItem('site_lang', 'en');
 
-      // 2. Ambient background to standard
-      window.dispatchEvent(new CustomEvent('set-bg-mode', { detail: 'standard' }));
+      // 2. Ambient background back to the default off
+      window.dispatchEvent(new CustomEvent('set-bg-mode', { detail: 'off' }));
+      window.dispatchEvent(new CustomEvent('toggle-bg-switcher', { detail: { show: false } }));
       localStorage.removeItem('site_bg_mode');
       localStorage.removeItem('site_bg_switcher_open');
 
@@ -846,6 +845,7 @@ ${ctx.escapeHtml(node.content)}
       sessionStorage.removeItem('dismissed_thought_lang_notice');
       sessionStorage.removeItem('terminal_cat_hint_dismissed');
       sessionStorage.removeItem('terminal_closed_by_user');
+      sessionStorage.removeItem('terminal_hidden_by_user');
       sessionStorage.removeItem('terminal_cmd_history');
       sessionStorage.removeItem('terminal_history_html');
       sessionStorage.removeItem('terminal_nav_scroll_y');
@@ -853,6 +853,7 @@ ${ctx.escapeHtml(node.content)}
       sessionStorage.removeItem('gulo_boot_intro_played');
       sessionStorage.removeItem('navigated_via_cli');
       localStorage.removeItem('terminal_cmd_history');
+      if (window.location.hash === '#about') history.replaceState(null, '', window.location.pathname);
 
       // Unhide thought notice on current page if present
       const notice = document.getElementById('thought-lang-notice');
@@ -916,8 +917,8 @@ ${ctx.escapeHtml(node.content)}
         nvim: { descSv: 'Interaktiv Neovim TUI bufferinspektör med TokyoNight statusline.', descEn: 'Interactive Neovim TUI buffer inspector with TokyoNight statusline.', syn: 'nvim [filnamn]' },
         calc: { descSv: 'Säker matematisk miniräknare utan eval.', descEn: 'Safe mathematical expression evaluator without eval.', syn: 'calc <uttryck>' },
         wget: { descSv: 'Laddar ned resurser, arkivpaket och artikeldokument (PDF) direkt till din disk.', descEn: 'Downloads resources, archive packages, and article companion PDFs directly to your disk.', syn: 'wget <filnamn>' },
-        bg: { descSv: 'Växlar ambient visuell bakgrundseffekt i cockpiten.', descEn: 'Switches ambient visual background effect in the cockpit.', syn: 'bg [standard|topo|dither|ascii|dots|pixel|shimmer|off]' },
-        status: { descSv: 'Visar aktuell live-telemetri, homelab & tillgänglighet.', descEn: 'Displays current live telemetry, homelab status & availability.', syn: 'status' },
+        bg: { descSv: 'Växlar ambient bakgrundseffekt.', descEn: 'Switches the ambient background effect.', syn: 'bg [standard|topo|dither|ascii|dots|pixel|shimmer|off]' },
+        status: { descSv: 'Visar aktuell status, homelab och tillgänglighet.', descEn: 'Shows the current status, homelab, and availability.', syn: 'status' },
         echo: { descSv: 'Skriver ut säker text till terminalen.', descEn: 'Prints sanitized text to the terminal.', syn: 'echo <text>' }
       };
 
@@ -1326,8 +1327,8 @@ ${ctx.escapeHtml(node.content)}
   commands[':q'] = (_args, ctx) => {
     const isSv = ctx.lang === 'sv';
     return isSv
-      ? `<div class="text-[#8b949e] font-mono text-xs">[bash] :q: du är redan i bash! 😉 (Skriv <code class="text-[#10b981]">help</code> för kommandon)</div>`
-      : `<div class="text-[#8b949e] font-mono text-xs">[bash] :q: you are already in bash! 😉 (Type <code class="text-[#10b981]">help</code> for commands)</div>`;
+      ? `<div class="text-[#8b949e] font-mono text-xs">[bash] :q: du är redan i bash! (Skriv <code class="text-[#10b981]">help</code> för kommandon)</div>`
+      : `<div class="text-[#8b949e] font-mono text-xs">[bash] :q: you are already in bash! (Type <code class="text-[#10b981]">help</code> for commands)</div>`;
   };
   commands[':q!'] = commands[':wq'] = commands[':x'] = commands[':q'];
 
@@ -1341,9 +1342,6 @@ ${ctx.escapeHtml(node.content)}
   commands['resume'] = commands['cv'];
   commands['recruit'] = commands['cv'];
 
-  commands['btop'] = commands['stats'];
-  commands['htop'] = commands['stats'];
-  commands['top'] = commands['stats'];
 
   commands['os'] = commands['linux'];
   commands['distro'] = commands['linux'];
@@ -1359,8 +1357,8 @@ function executeHelloWorldScript(ctx: CommandContext): string {
     ? `
 <div class="text-xs font-mono space-y-1.5 p-3 rounded bg-[#0d1117] border border-[#10b981]">
   <div class="text-[#8b949e] text-[11px]">[exec] Kör ./helloworld.sh ...</div>
-  <div class="text-[#10b981] font-bold text-sm">Hello, World! 🚀</div>
-  <p class="text-[#e6edf3]">Välkommen till Gulos digitala cockpit (Chalmers Datateknik // D-24).</p>
+  <div class="text-[#10b981] font-bold text-sm">Hello, World!</div>
+  <p class="text-[#e6edf3]">Välkommen till gulo.se.</p>
   <div class="text-[#8b949e] text-[11px] pt-1 border-t border-[#30363d]/50">
     Testa att köra <code class="text-[#38bdf8]">school</code>, <code class="text-[#38bdf8]">swim</code>, <code class="text-[#38bdf8]">calc 42 * 1337</code>, <code class="text-[#38bdf8]">guess</code> eller <code class="text-[#38bdf8]">git status</code>!
   </div>
@@ -1368,8 +1366,8 @@ function executeHelloWorldScript(ctx: CommandContext): string {
     : `
 <div class="text-xs font-mono space-y-1.5 p-3 rounded bg-[#0d1117] border border-[#10b981]">
   <div class="text-[#8b949e] text-[11px]">[exec] Running ./helloworld.sh ...</div>
-  <div class="text-[#10b981] font-bold text-sm">Hello, World! 🚀</div>
-  <p class="text-[#e6edf3]">Welcome to Gulo's digital cockpit (Chalmers CS // D-24).</p>
+  <div class="text-[#10b981] font-bold text-sm">Hello, World!</div>
+  <p class="text-[#e6edf3]">Welcome to gulo.se.</p>
   <div class="text-[#8b949e] text-[11px] pt-1 border-t border-[#30363d]/50">
     Try running <code class="text-[#38bdf8]">school</code>, <code class="text-[#38bdf8]">swim</code>, <code class="text-[#38bdf8]">calc 42 * 1337</code>, <code class="text-[#38bdf8]">guess</code>, or <code class="text-[#38bdf8]">git status</code>!
   </div>

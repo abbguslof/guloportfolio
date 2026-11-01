@@ -1,5 +1,5 @@
 ---
-// src/pages/index.astro - Huvudsida: Cockpit & Playground
+// src/pages/index.astro - Home
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import InteractiveTerminal from '../components/InteractiveTerminal.astro';
@@ -9,13 +9,10 @@ import Footer from '../components/Footer.astro';
 import { getCollection } from 'astro:content';
 import { getGroupedProjects } from '../utils/projects';
 
-// Hämta projekt
 const sortedProjects = await getGroupedProjects();
-// Utvalda projekt för startsidan
 const featuredProjects = sortedProjects.filter((p) => p.en.data.featured);
 const displayProjects = featuredProjects.length > 0 ? featuredProjects : sortedProjects.slice(0, 2);
 
-// Hämta tankar & anteckningar (sorterade efter nyast först, max 5 för startsidan)
 const thoughts = await getCollection('thoughts');
 const sortedThoughts = thoughts
   .filter((post) => !post.data.draft)
@@ -23,45 +20,35 @@ const sortedThoughts = thoughts
 const latestThoughts = sortedThoughts.slice(0, 5);
 ---
 
-<Layout 
-  titleEn="gulo // digital garden & playground" 
-  titleSv="gulo // digital trädgård & playground"
-  descriptionEn="Personal cockpit, portfolio and file archive. Chalmers Datateknik, swimming, Minecraft homelab and systems programming."
-  descriptionSv="Personlig cockpit, portfolio och filarkiv. Chalmers Datateknik, simning, Minecraft-homelab och systemprogrammering."
+<Layout
+  titleEn="Gustav Löfqvist"
+  titleSv="Gustav Löfqvist"
+  descriptionEn="Gustav Löfqvist studies computer science at Chalmers, swims sprint freestyle, and runs a homelab in Gothenburg."
+  descriptionSv="Gustav Löfqvist läser datateknik på Chalmers, simmar sprint och driver ett homelab i Göteborg."
 >
-  <!-- Header -->
   <Header />
 
-  <main id="main-content" tabindex="-1" class="w-full space-y-10 sm:space-y-16 outline-none">
-    <!-- 1. Hero: Interactive Terminal (Med Chafa-porträtt, fungerande fönsterknappar & Bash) -->
+  <main id="main-content" tabindex="-1" class="w-full space-y-12 sm:space-y-16 outline-none">
     <InteractiveTerminal isSubpage={false} />
 
-    <!-- 2. Utvalda Projekt & Homelab (Portfolio Showcase) -->
-    <section id="projects" class="w-full" aria-labelledby="projects-heading">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-5 sm:mb-6 border-b border-[#30363d] gap-2">
-        <div class="flex items-center gap-2">
-          <span class="text-[#a78bfa] font-bold">#</span>
-          <h2 id="projects-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3]" data-i18n="home_hero_projects_title">
-            Featured Projects &amp; Homelab
+    {displayProjects.length > 0 && (
+      <section id="projects" class="w-full" aria-labelledby="projects-heading">
+        <div class="flex items-baseline justify-between gap-4 pb-2 mb-5 border-b border-[#30363d]">
+          <h2 id="projects-heading" class="text-base font-semibold text-[#e6edf3]">
+            <span class="text-[#a78bfa] font-bold mr-1.5">#</span><a href="/projects" class="hover:underline underline-offset-4 transition-colors" data-i18n="home_hero_projects_title">Projects</a>
           </h2>
-        </div>
-
-        <div class="flex items-center gap-3 text-xs font-mono">
-          <a 
-            href="/projects" 
-            class="text-[#38bdf8] hover:text-[#e6edf3] hover:underline transition-colors flex items-center gap-1 py-1"
+          <a
+            href="/projects"
+            class="text-xs text-[#8b949e] hover:text-[#e6edf3] transition-colors"
             data-i18n="home_hero_projects_view_all"
-            data-i18n-count={sortedProjects.length}
           >
-            [View full portfolio ({sortedProjects.length}) →]
+            All projects
           </a>
         </div>
-      </div>
 
-      {displayProjects.length > 0 ? (
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
           {displayProjects.map((project) => (
-            <ProjectCard 
+            <ProjectCard
               titleEn={project.en.data.title}
               titleSv={project.sv.data.title}
               descEn={project.en.data.description}
@@ -75,75 +62,47 @@ const latestThoughts = sortedThoughts.slice(0, 5);
             />
           ))}
         </div>
-      ) : (
-        <div class="rounded-lg bg-[#161b22] border border-[#30363d] p-8 text-center text-xs font-mono text-[#8b949e] space-y-2">
-          <div class="text-[#a78bfa] font-bold text-sm" data-i18n="projects_empty_title">[STAGING // REPOSITORY SYNC]</div>
-          <p data-i18n="projects_empty_desc">Portfolio projects are currently being staged and verified. Check back soon.</p>
-        </div>
-      )}
-    </section>
+      </section>
+    )}
 
-    <!-- 3. Senaste Tankar, Guider & Anteckningar (Max 5 poster med kategori, datum & utdrag) -->
     <section id="thoughts" class="w-full" aria-labelledby="thoughts-heading">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-4 sm:mb-5 border-b border-[#30363d] gap-2">
-        <div class="flex items-center gap-2">
-          <span class="text-[#f59e0b] font-bold">#</span>
-          <h2 id="thoughts-heading" class="text-sm font-semibold tracking-wider uppercase text-[#e6edf3] flex items-center gap-2" data-i18n="home_hero_thoughts_title">
-            Latest Thoughts, Guides &amp; Notes
-          </h2>
-          <span class="lang-sv-only text-[10px] font-mono text-[#f59e0b] bg-[#f59e0b]/10 border border-[#f59e0b]/30 px-1.5 py-0.5 rounded" title="Innehållet skrivs enbart på engelska">
-            EN
-          </span>
-        </div>
-
-        <div class="flex items-center gap-3 text-xs font-mono">
-          <a 
-            href="/thoughts" 
-            class="text-[#38bdf8] hover:text-[#e6edf3] hover:underline transition-colors flex items-center gap-1 py-1"
-            data-i18n="home_hero_thoughts_view_all"
-            data-i18n-count={sortedThoughts.length}
-          >
-            [Full blog archive ({sortedThoughts.length}) →]
-          </a>
-        </div>
+      <div class="flex items-baseline justify-between gap-4 pb-2 mb-4 border-b border-[#30363d]">
+        <h2 id="thoughts-heading" class="text-base font-semibold text-[#e6edf3]">
+          <span class="text-[#f59e0b] font-bold mr-1.5">#</span><a href="/thoughts" class="hover:underline underline-offset-4 transition-colors" data-i18n="home_hero_thoughts_title">Writing</a>
+        </h2>
+        <a
+          href="/thoughts"
+          class="text-xs text-[#8b949e] hover:text-[#e6edf3] transition-colors"
+          data-i18n="home_hero_thoughts_view_all"
+        >
+          All writing
+        </a>
       </div>
 
-      <!-- Articles list container with rich rows -->
-      {latestThoughts.length > 0 ? (
-        <>
-          <div class="thought-container rounded-lg bg-[#161b22] border border-[#30363d] p-2.5 sm:p-3 divide-y divide-[#30363d]/40">
-            {latestThoughts.map((post) => (
-              <ThoughtRow 
-                title={post.data.title}
-                slug={post.id}
-                pubDate={post.data.pubDate}
-                category={post.data.category}
-                description={post.data.description}
-                tags={post.data.tags}
-              />
-            ))}
-          </div>
+      <p class="lang-sv-only mb-3 text-[11px] text-[#8b949e]" data-i18n="thoughts_archive_lang_note">
+        (Texterna publiceras på engelska)
+      </p>
 
-          <div class="mt-4 text-center">
-            <a 
-              href="/thoughts" 
-              class="inline-flex items-center justify-center gap-2 text-xs font-mono text-[#8b949e] hover:text-[#10b981] hover:bg-[#1f242c] px-4 py-2.5 sm:py-2 min-h-[38px] sm:min-h-auto rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#10b981] transition-all w-full sm:w-auto"
-              data-i18n="home_hero_thoughts_bottom_btn"
-              data-i18n-count={sortedThoughts.length}
-            >
-              View all thoughts, guides and notes in the archive ({sortedThoughts.length} posts) →
-            </a>
-          </div>
-        </>
-      ) : (
-        <div class="rounded-lg bg-[#161b22] border border-[#30363d] p-8 text-center text-xs font-mono text-[#8b949e] space-y-2">
-          <div class="text-[#f59e0b] font-bold text-sm" data-i18n="thoughts_empty_title">[STAGING // POST ARCHIVE]</div>
-          <p data-i18n="thoughts_empty_desc">Notes and articles are currently being staged. New posts incoming.</p>
+      {latestThoughts.length > 0 ? (
+        <div class="border-y border-[#30363d] divide-y divide-[#30363d]/60">
+          {latestThoughts.map((post) => (
+            <ThoughtRow
+              title={post.data.title}
+              slug={post.id}
+              pubDate={post.data.pubDate}
+              category={post.data.category}
+              description={post.data.description}
+              tags={post.data.tags}
+            />
+          ))}
         </div>
+      ) : (
+        <p class="py-6 text-sm text-[#8b949e]">
+          No writing published yet.
+        </p>
       )}
     </section>
   </main>
 
-  <!-- Footer -->
   <Footer />
 </Layout>

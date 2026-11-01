@@ -11,44 +11,34 @@ const sortedProjects = await getGroupedProjects();
 ---
 
 <Layout 
-  titleEn="Projects & Portfolio // gulo" 
-  titleSv="Projekt & Portfolio // gulo"
-  descriptionEn="Portfolio of systems programming, Chalmers Datateknik coursework, Minecraft infrastructure, and homelab setups."
-  descriptionSv="Portfolio med systemprogrammering, laborationer från Chalmers, Minecraft-infrastruktur och homelab."
+  titleEn="Projects"
+  titleSv="Projekt"
+  descriptionEn="Systems work, coursework, and things running at home."
+  descriptionSv="Systemarbete, kursarbete och saker som körs hemma."
 >
   <Header />
 
   <!-- Global terminal on subpages (opens on header button click) -->
   <InteractiveTerminal isSubpage={true} />
 
-  <main id="main-content" tabindex="-1" class="w-full py-4 space-y-10 outline-none">
+  <main id="main-content" tabindex="-1" class="w-full py-4 space-y-10 outline-none" style="--page-accent:#a78bfa;">
     <!-- Breadcrumb & Top Header -->
     <div class="border-b border-[#30363d] pb-6">
-      <div class="flex items-center gap-2 text-xs font-mono text-[#8b949e] mb-3">
-        <a href="/" class="hover:text-[#10b981] transition-colors" data-i18n="projects_breadcrumb_home">[~/home]</a>
-        <span>/</span>
-        <span class="text-[#e6edf3]" data-i18n="projects_breadcrumb_current">projects</span>
-      </div>
+      <nav class="flex items-center gap-2 text-[11px] text-[#8b949e] mb-4" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-[#e6edf3] transition-colors" data-i18n="projects_breadcrumb_home">Home</a>
+        <span aria-hidden="true">/</span>
+        <span class="text-[#e6edf3]" data-i18n="projects_breadcrumb_current">Projects</span>
+      </nav>
 
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-        <div>
-          <h1 class="text-xl sm:text-3xl font-bold font-mono text-[#e6edf3] tracking-tight" data-i18n="projects_title">
-            Projects, Homelab &amp; Code
-          </h1>
-          <p class="text-xs sm:text-sm text-[#8b949e] mt-1 font-mono" data-i18n="projects_subtitle">
-            Technical deep dives, Chalmers lab coursework, and self-hosted infrastructure.
-          </p>
-        </div>
-
-        <div class="flex items-center gap-3 text-xs font-mono text-[#8b949e] self-start sm:self-auto">
-          <span class="px-2.5 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#10b981] font-mono text-xs">
-            <span id="project-count-badge">{sortedProjects.length}</span> <span data-i18n="projects_count_suffix">projects available</span>
-          </span>
-        </div>
-      </div>
+      <h1 class="text-2xl sm:text-3xl font-semibold text-[#e6edf3] tracking-tight">
+        <span class="text-[#a78bfa] font-bold mr-1.5">#</span><span data-i18n="projects_title">Projects</span>
+      </h1>
+      <p class="mt-1 max-w-[60ch] font-serif text-[18px] leading-relaxed text-[#b0bac4]" data-i18n="projects_subtitle">
+        Systems work, coursework, and things running at home.
+      </p>
 
       <!-- Search & Filters Bar -->
-      <div class="mt-5 sm:mt-6 pt-4 border-t border-[#30363d]/60 space-y-3.5 sm:space-y-4">
+      <div class={sortedProjects.length > 0 ? "mt-5 sm:mt-6 pt-4 border-t border-[#30363d]/60 space-y-3.5 sm:space-y-4" : "hidden"}>
         <!-- Live Search Bar -->
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none gap-1.5 text-xs font-mono text-[#8b949e]">
@@ -140,9 +130,9 @@ const sortedProjects = await getGroupedProjects();
         </div>
       </>
     ) : (
-      <div class="rounded-lg bg-[#161b22] border border-[#30363d] p-8 sm:p-12 text-center text-xs font-mono text-[#8b949e] space-y-2">
-        <div class="text-[#a78bfa] font-bold text-sm" data-i18n="projects_empty_title">[STAGING // REPOSITORY SYNC]</div>
-        <p data-i18n="projects_empty_desc">Portfolio projects are currently being staged and verified. Check back soon.</p>
+      <div class="py-8 max-w-[60ch] space-y-2">
+        <p class="font-serif text-[17px] leading-relaxed text-[#b0bac4]" data-i18n="projects_empty_desc">No project write-ups yet. The writing archive has the work in progress.</p>
+        <p class="text-xs"><a href="/thoughts" class="text-[#8b949e] underline decoration-[#30363d] underline-offset-2 hover:text-[#e6edf3]" data-i18n="projects_empty_link">Read the writing</a></p>
       </div>
     )}
 
@@ -150,9 +140,9 @@ const sortedProjects = await getGroupedProjects();
     <div class="pt-8 border-t border-[#30363d] flex items-center justify-between text-xs font-mono text-[#8b949e]">
       <a href="/" class="hover:text-[#10b981] transition-colors flex items-center gap-1.5">
         <span>←</span>
-        <span data-i18n="projects_back_home">[Back to the cockpit]</span>
+        <span data-i18n="projects_back_home">Back home</span>
       </a>
-      <span class="hidden sm:inline">gulo // portfolio matrix</span>
+      <span class="hidden sm:inline">Gustav Löfqvist</span>
     </div>
   </main>
 
@@ -207,12 +197,12 @@ const sortedProjects = await getGroupedProjects();
         currentCat = btn.getAttribute('data-category') || 'all';
 
         btns.forEach((b) => {
-          b.classList.remove('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]');
+          b.classList.remove('bg-[#1b212a]', 'text-[#e6edf3]', 'font-semibold', 'border-[#10b981]');
           b.classList.add('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]');
         });
 
         btn.classList.remove('bg-[#161b22]', 'text-[#8b949e]', 'border-[#30363d]');
-        btn.classList.add('bg-[#10b981]', 'text-[#0d1117]', 'font-semibold', 'border-[#10b981]');
+        btn.classList.add('bg-[#1b212a]', 'text-[#e6edf3]', 'font-semibold', 'border-[#10b981]');
 
         filterProjects();
       });

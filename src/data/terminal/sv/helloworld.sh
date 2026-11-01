@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# helloworld.sh - Gulos välkomstskript
+# helloworld.sh - gulo.se välkomstskript
 
-echo "Hej världen! 🚀"
-echo "Välkommen till Gulos digitala cockpit (Chalmers Datateknik // D-24)."
+echo "Hej världen!"
+echo "Välkommen till gulo.se."
 echo "Testa att köra 'school', 'swim', 'calc 42 * 1337', 'guess' eller 'git status'!"

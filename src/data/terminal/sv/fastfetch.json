@@ -1,8 +1,8 @@
 {
   "user": "gulo",
   "host": "chalmers-station",
-  "badge": "CHALMERS // D-24",
-  "tagline": "simmare • sysdev",
+  "badge": "Chalmers D-24",
+  "tagline": "simmare, sysdev",
   "specs": [
     {
       "key": "Skapare",
@@ -25,13 +25,8 @@
       "color": "sky"
     },
     {
-      "key": "Uptime",
-      "value": "42 dagar, 8 timmar, 14 min",
-      "color": "sky"
-    },
-    {
       "key": "Shell",
-      "value": "bash 5.2 / zsh 5.9 • alacritty",
+      "value": "bash 5.2 / zsh 5.9, alacritty",
       "color": "sky"
     },
     {
@@ -46,19 +41,13 @@
     },
     {
       "key": "Simning",
-      "value": "MASS & Growth Objective // Åbybadet & GoCo (Sprint frisim/fjäril)",
+      "value": "MASS & Growth Objective, sprint frisim/fjäril",
       "color": "emerald"
     },
     {
       "key": "Homelab",
-      "value": "Proxmox VE, Raspberry Pi, Webb & MC-kluster",
+      "value": "Proxmox VE och ett Raspberry Pi-kluster",
       "color": "emerald"
-    },
-    {
-      "key": "Status",
-      "value": "[ONLINE] Studier & Sprintträning",
-      "color": "amber",
-      "online": true
     }
   ]
 }

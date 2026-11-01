@@ -1,8 +1,8 @@
-# gulo // Chalmers student, sprint swimmer & developer
-- Studies: Computer Science & Engineering @ Chalmers University of Technology (Year 2, EDIT building, RIU elite athlete).
-- Athletics: Competitive sprint swimmer for MASS & Growth Objective (Åbybadet & GoCo, 50m/100m freestyle & butterfly).
-- Tech & OS: Omarchy (Arch Linux + Hyprland), Alacritty, Neovim. Dualboot Windows/macOS. Python, C, Java, JavaScript.
-- Homelab: Proxmox VE server & Raspberry Pi cluster. Deploying websites, Minecraft clusters, and internal services.
-- Interests: Outdoors (hiking, climbing, cycling, discgolf, golf), photo & video (Sony ZV-E10).
+# Gustav Löfqvist (gulo)
+- Studies: Computer Science and Engineering at Chalmers, year two, EDIT building, RIU student
+- Swimming: Sprint freestyle and butterfly for MASS and Growth Objective
+- Linux: Arch with Hyprland, Neovim, Alacritty
+- Homelab: Proxmox server and a Raspberry Pi cluster
+- Outside: hiking, climbing, cycling, discgolf, golf, and photo/video on a Sony ZV-E10
 ---
-Status: [ONLINE] Studying & Sprint training in Gothenburg
+Studying and training in Gothenburg.

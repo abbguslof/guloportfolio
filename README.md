@@ -1,4 +1,4 @@
-# 🚀 GULO // Personal Cockpit & TUI Digital Garden (gulo.se)
+# GULO // Personal Site & Terminal (gulo.se)
 
 ```text
   ____ _   _ _     ___  
@@ -6,7 +6,7 @@
 | |  _| | | | |  | | | |
 | |_| | |_| | |__| |_| |
  \____|\___/|_____\___/ 
- CHALMERS // D-24 // TUI WORKSTATION & DIGITAL PLAYGROUND
+ CHALMERS D-24 // PERSONAL SITE & TERMINAL
 ```
 
 [![Site](https://img.shields.io/badge/Live-gulo.se-10b981?style=flat-square)](https://gulo.se)
@@ -16,7 +16,7 @@
 [![Typography](https://img.shields.io/badge/Font-JetBrains%20Mono-000000?style=flat-square&logo=jetbrains&logoColor=white)](https://www.jetbrains.com/lp/mono/)
 [![Security](https://img.shields.io/badge/Security-CSP%20%2B%20XSS%20Hardened-10b981?style=flat-square)](#-security--hardening)
 
-A personal digital garden, portfolio showcase, technical blog, and file distribution hub disguised as an interactive Unix/Linux TUI workstation. Hosted on **GitHub Pages** at **[gulo.se](https://gulo.se)**, built with **Astro 7 (Static Site Generation)**, **TypeScript**, and **Tailwind CSS v4** for maximum performance, battery efficiency, and zero layout shift.
+A personal site with an interactive Unix terminal, a writing archive, and a small file shelf. Hosted on **GitHub Pages** at **[gulo.se](https://gulo.se)**, built with **Astro 7 (Static Site Generation)**, **TypeScript**, and **Tailwind CSS v4** for maximum performance, battery efficiency, and zero layout shift.
 
 ---
 
@@ -117,11 +117,13 @@ For research notes or course reports written in **Overleaf / LaTeX**:
 
 ## 🔒 Security & Hardening
 
-- **Content Security Policy (CSP)**: Enforced via `<meta http-equiv="Content-Security-Policy">` restricting scripts, objects, and connect sources to origin.
+- **Content Security Policy (CSP)**: Restricted to `self` sources, with `object-src 'none'`, `base-uri 'self'`, and `form-action 'self'`. Inline scripts are required by the static terminal/boot sequence; all dynamic terminal input is escaped before rendering.
 - **Referrer Policy**: Strict cross-origin referrer policy (`strict-origin-when-cross-origin`).
-- **Input Sanitization**: All user inputs in the terminal emulator (`git`, `guess`, `echo`, `cat`, `wget`, `calc`, etc.) are sanitized via `escapeHtml` to prevent client-side DOM XSS.
-- **Dependency Audit**: Clean `npm audit` with 0 known vulnerabilities.
-- **No External CDN Dependencies**: JetBrains Mono font, Tailwind, and assets are bundled locally for privacy, offline resilience, and speed.
+- **Input Sanitization**: Terminal commands (`git`, `guess`, `echo`, `cat`, `wget`, `calc`, etc.) escape user input. The calculator uses a dedicated parser rather than `eval`/`Function`.
+- **Supabase RLS**: `terminal_messages` and `terminal_stats` are insert-only for the anon role. No public select policy exists, and the anon key is not a service-role secret. The client cooldown is a spam deterrent, not a server-side rate limit.
+- **Dependency Audit**: `npm audit` reports 0 known vulnerabilities after the latest fixes.
+- **No Secrets In Git**: `.env.local` and `.env.*` are ignored; only example values are committed.
+- **No External CDN Dependencies**: JetBrains Mono, Newsreader, Tailwind, and assets are bundled locally for privacy, offline resilience, and speed.
 
 ---
 
@@ -133,12 +135,14 @@ For research notes or course reports written in **Overleaf / LaTeX**:
   - Simulated Neovim viewer (`nvim whoami.md`) with TokyoNight statusline.
   - Companion PDF downloading (`wget my-paper.pdf`) with dynamic autocomplete.
   - Tab auto-completion, Ctrl+C interrupt, Ctrl+L screen clear, command history (↑/↓ arrows).
+  - Two-column `help` on wide terminals, GULO emblem in `fastfetch`, true fullscreen, and hide/recover for the About card.
+  - Background mode is off by default for reading; `bg standard` restores the animated contour canvas and the other shader modes remain opt-in.
 - **Authentic Two-Stage Linux Kernel Boot Intro**:
-  - Realistic 23-line dmesg cascade transitioning smoothly into a centered cockpit splash screen.
+  - Realistic 23-line dmesg cascade transitioning smoothly into a centered boot splash screen.
   - Natural typewriter animation typing "launching terminal" / "startar terminalen" with steady trailing dots and cursor.
   - 100% bilingual (EN / SV), reduced-motion friendly, instant-skip on any keypress or click, and replayable via the `reboot` / `reset` command.
 - **Rich Open Graph Social Cards & Complete Favicon Suite**:
-  - Custom 1200×630 Open Graph preview card (`/images/og-card.png`) featuring ambient cockpit glow, wolverine emblem, and terminal highlights.
+  - Custom 1200×630 Open Graph preview card (`/images/og-card.png`) with a typographic layout and the site palette.
   - Complete `og:*` and `twitter:card="summary_large_image"` metadata for rich previews on iMessage, Discord, WhatsApp, Twitter/X, and LinkedIn.
   - Multi-resolution icon set (`.svg` vector, `.ico` fallback, 32×32 and 16×16 PNGs, iOS `apple-touch-icon.png`) and Progressive Web App manifest (`site.webmanifest`).
 - **Overleaf LaTeX / Markdown Parity & Companion PDFs**:
@@ -146,13 +150,19 @@ For research notes or course reports written in **Overleaf / LaTeX**:
   - Optional `pdfUrl` and `pdfName` on thoughts and projects render a clean download button on the slug page (aligned next to the word count under tags).
   - Isolated from `/files` to keep the downloads hub clean.
   - Dynamically available in the terminal for `wget` and tab autocompletion only when defined.
-- **Living Ambient Cockpit (`src/components/AmbientBackground.astro`)**:
-  - Canvas 2D elevation contour waves (Standard) + WebGL shader effects (`topo`, `dither`, `ascii`, `dots`, `pixel`, `shimmer`, `off`).
-  - Calibrated low opacities, zero battery drain when tab is backgrounded.
-- **Live Diagnostics Grid (`src/components/Footer.astro`)**:
-  - Resilient CSP-compliant same-origin ping measurement, location, uptime, and system nominal telemetry.
+- **Ambient Background (`src/components/AmbientBackground.astro`)**:
+  - Defaults to `off` for readable text. The animated canvas contour waves (`bg standard`) and WebGL effects (`topo`, `dither`, `ascii`, `dots`, `pixel`, `shimmer`) remain available as opt-in easter eggs.
+  - Calibrated low opacities, zero battery drain when the tab is backgrounded.
+- **Writing Archive**:
+  - Category and tag filters sync to the URL (`?category=guide`, `?tag=wellbeing`), and category/tag chips link into the filtered archive.
+  - Article links, inline code, and the code-copy button use the post category accent. Writing titles stay white to keep the list calm.
+- **Quiet Footer (`src/components/Footer.astro`)**:
+  - Local Gothenburg time, navigation, contact links, an `about` shortcut, and the build date. No network probing, simulated uptime, or status badges.
+- **Navigation & Motion**:
+  - A sliding header underline: faint on hover, full in the page colour when active.
+  - Page content fades in through a fixed wash on navigation.
 - **Full Keyboard Traversal (`src/scripts/keyboard-nav.ts`)**:
-  - Complete navigation with `Tab`, `Shift+Tab`, `Esc`, `Enter`, and Arrow keys.
+  - Skip link, roving `Tab`/`Shift+Tab`, arrow navigation for the header, writing filters, tags, cards, and project/file lists, plus focus management after filtering, hiding the About card, and recovering it from the footer.
 
 ---
 

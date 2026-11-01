@@ -1,122 +1,86 @@
 ---
-// Header.astro - Full-width Floating Cockpit Navigation with Active Page Indicators
+// Header.astro - Site navigation
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 const isProjects = currentPath.startsWith('/projects');
 const isThoughts = currentPath.startsWith('/thoughts');
 const isFiles = currentPath.startsWith('/files');
-const isHome = currentPath === '/';
 ---
 
-<!-- Placeholder div in normal document flow to guarantee 0px layout shift -->
+<!-- Placeholder in normal flow so the fixed header causes no layout shift -->
 <div class="h-14 sm:h-16 w-full mb-4 sm:mb-8 select-none pointer-events-none" aria-hidden="true"></div>
 
-<!-- Full-width Fixed Header: spans 100vw so background never cuts off -->
-<header id="site-header" class="fixed top-0 left-0 right-0 w-full z-50 pointer-events-none transition-[background-color,border-color,box-shadow] duration-250 ease-out">
-  <div 
-    id="header-surface" 
-    class="pointer-events-auto w-full max-w-[1400px] mx-auto px-2.5 sm:px-8 py-2 sm:py-3.5 pt-[calc(0.5rem+env(safe-area-inset-top,0px))] sm:pt-3.5 transition-[padding-top,padding-bottom] duration-250 ease-out"
+<header id="site-header" class="fixed top-0 left-0 right-0 w-full z-50 pointer-events-none">
+  <div
+    id="header-surface"
+    class="pointer-events-auto w-full max-w-[1400px] mx-auto px-3 sm:px-8 py-2 sm:py-3.5 pt-[calc(0.5rem+env(safe-area-inset-top,0px))] sm:pt-3.5 transition-[padding-top,padding-bottom] duration-200 ease-out"
   >
-    <div class="w-full flex items-center justify-between gap-1.5 sm:gap-6">
-      <!-- Brand / Logo (Far left to maximize center reading area) -->
-      <div id="header-brand" class="flex items-center gap-2 sm:gap-3 shrink-0">
-        <a href="/" class="group flex items-center gap-1.5 sm:gap-2 text-sm font-semibold tracking-tight transition-colors">
-          <span class={`px-2 py-1 sm:py-0.5 rounded font-mono text-xs font-bold transition-all min-h-[32px] sm:min-h-auto flex items-center ${
-            isHome 
-              ? 'bg-[#161b22] border border-[#10b981] text-[#10b981]' 
-              : 'bg-[#161b22] border border-[#30363d] text-[#10b981]'
-          }`} id="header-brand-badge">
-            GULO
-          </span>
-          <span class="text-xs font-mono text-[#8b949e] group-hover:text-[#e6edf3] transition-colors hidden md:inline">
-            chalmers.d <span class="text-[#30363d]">//</span> playground
-          </span>
-        </a>
+    <div class="w-full flex items-center justify-between gap-3 sm:gap-6">
+      <a href="/" class="group flex items-baseline gap-2 shrink-0">
+        <span class="text-sm font-bold tracking-tight text-[#e6edf3] group-hover:text-[#10b981] transition-colors">gulo</span>
+        <span class="text-[11px] text-[#8b949e] hidden md:inline">Gustav Löfqvist</span>
+      </a>
 
-        <span 
-          id="header-online-status"
-          class="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#161b22] border border-[#30363d] text-[#10b981] transition-all"
-          title="Station Connected // Online"
-        >
-          <span id="header-online-dot" class="w-1.5 h-1.5 mr-1 rounded-full bg-[#10b981] animate-pulse"></span>
-          <span id="header-online-text" data-i18n="header_status_online">ONLINE</span>
-        </span>
-      </div>
+      <nav id="header-nav" class="flex items-center flex-nowrap gap-3 sm:gap-5 text-xs shrink-0 overflow-x-auto no-scrollbar" aria-label="Main navigation">
+        <div id="nav-links" class="relative flex items-center gap-3 sm:gap-5 shrink-0">
+          <a
+            href="/projects"
+            class={`nav-link py-1.5 sm:py-1 transition-colors ${isProjects ? 'text-[#e6edf3]' : 'text-[#8b949e] hover:text-[#e6edf3]'}`}
+            data-i18n="nav_projects"
+            data-nav="projects"
+            data-color="#a78bfa"
+            aria-current={isProjects ? 'page' : undefined}
+          >projects</a>
+          <a
+            href="/thoughts"
+            class={`nav-link py-1.5 sm:py-1 transition-colors ${isThoughts ? 'text-[#e6edf3]' : 'text-[#8b949e] hover:text-[#e6edf3]'}`}
+            data-i18n="nav_thoughts"
+            data-nav="thoughts"
+            data-color="#f59e0b"
+            aria-current={isThoughts ? 'page' : undefined}
+          >writing</a>
+          <a
+            href="/files"
+            class={`nav-link py-1.5 sm:py-1 transition-colors ${isFiles ? 'text-[#e6edf3]' : 'text-[#8b949e] hover:text-[#e6edf3]'}`}
+            data-i18n="nav_files"
+            data-nav="files"
+            data-color="#38bdf8"
+            aria-current={isFiles ? 'page' : undefined}
+          >files</a>
+          <span id="nav-underline" class="pointer-events-none absolute bottom-0 left-0 h-[2px] rounded-full opacity-0 transition-all duration-300 ease-out" aria-hidden="true"></span>
+        </div>
+        <a
+          href="https://github.com/abbguslof"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hidden md:inline-flex items-center gap-1 py-1 text-[#8b949e] hover:text-[#e6edf3] transition-colors"
+          aria-label="GitHub profile"
+        >github<span class="text-[10px]">↗</span></a>
 
-      <!-- Navigation & Controls (Far right to maximize center reading area) -->
-      <nav id="header-nav" class="flex items-center flex-nowrap gap-1 sm:gap-2 text-xs font-mono shrink-0 overflow-x-auto no-scrollbar" aria-label="Huvudnavigation">
-        <button 
-          type="button" 
-          id="header-terminal-toggle" 
-          class="px-2 sm:px-2.5 py-1.5 sm:py-1 min-h-[32px] sm:min-h-auto rounded bg-[#161b22] border border-[#30363d] text-[#10b981] hover:text-[#e6edf3] hover:bg-[#1f242c] hover:border-[#10b981] active:scale-95 transition-all cursor-pointer flex items-center gap-1 sm:gap-1.5 shadow-sm text-xs shrink-0"
-          title="Toggle terminal (open/close)"
+        <button
+          type="button"
+          id="header-terminal-toggle"
+          class="py-1.5 sm:py-1 text-[#10b981] hover:text-[#e6edf3] transition-colors cursor-pointer flex items-center gap-1.5"
+          title="Toggle terminal"
+          aria-label="Toggle terminal"
         >
-          <span>&gt;_</span>
+          <span class="font-bold">&gt;_</span>
           <span class="hidden sm:inline" data-i18n="nav_terminal">terminal</span>
         </button>
-        <a 
-          href="/projects" 
-          class={`nav-link px-2 sm:px-2.5 py-1.5 sm:py-1 min-h-[32px] sm:min-h-auto rounded border transition-all text-xs shrink-0 flex items-center justify-center ${
-            isProjects 
-              ? 'border-[#a78bfa] text-[#e6edf3] bg-[#a78bfa]/15 font-semibold shadow-sm' 
-              : 'bg-[#161b22] border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#1f242c] hover:border-[#a78bfa]'
-          }`}
-          data-i18n="nav_projects"
-          data-nav="projects"
-        >
-          projects
-        </a>
-        <a 
-          href="/thoughts" 
-          class={`nav-link px-2 sm:px-2.5 py-1.5 sm:py-1 min-h-[32px] sm:min-h-auto rounded border transition-all text-xs shrink-0 flex items-center justify-center ${
-            isThoughts 
-              ? 'border-[#f59e0b] text-[#e6edf3] bg-[#f59e0b]/15 font-semibold shadow-sm' 
-              : 'bg-[#161b22] border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#1f242c] hover:border-[#f59e0b]'
-          }`}
-          data-nav="thoughts"
-        >
-          <span class="hidden sm:inline" data-i18n="nav_thoughts">blog / thoughts</span>
-          <span class="sm:hidden" data-i18n="nav_thoughts_short">thoughts</span>
-        </a>
-        <a 
-          href="/files" 
-          class={`nav-link px-2 sm:px-2.5 py-1.5 sm:py-1 min-h-[32px] sm:min-h-auto rounded border transition-all text-xs shrink-0 flex items-center justify-center ${
-            isFiles 
-              ? 'border-[#38bdf8] text-[#e6edf3] bg-[#38bdf8]/15 font-semibold shadow-sm' 
-              : 'bg-[#161b22] border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#1f242c] hover:border-[#38bdf8]'
-          }`}
-          data-i18n="nav_files"
-          data-nav="files"
-        >
-          files
-        </a>
-        <a 
-          href="https://github.com/abbguslof" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="px-1.5 sm:px-2 py-1 rounded bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#1f242c] hover:border-[#e6edf3] transition-all hidden md:inline-flex items-center gap-1 shrink-0"
-          aria-label="GitHub profil (öppnas i ny flik)"
-        >
-          <span>gh</span><span class="text-[10px]">↗</span>
-        </a>
 
-        <!-- Language Switcher [ EN | SV ] -->
-        <div class="flex items-center p-0.5 rounded bg-[#161b22] border border-[#30363d] select-none shrink-0" id="lang-toggle-container" title="Switch language (EN/SV)">
-          <button 
-            type="button" 
-            id="btn-lang-en" 
-            class="lang-btn px-2 sm:px-2 py-1 sm:py-0.5 min-h-[30px] sm:min-h-auto text-[10px] font-bold rounded transition-all cursor-pointer text-[#10b981] bg-[#0d1117] border border-[#10b981]/40 shadow-sm"
+        <div class="flex items-center gap-1 select-none" id="lang-toggle-container" title="Switch language">
+          <button
+            type="button"
+            id="btn-lang-en"
+            class="lang-btn px-1 py-1 text-[10px] font-bold transition-colors cursor-pointer text-[#e6edf3]"
             aria-label="Switch to English"
-          >
-            EN
-          </button>
-          <button 
-            type="button" 
-            id="btn-lang-sv" 
-            class="lang-btn px-2 sm:px-2 py-1 sm:py-0.5 min-h-[30px] sm:min-h-auto text-[10px] font-bold rounded transition-all cursor-pointer text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#1f242c]/60"
+          >EN</button>
+          <span class="text-[#30363d] text-[10px]">/</span>
+          <button
+            type="button"
+            id="btn-lang-sv"
+            class="lang-btn px-1 py-1 text-[10px] font-bold transition-colors cursor-pointer text-[#8b949e] hover:text-[#e6edf3]"
             aria-label="Växla till svenska"
-          >
-            SV
-          </button>
+          >SV</button>
         </div>
       </nav>
     </div>
@@ -124,36 +88,21 @@ const isHome = currentPath === '/';
 </header>
 
 <style>
-  /* Header spans 100vw so the background and border never cut off */
   #site-header {
-    background-color: rgba(13, 17, 23, 0.75);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-bottom: 1px solid rgba(48, 54, 61, 0.35);
-    box-shadow: 0 2px 10px -2px rgba(0, 0, 0, 0.25);
+    background-color: rgba(13, 17, 23, 0.72);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(48, 54, 61, 0.25);
   }
 
   #site-header.is-scrolled {
     background-color: rgba(13, 17, 23, 0.92);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border-bottom: 1px solid rgba(48, 54, 61, 0.85);
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.55);
+    border-bottom: 1px solid rgba(48, 54, 61, 0.7);
   }
 
-  /* Scrolled inner container contracts strictly vertically — zero horizontal shifts or jumping sideways */
   #header-surface.is-scrolled {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
-  }
-
-  /* Reliable disconnect styling for GULO badge */
-  #header-brand-badge.is-offline {
-    color: #f85149 !important;
-    border-color: #f85149 !important;
-  }
-  #header-brand-badge.is-online {
-    color: #10b981 !important;
   }
 </style>
 
@@ -166,15 +115,11 @@ const isHome = currentPath === '/';
   let ticking = false;
 
   function onScroll() {
-    const scrollY = window.scrollY;
-    if (scrollY > 60 && !isScrolled) {
-      isScrolled = true;
-      siteHeader?.classList.add('is-scrolled');
-      headerSurface?.classList.add('is-scrolled');
-    } else if (scrollY < 20 && isScrolled) {
-      isScrolled = false;
-      siteHeader?.classList.remove('is-scrolled');
-      headerSurface?.classList.remove('is-scrolled');
+    const shouldShrink = window.scrollY > 60;
+    if (shouldShrink !== isScrolled) {
+      isScrolled = shouldShrink;
+      siteHeader?.classList.toggle('is-scrolled', isScrolled);
+      headerSurface?.classList.toggle('is-scrolled', isScrolled);
     }
     ticking = false;
   }
@@ -186,80 +131,68 @@ const isHome = currentPath === '/';
     }
   }, { passive: true });
 
-  // Initial check
   onScroll();
 
-  // Active navigation highlight sync (subtle outline, no aggressive glow)
-  function syncActiveNav() {
-    const pathname = window.location.pathname.replace(/\/$/, '') || '/';
-    const linkProjects = document.querySelector<HTMLAnchorElement>('[data-nav="projects"]');
-    const linkThoughts = document.querySelector<HTMLAnchorElement>('[data-nav="thoughts"]');
-    const linkFiles = document.querySelector<HTMLAnchorElement>('[data-nav="files"]');
-    const brandBadge = document.getElementById('header-brand-badge');
+  const navLinksContainer = document.getElementById('nav-links');
+  const navUnderline = document.getElementById('nav-underline');
+  const navPageLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('#nav-links .nav-link'));
+  const activeNavLink = document.querySelector<HTMLAnchorElement>('#nav-links .nav-link[aria-current="page"]');
+  let hoveredNavLink: HTMLAnchorElement | null = null;
 
-    if (brandBadge) {
-      const isHome = pathname === '/';
-      const isOnline = typeof (window as any).__siteIsOnline === 'boolean'
-        ? (window as any).__siteIsOnline
-        : navigator.onLine;
-      if (isOnline) {
-        brandBadge.classList.remove('is-offline', 'is-offline-border', 'is-offline-text');
-        brandBadge.classList.add('is-online', 'is-online-text');
-        brandBadge.style.setProperty('color', '#10b981', 'important');
-        brandBadge.style.setProperty('border-color', isHome ? '#10b981' : '#30363d', 'important');
-      } else {
-        brandBadge.classList.remove('is-online', 'is-online-text');
-        brandBadge.classList.add('is-offline', 'is-offline-border', 'is-offline-text');
-        brandBadge.style.setProperty('color', '#f85149', 'important');
-        brandBadge.style.setProperty('border-color', '#f85149', 'important');
-      }
+  function positionNavUnderline(link: HTMLAnchorElement | null, faint = false) {
+    if (!navLinksContainer || !navUnderline) return;
+    if (!link) {
+      navUnderline.style.opacity = '0';
+      return;
     }
-
-    if (linkProjects) {
-      const active = pathname.startsWith('/projects');
-      linkProjects.classList.toggle('border-[#a78bfa]', active);
-      linkProjects.classList.toggle('text-[#e6edf3]', active);
-      linkProjects.classList.toggle('bg-[#a78bfa]/15', active);
-      linkProjects.classList.toggle('font-semibold', active);
-      linkProjects.classList.toggle('shadow-sm', active);
-      linkProjects.classList.toggle('bg-[#161b22]', !active);
-      linkProjects.classList.toggle('border-[#30363d]', !active);
-      linkProjects.classList.toggle('text-[#8b949e]', !active);
-    }
-
-    if (linkThoughts) {
-      const active = pathname.startsWith('/thoughts');
-      linkThoughts.classList.toggle('border-[#f59e0b]', active);
-      linkThoughts.classList.toggle('text-[#e6edf3]', active);
-      linkThoughts.classList.toggle('bg-[#f59e0b]/15', active);
-      linkThoughts.classList.toggle('font-semibold', active);
-      linkThoughts.classList.toggle('shadow-sm', active);
-      linkThoughts.classList.toggle('bg-[#161b22]', !active);
-      linkThoughts.classList.toggle('border-[#30363d]', !active);
-      linkThoughts.classList.toggle('text-[#8b949e]', !active);
-    }
-
-    if (linkFiles) {
-      const active = pathname.startsWith('/files');
-      linkFiles.classList.toggle('border-[#38bdf8]', active);
-      linkFiles.classList.toggle('text-[#e6edf3]', active);
-      linkFiles.classList.toggle('bg-[#38bdf8]/15', active);
-      linkFiles.classList.toggle('font-semibold', active);
-      linkFiles.classList.toggle('shadow-sm', active);
-      linkFiles.classList.toggle('bg-[#161b22]', !active);
-      linkFiles.classList.toggle('border-[#30363d]', !active);
-      linkFiles.classList.toggle('text-[#8b949e]', !active);
-    }
+    const containerRect = navLinksContainer.getBoundingClientRect();
+    const linkRect = link.getBoundingClientRect();
+    navUnderline.style.left = `${linkRect.left - containerRect.left}px`;
+    navUnderline.style.width = `${linkRect.width}px`;
+    navUnderline.style.backgroundColor = link.dataset.color || '#10b981';
+    navUnderline.style.opacity = faint ? '0.55' : '1';
   }
 
-  syncActiveNav();
+  navPageLinks.forEach((link) => {
+    link.addEventListener('mouseenter', () => {
+      hoveredNavLink = link;
+      positionNavUnderline(link, true);
+    });
+    link.addEventListener('focus', () => {
+      hoveredNavLink = link;
+      positionNavUnderline(link, true);
+    });
+    link.addEventListener('blur', () => {
+      hoveredNavLink = null;
+      positionNavUnderline(activeNavLink);
+    });
+  });
 
-  // Terminal button - toggles terminal open or closed
+  navLinksContainer?.addEventListener('mouseleave', () => {
+    hoveredNavLink = null;
+    positionNavUnderline(activeNavLink);
+  });
+
+  window.addEventListener('resize', () => {
+    positionNavUnderline(hoveredNavLink ?? activeNavLink, Boolean(hoveredNavLink));
+  });
+
+  window.addEventListener('lang-change', () => {
+    requestAnimationFrame(() => positionNavUnderline(hoveredNavLink ?? activeNavLink, Boolean(hoveredNavLink)));
+  });
+
+  if (activeNavLink && navUnderline) {
+    navUnderline.style.transition = 'none';
+    positionNavUnderline(activeNavLink);
+    requestAnimationFrame(() => {
+      navUnderline.style.transition = '';
+    });
+  }
+
   document.getElementById('header-terminal-toggle')?.addEventListener('click', () => {
     window.dispatchEvent(new CustomEvent('toggle-terminal'));
   });
 
-  // Language buttons
   document.getElementById('btn-lang-en')?.addEventListener('click', () => {
     setSiteLang('en');
   });
@@ -267,139 +200,4 @@ const isHome = currentPath === '/';
   document.getElementById('btn-lang-sv')?.addEventListener('click', () => {
     setSiteLang('sv');
   });
-
-  // Live Event-Driven Online/Offline Status Indicator
-  const onlineBadge = document.getElementById('header-online-status');
-  const onlineDot = document.getElementById('header-online-dot');
-  const onlineText = document.getElementById('header-online-text');
-
-  function updateOnlineUI(isOnline: boolean) {
-    (window as any).__siteIsOnline = isOnline;
-
-    const brandBadge = document.getElementById('header-brand-badge');
-    if (brandBadge) {
-      const pathname = window.location.pathname.replace(/\/$/, '') || '/';
-      const isHome = pathname === '/';
-      if (isOnline) {
-        brandBadge.classList.remove('is-offline', 'is-offline-border', 'is-offline-text');
-        brandBadge.classList.add('is-online', 'is-online-text');
-        brandBadge.style.setProperty('color', '#10b981', 'important');
-        brandBadge.style.setProperty('border-color', isHome ? '#10b981' : '#30363d', 'important');
-      } else {
-        brandBadge.classList.remove('is-online', 'is-online-text');
-        brandBadge.classList.add('is-offline', 'is-offline-border', 'is-offline-text');
-        brandBadge.style.setProperty('color', '#f85149', 'important');
-        brandBadge.style.setProperty('border-color', '#f85149', 'important');
-      }
-    }
-
-    if (!onlineBadge || !onlineDot || !onlineText) return;
-
-    if (isOnline) {
-      onlineBadge.className = 'hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#161b22] border border-[#30363d] text-[#10b981] transition-all is-online-text';
-      onlineBadge.style.color = '#10b981';
-      onlineBadge.style.borderColor = '#30363d';
-      onlineDot.className = 'w-1.5 h-1.5 mr-1 rounded-full bg-[#10b981] animate-pulse is-online-bg';
-      onlineDot.style.backgroundColor = '#10b981';
-      onlineText.textContent = 'ONLINE';
-      onlineBadge.title = 'Station Connected // All Systems Operational';
-    } else {
-      onlineBadge.className = 'hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#161b22] border border-[#f85149]/60 text-[#f85149] transition-all is-offline-text is-offline-border';
-      onlineBadge.style.color = '#f85149';
-      onlineBadge.style.borderColor = '#f85149';
-      onlineDot.className = 'w-1.5 h-1.5 mr-1 rounded-full bg-[#f85149] is-offline-bg';
-      onlineDot.style.backgroundColor = '#f85149';
-      onlineText.textContent = 'OFFLINE';
-      onlineBadge.title = 'Station Offline // Disconnected from Network';
-    }
-
-    window.dispatchEvent(new CustomEvent('connection-state-change', { detail: { isOnline } }));
-  }
-
-  // Lightweight probe to verify true connectivity and measure RTT ping
-  let isProbing = false;
-  async function checkConnectivity() {
-    if (isProbing) return;
-    if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      updateOnlineUI(false);
-      window.dispatchEvent(new CustomEvent('network-ping', { detail: { latency: null, isOnline: false } }));
-      return;
-    }
-
-    isProbing = true;
-    const t0 = performance.now();
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
-
-      // Probe same-origin lightweight asset (CSP-compliant, zero CORS errors, works on dev and production)
-      const res = await fetch('/favicon.svg?t=' + Date.now(), {
-        method: 'HEAD',
-        cache: 'no-store',
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-
-      const latency = Math.max(1, Math.round(performance.now() - t0));
-      const online = res.ok || (typeof navigator !== 'undefined' && navigator.onLine);
-      updateOnlineUI(online);
-      window.dispatchEvent(new CustomEvent('network-ping', { detail: { latency, isOnline: online } }));
-    } catch {
-      // Fallback to browser navigator.onLine if probe is aborted or locally cached
-      const online = typeof navigator !== 'undefined' ? navigator.onLine : true;
-      updateOnlineUI(online);
-      window.dispatchEvent(new CustomEvent('network-ping', { detail: { latency: null, isOnline: online } }));
-    } finally {
-      isProbing = false;
-    }
-  }
-
-  window.addEventListener('online', () => {
-    checkConnectivity();
-  });
-
-  window.addEventListener('offline', () => {
-    updateOnlineUI(false);
-    window.dispatchEvent(new CustomEvent('network-ping', { detail: { latency: null, isOnline: false } }));
-  });
-
-  window.addEventListener('connection-state-change', ((e: CustomEvent) => {
-    if (typeof e.detail?.isOnline === 'boolean' && e.detail.isOnline !== (window as any).__siteIsOnline) {
-      updateOnlineUI(e.detail.isOnline);
-    }
-  }) as EventListener);
-
-  // Fast check whenever window regains focus (e.g. user toggled Wi-Fi in OS menu)
-  window.addEventListener('focus', () => {
-    checkConnectivity();
-  });
-
-  // Battery- & bandwidth-friendly connectivity verification:
-  // Zero network requests when the tab is hidden or device is offline.
-  let probeTimer: number | null = null;
-
-  function scheduleProbe() {
-    if (probeTimer !== null) clearInterval(probeTimer);
-    if (document.visibilityState === 'visible') {
-      probeTimer = window.setInterval(checkConnectivity, 8000);
-    }
-  }
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-      checkConnectivity();
-      scheduleProbe();
-    } else {
-      if (probeTimer !== null) {
-        clearInterval(probeTimer);
-        probeTimer = null;
-      }
-    }
-  });
-
-  // Initial setup: initial UI state from navigator.onLine, probe immediately
-  (window as any).__siteIsOnline = navigator.onLine;
-  updateOnlineUI(navigator.onLine);
-  setTimeout(checkConnectivity, 100);
-  scheduleProbe();
 </script>
