@@ -167,7 +167,7 @@ const allTags = Array.from(
 
           return (
             <article
-              class={`thought-card ${cat.className} border-b border-[#30363d] px-2 sm:px-3 py-5 group`}
+              class={`thought-card ${cat.className} relative border-b border-[#30363d] px-2 sm:px-3 py-5 group`}
               data-category={category}
               data-tags={(post.data.tags || []).join(',').toLowerCase()}
               data-title={post.data.title.toLowerCase()}
@@ -177,7 +177,7 @@ const allTags = Array.from(
               <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#8b949e]">
                 <a
                   href={`/thoughts?category=${cat.key}`}
-                  class={`${cat.className} cat-label font-semibold hover:underline underline-offset-4`}
+                  class={`${cat.className} cat-label relative z-10 font-semibold hover:underline underline-offset-4`}
                   data-filter-category-link={cat.key}
                   data-i18n={cat.labelKey}
                 >{cat.label}</a>
@@ -189,7 +189,7 @@ const allTags = Array.from(
                   {(post.data.tags || []).map((tag) => (
                     <a
                       href={`/thoughts?tag=${encodeURIComponent(tag.toLowerCase())}`}
-                      class="text-[10px] text-[#8b949e] bg-[#161b22] border border-[#30363d] px-1.5 py-0.5 rounded hover:text-[#e6edf3] hover:border-[#484f58] transition-colors"
+                      class="relative z-10 text-[10px] text-[#8b949e] bg-[#161b22] border border-[#30363d] px-1.5 py-0.5 rounded hover:text-[#e6edf3] hover:border-[#484f58] transition-colors"
                       data-filter-tag-link={tag.toLowerCase()}
                     >{tag}</a>
                   ))}
@@ -203,6 +203,7 @@ const allTags = Array.from(
 
               <h2 class="mt-2 text-base sm:text-lg font-semibold text-[#e6edf3]">
                 <a href={`/thoughts/${post.id}`} class="text-[#e6edf3] hover:text-[var(--cat)] hover:underline underline-offset-4 transition-colors focus-visible:outline-none">
+                  <span class="absolute inset-0" aria-hidden="true"></span>
                   {post.data.title}
                 </a>
               </h2>
@@ -228,7 +229,7 @@ const allTags = Array.from(
 
     <div class="pt-6 border-t border-[#30363d] flex items-center justify-between text-xs text-[#8b949e]">
       <a href="/" class="hover:text-[#e6edf3] transition-colors" data-i18n="thoughts_back_home">Back home</a>
-      <span class="hidden sm:inline">Gustav Löfqvist</span>
+      <span class="select-none font-mono" aria-hidden="true">:wq</span>
     </div>
   </main>
 

@@ -1,22 +1,29 @@
 ---
 title: "Friction by Design: A Dopamine Firewall for iOS"
-description: Lost willpower from short-form feeds, so I figured out how to block it.
+description: "Short-form feeds ate my evenings. I made scrolling inconvenient instead of relying on willpower."
 pubDate: 2026-10-08
+updatedDate: 2026-11-10
 category: guide
 tags:
   - Wellbeing
+  - Privacy
+  - DNS
+  - iOS
+  - Self-hosting
 featured: false
 draft: false
 pdfUrl:
 pdfName:
 ---
-Short-form content was eating my life. I'd pick up my phone, open an app without deciding to, and surface 40 minutes later with nothing to show for it. Screen Time limits didn't help either: two taps and the timer is gone.
 
-So I stopped relying on discipline and made scrolling _inconvenient_. It's not perfect, but it works. I've gotten a lot of time back, and mindless scrolling now mostly just... fails.
+Short-form content ate my evenings. I would pick up my phone, open an app without deciding to, and surface 40 minutes later with nothing to show for it. Screen Time limits did not help: two taps and the timer is gone.
 
-**Prerequisites:** a home server (a Raspberry Pi is fine), a free [NextDNS](https://nextdns.io) account, and an iPhone. *(sorry andriods hehe)*
+I stopped relying on discipline and made scrolling inconvenient. The setup works well enough that mindless scrolling now fails.
 
-## Step 1: Pi-hole + Unbound at home
+**Prerequisites:** a home server (a Raspberry Pi works), a free [NextDNS](https://nextdns.io) account, and an iPhone. The DNS parts work on Android too; the profile steps differ.
+
+## Step 1: Pi-hole and Unbound at home
+
 Pi-hole blocks ads and feeds. Unbound resolves domains itself instead of asking Google or Cloudflare, so nobody sees your lookups except the root servers.
 
 ```yaml
@@ -33,15 +40,15 @@ services:
     restart: unless-stopped
 ```
 
-Then in Pi-hole's Adlists, add OISD and HaGeZi. Add the NSFW list too, because porn is a dopamine problem of its own.
+In Pi-hole's Adlists, add OISD and HaGeZi. Add the NSFW list too if you want it blocked.
 
 ## Step 2: NextDNS on cellular
-Same blocklists, but they follow you out the door. Create a profile at nextdns.io, enable the same lists (OISD, HaGeZi), and turn on the **Porn** category under Parental Control.
+
+NextDNS carries the same blocklists when you leave home. Create a profile, enable OISD and HaGeZi, and turn on the **Porn** category under Parental Control if you want it.
 
 ## Step 3: Stop Wi-Fi Assist from cheating
-Wi-Fi Assist quietly switches to cellular when your Wi-Fi is bad. Pi-hole answers "nope" for a blocked domain, cellular asks again, and the feed loads anyway. Rude.
 
-The fix: use NextDNS's `.mobileconfig` profile everywhere, so the blocking still holds on cellular. Then edit the profile so it steps aside on your home Wi-Fi and lets Pi-hole take over:
+Wi-Fi Assist switches to cellular when your Wi-Fi is weak. Pi-hole answers "nope" for a blocked domain, the phone asks again over cellular, and the feed loads. Use NextDNS's `.mobileconfig` profile everywhere so blocking holds on cellular, then edit the profile to step aside on your home Wi-Fi:
 
 ```xml
 <key>OnDemandRules</key>
@@ -60,10 +67,11 @@ The fix: use NextDNS's `.mobileconfig` profile everywhere, so the blocking still
 </array>
 ```
 
-Put this inside the `DNSSettings` payload, swap in your own SSIDs, AirDrop the file to your phone, and install it under **Settings → Profile Downloaded**.
+Put this inside the `DNSSettings` payload, swap in your SSIDs, AirDrop the file to your phone, and install it under **Settings → Profile Downloaded**.
 
 ## Step 4: Snapchat, surgically
-I can't delete Snapchat, because my friends refuse to talk anywhere else. But Spotlight and Stories load from different subdomains than chat does. Block one, allow the other.
+
+I cannot delete Snapchat because my friends refuse to talk anywhere else. Spotlight and Stories load from different subdomains than chat does, so I block one and allow the other.
 
 **Denylist** (feeds and analytics):
 ```
@@ -82,17 +90,19 @@ us-east4-gcp.api.snapchat.com
 aws-proxy-gcp.api.snapchat.com
 ```
 
-NextDNS covers subdomains automatically. In Pi-hole, add the denylist entries as regex (e.g. `(\.|^)gcp\.api\.snapchat\.com$`). Result: Spotlight spins forever, snaps still arrive.
+NextDNS covers subdomains. In Pi-hole, add the denylist entries as regex (for example, `(\.|^)gcp\.api\.snapchat\.com$`). Spotlight spins forever; snaps still arrive.
 
-## Step 5: Orion + SocialFocus
-Native apps hide their feeds on the same domains as everything else, so DNS can't separate them. I deleted Instagram, YouTube and Reddit and use them in the browser instead.
+## Step 5: Orion and SocialFocus
 
-1. Install **Orion** from the App Store. It's WebKit (fast), but supports Chrome and Firefox extensions.
-2. Install **SocialFocus** from the Chrome Web Store, inside Orion.
-3. Turn off the bait: Reels, Shorts, Explore, the home feed, thumbnails and Reddit's "get the app" popup.
-4. Optional: open `instagram.com/direct/inbox`, then **Share → Add to Home Screen**. You get a DM-only icon with no feed attached.
+Native apps hide their feeds on the same domains as everything else, so DNS cannot separate them. I deleted Instagram, YouTube, and Reddit and use them in the browser.
+
+1. Install **Orion** from the App Store. It uses WebKit and supports Chrome and Firefox extensions.
+2. Install **SocialFocus** from the Chrome Web Store inside Orion.
+3. Turn off Reels, Shorts, Explore, the home feed, thumbnails, and Reddit's "get the app" popup.
+4. Optional: open `instagram.com/direct/inbox`, then **Share → Add to Home Screen**. You get a DM-only icon with no feed.
 
 ## Step 6: Verify
+
 ```bash
 # Home: should resolve and show the "ad" (DNSSEC validated) flag
 dig @192.168.1.100 example.com +dnssec
@@ -101,11 +111,16 @@ dig @192.168.1.100 example.com +dnssec
 curl -s https://test.nextdns.io
 ```
 
-Then open Snapchat and tap Spotlight. If it spins, you're done.
+Open Snapchat and tap Spotlight. If it spins, the setup is working.
+
 ## Result
-Each layer leaks a little on its own. Together, consuming anything without intent takes real effort, so mostly I don't. The goal was never to be more disciplined. It was to make the lazy path a dead end.
+
+Each layer leaks on its own. Together they make mindless scrolling take effort, so I skip it. I wanted the lazy path to fail.
 
 ### References
+
 - [Pi-hole docs: Unbound](https://docs.pi-hole.net/guides/dns/unbound/)
-- [SocialFocus]([https://github.com/hagezi/dns-blocklists](https://socialfocus.app/))
+- [SocialFocus](https://socialfocus.app/)
 - [NextDNS](https://nextdns.io)
+- [OISD](https://oisd.nl/)
+- [HaGeZi DNS blocklists](https://github.com/hagezi/dns-blocklists)

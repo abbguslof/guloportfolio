@@ -28,20 +28,21 @@ const cat = categoryMap[category] || categoryMap.tanke;
 ---
 
 <div
-  class={`thought-item ${cat.className} group block px-2 py-4 sm:px-3 sm:py-5 border-l-2 transition-colors hover:bg-[#1b212a]`}
+  class={`thought-item ${cat.className} group relative block px-2 py-4 sm:px-3 sm:py-5 border-l-2 transition-colors hover:bg-[#1b212a]`}
   data-tags={tagsData}
   data-category={category}
 >
   <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#8b949e]">
     <a
       href={`/thoughts?category=${cat.key}`}
-      class={`${cat.className} cat-label font-semibold hover:underline underline-offset-4`}
+      class={`${cat.className} cat-label font-semibold hover:underline underline-offset-4 relative z-10`}
       data-i18n={cat.labelKey}
     >{cat.label}</a>
     <time datetime={formattedDate}>{formattedDate}</time>
   </div>
 
   <a href={`/thoughts/${slug}`} class="thought-title-link group block mt-1.5">
+    <span class="absolute inset-0" aria-hidden="true"></span>
     <h3 class="text-sm sm:text-[15px] font-semibold text-[#e6edf3] group-hover:text-[var(--cat)] group-hover:underline underline-offset-4 transition-colors">
       {title}
     </h3>
