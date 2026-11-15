@@ -1,5 +1,5 @@
 # Gustav Löfqvist (gulo)
-- Studier: Civilingenjör Datateknik på Chalmers, årskurs två, EDIT-huset, RIU-student
+- Studier: Civilingenjör Datateknik på Chalmers, årskurs två. RIU-idrottare godkänd av Svenska Simförbundet
 - Simning: Sprint frisim och fjäril för MASS och Growth Objective
 - Linux: Arch med Hyprland, Neovim, Alacritty
 - Homelab: Proxmox-server och ett Raspberry Pi-kluster

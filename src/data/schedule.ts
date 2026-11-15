@@ -32,10 +32,10 @@ export interface ScheduleEvent {
 
 export const scheduleEvents: ScheduleEvent[] = [
   {
-    id: 'turkey-camp-2026',
+    id: 'training-camp-2026',
     name: {
-      sv: 'Elitträningsläger i Turkiet (Growth Objective)',
-      en: 'Elite Swim Training Camp in Turkey (Growth Objective)',
+      sv: 'Träningsläger (Growth Objective)',
+      en: 'Swim Training Camp (Growth Objective)',
     },
     startDate: '2026-10-14',
     endDate: '2026-10-23',
@@ -45,8 +45,8 @@ export const scheduleEvents: ScheduleEvent[] = [
       en: 'Intensive training camp with Growth Objective. Double swim sessions, dryland & sprint mechanics.',
     },
     badge: {
-      sv: 'SIMLÄGER TURKIET',
-      en: 'TURKEY SWIM CAMP',
+      sv: 'TRÄNINGSLÄGER',
+      en: 'TRAINING CAMP',
     },
   },
   {
@@ -70,8 +70,8 @@ export const scheduleEvents: ScheduleEvent[] = [
   {
     id: 'sm-kortbana-2026',
     name: {
-      sv: 'SM / U21-SM kortbana 25m (Linköping)',
-      en: 'Swedish National Championships 25m (Linköping)',
+      sv: 'SM / U21-SM kortbana 25m',
+      en: 'Swedish National Championships 25m',
     },
     startDate: '2026-12-09',
     endDate: '2026-12-13',
@@ -81,7 +81,7 @@ export const scheduleEvents: ScheduleEvent[] = [
       en: 'Competing at Swedish Nationals for MASS & Growth Objective. 50m/100m freestyle and butterfly.',
     },
     badge: {
-      sv: 'SM LINKÖPING 25M',
+      sv: 'SM 25M',
       en: 'SM NATIONALS 25M',
     },
   },
@@ -178,36 +178,36 @@ export const scheduleEvents: ScheduleEvent[] = [
   {
     id: 'sm-langbana-2027',
     name: {
-      sv: 'SM / Para-SM / U21-SM 50m (Norrköping)',
-      en: 'Swedish National Championships 50m (Norrköping)',
+      sv: 'SM / Para-SM / U21-SM 50m',
+      en: 'Swedish National Championships 50m',
     },
     startDate: '2027-06-30',
     endDate: '2027-07-04',
     statusPreset: 'swim',
     description: {
-      sv: 'Svenska Mästerskapen i långbana (50m) på Centralbadet i Norrköping.',
-      en: 'Swedish National Championships (50m) at Centralbadet in Norrköping.',
+      sv: 'Svenska Mästerskapen i långbana (50m).',
+      en: 'Swedish National Championships (50m).',
     },
     badge: {
-      sv: 'SM NORRKÖPING 50M',
+      sv: 'SM 50M',
       en: 'SM NATIONALS 50M',
     },
   },
   {
     id: 'sm-kortbana-2027',
     name: {
-      sv: 'SM / U21-SM 25m (Stockholm Eriksdal)',
-      en: 'Swedish National Championships 25m (Stockholm)',
+      sv: 'SM / U21-SM 25m',
+      en: 'Swedish National Championships 25m',
     },
     startDate: '2027-12-15',
     endDate: '2027-12-19',
     statusPreset: 'swim',
     description: {
-      sv: 'Kortbane-SM på Eriksdalsbadet i Stockholm.',
-      en: 'Short course Swedish Nationals at Eriksdalsbadet in Stockholm.',
+      sv: 'Kortbane-SM (25m).',
+      en: 'Short course Swedish Nationals (25m).',
     },
     badge: {
-      sv: 'SM STOCKHOLM 25M',
+      sv: 'SM 25M',
       en: 'SM NATIONALS 25M',
     },
   },

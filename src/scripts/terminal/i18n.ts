@@ -388,8 +388,8 @@ export function getOsOpinionOutput(lang: LangCode): string {
   <div class="space-y-1.5 text-[#8b949e]">
     <p>Linux är <span class="text-[#10b981] font-bold">friheten</span> att förstå exakt vad din dator gör. Inget telemetri-nonsens, inga uppdateringar som startar om mitt i ett prov.</p>
     <p>Windows är som att hyra en lägenhet där hyresvärden <span class="text-[#f85149]">byter lås varannan vecka</span>, installerar nya gardiner du inte bad om, och ibland bara... startar om allt medan du sover.</p>
-    <p>Men — ärligt? Ibland vid 3 på natten när <span class="text-[#f59e0b]">nvidia-drivrutinerna vägrar</span> samarbeta, PulseAudio bestämmer sig för att byta till hörlurarna i ett annat rum, och WiFi-kortet kräver en kernel-patch kompilerad under fullmåne... då undrar man ibland.</p>
-    <p class="text-[#10b981] font-bold">Men sedan startar man om i 0.8 sekunder utan att bli tillfrågad om Outlook, OneDrive, Copilot och Edge. Och då vet man att det var värt det. </p>
+    <p>Men ibland, klockan 3 på natten, när <span class="text-[#f59e0b]">nvidia-drivrutinerna vägrar</span> samarbeta, PulseAudio skickar ljudet till hörlurarna i ett annat rum, och WiFi-kortet kräver en kernel-patch kompilerad under fullmåne... då undrar man.</p>
+    <p class="text-[#10b981] font-bold">Men sedan startar man om i 0.8 sekunder utan att bli tillfrågad om Outlook, OneDrive, Copilot och Edge. Och då vet man att det var värt det.</p>
   </div>
   <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/40 pt-1">
     <span class="text-[#38bdf8]">BTW, I use</span> <span class="text-[#10b981] font-bold">Omarchy (Arch Linux + Hyprland).</span>
@@ -406,8 +406,8 @@ export function getOsOpinionOutput(lang: LangCode): string {
   <div class="space-y-1.5 text-[#8b949e]">
     <p>Linux is the <span class="text-[#10b981] font-bold">freedom</span> to understand exactly what your machine is doing. No telemetry nonsense, no updates that reboot mid-exam.</p>
     <p>Windows is like renting an apartment where the landlord <span class="text-[#f85149]">changes the locks every other week</span>, installs curtains you didn't ask for, and occasionally just... reboots everything while you sleep.</p>
-    <p>But — honestly? Sometimes at 3 AM when <span class="text-[#f59e0b]">nvidia drivers refuse</span> to cooperate, PulseAudio decides to route sound to headphones in another room, and the WiFi card requires a kernel patch compiled under a full moon... you wonder.</p>
-    <p class="text-[#10b981] font-bold">But then you reboot in 0.8 seconds without being asked about Outlook, OneDrive, Copilot and Edge. And you know it was worth it. </p>
+    <p>But sometimes at 3 AM, when <span class="text-[#f59e0b]">nvidia drivers refuse</span> to cooperate, PulseAudio routes sound to headphones in another room, and the WiFi card needs a kernel patch compiled under a full moon... you wonder.</p>
+    <p class="text-[#10b981] font-bold">But then you reboot in 0.8 seconds without being asked about Outlook, OneDrive, Copilot and Edge. And you know it was worth it.</p>
   </div>
   <div class="text-[11px] text-[#8b949e] border-t border-[#30363d]/40 pt-1">
     <span class="text-[#38bdf8]">BTW, I use</span> <span class="text-[#10b981] font-bold">Omarchy (Arch Linux + Hyprland).</span>
@@ -553,15 +553,15 @@ export function getBioOutput(lang: LangCode): string {
 
   const rows = isSv
     ? [
-        ['Studier', '#56b6e8', 'Civilingenjör Datateknik på Chalmers, årskurs två, EDIT-huset, RIU-student.'],
-        ['Simning', '#4fbf8b', 'Sprint frisim och fjäril för MASS och Growth Objective, på Åbybadet och GoCo.'],
+        ['Studier', '#56b6e8', 'Civilingenjör Datateknik på Chalmers, årskurs två. RIU-idrottare godkänd av Svenska Simförbundet.'],
+        ['Simning', '#4fbf8b', 'Sprint frisim och fjäril för MASS och Growth Objective.'],
         ['Linux', '#38bdf8', 'Arch med Hyprland, Neovim och Alacritty på mina egna maskiner.'],
         ['Homelab', '#e0a43a', 'Proxmox-server och ett Raspberry Pi-kluster med webbplatser, spelservrar och interna verktyg.'],
         ['Utanför', '#b39ae8', 'Vandring, klättring, cykling, discgolf, golf och foto/video med en Sony ZV-E10.'],
       ]
     : [
-        ['Studies', '#56b6e8', 'Computer Science and Engineering at Chalmers, year two, EDIT building, RIU student.'],
-        ['Swimming', '#4fbf8b', 'Sprint freestyle and butterfly for MASS and Growth Objective, at Åbybadet and GoCo.'],
+        ['Studies', '#56b6e8', 'Computer Science and Engineering at Chalmers, year two. RIU athlete approved by the Swedish Swimming Federation.'],
+        ['Swimming', '#4fbf8b', 'Sprint freestyle and butterfly for MASS and Growth Objective.'],
         ['Linux', '#38bdf8', 'Arch with Hyprland, Neovim, and Alacritty on my own machines.'],
         ['Homelab', '#e0a43a', 'A Proxmox server and a Raspberry Pi cluster running websites, game servers, and internal tools.'],
         ['Outside', '#b39ae8', 'Hiking, climbing, cycling, discgolf, golf, and photo/video on a Sony ZV-E10.'],
@@ -610,11 +610,11 @@ export function getCvOutput(lang: LangCode): string {
     `<div><span class="text-[#e6edf3]">${title}</span> ${detail}</div>`;
 
   const education = isSv
-    ? item('Chalmers tekniska högskola, 2024–2029', 'Civilingenjör Datateknik, årskurs två. RIU-elitidrottare.') +
+    ? item('Chalmers tekniska högskola, 2024–2029', 'Civilingenjör Datateknik, årskurs två. RIU-idrottare godkänd av Svenska Simförbundet.') +
       item('Wheeling University, 2023–2024', 'Business Management och NCAA D2-simning. Dean\'s List, Conference Champion och Freshman of the Year.') +
       item('Mälardalens universitet, 2022–2023', 'Datavetenskap: Python, Linux och nätverkssäkerhet.') +
       item('Hitachigymnasiet, 2020–2023', 'Smarta system och AI.')
-    : item('Chalmers University of Technology, 2024–2029', 'M.Sc. Computer Science and Engineering, year two. RIU elite athlete.') +
+    : item('Chalmers University of Technology, 2024–2029', 'M.Sc. Computer Science and Engineering, year two. RIU athlete approved by the Swedish Swimming Federation.') +
       item('Wheeling University, 2023–2024', 'Business Management and NCAA D2 swimming. Dean\'s List, Conference Champion, Freshman of the Year.') +
       item('Mälardalen University, 2022–2023', 'Computer science: Python, Linux, and network security.') +
       item('Hitachigymnasiet, 2020–2023', 'Smart systems and AI.');

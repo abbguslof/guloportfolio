@@ -35,8 +35,8 @@ export function handleNvimCommand(args: string[], ctx: CommandContext): string {
     <div class="text-[#8b949e] text-[11px]">Personal configuration: <span class="text-[#10b981]">~/.config/nvim (Lua dotfiles)</span></div>
     
     <div class="pt-3 max-w-sm mx-auto text-left text-[11px] text-[#8b949e] space-y-1.5 bg-[#161b22] p-2.5 rounded border border-[#30363d]">
-      <div><code class="text-[#10b981]">nvim &lt;fil&gt;</code> <span class="text-[#8b949e]">— ${isSv ? 'öppna fil i neovim-buffer med radnummer' : 'open file in neovim buffer with line numbers'}</span></div>
-      <div><code class="text-[#38bdf8]">cat &lt;fil&gt;</code> <span class="text-[#8b949e]">— ${isSv ? 'snabb textvisning i skalet' : 'quick text output in shell'}</span></div>
+      <div><code class="text-[#10b981]">nvim &lt;fil&gt;</code> <span class="text-[#8b949e]">: ${isSv ? 'öppna fil i neovim-buffer med radnummer' : 'open file in neovim buffer with line numbers'}</span></div>
+      <div><code class="text-[#38bdf8]">cat &lt;fil&gt;</code> <span class="text-[#8b949e]">: ${isSv ? 'snabb textvisning i skalet' : 'quick text output in shell'}</span></div>
     </div>
   </div>
 

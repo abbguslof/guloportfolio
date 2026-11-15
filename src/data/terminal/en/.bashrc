@@ -1,7 +1,7 @@
 # ~/.bashrc - gulo interactive terminal configuration
 export PS1="\[\033[01;32m\]visitor@playground\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
 export EDITOR="nvim"
-export SWIM_POOL="Åbybadet & GoCo"
+export SWIM_CLUB="MASS & Growth Objective"
 
 alias study="school"
 alias education="school"

@@ -2,7 +2,7 @@
 title: "A Short Guide to Rooting a Philips Titan OS TV"
 description: "The fast path from stock to a root shell on a Philips Titan OS set, using a USB stick and a cold boot."
 pubDate: 2026-11-10
-updatedDate: 2026-11-10
+updatedDate: 2026-11-15
 category: guide
 tags:
   - Reverse Engineering
@@ -17,9 +17,11 @@ pdfName:
 
 This is the short version. The tools, evidence, detailed walkthrough, and restore path are in **[philips-titanos-tools](https://github.com/abbguslof/philips-titanos-tools)**.
 
+This guide covers root and persistence. It does not cover the app-layer firmware update or a modified VER40 package; the repo's research notes do.
+
 Treat this page as a starting point. The repo is the source of truth: payloads, commands, and firmware details can change. Confirm the current procedure against the repo before you run anything.
 
-Verified on a `55PUS8000/12` (`TPA256E` / `TPN256E`, firmware `TPA256E_V056.002.236.191`). Results on other builds are unknown.
+Verified on a `55PUS8000/12` (`TPA256E` / `TPN256E`, firmware `TPA256E_V056.002.236.191`). Root and persistence survived the vendor `002.236.191` update. Results on other builds are unknown.
 
 ## What you need
 
@@ -80,7 +82,7 @@ python3 -m http.server 8000 --bind 0.0.0.0
 /bin/sh /tmp/persist_root.sh
 ```
 
-The installer adds one line to the vendor `customer_env.sh` on the writable `apdat` partition. Remove the stick, cold boot, and `:2323` comes back on its own.
+The installer picks the boot hook your firmware reads. On most builds it appends one line to the vendor `customer_env.sh` on the writable `apdat` partition. On the reported `/swdl` variant it writes `/swdl/telnet/telnetd`. Remove the stick, cold boot, and `:2323` comes back on its own. If the port stays closed, the repo's persistent-root guide shows the `grep` checks for each hook.
 
 ## 5. Optional: SSH and durable tools
 
@@ -90,20 +92,28 @@ Keep telnet `:2323` as your fallback. To disable the SSH server, create `/mtd_rw
 
 ## Restore to stock
 
-Remove the USB stick for the ephemeral path. For persistence, from any root shell:
+Remove the USB stick for the ephemeral path. For persistence, remove the hook your firmware uses, then the shared payload:
 
 ```sh
+# customer_env.sh hook
 sed -i '/root_boot.sh/d' /mtd_rwarea/apdat/customer_env.sh
+
+# /swdl hook
+rm -f /swdl/telnet/telnetd
+```
+
+```sh
 rm -f /mtd_rwarea/apdat/root_boot.sh /mtd_rwarea/apdat/busybox \
       /mtd_rwarea/apdat/root_boot.log /mtd_rwarea/apdat/root_boot.ready \
       /mtd_rwarea/apdat/root_boot.ready.failed
 ```
 
-Then cold boot. Full rollback, including SAM and NVM/EDID restore, is in [restore to stock](https://github.com/abbguslof/philips-titanos-tools/blob/main/docs/guides/restore-to-stock.md).
+If `/swdl/telnet/telnetd.bak` or `/mtd_rwarea/apdat/customer_env.sh.bak` exists, inspect it before you delete it. Then cold boot. Full rollback, including SAM and NVM/EDID restore, is in [restore to stock](https://github.com/abbguslof/philips-titanos-tools/blob/main/docs/guides/restore-to-stock.md).
 
 ## Safety
 
 - **Owned devices only.**
 - This is a **physical-access** path, not a remote exploit.
 - Do **not** write the boot partitions or flash a modified image. There is no proven unbrick path before the UI is up.
-- Read the repo's `SECURITY.md` and test the restore path before you experiment.
+- Read the repo's `SECURITY.md` and the [recovery gate](https://github.com/abbguslof/philips-titanos-tools/blob/main/docs/guides/recovery-gate.md). Test the restore path before you experiment.
+- The lab unit has a verified boot-area backup and a same-byte restore. A deliberately corrupted boot area is still untested.

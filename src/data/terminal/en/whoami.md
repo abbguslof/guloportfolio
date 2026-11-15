@@ -1,5 +1,5 @@
 # Gustav Löfqvist (gulo)
-- Studies: Computer Science and Engineering at Chalmers, year two, EDIT building, RIU student
+- Studies: Computer Science and Engineering at Chalmers, year two. RIU athlete approved by the Swedish Swimming Federation
 - Swimming: Sprint freestyle and butterfly for MASS and Growth Objective
 - Linux: Arch with Hyprland, Neovim, Alacritty
 - Homelab: Proxmox server and a Raspberry Pi cluster

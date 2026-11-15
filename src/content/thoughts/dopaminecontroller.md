@@ -69,7 +69,7 @@ Wi-Fi Assist switches to cellular when your Wi-Fi is weak. Pi-hole answers "nope
 
 Put this inside the `DNSSettings` payload, swap in your SSIDs, AirDrop the file to your phone, and install it under **Settings → Profile Downloaded**.
 
-## Step 4: Snapchat, surgically
+## Step 4: Block Snapchat's feeds
 
 I cannot delete Snapchat because my friends refuse to talk anywhere else. Spotlight and Stories load from different subdomains than chat does, so I block one and allow the other.
 

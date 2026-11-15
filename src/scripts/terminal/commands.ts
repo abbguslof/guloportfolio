@@ -102,7 +102,7 @@ export function getCommands(): Record<string, CommandFunction> {
 ██║   ██║██║   ██║╚════██║   ██║   ██╔══██║╚██╗ ██╔╝
 ╚██████╔╝╚██████╔╝███████║   ██║   ██║  ██║ ╚████╔╝ 
   </pre>
-  <div class="text-[#e6edf3] text-xs">${isSv ? 'Datateknik på Chalmers, årskurs två, EDIT-huset.' : 'Computer Science and Engineering at Chalmers, year two, EDIT building.'}</div>
+  <div class="text-[#e6edf3] text-xs">${isSv ? 'Datateknik på Chalmers, årskurs två.' : 'Computer Science and Engineering at Chalmers, year two.'}</div>
   <div class="text-[#8b949e] text-xs">${isSv ? 'Sprint frisim och fjäril för MASS och Growth Objective.' : 'Sprint freestyle and butterfly for MASS and Growth Objective.'}</div>
   <div class="text-[#8b949e] text-xs">${isSv ? 'Arch, Neovim, Proxmox och ett Raspberry Pi-kluster.' : 'Arch, Neovim, Proxmox, and a Raspberry Pi cluster.'}</div>
   <div class="text-[11px] text-[#8b949e] pt-1 border-t border-[#30363d]/40">${isSv ? '[bio] [cv] [school] [swim] [contact] [status]' : '[bio] [cv] [school] [swim] [contact] [status]'}</div>
@@ -184,7 +184,7 @@ export function getCommands(): Record<string, CommandFunction> {
       if (fileNode && fileNode.type === 'file' && fileNode.content) {
         return ctx.renderMarkdownCard(fileNode.content);
       }
-      return `<div class="text-[#8b949e] font-mono">Chalmers University of Technology — Computer Science & Engineering (D-24)</div>`;
+      return `<div class="text-[#8b949e] font-mono">Chalmers University of Technology, Computer Science & Engineering (D-24)</div>`;
     },
     chalmers: (args, ctx) => commands.school(args, ctx),
     study: (args, ctx) => commands.school(args, ctx),
@@ -199,7 +199,7 @@ export function getCommands(): Record<string, CommandFunction> {
       if (fileNode && fileNode.type === 'file' && fileNode.content) {
         return ctx.renderMarkdownCard(fileNode.content);
       }
-      return `<div class="text-[#38bdf8] font-mono">Åbybadet &amp; GoCo — MASS &amp; Growth Objective (5+ swim sessions/week)</div>`;
+      return `<div class="text-[#38bdf8] font-mono">${ctx.lang === 'sv' ? 'MASS &amp; Growth Objective (fem eller sex simpass i veckan)' : 'MASS &amp; Growth Objective (five or six swim sessions a week)'}</div>`;
     },
     simma: (args, ctx) => commands.swim(args, ctx),
     simning: (args, ctx) => commands.swim(args, ctx),
@@ -1001,11 +1001,11 @@ ${ctx.escapeHtml(node.content)}
 
         return isSv
           ? `<div class="text-[#f59e0b] text-xs font-mono space-y-1">
-              <div>Användning: <code class="text-[#10b981]">wget &lt;filnamn&gt;</code> — Ladda ned en resurs eller PDF till din disk.</div>
+              <div>Användning: <code class="text-[#10b981]">wget &lt;filnamn&gt;</code> : ladda ned en resurs eller PDF till din disk.</div>
               <div class="text-[#8b949e]">Tillgängliga filer &amp; PDF:er: ${list}</div>
              </div>`
           : `<div class="text-[#f59e0b] text-xs font-mono space-y-1">
-              <div>Usage: <code class="text-[#10b981]">wget &lt;filename&gt;</code> — Download a resource or PDF to your disk.</div>
+              <div>Usage: <code class="text-[#10b981]">wget &lt;filename&gt;</code> : download a resource or PDF to your disk.</div>
               <div class="text-[#8b949e]">Available files &amp; PDFs: ${list}</div>
              </div>`;
       }

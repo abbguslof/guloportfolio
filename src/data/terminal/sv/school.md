@@ -1,7 +1,6 @@
 # Chalmers tekniska högskola
 - Program: Civilingenjör Datateknik, årskurs två
-- Campus: Johanneberg, EDIT-huset
-- Satsning: RIU elitidrott
+- RIU: Idrottare godkänd av Svenska Simförbundet
 - Innan Chalmers: Hitachigymnasiet, Mälardalens universitet, Wheeling University (USA)
 - Fokus: C, Python, Java, algoritmer, systemarkitektur, Linux, nätverkssäkerhet
 ---

@@ -51,12 +51,12 @@ export const statusPresets: Record<PresetKey, StatusProfile> = {
       en: 'Semester & Swimming',
     },
     activity: {
-      sv: 'Civilingenjör Datateknik på Chalmers, årskurs två, EDIT-huset, RIU-student. Fem simpass och tre gympass de flesta veckor.',
-      en: 'Computer Science and Engineering at Chalmers, year two, EDIT building, RIU student. Five swim sessions and three gym sessions most weeks.',
+      sv: 'Civilingenjör Datateknik på Chalmers, årskurs två. RIU-idrottare godkänd av Svenska Simförbundet. Fem simpass och tre gympass de flesta veckor.',
+      en: 'Computer Science and Engineering at Chalmers, year two. RIU athlete approved by the Swedish Swimming Federation. Five swim sessions and three gym sessions most weeks.',
     },
     focus: {
-      sv: 'System, nätverkssäkerhet, Linux och sprintsimning på Åbybadet och GoCo.',
-      en: 'Systems, network security, Linux, and sprint swimming at Åbybadet and GoCo.',
+      sv: 'System, nätverkssäkerhet, Linux och sprintsimning.',
+      en: 'Systems, network security, Linux, and sprint swimming.',
     },
     mood: {
       sv: 'Kaffe, Neovim-keybindings, och Proxmox-arkitektur.',
@@ -83,8 +83,8 @@ export const statusPresets: Record<PresetKey, StatusProfile> = {
       en: 'Final exams period at Chalmers! Reviewing systems theory, algorithms, and computing fundamentals.',
     },
     focus: {
-      sv: 'Tentaplugg & problemlösning i EDIT-huset. Svarstider kan vara något fördröjda.',
-      en: 'Exam preparation & problem solving in the EDIT building. Response times may be slightly delayed.',
+      sv: 'Tentaplugg och problemlösning. Svarstider kan vara något fördröjda.',
+      en: 'Exam preparation and problem solving. Response times may be slightly delayed.',
     },
     mood: {
       sv: 'Svart kaffe, whiteboard-pennor och öronproppar.',
@@ -103,8 +103,8 @@ export const statusPresets: Record<PresetKey, StatusProfile> = {
   camp: {
     name: 'Swim Training Camp / Träningsläger',
     badge: {
-      sv: 'Simläger Elitträningsläger i Turkiet',
-      en: 'Swim Camp Elite Training Camp in Turkey',
+      sv: 'Träningsläger',
+      en: 'Training Camp',
     },
     activity: {
       sv: 'Intensivt elitträningsläger med Growth Objective (GO). Dubbla simpass och sprintoptimering.',
@@ -258,7 +258,7 @@ export function getActiveStatus(targetDate: Date = new Date()): ActiveStatusResu
     mode: presetKey,
     isAutoScheduled: !!currentEvent,
     activeEvent: currentEvent,
-    lastUpdated: '2026-10-06',
+    lastUpdated: '2026-11-15',
   };
 }
 
