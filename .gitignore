@@ -25,11 +25,6 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
-# Obsidian vault local workspace & trash
-.obsidian/workspace.json
-.obsidian/workspace-mobile.json
-.obsidian/cache/
+# Personal Obsidian authoring vault (local only)
+.obsidian/
 .trash/
-
-# Obsidian plugin settings (may contain API keys / credentials)
-.obsidian/plugins/*/data.json

@@ -138,7 +138,7 @@ export const translations = {
 
     // Footer
     footer_build: 'Last build: {count}',
-    footer_built: 'Built with <a href="https://astro.build" target="_blank" rel="noopener noreferrer" class="text-[#8b949e] underline decoration-[#30363d] underline-offset-2 hover:text-[#e6edf3] hover:decoration-[#8b949e]">Astro</a>. The source is on <a href="https://github.com/abbguslof" target="_blank" rel="noopener noreferrer" class="text-[#8b949e] underline decoration-[#30363d] underline-offset-2 hover:text-[#e6edf3] hover:decoration-[#8b949e]">GitHub</a>.',
+    footer_built: 'Built with <a href="https://astro.build" target="_blank" rel="noopener noreferrer" class="text-[#8b949e] underline decoration-[#30363d] underline-offset-2 hover:text-[#e6edf3] hover:decoration-[#8b949e]">Astro</a>. The source is on <a href="https://github.com/abbguslof/guloportfolio" target="_blank" rel="noopener noreferrer" class="text-[#8b949e] underline decoration-[#30363d] underline-offset-2 hover:text-[#e6edf3] hover:decoration-[#8b949e]">GitHub</a>.',
     footer_link_about: 'about',
     footer_link_portfolio: 'projects',
     footer_link_blog: 'writing',
@@ -334,7 +334,7 @@ export const translations = {
 
     // Footer
     footer_build: 'Senast byggd: {count}',
-    footer_built: 'Byggd med <a href="https://astro.build" target="_blank" rel="noopener noreferrer" class="text-[#8b949e] underline decoration-[#30363d] underline-offset-2 hover:text-[#e6edf3] hover:decoration-[#8b949e]">Astro</a>. Källkoden finns på <a href="https://github.com/abbguslof" target="_blank" rel="noopener noreferrer" class="text-[#8b949e] underline decoration-[#30363d] underline-offset-2 hover:text-[#e6edf3] hover:decoration-[#8b949e]">GitHub</a>.',
+    footer_built: 'Byggd med <a href="https://astro.build" target="_blank" rel="noopener noreferrer" class="text-[#8b949e] underline decoration-[#30363d] underline-offset-2 hover:text-[#e6edf3] hover:decoration-[#8b949e]">Astro</a>. Källkoden finns på <a href="https://github.com/abbguslof/guloportfolio" target="_blank" rel="noopener noreferrer" class="text-[#8b949e] underline decoration-[#30363d] underline-offset-2 hover:text-[#e6edf3] hover:decoration-[#8b949e]">GitHub</a>.',
     footer_link_about: 'om',
     footer_link_portfolio: 'projekt',
     footer_link_blog: 'texter',
