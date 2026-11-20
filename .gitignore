@@ -30,3 +30,6 @@ pnpm-debug.log*
 .obsidian/workspace-mobile.json
 .obsidian/cache/
 .trash/
+
+# Obsidian plugin settings (may contain API keys / credentials)
+.obsidian/plugins/*/data.json
