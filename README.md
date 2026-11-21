@@ -25,7 +25,9 @@ The source lives at [github.com/abbguslof/guloportfolio](https://github.com/abbg
 
 This is my personal site, not a template. I publish the source so you can read it and learn how it works. I do not accept pull requests.
 
-Please do not copy, redeploy, or publish this site as your own. The code and content are all rights reserved; see [LICENSE](LICENSE). If you want to reuse a specific piece, ask me first.
+Please do not copy, redeploy, or publish this site as your own. The code and content are all rights reserved; see [LICENSE](LICENSE). If you want to reuse a specific piece, ask me first: gurra@gulo.se.
+
+For security reports, use [SECURITY.md](SECURITY.md). Do not open a public issue for a vulnerability.
 
 ## Quick Start
 
@@ -208,7 +210,8 @@ guloportfolio/
 ├── .env.example              # Environment variable template (no secrets)
 ├── AGENTS.md                 # Dev server commands and Astro docs links
 ├── AUTHORING.md              # Authoring manual and content guide
-├── LICENSE                   # MIT license
+├── LICENSE                   # All rights reserved
+├── SECURITY.md               # Vulnerability reporting
 ├── astro.config.mjs          # Astro config (site: https://gulo.se)
 └── package.json              # Dependencies and scaffolding scripts
 ```

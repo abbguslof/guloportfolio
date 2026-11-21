@@ -1,5 +1,8 @@
 {
-  "name": "portfoliosite",
+  "name": "guloportfolio",
+  "description": "Personal portfolio and interactive browser terminal at gulo.se, built with Astro, TypeScript, and Tailwind CSS.",
+  "private": true,
+  "license": "UNLICENSED",
   "type": "module",
   "version": "0.0.1",
   "engines": {

@@ -79,6 +79,7 @@ async function main() {
     const content = template
       .replace('Article or Research Note Title', title)
       .replace('2026-10-08', TODAY);
+    fs.mkdirSync(path.dirname(targetPath), { recursive: true });
     fs.writeFileSync(targetPath, content, 'utf-8');
     console.log(`\n\x1b[32m✓ Created new thought:\x1b[0m ${path.relative(ROOT_DIR, targetPath)}`);
     console.log(`  \x1b[90mTitle:\x1b[0m ${title}`);
@@ -93,6 +94,7 @@ async function main() {
     }
     const template = fs.readFileSync(path.join(TEMPLATES_DIR, 'project.md'), 'utf-8');
     const content = template.replace('Project or Infrastructure Name', title);
+    fs.mkdirSync(path.dirname(targetPath), { recursive: true });
     fs.writeFileSync(targetPath, content, 'utf-8');
     console.log(`\n\x1b[32m✓ Created new project:\x1b[0m ${path.relative(ROOT_DIR, targetPath)}`);
     console.log(`  \x1b[90mTitle:\x1b[0m ${title}`);
@@ -108,6 +110,7 @@ async function main() {
       .replace('Resource Display Name', title)
       .replace('package-or-script.tar.gz', `${slug}.tar.gz`)
       .replace('2026-10-08', TODAY);
+    fs.mkdirSync(path.dirname(targetPath), { recursive: true });
     fs.writeFileSync(targetPath, content, 'utf-8');
     console.log(`\n\x1b[32m✓ Created new download descriptor:\x1b[0m ${path.relative(ROOT_DIR, targetPath)}`);
     console.log(`  \x1b[90mTarget binary file:\x1b[0m public/downloads/${slug}.tar.gz`);
